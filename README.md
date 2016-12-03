@@ -34,7 +34,7 @@ The heartbeat section of config.json lists the node, container name, and the por
 
 
 The following environment variables need to be set:
-* dockerFolder - Where the Dockerfiles' are
+* DOCKER - Where the Dockerfiles' are
 * PORT - Port that the master listens on
 * AGENTPORT - Port that the agent listens on
 
