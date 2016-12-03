@@ -8,6 +8,12 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 * Docker
 * Node.js
 
+## Features
+
+* Run commands in parallel across Nodes
+* Heartbeat for services
+* Easily build and orchestrate Docker images across
+
 ## Server Installation
 
 ##### 1. Modify config.json with your desired layout.
