@@ -82,7 +82,7 @@ if [ "$1" = "exec" ]; then shell "$2";exit; fi;
 
 
 if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
-if [ "$1" = "logs" ]; then echo "Gathering Logs....";logs;exit; fi;
+if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
 if [ "$1" = "build" ]; then echo "Building Images....";build; fi;
 if [ "$1" = "start" ]; then echo "Running Containers....";start; fi;
 if [ "$1" = "stop" ]; then echo "Stopping Containers....";stop; fi;
