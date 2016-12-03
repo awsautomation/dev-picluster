@@ -64,7 +64,6 @@ app.get('/build', function(req, res){
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {    //Builds the required images on each host
         if(key.indexOf("node") > -1){
-console.log('\nDEbug:' + key);
         } else {
         var command = JSON.stringify({ "command": 'docker build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile'});
 
@@ -182,31 +181,29 @@ app.get('/stop', function(req, res){
     var node = config.layout[i].node;
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {
-
+       if(key.indexOf("node") > -1){
         //Starts the Docker images assigned to each host.
         var command = JSON.stringify({ "command": 'docker stop ' + key});
         var options = {
-          hostname: node,
-          port    : agentPort,
-          path    : '/run',
-          method  : 'POST',
-          headers : {
+          url: 'http://' + node + ':' + agentPort + '/run',
+          method: 'POST',
+          headers: {
             'Content-Type': 'application/json',
             'Content-Length': command.length
-          }
+          },
+          body: command
         }
-        var request = http.request(options, function(response){
-          response.on('data', function(data) {
-            responseString += data;
-          });
-          response.on('end', function(data){
-            var results = JSON.parse(responseString);
-            addLog(results.output);
-          });
-        });
-        request.write(command);
-        req.end;
+
+        request(options, function(error, response, body) {
+          if (response.statusCode != "200") {
+            res.end("An error has occurred.");
+          } else {
+            var results = JSON.parse(response.body);
+            addLog('\n' + results.output);
+          }
+        })
       }
+    }
     }
   }
   res.end('');
