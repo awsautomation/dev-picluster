@@ -8,7 +8,7 @@ var request = require('request');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
-#require('request-debug')(request);
+//require('request-debug')(request);
 var fs = require('fs');
 var exec = require('child_process').exec;
 var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
