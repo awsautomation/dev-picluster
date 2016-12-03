@@ -289,7 +289,7 @@ function hb_check(node, port, container){
     var options = {
       host: '127.0.0.1',
       path: '/restart?node=' + node + '&container=' + container,
-      port: port;
+      port: port
     };
 
     var request = http.get(options, function(response){
