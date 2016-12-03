@@ -3,16 +3,17 @@
 PiCluster is a simple way to manage Docker containers on multiple hosts. I created this
 because I found Docker Swarm not that good and Kubernetes was too difficult to install currently on ARM.
 
-## Prerequisites
-
-* Docker
-* Node.js
-
 ## Features
 
 * Run commands in parallel across Nodes
 * Heartbeat for services
 * Easily build and orchestrate Docker images across
+
+## Prerequisites
+
+* Docker
+* Node.js
+
 
 ## Server Installation
 
