@@ -43,7 +43,7 @@ The format for the Docker folder should be like this:
 dockerfiles/imagename/Dockerfile
 
 ```
-export dockerFolder='/home/user/dockefiles'
+export DOCKER='/home/user/dockefiles'
 export PORT='9000'
 export AGENTPORT='9001'
 cd server
