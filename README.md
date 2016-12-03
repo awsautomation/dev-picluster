@@ -24,10 +24,11 @@ The heartbeat section of config.json lists the node, container name, and the por
     {"node":"192.168.0.102", "openvpn":"-p 1194:1194 openvpn"}
   ],
   "hb": [
-    {"node":"192.168.0.100","mysql":"3306", "nginx":, "80"},
+    {"node":"192.168.0.100","mysql":"3306", "nginx": "80"},
     {"node":"192.168.0.102","openvpn":"1194"}
   ]
 }
+
 ```
 
 ##### 2. Running the Application
