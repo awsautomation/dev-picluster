@@ -1,0 +1,89 @@
+#!/bin/bash
+clear
+server='127.0.0.1'
+port='9000'
+
+
+hb(){
+curl -s $server:$port/hb
+logs
+}
+
+stop(){
+curl -s  http://$server:$port/stop
+logs
+}
+
+start(){
+curl -s  http://$server:$port/start
+logs
+}
+
+shell(){
+
+   curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'"}' http://$server:$port/exec
+   sleep 1
+   logs
+}
+
+
+build() {
+  curl -s http://$server:$port/build
+  logs
+}
+
+
+gluster_mounts() {
+  echo "Mounting Gluster volumes......"
+  for i in "${hosts[@]}"
+  do
+    :
+    ssh $i mount -t glusterfs $i:/main /mnt
+  done
+}
+
+gluster_umounts() {
+  echo "Unounting Gluster volumes......"
+  for i in "${hosts[@]}"
+  do
+    :
+    ssh $i umount /mnt
+  done
+}
+
+logs(){
+  curl -s http://$server:$port/log
+}
+
+create() {
+curl -s http://$server:$port/create
+logs
+}
+
+status() {
+curl -s http://$server:$port/status
+sleep 5
+logs
+}
+
+
+if [  -z "$1" ]; then
+echo "Error, no args specified!"
+echo
+arguments="build start create status exec start stop "
+echo "Valid arguments are: $arguments"
+echo
+exit
+fi;
+
+if [ "$1" = "hb" ]; then hb;exit; fi;
+
+if [ "$1" = "exec" ]; then shell "$2";exit; fi;
+
+
+if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
+if [ "$1" = "logs" ]; then echo "Gathering Logs....";logs;exit; fi;
+if [ "$1" = "build" ]; then echo "Building Images....";build; fi;
+if [ "$1" = "start" ]; then echo "Running Containers....";start; fi;
+if [ "$1" = "stop" ]; then echo "Stopping Containers....";stop; fi;
+if [ "$1" = "create" ]; then echo "Creating Containers....";create; fi;
