@@ -10,12 +10,16 @@ require('request-debug')(request);
 var exec = require('child_process').exec;
 var server = require("http").createServer(app);
 var token_file = JSON.parse(fs.readFileSync('./auth.json', 'utf8'));
+var node = new run_cmd(
+    'hostname', ['-an'], function (me, data){me.stdout=data;}
+);
 
 app.post('/run', function(req, res){
 var token = token_file.token;
 
   var output = {
-    "output": ""
+    "output": "",
+    "node": node
   };
 
   var cmd = req.body.command;
