@@ -53,6 +53,43 @@ app.get('/status', function(req, res){
   }
 });
 
+app.get('/nodes', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var command = JSON.stringify({ "command": 'hostname', "token": token});
+    for(var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      var responseString = '';
+
+      //Runs a command on each node
+      var options = {
+        url: 'http://' + node + ':' + agentPort + '/run',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      }
+
+      request(options, function(error, response, body) {
+        if (error) {
+          res.end("An error has occurred.");
+        } else {
+          console.log(response);
+          var results = JSON.parse(response.body);
+          addLog('\nNode:' + node + '\n' + results.output);
+        }
+      })
+
+    }
+    res.end('');
+  }
+});
+
+
 app.get('/images', function(req, res){
   var check_token = req.query['token'];
   if((check_token != token) || (!check_token)) {

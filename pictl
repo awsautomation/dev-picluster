@@ -11,6 +11,14 @@ curl -s $server:$port/hb?token=$token
 logs
 }
 
+nodes(){
+clear
+echo "Active Nodes:"
+curl -s $server:$port/nodes?token=$token
+sleep 1
+logs
+}
+
 stop(){
 clear
 echo "Stopping the containers....."
@@ -86,7 +94,7 @@ logs
 if [  -z "$1" ]; then
 echo "Error, no args specified!"
 echo
-arguments="build reloadconfig images start create status exec start stop "
+arguments="build nodes reloadconfig images start create status exec start stop "
 echo "Valid arguments are: $arguments"
 echo
 exit
@@ -98,6 +106,7 @@ if [ "$1" = "exec" ]; then shell "$2";exit; fi;
 
 
 if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
+if [ "$1" = "nodes" ]; then nodes;exit; fi;
 if [ "$1" = "images" ]; then images;exit; fi;
 if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
 if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
