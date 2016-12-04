@@ -325,12 +325,8 @@ app.get('/log', function(req, res){
 
 });
 
-app.get('/glusterMount', function(req, res){
-
-});
-
-app.get('/glusterUmount', function(req, res){
-
+app.get('reloadconfig', function(req, res){
+var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 });
 
 server.listen(port, function() {

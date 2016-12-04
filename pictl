@@ -26,6 +26,14 @@ sleep 5
 logs
 }
 
+reloadconfig(){
+clear
+echo "Reloading the configuration...."
+curl -s http://$server:$port/reloadconfig
+logs
+}
+
+
 shell(){
   clear
   echo "Running the command....."
@@ -69,7 +77,7 @@ logs
 if [  -z "$1" ]; then
 echo "Error, no args specified!"
 echo
-arguments="build start create status exec start stop "
+arguments="build reloadconfig start create status exec start stop "
 echo "Valid arguments are: $arguments"
 echo
 exit
@@ -81,6 +89,7 @@ if [ "$1" = "exec" ]; then shell "$2";exit; fi;
 
 
 if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
+if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
 if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
 if [ "$1" = "build" ]; then echo "Building Images....";build; fi;
 if [ "$1" = "start" ]; then echo "Running Containers....";start; fi;
