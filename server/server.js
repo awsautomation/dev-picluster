@@ -142,6 +142,8 @@ app.get('/start', function(req, res){
     var node = config.layout[i].node;
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {
+        if(key.indexOf('node') > -1) {
+        } else {
         //Starts the Docker images assigned to each host.
         var command = JSON.stringify({ "command": 'docker start ' + key, "token": token});
         var options = {
@@ -162,6 +164,7 @@ app.get('/start', function(req, res){
             addLog('\n' + results.output);
           }
         })
+      }
     }
     }
   }
@@ -174,6 +177,8 @@ app.get('/stop', function(req, res){
     var node = config.layout[i].node;
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {
+        if(key.indexOf('node') > -1) {
+        } else {
         //Starts the Docker images assigned to each host.
         var command = JSON.stringify({ "command": 'docker stop ' + key, "token": token});
         var options = {
@@ -194,6 +199,7 @@ app.get('/stop', function(req, res){
             addLog('\n' + results.output);
           }
         })
+      }
     }
     }
   }
