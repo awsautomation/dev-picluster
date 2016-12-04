@@ -1,37 +1,35 @@
 #!/bin/bash
 clear
 server='127.0.0.1'
-port='3000'
-
+port='9000'
+token='1234567890ABCDEFGHJKLMNOP'
 
 hb(){
 clear
 echo "Heartbeat is now checking....."
-curl -s $server:$port/hb
+curl -s $server:$port/hb?token=$token
 logs
 }
 
 stop(){
 clear
 echo "Stopping the containers....."
-curl -s  http://$server:$port/stop
+curl -s  http://$server:$port/stop?token=$token
 logs
 }
 
 images(){
 clear
 echo "Gathering a list of images....."
-curl -s  http://$server:$port/images
+curl -s  http://$server:$port/images?token=$token
 sleep 2
 logs
 }
 
-
-
 start(){
 clear
 echo "Starting the containers....."
-curl -s  http://$server:$port/start
+curl -s  http://$server:$port/start?token=$token
 sleep 5
 logs
 }
@@ -39,7 +37,7 @@ logs
 reloadconfig(){
 clear
 echo "Reloading the configuration...."
-curl -s http://$server:$port/reloadconfig
+curl -s http://$server:$port/reloadconfig?token=$token
 logs
 }
 
@@ -47,7 +45,7 @@ logs
 shell(){
   clear
   echo "Running the command....."
-   curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'"}' http://$server:$port/exec
+   curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"$token"'"}' http://$server:$port/exec
    sleep 1
    logs
 }
@@ -56,7 +54,7 @@ shell(){
 build() {
   clear
   echo "Building the containers in the background. This may take a while. Continue to check the logs for progress."
-  curl -s http://$server:$port/build
+  curl -s http://$server:$port/build?token=$token
   sleep 10
   logs
 }
@@ -65,20 +63,20 @@ build() {
 logs(){
   clear
   echo "Checking the logs....."
-  curl -s http://$server:$port/log
+  curl -s http://$server:$port/log?token=$token
 }
 
 create() {
   clear
   echo "Running the containers....."
-curl -s http://$server:$port/create
+curl -s http://$server:$port/create?token=$token
 logs
 }
 
 status() {
   clear
   echo "Checking the status....."
-curl -s http://$server:$port/status
+curl -s http://$server:$port/status?token=$token
 sleep 5
 logs
 }
