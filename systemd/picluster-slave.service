@@ -1,0 +1,15 @@
+[Unit]
+Description=PiCluster-Agent
+Requires=docker.service
+After=docker.service
+
+[Service]
+#Restart=always
+RemainAfterExit=yes
+TimeoutStartSec=0
+ExecStart=bash /root/picluster/server/systemd/start-agent.sh
+ExecStop=bash /root/picluster/server/systemd/stop-agent.sh
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
