@@ -157,7 +157,7 @@ app.get('/start', function(req, res){
         }
 
         request(options, function(error, response, body) {
-          if (response.statusCode != "200") {
+          if (error) {
             res.end("An error has occurred.");
           } else {
             var results = JSON.parse(response.body);
@@ -192,7 +192,7 @@ app.get('/stop', function(req, res){
         }
 
         request(options, function(error, response, body) {
-          if (response.statusCode != "200") {
+          if (error) {
             res.end("An error has occurred.");
           } else {
             var results = JSON.parse(response.body);
