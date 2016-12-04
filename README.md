@@ -27,9 +27,13 @@ The heartbeat section of config.json lists the node, container name, and the por
 The token section lets you define a random string that will be used for authentication with the agents. If the token in config.json
 does not match the token in the agent's config (auth.json), no commands will be run on the agent.
 
+The docker section defines where your Dockerfile's are. The format for the Docker folder should be like this:
+dockerfiles/imagename/Dockerfile
+
 ```
 {
   "token":"1234567890ABCDEFGHJKLMNOP",
+  "docker": "/root/docker",
   "layout": [
     {"node":"192.168.0.100", "mysql":"-p 3306:3306 mysql","nginx":"nginx"},
     {"node":"192.168.0.102", "openvpn":"-p 1194:1194 openvpn"}
@@ -46,15 +50,10 @@ does not match the token in the agent's config (auth.json), no commands will be 
 
 
 The following environment variables need to be set:
-* DOCKER - Where the Dockerfiles' are
 * PORT - Port that the master listens on
 * AGENTPORT - Port that the agent listens on
 
-The format for the Docker folder should be like this:
-dockerfiles/imagename/Dockerfile
-
 ```
-export DOCKER='/home/user/dockefiles'
 export PORT='9000'
 export AGENTPORT='9001'
 cd server
