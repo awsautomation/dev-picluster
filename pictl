@@ -58,7 +58,7 @@ logs
 
 status() {
   clear
-  echo "Creating the status....."
+  echo "Checking the status....."
 curl -s http://$server:$port/status
 sleep 5
 logs
