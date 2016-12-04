@@ -5,22 +5,29 @@ port='9000'
 
 
 hb(){
+clear
+echo "Heartbeat is now checking....."
 curl -s $server:$port/hb
 logs
 }
 
 stop(){
+clear
+echo "Stopping the containers....."
 curl -s  http://$server:$port/stop
 logs
 }
 
 start(){
+clear
+echo "Starting the containers....."
 curl -s  http://$server:$port/start
 logs
 }
 
 shell(){
-
+  clear
+  echo "Running the command....."
    curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'"}' http://$server:$port/exec
    sleep 1
    logs
@@ -28,39 +35,29 @@ shell(){
 
 
 build() {
+  clear
+  echo "Building the containers....."
   curl -s http://$server:$port/build
   logs
 }
 
 
-gluster_mounts() {
-  echo "Mounting Gluster volumes......"
-  for i in "${hosts[@]}"
-  do
-    :
-    ssh $i mount -t glusterfs $i:/main /mnt
-  done
-}
-
-gluster_umounts() {
-  echo "Unounting Gluster volumes......"
-  for i in "${hosts[@]}"
-  do
-    :
-    ssh $i umount /mnt
-  done
-}
-
 logs(){
+  clear
+  echo "Checking the logs....."
   curl -s http://$server:$port/log
 }
 
 create() {
+  clear
+  echo "Running the containers....."
 curl -s http://$server:$port/create
 logs
 }
 
 status() {
+  clear
+  echo "Creating the status....."
 curl -s http://$server:$port/status
 sleep 5
 logs
