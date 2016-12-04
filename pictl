@@ -87,7 +87,7 @@ logs
 if [  -z "$1" ]; then
 echo "Error, no args specified!"
 echo
-arguments="build reloadconfig start create status exec start stop "
+arguments="build reloadconfig images start create status exec start stop "
 echo "Valid arguments are: $arguments"
 echo
 exit
