@@ -22,6 +22,7 @@ start(){
 clear
 echo "Starting the containers....."
 curl -s  http://$server:$port/start
+sleep 5
 logs
 }
 
