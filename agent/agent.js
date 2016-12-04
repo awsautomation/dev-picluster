@@ -10,35 +10,41 @@ require('request-debug')(request);
 var exec = require('child_process').exec;
 var server = require("http").createServer(app);
 var token_file = JSON.parse(fs.readFileSync('./auth.json', 'utf8'));
-var node = new run_cmd(
-    'hostname', ['-an'], function (me, data){me.stdout=data;}
-);
+var node = 'null';
 
-app.post('/run', function(req, res){
-var token = token_file.token;
+  exec('hostname', function(error, stdout, stderr) {
+    if(error){
+      node = stderr;
+    } else {
+      node = stdout;
+    }
+  });
 
-  var output = {
-    "output": "",
-    "node": node
-  };
+  app.post('/run', function(req, res){
+    var token = token_file.token;
 
-  var cmd = req.body.command;
-  var check_token = req.body.token;
-  if(check_token == token) {
-    exec(cmd, function(error, stdout, stderr) {
-      if(error){
-        output.output = stderr;
-        res.send(output);
-      } else {
-        output.output = stdout;
-        res.send(output);
-      }
-    });
-  }  else {
-    res.send( { output: "Not Authorized to connect to this agent!" });
-  }
-});
+    var output = {
+      "output": "",
+      "node": node
+    };
 
-server.listen(port, function() {
-  console.log('Listening on port %d', port);
-});
+    var cmd = req.body.command;
+    var check_token = req.body.token;
+    if(check_token == token) {
+      exec(cmd, function(error, stdout, stderr) {
+        if(error){
+          output.output = stderr;
+          res.send(output);
+        } else {
+          output.output = stdout;
+          res.send(output);
+        }
+      });
+    }  else {
+      res.send( { output: "Not Authorized to connect to this agent!" });
+    }
+  });
+
+  server.listen(port, function() {
+    console.log('Listening on port %d', port);
+  });
