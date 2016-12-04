@@ -38,6 +38,7 @@ build() {
   clear
   echo "Building the containers....."
   curl -s http://$server:$port/build
+  sleep 10
   logs
 }
 
