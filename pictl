@@ -15,6 +15,7 @@ stop(){
 clear
 echo "Stopping the containers....."
 curl -s  http://$server:$port/stop?token=$token
+sleep 2
 logs
 }
 
