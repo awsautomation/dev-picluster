@@ -130,3 +130,45 @@ To view the current log
 ```
 pictl log
 ```
+
+## Using Systemd for Server and Agent Processes
+
+The systemd folder containers the service files and scripts to make PiCluster start at boot time.
+
+#### 1. Modify the .service files in the systemd folder
+
+For each .service file, change ExecStart and ExecStop to refelct the location of the PiCluster folder.
+```
+ExecStart=/bin/bash /root/picluster/systemd/start-agent.sh
+ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
+```
+#### 2. Modify the start scripts in the systemd folder
+
+For each file that begins with "start", modify the following variables for your installation.
+```
+export PICLUSTER_AGENT_PATH="/root/picluster/agent"
+export PORT="3001"
+export AGENTPORT="3002"
+```
+
+#### 3. Copy the systemd files to the systemd directory
+```
+cp systemd/*.service /lib/systemd/system/
+```
+
+#### 4. Enable the services
+
+To enable the server service.
+```
+systemctl enable picluster-server.service
+```
+
+To enable the agent service.
+```
+systemctl enable picluster-agent.service
+```
+
+#### 5. Reboot for the services to be started properly
+```
+Reboot
+```
