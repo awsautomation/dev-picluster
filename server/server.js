@@ -216,7 +216,7 @@ app.get('/start', function(req, res){
             res.end("An error has occurred.");
           } else {
             var results = JSON.parse(response.body);
-            addLog('\n' + results.output);
+            addLog('\nStarting: ' + key + '\n' + results.output);
           }
         })
       }
@@ -256,7 +256,7 @@ app.get('/stop', function(req, res){
             res.end("An error has occurred.");
           } else {
             var results = JSON.parse(response.body);
-            addLog('\n' + results.output);
+            addLog('\nStopping: ' + key + '\n' + results.output);
           }
         })
       }
