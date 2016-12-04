@@ -15,9 +15,10 @@ var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 var server = require("http").createServer(app);
 var logFile = './log.txt';
 var log = '';
+var token = config.token;
 
 app.get('/status', function(req, res){
-  var command = JSON.stringify({ "command": 'docker ps' });
+  var command = JSON.stringify({ "command": 'docker ps', "token": token});
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
     var responseString = '';
@@ -65,7 +66,7 @@ app.get('/build', function(req, res){
       if (config.layout[i].hasOwnProperty(key)) {    //Builds the required images on each host
         if(key.indexOf("node") > -1){
         } else {
-        var command = JSON.stringify({ "command": 'docker build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile'});
+        var command = JSON.stringify({ "command": 'docker build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile', "token": token});
 
         var options = {
           url: 'http://' + node + ':' + agentPort + '/run',
@@ -100,7 +101,7 @@ app.get('/create', function(req, res){
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {
         //Creates and runs the Docker images assigned to each host.
-        var command = JSON.stringify({ "command": 'docker run -d --name ' + key +  ' ' + config.layout[i][key]});
+        var command = JSON.stringify({ "command": 'docker run -d --name ' + key +  ' ' + config.layout[i][key], "token": token});
         var options = {
           hostname: node,
           port    : agentPort,
@@ -142,7 +143,7 @@ app.get('/start', function(req, res){
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {
         //Starts the Docker images assigned to each host.
-        var command = JSON.stringify({ "command": 'docker start ' + key});
+        var command = JSON.stringify({ "command": 'docker start ' + key, "token": token});
         var options = {
           url: 'http://' + node + ':' + agentPort + '/run',
           method: 'POST',
@@ -174,7 +175,7 @@ app.get('/stop', function(req, res){
     for (var key in config.layout[i]) {
       if (config.layout[i].hasOwnProperty(key)) {
         //Starts the Docker images assigned to each host.
-        var command = JSON.stringify({ "command": 'docker stop ' + key});
+        var command = JSON.stringify({ "command": 'docker stop ' + key, "token": token});
         var options = {
           url: 'http://' + node + ':' + agentPort + '/run',
           method: 'POST',
@@ -203,7 +204,7 @@ app.get('/restart', function(req, res){
   var node = req.query['node'];
   var container = req.query['container'];
   var responseString = '';
-  var command = JSON.stringify({ "command": 'docker restart ' + container});
+  var command = JSON.stringify({ "command": 'docker restart ' + container, "token": token});
 
   var options = {
     hostname: node,
@@ -236,7 +237,7 @@ app.get('/restart', function(req, res){
 
 app.post('/exec', function(req, res){
   var test = '';
-  var command = JSON.stringify({ "command": req.body.command });
+  var command = JSON.stringify({ "command": req.body.command, "token": token});
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
     var responseString = '';
