@@ -7,8 +7,8 @@ After=docker.service
 #Restart=always
 RemainAfterExit=yes
 TimeoutStartSec=0
-ExecStart=bash /root/picluster/server/systemd/start-agent.sh
-ExecStop=bash /root/picluster/server/systemd/stop-agent.sh
+ExecStart=/bin/bash /root/picluster/server/systemd/start-agent.sh
+ExecStop=/bin/bash /root/picluster/server/systemd/stop-agent.sh
 Type=oneshot
 
 [Install]
