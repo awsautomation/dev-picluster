@@ -39,7 +39,37 @@ app.get('/status', function(req, res){
         res.end("An error has occurred.");
       } else {
         var results = JSON.parse(response.body);
-        addLog('\n\n\n' + results.output);
+        addLog('\nNode:' + node + '\n' + results.output);
+      }
+    })
+
+  }
+  res.end('');
+});
+
+app.get('/images', function(req, res){
+  var command = JSON.stringify({ "command": 'docker images', "token": token});
+  for(var i = 0; i < config.layout.length; i++) {
+    var node = config.layout[i].node;
+    var responseString = '';
+
+    //Runs a command on each node
+    var options = {
+      url: 'http://' + node + ':' + agentPort + '/run',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    }
+
+    request(options, function(error, response, body) {
+      if (error) {
+        res.end("An error has occurred.");
+      } else {
+        var results = JSON.parse(response.body);
+        addLog('\nNode:' + node + '\n' +  results.output);
       }
     })
 
