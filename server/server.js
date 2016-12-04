@@ -2,7 +2,6 @@ var http = require('http');
 var net = require('net');
 var port =  process.env.PORT;
 var express = require('express');
-var dockerFolder = process.env.DOCKER;
 var agentPort = process.env.AGENTPORT;
 var request = require('request');
 var app = express();
@@ -16,6 +15,7 @@ var server = require("http").createServer(app);
 var logFile = './log.txt';
 var log = '';
 var token = config.token;
+var dockerFolder = config.docker;
 
 app.get('/status', function(req, res){
   var command = JSON.stringify({ "command": 'docker ps', "token": token});
