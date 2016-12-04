@@ -327,7 +327,7 @@ app.get('/log', function(req, res){
 
 app.get('/reloadconfig', function(req, res){
 config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-addLog('\nReloading Config.json');
+addLog('\nReloading Config.json\n\n');
 res.end('');
 });
 
