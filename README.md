@@ -24,8 +24,12 @@ address of the node to run the container on, the name for the container, and the
 
 The heartbeat section of config.json lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
 
+The token section lets you define a random string that will be used for authentication with the agents. If the token in config.json
+does not match the token in the agent's config (auth.json), no commands will be run on the agent.
+
 ```
 {
+  "token":"1234567890ABCDEFGHJKLMNOP",
   "layout": [
     {"node":"192.168.0.100", "mysql":"-p 3306:3306 mysql","nginx":"nginx"},
     {"node":"192.168.0.102", "openvpn":"-p 1194:1194 openvpn"}
@@ -59,7 +63,16 @@ node server.js
 ```
 
 ## Agent Installation
-##### 1. Running the Application
+
+##### 1. Modify auth.json with the token from the server.
+
+```
+{
+  "token":"1234567890ABCDEFGHJKLMNOP"
+}
+```
+
+##### 2. Running the Application
 
 The following variable needs to be set:
 * AGENTPORT - Port that the agent listens on
