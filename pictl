@@ -45,7 +45,7 @@ shell(){
 
 build() {
   clear
-  echo "Building the containers....."
+  echo "Building the containers in the background. This may take a while. Continue to check the logs for progress."
   curl -s http://$server:$port/build
   sleep 10
   logs
