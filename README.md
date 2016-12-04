@@ -93,6 +93,7 @@ Pictl is a bash client to easily control the cluster. It will make all the HTTP 
 
 * server - IP address of the server
 * port - PORT that the server uses
+* token - The token used in the Server and Agent configs.
 
 #### 2. Using the client
 
