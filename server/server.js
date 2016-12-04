@@ -80,7 +80,7 @@ app.get('/nodes', function(req, res){
         } else {
           console.log(response);
           var results = JSON.parse(response.body);
-          addLog('\nRegistered Node:' + node + '\nHostname:' + results.output);
+          addLog('\nRegistered Node:' + results.output);
         }
       })
 
