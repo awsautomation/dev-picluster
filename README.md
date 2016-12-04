@@ -102,6 +102,11 @@ To get a list of accepted arguments:
 pictl
 ```
 
+To get a list of all the nodes in PiCluster:
+```
+pictl nodes
+```
+
 To build all of the Docker images from your config:
 ```
 pictl build
