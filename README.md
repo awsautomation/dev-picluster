@@ -50,7 +50,7 @@ dockerfiles/imagename/Dockerfile
 
 
 The following environment variables need to be set:
-* PORT - Port that the master listens on
+* PORT - Port that the server listens on
 * AGENTPORT - Port that the agent listens on
 
 ```
@@ -87,12 +87,12 @@ node agent.js
 
 ## Configuring and using the client "pictl"
 
-Pictl is a bash client to easilly control the cluster. It will make all the HTTP requests using curl.
+Pictl is a bash client to easily control the cluster. It will make all the HTTP requests using curl.
 
 #### 1. The following variables need to be set in the file:
 
-* server - IP address of the master
-* port - PORT that the master uses
+* server - IP address of the server
+* port - PORT that the server uses
 
 #### 2. Using the client
 
