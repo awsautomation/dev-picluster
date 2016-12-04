@@ -18,6 +18,16 @@ curl -s  http://$server:$port/stop
 logs
 }
 
+images(){
+clear
+echo "Gathering a list of images....."
+curl -s  http://$server:$port/images
+sleep 2
+logs
+}
+
+
+
 start(){
 clear
 echo "Starting the containers....."
@@ -89,6 +99,7 @@ if [ "$1" = "exec" ]; then shell "$2";exit; fi;
 
 
 if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
+if [ "$1" = "images" ]; then images;exit; fi;
 if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
 if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
 if [ "$1" = "build" ]; then echo "Building Images....";build; fi;
