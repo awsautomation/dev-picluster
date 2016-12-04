@@ -63,6 +63,9 @@ node server.js
 
 ## Agent Installation
 
+The server will send commands to be executed on the agents nodes. The agent should be installed on each host in the cluster. You can
+run the server and agent on the same node since they are listening on different ports.
+
 ##### 1. Modify auth.json with the token from the server.
 
 ```
