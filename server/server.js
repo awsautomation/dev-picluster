@@ -42,7 +42,6 @@ app.get('/status', function(req, res){
         if (error) {
           res.end("An error has occurred.");
         } else {
-          console.log(response);
           var results = JSON.parse(response.body);
           addLog('\nNode:' + results.node + '\n' + results.output);
         }
