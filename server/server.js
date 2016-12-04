@@ -18,6 +18,10 @@ var token = config.token;
 var dockerFolder = config.docker;
 
 app.get('/status', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var command = JSON.stringify({ "command": 'docker ps', "token": token});
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
@@ -38,6 +42,7 @@ app.get('/status', function(req, res){
       if (error) {
         res.end("An error has occurred.");
       } else {
+        console.log(response);
         var results = JSON.parse(response.body);
         addLog('\nNode:' + node + '\n' + results.output);
       }
@@ -45,9 +50,14 @@ app.get('/status', function(req, res){
 
   }
   res.end('');
+}
 });
 
 app.get('/images', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var command = JSON.stringify({ "command": 'docker images', "token": token});
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
@@ -75,6 +85,7 @@ app.get('/images', function(req, res){
 
   }
   res.end('');
+}
 });
 
 
@@ -89,6 +100,10 @@ function addLog(data){
 }
 
 app.get('/build', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var responseString = '';
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
@@ -121,10 +136,15 @@ app.get('/build', function(req, res){
     }
   }
   res.end('');
+}
 });
 
 
 app.get('/create', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var responseString = '';
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
@@ -164,9 +184,14 @@ app.get('/create', function(req, res){
     }
   }
   res.end('');
+}
 });
 
 app.get('/start', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var responseString = '';
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
@@ -199,9 +224,14 @@ app.get('/start', function(req, res){
     }
   }
   res.end('');
+}
 });
 
 app.get('/stop', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var responseString = '';
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
@@ -234,9 +264,14 @@ app.get('/stop', function(req, res){
     }
   }
   res.end('');
+}
 });
 
 app.get('/restart', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var node = req.query['node'];
   var container = req.query['container'];
   var responseString = '';
@@ -267,6 +302,7 @@ app.get('/restart', function(req, res){
   request.write(command);
   req.end;
   res.end('');
+}
 });
 
 
@@ -326,6 +362,10 @@ function hb_check(node, port, container){
 };
 
 app.get('/hb', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   var responseString = '';
   var node = '';
   var port = ''
@@ -344,6 +384,7 @@ app.get('/hb', function(req, res){
     }
   }
   res.end('');
+}
 });
 
 function gatherLog (callback){
@@ -351,14 +392,23 @@ function gatherLog (callback){
 }
 
 app.get('/log', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
   res.sendFile(__dirname + '/log.txt');
-
+}
 });
 
 app.get('/reloadconfig', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
 config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 addLog('\nReloading Config.json\n\n');
 res.end('');
+}
 });
 
 server.listen(port, function() {
