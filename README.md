@@ -118,7 +118,7 @@ To execute a command on all of the hosts
 pictl exec "command"
 ```
 
-To gather a list of all the Docker images on each host
+Display all of the Docker images on each host
 ```
 pictl images
 ```
