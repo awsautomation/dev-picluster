@@ -19,23 +19,23 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 
 ##### 1. Modify config.json with your desired layout.
 
-This is the core config file. Under layout, each row contains an IP
-address of the node to run the container on, the name for the container, and the Docker arguments.
+This is the core config file for the web console, agent, and server.
 
-The heartbeat section of config.json lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
+* layout - Contains each row contains an IP address of the node to run the container on, the name for the container, and the Docker arguments.
 
-The token string lets you define a random string that will be used for authentication with the agents.
+* heartbeat -  lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
 
-The agent_port string defines the port that the agent will listen on.
+* token - A string you define a random string that will be used for authentication with the agents.
 
-The docker section defines where your Dockerfile's are. The format for the Docker folder should be like this:
-dockerfiles/imagename/Dockerfile
+* agent_port -  Defines the port that the agent will listen on.
 
-The web_username and web_password strings define the username and password for the web interface.
+* docker - Defines where your Dockerfile's are. The format for the Docker folder should be like this: dockerfiles/imagename/Dockerfile
 
-The web_connect is an IP address of a node running the server.
+* web_username and web_password - Define's the username and password for the web interface.
 
-The web_port is the port that the web console listens on.
+* web_connect - IP address of a node running the server.
+
+* web_port - Port that the web console listens on.
 
 
 You can run the server and agent on the same node since they are listening on different ports.
