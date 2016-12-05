@@ -1,0 +1,29 @@
+<html>
+<title>PiCluster Web Console</title>
+<head>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script>
+		$(function() {
+		$( "#start" ).dialog();
+	});
+</script>
+</head>
+<body bgcolor="#f5f5f5">
+
+	<div id="start" title="PiCluster Login">
+		<p align=center>
+			<img src="/logo.png" height="150" width="100">
+			<br>
+		Please login to continue
+			<br>
+			<form method="post" action="/login">
+					<p align=center>
+				<input type="text" name="username">
+				<input type="text" name="password">
+				<input type="submit" onclick="login()">
+				<br>
+			</form></p>
+		</body>
+		</html>

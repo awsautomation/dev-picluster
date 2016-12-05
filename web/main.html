@@ -1,0 +1,35 @@
+<html>
+<title>PiCluster Login</title>
+<head>
+<p align=center><a href="/"><img src="/logo.png"height="150" width="100"></a></p>
+</head>
+<body bgcolor="#f5f5f5">
+<p align=center>
+<b><font size="6">PiCluster Control Console<b><br><br></font>
+<table style="width:10%">
+<tr>
+<td><form action="/nodes" method="get" target="iframe_a">
+<input type="submit" value="List all Nodes" name="Submit" id="frm1_jobs"/>
+</form></td>
+<td><form action="/status" target="iframe_a">
+<input type="submit" value="Running Images"/>
+</form></td>
+
+<td><form action="/sandbox" target="iframe_a">
+<input type="submit" value="Run Command"/>
+</form></td>
+
+<td><form action="/hb" target="iframe_a">
+<input type="submit" value="Heart Beat"/></td>
+
+<td><form action="/stop" target="iframe_a">
+<input type="submit" value="Stop Containers"/>
+</form></td>
+
+<td><form action="/start" target="iframe_a">
+<input type="submit" value="Start Containers"/>
+</form></td>
+<td><form action="/log" target="iframe_a">
+<input type="submit" value="View Log"/>
+</form></td></tr></table>
+<IFRAME SRC="/log" name="iframe_a" WIDTH=1200 HEIGHT=1000></html>
