@@ -389,7 +389,7 @@ function hb_check(node, container_port, container){
   client.connect(container_port, node, container, function() {
   });
 
-  client.on('data', function(data) {
+  client.on('end', function(data) {
       addLog('\nHeart Beat Check Run');
   });
 

@@ -7,7 +7,7 @@ var request = require('request');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
-require('request-debug')(request);
+//require('request-debug')(request);
 var port = config.port;
 var lineReader = require('line-reader');
 var webconsole = require("http").createServer(app);
@@ -93,7 +93,6 @@ function display_log(callback){
   var responseString = '';
   clear_log(function(data) {
     setTimeout(function() {
-      console.log('\nHere 2');
       var options = {
         host: server,
         path: '/log?' + 'token=' + token,
@@ -111,8 +110,7 @@ function display_log(callback){
   });
 }
 
-function clear_log(){
-  console.log('\nDebug: Here');
+function clear_log(callback){
   var responseString = '';
   var options = {
     host: server,
@@ -124,7 +122,7 @@ function clear_log(){
       responseString += data;
     });
     response.on('end', function(data){
-      return('');
+      callback('');
     });
   });
 }
@@ -216,8 +214,19 @@ app.get('/start', function(req, res){
 });
 
 app.get('/log', function(req, res){
-  display_log(function(data) {
-    res.end(data);
+  var responseString = '';
+  var options = {
+    host: server,
+    path: '/log?' + 'token=' + token,
+    port: server_port
+  };
+  var request = http.get(options, function(response){
+    response.on('data', function(data) {
+      responseString += data;
+    });
+    response.on('end', function(data){
+    res.end(responseString);
+    });
   });
 });
 
