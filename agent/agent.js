@@ -1,9 +1,9 @@
 var http = require('http');
-var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-var fs = require('fs');
-var port =  config.agent_port;
 var express = require('express');
 var request = require('request');
+var fs = require('fs');
+var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+var port =  config.agent_port;
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
