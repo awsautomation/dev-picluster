@@ -390,7 +390,7 @@ function hb_check(node, container_port, container){
   });
 
   client.on('end', function(data) {
-    addLog('\nA Heart Beat Check Just Run.');
+    addLog('\nA Heart Beat Check Just Ran.');
   });
 
   client.on('error', function(data) {
