@@ -117,6 +117,18 @@ function clear_log(callback){
   })
 }
 
+app.get('/create', function(req, res){
+  var responseString  = '';
+  request('http://' + server + ':' + server_port + '/create?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      display_log(function(data) {
+        res.end('\nSent request to build all the containers in the configuration file.');
+      });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
+});
 
 app.get('/status', function(req, res){
   var responseString  = '';
