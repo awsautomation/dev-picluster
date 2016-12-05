@@ -10,6 +10,9 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 * Run commands in parallel across Nodes
 * Heartbeat for services
 * Easily build and orchestrate Docker images across nodes
+* Command-line interface
+* Web interface
+* HTTP interface
 
 ## Prerequisites
 
