@@ -87,6 +87,16 @@ npm install
 node agent.js
 ```
 
+## Web Console Installation
+
+The web console will send commands to the server.
+
+```
+cd web
+npm install
+node webconsole.js
+```
+
 ## Configuring and using the client "pictl"
 
 Pictl is a bash client to easily control the cluster. It will make all the HTTP requests using curl.
