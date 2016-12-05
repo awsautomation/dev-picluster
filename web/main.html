@@ -6,7 +6,7 @@
 <body bgcolor="#f5f5f5">
 <p align=center>
 <b><font size="6">PiCluster Control Console<b><br><br></font>
-<table style="width:10%">
+<table style="width:50%">
 <tr>
 
 <td><form action="/nodes" method="get" target="iframe_a">
@@ -14,7 +14,12 @@
 </form></td>
 
 <td><form action="/status" target="iframe_a">
-<input type="submit" value="Running Images"/>
+<input type="submit" value="Running Containers"/>
+</form></td>
+
+
+<td><form action="/images" target="iframe_a">
+<input type="submit" value="List Images"/>
 </form></td>
 
 <td><form action="/sandbox" target="iframe_a">
@@ -22,14 +27,14 @@
 </form></td>
 
 <td><form action="/hb" target="iframe_a">
-<input type="submit" value="Heart Beat"/></td>
+<input type="submit" value="Heart Beat"/></form></td>
 
 <td><form action="/stop" target="iframe_a">
-<input type="submit" value="Stop "/>
+<input type="submit" value="Stop All Containers"/>
 </form></td>
 
 <td><form action="/start" target="iframe_a">
-<input type="submit" value="Start Containers"/>
+<input type="submit" value="Start All Containers"/>
 </form></td>
 
 <td><form action="/log" target="iframe_a">

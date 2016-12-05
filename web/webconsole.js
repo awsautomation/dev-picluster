@@ -148,6 +148,26 @@ app.get('/status', function(req, res){
   });
 });
 
+app.get('/images', function(req, res){
+  var responseString  = '';
+  var options = {
+    host: server,
+    path: '/images?' + 'token=' + token,
+    port: server_port
+  };
+
+  var request = http.get(options, function(response){
+    response.on('data', function(data) {
+      responseString += data;
+    });
+    response.on('end', function(data){
+      display_log(function(data) {
+        res.end(data);
+      });
+    });
+  });
+});
+
 
 app.get('/hb', function(req, res){
   var responseString  = '';
