@@ -78,15 +78,6 @@ node server.js
 
 The server will send commands to be executed on the agents nodes. The agent should be installed on each host in the cluster.
 
-##### 1. Modify auth.json with the token from the server.
-
-```
-{
-  "token":"1234567890ABCDEFGHJKLMNOP"
-}
-```
-
-##### 2. Running the Application
 ```
 cd agent
 npm install
