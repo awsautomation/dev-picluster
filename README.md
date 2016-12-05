@@ -194,7 +194,19 @@ systemctl enable picluster-agent.service
 Reboot
 ```
 
-# Authors and Contributors
+# Authors and Contributions
 
-* Project created by [Phillip Tribble] (https://www.linkedin.com/in/philliptribble)
-* Logo provided by Luis Prado from the Noun Project
+Project created by [Phillip Tribble] (https://www.linkedin.com/in/philliptribble)
+#### Images
+
+##### https://thenounproject.com/search/?q=raspberry&i=618508
+raspberry by Chanut is Industries from the Noun Project
+
+##### https://thenounproject.com/search/?q=whale&i=682078
+Sperm Whale by Oksana Latysheva from the Noun Project
+
+##### https://thenounproject.com/term/pie/44998/
+Pie by Luis Prado from the Noun Project
+
+License stuff
+https://creativecommons.org/licenses/by/3.0/us/
