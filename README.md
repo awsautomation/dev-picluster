@@ -19,7 +19,7 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 
 ##### 1. Modify config.json with your desired layout.
 
-This is the core config file for the web console, agent, and server. A valid config.json must exist in each directory before starting the applications.
+This is the core config file for the web console, agent, and server. 
 
 You can run the server and agent on the same node since they are listening on different ports.
 
