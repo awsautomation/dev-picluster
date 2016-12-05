@@ -94,13 +94,11 @@ function display_log(callback){
   clear_log(function(data) {
     setTimeout(function() {
       var responseString  = '';
-      request(server + ':' + server_port + '/log?' + 'token=' + token, function (error, response, body) {
+      request('http://' + server + ':' + server_port + '/log?' + 'token=' + token, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-          display_log(function(data) {
-            res.end(data);
-          });
+          callback(body);
         } else {
-          res.end('\nError connecting with server.');
+          callback('\nError connecting with server.');
         }
       })
     },5000);
@@ -108,14 +106,13 @@ function display_log(callback){
 }
 
 function clear_log(callback){
+
   var responseString  = '';
-  request(server + ':' + server_port + '/clearlog?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/clearlog?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      display_log(function(data) {
-        res.end(data);
-      });
+      callback('');
     } else {
-      res.end('\nError connecting with server.');
+      console.log('\nError clearing log: '  + error);
     }
   })
 }
@@ -123,7 +120,7 @@ function clear_log(callback){
 
 app.get('/status', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port + '/status?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/status?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
@@ -136,7 +133,7 @@ app.get('/status', function(req, res){
 
 app.get('/images', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port +  '/images?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port +  '/images?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
@@ -150,7 +147,7 @@ app.get('/images', function(req, res){
 
 app.get('/build', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port +  '/build?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port +  '/build?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
@@ -164,7 +161,7 @@ app.get('/build', function(req, res){
 
 app.get('/hb', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port + '/hb?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/hb?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
@@ -179,7 +176,7 @@ app.get('/hb', function(req, res){
 
 app.get('/stop', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port + '/stop?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/stop?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
@@ -193,7 +190,7 @@ app.get('/stop', function(req, res){
 
 app.get('/start', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port + '/start?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/start?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
@@ -206,11 +203,9 @@ app.get('/start', function(req, res){
 
 app.get('/log', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port + '/log?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/log?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      display_log(function(data) {
-        res.end(data);
-      });
+      res.end(body);
     } else {
       res.end('\nError connecting with server.');
     }
@@ -220,13 +215,13 @@ app.get('/log', function(req, res){
 
 app.get('/nodes', function(req, res){
   var responseString  = '';
-  request(server + ':' + server_port + '/nodes?' + 'token=' + token, function (error, response, body) {
+  request('http://' + server + ':' + server_port + '/nodes?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
     } else {
-      res.end('\nError connecting with server.');
+      res.end('\nError connecting with server. ' + error);
     }
   })
 });
