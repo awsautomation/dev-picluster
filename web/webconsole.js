@@ -83,48 +83,50 @@ app.post('/exec', function(req, res){
       res.end(error);
     } else {
       display_log(function(data) {
-          res.end(data);
+        res.end(data);
       });
     }
   })
-  });
+});
 
 function display_log(callback){
   var responseString = '';
   clear_log(function(data) {
-        setTimeout(function() {
-            var options = {
-              host: server,
-              path: '/log?' + 'token=' + token,
-              port: server_port
-            };
-            var second_request = http.get(options, function(response){
-              response.on('data', function(data) {
-                responseString += data;
-              });
-              response.on('end', function(data){
-                callback(responseString);
-              });
-            });
-      }, 3000);
+    setTimeout(function() {
+      console.log('\nHere 2');
+      var options = {
+        host: server,
+        path: '/log?' + 'token=' + token,
+        port: server_port
+      };
+      var request = http.get(options, function(response){
+        response.on('data', function(data) {
+          responseString += data;
+        });
+        response.on('end', function(data){
+          callback(responseString);
+        });
+      });
+    }, 3000);
   });
 }
 
-function clear_log(callback){
+function clear_log(){
+  console.log('\nDebug: Here');
   var responseString = '';
-        var options = {
-          host: server,
-          path: '/clearlog?' + 'token=' + token,
-          port: server_port
-        };
-        var second_request = http.get(options, function(response){
-          response.on('data', function(data) {
-            responseString += data;
-          });
-          response.on('end', function(data){
-            callback();
-          });
-        });
+  var options = {
+    host: server,
+    path: '/clearlog?' + 'token=' + token,
+    port: server_port
+  };
+  var request = http.get(options, function(response){
+    response.on('data', function(data) {
+      responseString += data;
+    });
+    response.on('end', function(data){
+      return('');
+    });
+  });
 }
 
 
@@ -142,7 +144,7 @@ app.get('/status', function(req, res){
     });
     response.on('end', function(data){
       display_log(function(data) {
-          res.end(data);
+        res.end(data);
       });
     });
   });
@@ -163,7 +165,7 @@ app.get('/hb', function(req, res){
     });
     response.on('end', function(data){
       display_log(function(data) {
-          res.end(data);
+        res.end(data);
       });
     });
   });
@@ -185,7 +187,7 @@ app.get('/stop', function(req, res){
     });
     response.on('end', function(data){
       display_log(function(data) {
-          res.end(data);
+        res.end(data);
       });
 
     });
@@ -207,7 +209,7 @@ app.get('/start', function(req, res){
     });
     response.on('end', function(data){
       display_log(function(data) {
-          res.end(data);
+        res.end(data);
       });
     });
   });
@@ -215,7 +217,7 @@ app.get('/start', function(req, res){
 
 app.get('/log', function(req, res){
   display_log(function(data) {
-      res.end(data);
+    res.end(data);
   });
 });
 
@@ -234,7 +236,7 @@ app.get('/nodes', function(req, res){
     });
     response.on('end', function(data){
       display_log(function(data) {
-          res.end(data);
+        res.end(data);
       });
     });
   });
