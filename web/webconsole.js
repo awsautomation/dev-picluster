@@ -135,9 +135,7 @@ app.get('/reloadconfig', function(req, res){
   var responseString  = '';
   request('http://' + server + ':' + server_port + '/reloadconfig?' + 'token=' + token, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      display_log(function(data) {
-        res.end(data);
-      });
+      res.end('\nRequest to update configuation succeeded.');
     } else {
       res.end('\nError connecting with server.' + error);
     }
