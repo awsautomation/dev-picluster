@@ -412,6 +412,7 @@ app.get('/hb', function(req, res){
   if((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
+    addLog('\nHeart Beat Check Run');
     var responseString = '';
     var node = '';
     var port = ''
@@ -428,7 +429,6 @@ app.get('/hb', function(req, res){
         }
       }
     }
-    addLog('\nHeart Beat Check Run');
     res.end('');
   }
 });
