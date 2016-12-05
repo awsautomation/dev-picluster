@@ -3,6 +3,9 @@
 PiCluster is a simple way to manage Docker containers on multiple hosts. I created this
 because I found Docker Swarm not that good and Kubernetes was too difficult to install currently on ARM.
 
+
+[![build status](http://imgur.com/a/KUMxu)
+
 ## Features
 
 * Run commands in parallel across Nodes
@@ -19,7 +22,7 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 
 ##### 1. Modify config.json with your desired layout.
 
-This is the core config file for the web console, agent, and server. 
+This is the core config file for the web console, agent, and server.
 
 You can run the server and agent on the same node since they are listening on different ports.
 
