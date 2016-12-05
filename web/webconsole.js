@@ -243,6 +243,9 @@ app.get('/nodes', function(req, res){
     response.on('data', function(data) {
       responseString += data;
     });
+    response.on('error', function(err) {
+      res.end(err);
+    });
     response.on('end', function(data){
       display_log(function(data) {
         res.end(data);
