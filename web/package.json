@@ -9,7 +9,6 @@
         "fs": "",
     "body-parser": "latest",
     "sys": "",
-    "randomstring": "",
     "request": ""
   }
 }
