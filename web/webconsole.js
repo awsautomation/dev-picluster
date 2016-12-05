@@ -131,6 +131,19 @@ app.get('/status', function(req, res){
   })
 });
 
+app.get('/reloadconfig', function(req, res){
+  var responseString  = '';
+  request('http://' + server + ':' + server_port + '/reloadconfig?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      display_log(function(data) {
+        res.end(data);
+      });
+    } else {
+      res.end('\nError connecting with server.' + error);
+    }
+  })
+});
+
 app.get('/images', function(req, res){
   var responseString  = '';
   request('http://' + server + ':' + server_port +  '/images?' + 'token=' + token, function (error, response, body) {

@@ -454,7 +454,7 @@ app.get('/reloadconfig', function(req, res){
   if((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
-    config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+    config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
     addLog('\nReloading Config.json\n\n');
     res.end('');
   }
