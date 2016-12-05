@@ -1,6 +1,6 @@
 var http = require('http');
 var net = require('net');
-var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 var port =  config.server_port;
 var express = require('express');
 var agentPort = process.env.agent_port;
