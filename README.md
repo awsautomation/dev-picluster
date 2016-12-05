@@ -21,23 +21,6 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 
 This is the core config file for the web console, agent, and server.
 
-* layout - Contains each row contains an IP address of the node to run the container on, the name for the container, and the Docker arguments.
-
-* heartbeat -  lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
-
-* token - A string you define a random string that will be used for authentication with the agents.
-
-* agent_port -  Defines the port that the agent will listen on.
-
-* docker - Defines where your Dockerfile's are. The format for the Docker folder should be like this: dockerfiles/imagename/Dockerfile
-
-* web_username and web_password - Define's the username and password for the web interface.
-
-* web_connect - IP address of a node running the server.
-
-* web_port - Port that the web console listens on.
-
-
 You can run the server and agent on the same node since they are listening on different ports.
 
 
@@ -60,8 +43,23 @@ You can run the server and agent on the same node since they are listening on di
   "web_port":"3003"
 }
 
-
 ```
+* layout - Contains each row contains an IP address of the node to run the container on, the name for the container, and the Docker arguments.
+
+* heartbeat -  lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
+
+* token - A string you define a random string that will be used for authentication with the agents.
+
+* agent_port -  Defines the port that the agent will listen on.
+
+* docker - Defines where your Dockerfile's are. The format for the Docker folder should be like this: dockerfiles/imagename/Dockerfile
+
+* web_username and web_password - Define's the username and password for the web interface.
+
+* web_connect - IP address of a node running the server.
+
+* web_port - Port that the web console listens on.
+
 
 ##### 2. Running the Application
 
