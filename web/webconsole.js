@@ -106,7 +106,7 @@ function display_log(callback){
           callback(responseString);
         });
       });
-    }, 3000);
+    },5000);
   });
 }
 
