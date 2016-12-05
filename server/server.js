@@ -389,6 +389,10 @@ function hb_check(node, container_port, container){
   client.connect(container_port, node, container, function() {
   });
 
+  client.on('end', function(data) {
+      addLog('\nA Heart Beat Check Just Run.');
+  });
+
   client.on('error', function(data) {
     addLog('\n' + container + ' failed on: ' + node);
 
@@ -412,7 +416,6 @@ app.get('/hb', function(req, res){
   if((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
-    addLog('\nHeart Beat Check Run');
     var responseString = '';
     var node = '';
     var port = ''
