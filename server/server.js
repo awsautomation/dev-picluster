@@ -385,12 +385,8 @@ app.post('/exec', function(req, res){
 
 function hb_check(node, container_port, container){
   var client = new net.Socket();
-
+  addLog('\nHeart Beat Check Run');
   client.connect(container_port, node, container, function() {
-  });
-
-  client.on('end', function(data) {
-      addLog('\nHeart Beat Check Run');
   });
 
   client.on('error', function(data) {
