@@ -456,7 +456,7 @@ app.get('/reloadconfig', function(req, res){
   } else {
     config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
     addLog('\nReloading Config.json\n\n');
-    res.end('');
+    res.end('Reloaded Configuration.');
   }
 });
 
