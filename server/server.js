@@ -1,12 +1,12 @@
+var express = require('express');
+var request = require('request');
+var app = express();
 var http = require('http');
 var net = require('net');
 var fs = require('fs');
 var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 var port =  config.server_port;
-var express = require('express');
 var agentPort = process.env.agent_port;
-var request = require('request');
-var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 //require('request-debug')(request);
