@@ -132,7 +132,7 @@ app.get('/images', function(req, res){
           res.end("An error has occurred.");
         } else {
           var results = JSON.parse(response.body);
-          addLog('\nNode:' + node + '\n' +  results.output);
+          addLog('\nNode:' + results.node); + '\n' +  results.output);
         }
       })
 
@@ -390,7 +390,7 @@ function hb_check(node, container_port, container){
   });
 
   client.on('end', function(data) {
-      addLog('\nA Heart Beat Check Just Run.');
+    addLog('\nA Heart Beat Check Just Run.');
   });
 
   client.on('error', function(data) {
