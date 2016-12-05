@@ -52,6 +52,21 @@ app.get('/status', function(req, res){
   }
 });
 
+app.get('/clearlog', function(req, res){
+  var check_token = req.query['token'];
+  if((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    log = '';
+    fs.writeFile(logFile, log, function(err) {
+      if(err) {
+        console.log('\nError while adding data to the log' + err);
+      }
+    });
+  }
+});
+
+
 app.get('/nodes', function(req, res){
   var check_token = req.query['token'];
   if((check_token != token) || (!check_token)) {
@@ -337,7 +352,6 @@ app.get('/restart', function(req, res){
 
 
 app.post('/exec', function(req, res){
-  var test = '';
   var command = JSON.stringify({ "command": req.body.command, "token": token});
   for(var i = 0; i < config.layout.length; i++) {
     var node = config.layout[i].node;
