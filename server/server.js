@@ -6,7 +6,7 @@ var net = require('net');
 var fs = require('fs');
 var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 var port =  config.server_port;
-var agentPort = process.env.agent_port;
+var agentPort = config.agent_port;
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 //require('request-debug')(request);
