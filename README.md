@@ -191,3 +191,8 @@ systemctl enable picluster-agent.service
 ```
 Reboot
 ```
+
+# Authors and Contributors
+
+* Project created by [Phillip Tribble] (https://www.linkedin.com/in/philliptribble)
+* Logo provided by Luis Prado from the Noun Project
