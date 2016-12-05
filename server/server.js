@@ -61,6 +61,8 @@ app.get('/clearlog', function(req, res){
     fs.writeFile(logFile, log, function(err) {
       if(err) {
         console.log('\nError while adding data to the log' + err);
+      } else {
+        res.end('');
       }
     });
   }
