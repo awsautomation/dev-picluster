@@ -1,6 +1,6 @@
 var http = require('http');
 var fs = require('fs');
-var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 var randomstring = require("randomstring");
 var express = require('express');
 var request = require('request');

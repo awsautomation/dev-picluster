@@ -1,8 +1,8 @@
 var http = require('http');
-var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+var fs = require('fs');
 var port =  config.agent_port;
 var express = require('express');
-var fs = require('fs');
 var request = require('request');
 var app = express();
 var bodyParser = require('body-parser');
