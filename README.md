@@ -87,9 +87,6 @@ The server will send commands to be executed on the agents nodes. The agent shou
 ```
 
 ##### 2. Running the Application
-
-The following variable needs to be set:
-* AGENTPORT - Port that the agent listens on
 ```
 cd agent
 npm install
@@ -154,7 +151,7 @@ The systemd folder containers the service files and scripts to make PiCluster st
 
 #### 1. Modify the .service files in the systemd folder
 
-For each .service file, change ExecStart and ExecStop to refelct the location of the PiCluster folder.
+For each .service file, change ExecStart and ExecStop to reflect the location of the PiCluster folder.
 ```
 ExecStart=/bin/bash /root/picluster/systemd/start-agent.sh
 ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
@@ -164,8 +161,6 @@ ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
 For each file that begins with "start", modify the following variables for your installation.
 ```
 export PICLUSTER_AGENT_PATH="/root/picluster/agent"
-export PORT="3001"
-export AGENTPORT="3002"
 ```
 
 #### 3. Copy the systemd files to the systemd directory
