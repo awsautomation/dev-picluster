@@ -1,6 +1,6 @@
 var http = require('http');
 var fs = require('fs');
-var config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
+var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 var randomstring = require("randomstring");
 var express = require('express');
 var request = require('request');
@@ -8,13 +8,13 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 //require('request-debug')(request);
-var port = config.port;
+var port = config.web_port;
 var lineReader = require('line-reader');
 var webconsole = require("http").createServer(app);
 var token = config.token;
-var user = config.username;
-var password = config.password;
-var server = config.server;
+var user = config.web_username;
+var password = config.web_password;
+var server = config.web_connect;
 var server_port = config.server_port;
 
 var sandbox_html = ('<html>'

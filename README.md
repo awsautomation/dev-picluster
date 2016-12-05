@@ -24,25 +24,42 @@ address of the node to run the container on, the name for the container, and the
 
 The heartbeat section of config.json lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
 
-The token section lets you define a random string that will be used for authentication with the agents. If the token in config.json
-does not match the token in the agent's config (auth.json), no commands will be run on the agent.
+The token string lets you define a random string that will be used for authentication with the agents.
+
+The agent_port string defines the port that the agent will listen on.
 
 The docker section defines where your Dockerfile's are. The format for the Docker folder should be like this:
 dockerfiles/imagename/Dockerfile
 
+The web_username and web_password strings define the username and password for the web interface.
+
+The web_connect is an IP address of a node running the server.
+
+The web_port is the port that the web console listens on.
+
+
+You can run the server and agent on the same node since they are listening on different ports.
+
+
 ```
 {
   "token":"1234567890ABCDEFGHJKLMNOP",
-  "docker": "/root/docker",
+  "docker":"/root/docker",
+  "server_port":"3000",
+  "agent_port": "3001",
   "layout": [
     {"node":"192.168.0.100", "mysql":"-p 3306:3306 mysql","nginx":"nginx"},
-    {"node":"192.168.0.102", "openvpn":"-p 1194:1194 openvpn"}
-  ],
+    {"node":"192.168.0.102", "openvpn":"-p 1194:1194 openvpn"}],
   "hb": [
     {"node":"192.168.0.100","mysql":"3306", "nginx": "80"},
     {"node":"192.168.0.102","openvpn":"1194"}
-  ]
+  ],
+  "web_username": "admin",
+  "web_password":"admin",
+  "web_connect":"192.168.0.101",
+  "web_port":"3003"
 }
+
 
 ```
 
@@ -50,12 +67,8 @@ dockerfiles/imagename/Dockerfile
 
 
 The following environment variables need to be set:
-* PORT - Port that the server listens on
-* AGENTPORT - Port that the agent listens on
 
 ```
-export PORT='9000'
-export AGENTPORT='9001'
 cd server
 npm install
 node server.js
@@ -63,8 +76,7 @@ node server.js
 
 ## Agent Installation
 
-The server will send commands to be executed on the agents nodes. The agent should be installed on each host in the cluster. You can
-run the server and agent on the same node since they are listening on different ports.
+The server will send commands to be executed on the agents nodes. The agent should be installed on each host in the cluster.
 
 ##### 1. Modify auth.json with the token from the server.
 
@@ -79,7 +91,6 @@ run the server and agent on the same node since they are listening on different 
 The following variable needs to be set:
 * AGENTPORT - Port that the agent listens on
 ```
-export AGENTPORT='9001'
 cd agent
 npm install
 node agent.js

@@ -1,5 +1,6 @@
 var http = require('http');
-var port =  process.env.AGENTPORT;
+var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+var port =  config.agent_port;
 var express = require('express');
 var fs = require('fs');
 var request = require('request');
@@ -9,7 +10,6 @@ app.use(bodyParser());
 require('request-debug')(request);
 var exec = require('child_process').exec;
 var server = require("http").createServer(app);
-var token_file = JSON.parse(fs.readFileSync('./auth.json', 'utf8'));
 var node = 'null';
 
   exec('hostname', function(error, stdout, stderr) {
@@ -21,7 +21,7 @@ var node = 'null';
   });
 
   app.post('/run', function(req, res){
-    var token = token_file.token;
+    var token = config.token;
 
     var output = {
       "output": "",
