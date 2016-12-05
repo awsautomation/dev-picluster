@@ -93,206 +93,142 @@ function display_log(callback){
   var responseString = '';
   clear_log(function(data) {
     setTimeout(function() {
-      var options = {
-        host: server,
-        path: '/log?' + 'token=' + token,
-        port: server_port
-      };
-      var request = http.get(options, function(response){
-        response.on('data', function(data) {
-          responseString += data;
-        });
-        response.on('end', function(data){
-          callback(responseString);
-        });
-      });
+      var responseString  = '';
+      request(server + ':' + server_port + '/log?' + 'token=' + token, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          display_log(function(data) {
+            res.end(data);
+          });
+        } else {
+          res.end('\nError connecting with server.');
+        }
+      })
     },5000);
   });
 }
 
 function clear_log(callback){
-  var responseString = '';
-  var options = {
-    host: server,
-    path: '/clearlog?' + 'token=' + token,
-    port: server_port
-  };
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
-      callback('');
-    });
-  });
+  var responseString  = '';
+  request(server + ':' + server_port + '/clearlog?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      display_log(function(data) {
+        res.end(data);
+      });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 }
 
 
 app.get('/status', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/status?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port + '/status?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 app.get('/images', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/images?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port +  '/images?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 
 app.get('/build', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/build?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port +  '/build?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 
 app.get('/hb', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/hb?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port + '/hb?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 
 
 app.get('/stop', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/stop?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port + '/stop?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 
 app.get('/start', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/start?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port + '/start?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 app.get('/log', function(req, res){
-  var responseString = '';
-  var options = {
-    host: server,
-    path: '/log?' + 'token=' + token,
-    port: server_port
-  };
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('end', function(data){
-    res.end(responseString);
-    });
-  });
+  var responseString  = '';
+  request(server + ':' + server_port + '/log?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      display_log(function(data) {
+        res.end(data);
+      });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 
 app.get('/nodes', function(req, res){
   var responseString  = '';
-  var options = {
-    host: server,
-    path: '/nodes?' + 'token=' + token,
-    port: server_port
-  };
-
-  var request = http.get(options, function(response){
-    response.on('data', function(data) {
-      responseString += data;
-    });
-    response.on('error', function(err) {
-      res.end(err);
-    });
-    response.on('end', function(data){
+  request(server + ':' + server_port + '/nodes?' + 'token=' + token, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
       display_log(function(data) {
         res.end(data);
       });
-    });
-  });
+    } else {
+      res.end('\nError connecting with server.');
+    }
+  })
 });
 
 app.get('/', function(req, res){
