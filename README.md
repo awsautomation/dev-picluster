@@ -199,14 +199,4 @@ Reboot
 Project created by [Phillip Tribble] (https://www.linkedin.com/in/philliptribble)
 #### Images
 
-##### https://thenounproject.com/search/?q=raspberry&i=618508
-raspberry by Chanut is Industries from the Noun Project
-
-##### https://thenounproject.com/search/?q=whale&i=682078
-Sperm Whale by Oksana Latysheva from the Noun Project
-
-##### https://thenounproject.com/term/pie/44998/
-Pie by Luis Prado from the Noun Project
-
-License stuff
-https://creativecommons.org/licenses/by/3.0/us/
+This work, "Raspy Whale", is a derivative of "raspberry" by Chanut is Industries from the Noun Project used under CC BY, "Sperm Whale" by Oksana Latysheva from the Noun Project used under CC BY, and "Sperm Whale" by Oksana Latysheva from the Noun Project used under CC BY. "Raspy Whale" is licensed under CC BY by Jordan Sinn.
