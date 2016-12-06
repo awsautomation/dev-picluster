@@ -36,7 +36,7 @@ app.get('/sandbox', function(req, res){
 });
 
 
-app.post('/login', function(req, res){
+app.post('/', function(req, res){
   var get_user = req.body.username;
   var get_pass = req.body.password;
 
@@ -254,9 +254,24 @@ app.get('/', function(req, res){
 });
 
 
+app.get('/', function(req, res){
+  var responseString = "";
+  res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/blank', function(req, res){
+  res.end('');
+});
+
+
 app.get('/logo.png', function(req, res){
   res.sendFile(__dirname + '/logo.png');
 });
+
+app.get('/style.css', function(req, res){
+  res.sendFile(__dirname + '/style.css');
+});
+
 
 webconsole.listen(port, function() {
   console.log('Listening on port %d', webconsole.address().port);

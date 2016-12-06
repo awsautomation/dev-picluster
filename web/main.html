@@ -1,54 +1,155 @@
 <html>
-<title>PiCluster Login</title>
+<title>PiCluster Web Console</title>
 <head>
-<p align=center><a href="/"><img src="/logo.png"height="250" width="250"></a></p>
+  <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+  <p align=center><a href="/"><img src="/logo.png"height="250" width="250"></a></p>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <script>
+
+  function clear(callback){
+  var iframe = document.getElementById('iframe_a').contentWindow.document;
+  iframe.write('<html>');
+  iframe.close();
+  callback();
+  }
+
+  $(document).ready(function () {
+
+    $('#nodes').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/nodes", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+
+    $('#status').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/status", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#create').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/create", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#sandbox').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/sandbox", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#hb').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/hb", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#images').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/images", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#build').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/build", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#stop').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/stop", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#start').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/start", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#reloadconfig').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/reloadconfig", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+      });
+    });
+    $('#log').click(function () {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      clear(function(data) {
+        $.get( "/log", function( data ) {
+          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+        });
+    });
+  });
+      });
+  </script>
+
 </head>
+<body>
+  <div id="top"> </div>
+  <div id="menu">
+    <ul>
+      <li><a href="#" id="nodes">List all Nodes</a></li>
+      <li><a href="#" id="status">Running Containers</a></li>
+      <li><a href="#" id="create">Create and Run Containers</a></li>
+      <li><a href="#" id="images">List Images</a></li>
+      <li><a href="#" id="build">Build all Images</a></li>
+      <li><a href="#" id="sandbox">Run Command</a></li>
+      <li><a href="#" id="hb">Heartbeat</a></li>
+      <li><a href="#" id="stop">Stop All Containers</a></li>
+      <li><a href="#" id="start">Start All Containers</a></li>
+      <li><a href="#" id="reloadconfig">Reload Config</a></li>
+      <li><a href="#" id="log">View Log</a></li>
+    </ul>
+  </div>
+
+  <div id="content">
+    <div class="left">
+    </div>
+
+
+    <div style="clear: both;"> </div>
+  </div>
+
+  <div id="bottom"> </div>
+</div>
+
 <p align=center>
-<b><font size="6">PiCluster Control Console<b><br><br></font>
-<table style="width:20%">
-<tr>
-
-<td><form action="/nodes" method="get" target="iframe_a">
-<input type="submit" value="List all Nodes" name="Submit" id="frm1_jobs"/>
-</form></td>
-
-<td><form action="/status" target="iframe_a">
-<input type="submit" value="Running Containers"/>
-</form></td>
-
-<td><form action="/create" target="iframe_a">
-<input type="submit" value="Create and Run Containers"/>
-</form></td>
-
-
-<td><form action="/images" target="iframe_a">
-<input type="submit" value="List Images"/>
-</form></td>
-
-<td><form action="/build" target="iframe_a">
-<input type="submit" value="Build all Images"/>
-</form></td>
-
-<td><form action="/sandbox" target="iframe_a">
-<input type="submit" value="Run Command"/>
-</form></td>
-
-<td><form action="/hb" target="iframe_a">
-<input type="submit" value="Heartbeat"/></form></td>
-
-<td><form action="/stop" target="iframe_a">
-<input type="submit" value="Stop All Containers"/>
-</form></td>
-
-<td><form action="/start" target="iframe_a">
-<input type="submit" value="Start All Containers"/>
-</form></td>
-
-<td><form action="/reloadconfig" target="iframe_a">
-<input type="submit" value="Reload Config"/>
-</form></td>
-
-<td><form action="/log" target="iframe_a">
-<input type="submit" value="View Log"/>
-</form></td></tr></table>
-<IFRAME SRC="/nodes" name="iframe_a" WIDTH=1200 HEIGHT=1000></html>
+  <IFRAME SRC="/nodes" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%></html>
+  </body>
+  </html>
