@@ -54,7 +54,7 @@ You can run the server and agent on the same node since they are listening on di
 }
 
 ```
-* layout - Contains each row contains an IP address of the node to run the container on, the name for the container, and the Docker arguments.
+* layout - Contains each row contains an IP address of the node to run the container on, the name for the container image as it corresponds in the Docker folder, and the Docker run arguments.
 
 * heartbeat -  lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
 
