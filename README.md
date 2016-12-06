@@ -8,7 +8,7 @@ PiCluster will only build and run images from Dockerfile's on the host specified
 on regular x86 hardware also and is not tied to ARM.
 
 
-![Pic](http://i.imgur.com/MLZj3o5.png)
+![Pic](http://i.imgur.com/9km7cbf.png)
 
 ## Features
 
