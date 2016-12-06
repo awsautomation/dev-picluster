@@ -197,6 +197,8 @@ Reboot
 # Authors and Contributions
 
 Project created by [Phillip Tribble] (https://www.linkedin.com/in/philliptribble)
+[Twitter] (https://twitter.com/rusher81572)
+
 #### Images
 
 This work, "Raspy Whale", is a derivative of "raspberry" by Chanut is Industries from the Noun Project used under CC BY, "Sperm Whale" by Oksana Latysheva from the Noun Project used under CC BY, and "Sperm Whale" by Oksana Latysheva from the Noun Project used under CC BY. "Raspy Whale" is licensed under CC BY by Jordan Sinn.
