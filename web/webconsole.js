@@ -26,7 +26,7 @@ var sandbox_html = ('<html>'
 + '<table style="width:10%">'
 + '<tr>'
 + '<td><form action="/exec" method="POST">'
-+ '<b>Run a command on each server:</b><br><input type="text" size="50" name="command" value=""><br>'
++ '<b><font size="4"> Run a command on each server:</b><br><input type="text" size="50" name="command" value=""></font><br>'
 + '<br><br>'
 + '<input type="submit" value="Submit"/>'
 + '</form></td></tr></table></p>');

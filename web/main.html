@@ -8,10 +8,10 @@
   <script>
 
   function clear(callback){
-  var iframe = document.getElementById('iframe_a').contentWindow.document;
-  iframe.write('<html>');
-  iframe.close();
-  callback();
+    var iframe = document.getElementById('iframe_a').contentWindow.document;
+    iframe.write('<html>');
+    iframe.close();
+    callback();
   }
 
   $(document).ready(function () {
@@ -21,7 +21,7 @@
       clear(function(data) {
         $.get( "/nodes", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -31,7 +31,7 @@
       clear(function(data) {
         $.get( "/status", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -40,7 +40,7 @@
       clear(function(data) {
         $.get( "/create", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -49,7 +49,7 @@
       clear(function(data) {
         $.get( "/sandbox", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -58,7 +58,7 @@
       clear(function(data) {
         $.get( "/hb", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -67,7 +67,7 @@
       clear(function(data) {
         $.get( "/images", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -76,7 +76,7 @@
       clear(function(data) {
         $.get( "/build", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -85,7 +85,7 @@
       clear(function(data) {
         $.get( "/stop", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -94,7 +94,7 @@
       clear(function(data) {
         $.get( "/start", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -103,7 +103,7 @@
       clear(function(data) {
         $.get( "/reloadconfig", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
       });
     });
@@ -112,11 +112,11 @@
       clear(function(data) {
         $.get( "/log", function( data ) {
           var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;">' + output);
+          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
         });
+      });
     });
   });
-      });
   </script>
 
 </head>
@@ -150,6 +150,6 @@
 </div>
 
 <p align=center>
-  <IFRAME SRC="/nodes" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%></html>
+  <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%></html>
   </body>
   </html>
