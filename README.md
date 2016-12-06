@@ -83,7 +83,7 @@ The Docker folder will need to be setup like this to match the container names:
 /root/docker/nginx/Dockerfile
 ```
 
-When it is time to build the containers, PiCluster will use the "docker" variable from config.json + the container name to locate and build the images.
+When it is time to build the containers, PiCluster will use the "docker" variable from config.json plus the container name to locate and build the images.
 
 ##### 2. Running the Application
 
