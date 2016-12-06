@@ -54,7 +54,7 @@ You can run the server and agent on the same node since they are listening on di
 }
 
 ```
-* layout - Contains each row contains an IP address of the node to run the container on, the name for the container image as it corresponds in the Docker folder, and the Docker run arguments.
+* layout - Each row contains an IP address of the node to run the container on, the name for the container image as it corresponds in the Docker folder, and the Docker run arguments.
 
 * heartbeat -  lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
 
@@ -70,6 +70,20 @@ You can run the server and agent on the same node since they are listening on di
 
 * web_port - Port that the web console listens on.
 
+###### An example on the Docker folder layout:
+Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
+```
+"layout": [
+  {"node":"192.168.0.100", "mysql":"-p 3306:3306 mysql","nginx":"-p 80:80 nginx"}
+```
+
+The Docker folder will need to be setup like this to match the container names:
+```
+/root/docker/mysql/Dockerfile
+/root/docker/nginx/Dockerfile
+```
+
+When it is time to build the containers, PiCluster will use the "docker" variable from config.json + the container name to locate and build the images.
 
 ##### 2. Running the Application
 
