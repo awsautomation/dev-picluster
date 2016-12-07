@@ -1,155 +1,224 @@
 <html>
 <title>PiCluster Web Console</title>
+
 <head>
-  <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-  <p align=center><a href="/"><img src="/logo.png"height="250" width="250"></a></p>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
-  <script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <p align=center>
+        <a href="/"><img src="/logo.png" height="250" width="250"></a>
+    </p>
+    <script>
+        function clear(callback) {
+            var iframe = document.getElementById('iframe_a').contentWindow.document;
+            iframe.write('<html>');
+            iframe.close();
+            callback();
+        }
 
-  function clear(callback){
-    var iframe = document.getElementById('iframe_a').contentWindow.document;
-    iframe.write('<html>');
-    iframe.close();
-    callback();
-  }
+        $(document).ready(function() {
 
-  $(document).ready(function () {
+            $('#nodes').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/nodes?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
 
-    $('#nodes').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/nodes", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
+            $('#status').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/status?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#create').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/create?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#hb').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/hb?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#images').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/images?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#build').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/build?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#stop').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/stop?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#start').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/start?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#reloadconfig').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/reloadconfig?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#editconfig').click(function() {
 
-    $('#status').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/status", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    iframe.write('\nNot implemented.');
+/**
+                    $.get("/editconfig?token=" + token, function(data) {
+                        iframe.write(data);
+                    });
+                    **/
+                });
+            });
+            $('#log').click(function() {
+                var iframe = document.getElementById('iframe_a').contentWindow.document;
+                clear(function(data) {
+                    $.get("/log?token=" + token, function(data) {
+                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+                    });
+                });
+            });
+            $('#sandbox').click(function() {
+                $('#iframe_a').attr('src', '/sandbox?token=' + token);
+            });
+            $('#reloadconfig').click(function() {
+                $('#iframe_a').attr('src', '/editconfig?token=' + token);
+            });
         });
-      });
-    });
-    $('#create').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/create", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
+    </script>
+    <script>
+        function hideshow(id) {
+            var e = document.getElementById(id);
+            if (e.style.display == 'block')
+                e.style.display = 'none';
+            else
+                e.style.display = 'block';
+        }
+        $(function() {
+            hideshow('menu');
+            hideshow('content');
+            hideshow('menu');
+            hideshow('content');
+            $("#login").dialog();
         });
-      });
-    });
-    $('#sandbox').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/sandbox", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#hb').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/hb", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#images').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/images", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#build').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/build", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#stop').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/stop", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#start').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/start", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#reloadconfig').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/reloadconfig", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-    $('#log').click(function () {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      clear(function(data) {
-        $.get( "/log", function( data ) {
-          var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-          iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-        });
-      });
-    });
-  });
-  </script>
+    </script>
 
+    <script>
+        var token = "";
+
+        function getToken() {
+            return token;
+        }
+
+        function login() {
+            var username = document.getElementById("user").value;;
+            var password = document.getElementById("password").value;
+            $.post("/", {
+                username: username,
+                password: password
+            }, function(auth) {
+                if (auth.token) {
+                    token = auth.token;
+                    $("#login").dialog('close');
+                    hideshow('login');
+                    hideshow('menu');
+                    hideshow('content');
+                } else {
+                    alert('Access Denied!');
+                }
+            });
+        }
+    </script>
 </head>
-<body>
-  <div id="top"> </div>
-  <div id="menu">
-    <ul>
-      <li><a href="#" id="nodes">List all Nodes</a></li>
-      <li><a href="#" id="status">Running Containers</a></li>
-      <li><a href="#" id="create">Create and Run Containers</a></li>
-      <li><a href="#" id="images">List Images</a></li>
-      <li><a href="#" id="build">Build all Images</a></li>
-      <li><a href="#" id="sandbox">Run Command</a></li>
-      <li><a href="#" id="hb">Heartbeat</a></li>
-      <li><a href="#" id="stop">Stop All Containers</a></li>
-      <li><a href="#" id="start">Start All Containers</a></li>
-      <li><a href="#" id="reloadconfig">Reload Config</a></li>
-      <li><a href="#" id="log">View Log</a></li>
-    </ul>
-  </div>
 
-  <div id="content">
-    <div class="left">
+<body>
+
+    <div id="login" title="PiCluster Login">
+        <p align=center>
+            <img src="/logo.png" height="165" width="150">
+            <br> Please login to continue
+            <br>
+            <p align=center>
+                <input type="text" id="user" name="username">
+                <input type="password" id="password" name="password">
+                <br>
+                <button onclick="login()">Connect</button>
+                <br>
+            </p>
     </div>
 
+    <div id="top"> </div>
 
-    <div style="clear: both;"> </div>
-  </div>
+    <div id="menu">
+        <ul>
+            <li><a href="#" id="nodes">List all Nodes</a></li>
+            <li><a href="#" id="status">Running Containers</a></li>
+            <li><a href="#" id="create">Create and Run Containers</a></li>
+            <li><a href="#" id="images">List Images</a></li>
+            <li><a href="#" id="build">Build all Images</a></li>
+            <li><a href="#" id="sandbox"> Run Command</a></li>
+            <li><a href="#" id="hb">Heartbeat</a></li>
+            <li><a href="#" id="stop">Stop All Containers</a></li>
+            <li><a href="#" id="start">Start All Containers</a></li>
+            <li><a href="#" id="reloadconfig">Reload Config</a></li>
+            <li><a href="#" id="editconfig">Edit Config</a></li>
+            <li><a href="#" id="log">View Log</a></li>
+        </ul>
+    </div>
 
-  <div id="bottom"> </div>
-</div>
+    <div id="content">
+        <div class="left">
+        </div>
 
-<p align=center>
-  <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%></html>
+        <div style="clear: both;"> </div>
+    </div>
+
+    <p align=center>
+        <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
   </body>
   </html>
