@@ -16,6 +16,7 @@ var user = config.web_username;
 var password = config.web_password;
 var server = config.web_connect;
 var server_port = config.server_port;
+var request_timeout = 5000;
 
 var sandbox_html = ('<html>'
 + '<title>PiCluster</title>'
@@ -100,7 +101,7 @@ function display_log(callback){
           callback('\nError connecting with server.');
         }
       })
-    },5000);
+    },request_timeout);
   });
 }
 
