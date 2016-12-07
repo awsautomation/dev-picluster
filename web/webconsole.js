@@ -18,22 +18,8 @@ var server = config.web_connect;
 var server_port = config.server_port;
 var request_timeout = 5000;
 
-var sandbox_html = ('<html>'
-+ '<title>PiCluster</title>'
-+ '<head>'
-+ '<style type="text/css">.myinput { width:200px; height:50px; } </style>'
-+ '</head>'
-+ '<p align=center>'
-+ '<table style="width:10%">'
-+ '<tr>'
-+ '<td><form action="/exec" method="POST">'
-+ '<b><font size="4"> Run a command on each server:</b><br><input type="text" size="50" name="command" value=""></font><br>'
-+ '<br><br>'
-+ '<input type="submit" value="Submit"/>'
-+ '</form></td></tr></table></p>');
-
 app.get('/sandbox', function(req, res){
-  res.end(sandbox_html);
+res.sendFile(__dirname + '/exec.html');
 });
 
 
