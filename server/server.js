@@ -96,7 +96,7 @@ app.get('/nodes', function(req, res){
         } else {
           console.log(response);
           var results = JSON.parse(response.body);
-          addLog('\n' + results.output + ' is  Online.');
+          addLog('\nNode Online: ' + results.output);
         }
       })
 
