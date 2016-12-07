@@ -92,11 +92,11 @@ app.get('/nodes', function(req, res){
 
       request(options, function(error, response, body) {
         if (error) {
-          res.end('\nNode: ' + ' Status: disconnected');
+          res.end(error);
         } else {
           console.log(response);
           var results = JSON.parse(response.body);
-          addLog(results.output + ' is  Online.');
+          addLog('\nNode Online: ' + results.output);
         }
       })
 
