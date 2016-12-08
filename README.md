@@ -74,7 +74,7 @@ You can run the server and agent on the same node since they are listening on di
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
 ```
 "layout": [
-  {"node":"192.168.0.100", "mysql":"-p 3306:3306 mysql","nginx":"-p 80:80 nginx"}
+  {"node":"192.168.0.100", "mysql":"-p 3306:3306","nginx":"-p 80:80"}
 ```
 
 The Docker folder will need to be setup like this to match the container names:
