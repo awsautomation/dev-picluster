@@ -34,7 +34,6 @@ if (config.automatic_heartbeat) {
 
 function automatic_heartbeat() {
     setTimeout(function() {
-      console.log('\nDebug: Here');
         var options = {
             host: '127.0.0.1',
             path: '/hb?token=' + token,
@@ -44,7 +43,7 @@ function automatic_heartbeat() {
         var request = http.get(options, function(response) {}).on('error', function(e) {
             console.error(e);
         });
-        automatic_heartbeat(automatic_heartbeat_async);
+        automatic_heartbeat();
     }, config.heartbeat_interval);
 
 }
