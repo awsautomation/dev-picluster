@@ -41,8 +41,8 @@ You can run the server and agent on the same node since they are listening on di
   "server_port":"3000",
   "agent_port": "3001",
   "layout": [
-    {"node":"192.168.0.100", "mysql":"-p 3306:3306 mysql","nginx":"nginx"},
-    {"node":"192.168.0.102", "openvpn":"-p 1194:1194 openvpn"}],
+    {"node":"192.168.0.100", "mysql":"-p 3306:3306","nginx":"-p 80:80"},
+    {"node":"192.168.0.102", "openvpn":"-p 1194:1194"}],
   "hb": [
     {"node":"192.168.0.100","mysql":"3306", "nginx": "80"},
     {"node":"192.168.0.102","openvpn":"1194"}
