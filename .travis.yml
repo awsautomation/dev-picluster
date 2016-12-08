@@ -22,4 +22,4 @@ script:
 - curl -s http://$IP:3000/stop?token=$token
 - curl -s http://$IP:3000/hb?token=$token
 - curl -s http://$IP:3000/status?token=$token
-- curl -H "Content-Type: application/json" -X POST -d '{"command":"uname -a","token":"'"$token"'"}' http://$IP:3000/exec
+- curl -H "Content-Type: application/json" -X POST -d '{"command":"uname -a","token":"$token"}' http://$IP:3000/exec
