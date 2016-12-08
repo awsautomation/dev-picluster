@@ -25,6 +25,9 @@
             $('#images').click(function() {
                 $('#iframe_a').attr('src', '/images.html');
             });
+            $('#syslog').click(function() {
+                $('#iframe_a').attr('src', '/syslog.html');
+            });
             $('#nodes').click(function() {
                 $('#iframe_a').attr('src', '/nodes.html');
             });
@@ -79,6 +82,7 @@
 
     <script>
         var token = "";
+        var syslog = "";
 
         function getToken() {
             return token;
@@ -93,6 +97,9 @@
             }, function(auth) {
                 if (auth.token) {
                     token = auth.token;
+                    if (auth.syslog) {
+                        syslog = auth.syslog;
+                    }
                     $("#login").dialog('close');
                     hideshow('login');
                     hideshow('menu');
@@ -137,6 +144,7 @@
             <li><a href="#" id="reloadconfig">Reload Config</a></li>
             <li><a href="#" id="editconfig">Edit Config</a></li>
             <li><a href="#" id="log">View Log</a></li>
+            <li><a href="#" id="syslog">System Log</a></li>
         </ul>
     </div>
 

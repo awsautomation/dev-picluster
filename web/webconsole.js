@@ -16,7 +16,12 @@ var user = config.web_username;
 var password = config.web_password;
 var server = config.web_connect;
 var server_port = config.server_port;
+var syslog = "";
 var request_timeout = 5000;
+
+if (config.syslog) {
+    syslog = config.syslog;
+}
 
 app.get('/sandbox', function(req, res) {
     var check_token = req.query['token'];
@@ -78,7 +83,8 @@ app.post('/', function(req, res) {
     if (get_user == user) {
         if (get_pass == password) {
             var auth_data = {
-                "token": token
+                "token": token,
+                "syslog": syslog
             };
             res.send(auth_data);
         } else {
@@ -413,6 +419,10 @@ app.get('/stop.html', function(req, res) {
 
 app.get('/hb.html', function(req, res) {
     res.sendFile(__dirname + '/hb.html');
+});
+
+app.get('/syslog.html', function(req, res) {
+    res.sendFile(__dirname + '/syslog.html');
 });
 
 app.get('/style.css', function(req, res) {
