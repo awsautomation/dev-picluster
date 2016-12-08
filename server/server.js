@@ -216,7 +216,7 @@ app.get('/create', function(req, res) {
                 if (config.layout[i].hasOwnProperty(key)) {
                     //Creates and runs the Docker images assigned to each host.
                     var command = JSON.stringify({
-                        "command": 'docker run -d --name ' + key + ' ' + config.layout[i][key],
+                        "command": 'docker run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
                         "token": token
                     });
                     var options = {
@@ -477,6 +477,8 @@ app.get('/reloadconfig', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+        token = config.token;
+        dockerFolder = config.docker;
         addLog('\nReloading Config.json\n');
         res.end('');
     }
