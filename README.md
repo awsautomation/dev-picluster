@@ -181,7 +181,9 @@ ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
 ```
 #### 2. Modify the start scripts in the systemd folder
 
-For each file that begins with "start", modify the following variable for your installation.
+For each file that begins with "start", modify the PICLUSTER_ variables for your installation.
+
+Example for start-agent.sh.
 ```
 export PICLUSTER_AGENT_PATH="/root/picluster/agent"
 ```
