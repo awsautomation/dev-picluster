@@ -19,103 +19,44 @@
         }
 
         $(document).ready(function() {
-            $('#status').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/status?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#create').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/create?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#hb').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/hb?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#images').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/images?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#build').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/build?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#stop').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/stop?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#start').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/start?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#reloadconfig').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/reloadconfig?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-            $('#editconfig').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/editconfig?token=" + token, function(data) {
-                        iframe.write(data);
-                    });
-                });
-            });
-            $('#log').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/log?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
             $('#sandbox').click(function() {
                 $('#iframe_a').attr('src', '/sandbox?token=' + token);
+            });
+            $('#images').click(function() {
+                $('#iframe_a').attr('src', '/images.html');
             });
             $('#nodes').click(function() {
                 $('#iframe_a').attr('src', '/nodes.html');
             });
+            $('#running').click(function() {
+                $('#iframe_a').attr('src', '/running.html');
+            });
+            $('#editconfig').click(function() {
+                $('#iframe_a').attr('src', '/editconfig');
+            });
+            $('#create').click(function() {
+                $('#iframe_a').attr('src', '/create.html');
+            });
+            $('#log').click(function() {
+                $('#iframe_a').attr('src', '/log.html');
+            });
+            $('#hb').click(function() {
+                $('#iframe_a').attr('src', '/hb.html');
+            });
+            $('#build').click(function() {
+                $('#iframe_a').attr('src', '/build.html');
+            });
+            $('#start').click(function() {
+                $('#iframe_a').attr('src', '/start.html');
+            });
+            $('#stop').click(function() {
+                $('#iframe_a').attr('src', '/stop.html');
+            });
+            $('#editconfig').click(function() {
+                $('#iframe_a').attr('src', '/stop.html');
+            });
             $('#reloadconfig').click(function() {
-                $('#iframe_a').attr('src', '/editconfig?token=' + token);
+                $('#iframe_a').attr('src', '/reloadconfig.html');
             });
         });
     </script>
@@ -185,7 +126,7 @@
     <div id="menu">
         <ul>
             <li><a href="#" id="nodes">List all Nodes</a></li>
-            <li><a href="#" id="status">Running Containers</a></li>
+            <li><a href="#" id="running">Running Containers</a></li>
             <li><a href="#" id="create">Create and Run Containers</a></li>
             <li><a href="#" id="images">List Images</a></li>
             <li><a href="#" id="build">Build all Images</a></li>
