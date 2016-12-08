@@ -4,6 +4,7 @@ node_js:
 
 script:
 - echo "Installing Modules"
+- ip addr show 
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
