@@ -16,10 +16,10 @@ script:
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
-- curl -s http://$IP:3000/build?token=$token
-- curl -s http://$IP:3000/create?token=$token
-- curl -s http://$IP:3000/status?token=$token
-- curl -s http://$IP:3000/stop?token=$token
-- curl -s http://$IP:3000/hb?token=$token
-- curl -s http://$IP:3000/status?token=$token
-- curl -s http://$IP:3000/log?token=$token
+- curl -s http://`echo $IP`:3000/build?token=$token
+- curl -s http://`echo $IP`:3000/create?token=$token
+- curl -s http://`echo $IP`:3000/status?token=$token
+- curl -s http://`echo $IP`:3000/stop?token=$token
+- curl -s http://`echo $IP`:3000/hb?token=$token
+- curl -s http://`echo $IP`:3000/status?token=$token
+- curl -s http://`echo $IP`:3000/log?token=$token
