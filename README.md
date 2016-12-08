@@ -72,7 +72,7 @@ You can run the server and agent on the same node since they are listening on di
 
 * web_port - Port that the web console listens on.
 
-* automatic_heartbeat - Have the server do a heartbeat check on the services in the hb section of config.json every 5 minutes by default. Valid valued are enabled or disabled.
+* automatic_heartbeat - Have the server do a heartbeat check on the services in the hb section of config.json. Valid values are: enabled or disabled.
 
 * heartbeat_interval - How often to do the heartbeat check. Requires automatic_heartbeat to be enabled.
 
