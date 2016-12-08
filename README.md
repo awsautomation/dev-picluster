@@ -181,7 +181,7 @@ ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
 ```
 #### 2. Modify the start scripts in the systemd folder
 
-For each file that begins with "start", modify the following variables for your installation.
+For each file that begins with "start", modify the following variable for your installation.
 ```
 export PICLUSTER_AGENT_PATH="/root/picluster/agent"
 ```
@@ -201,6 +201,11 @@ systemctl enable picluster-server.service
 To enable the agent service.
 ```
 systemctl enable picluster-agent.service
+```
+
+To enable the web console service.
+```
+systemctl enable picluster-web.service
 ```
 
 #### 5. Reboot for the services to be started properly
