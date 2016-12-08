@@ -365,12 +365,48 @@ app.get('/nodes.html', function(req, res) {
   res.sendFile(__dirname + '/nodes.html');
 });
 
+app.get('/running.html', function(req, res) {
+  res.sendFile(__dirname + '/running.html');
+});
+
 app.get('/background', function(req, res) {
     res.sendFile(__dirname + '/background.jpg');
 });
 
+app.get('/reloadconfig.html', function(req, res) {
+    res.sendFile(__dirname + '/reloadconfig.html');
+});
+
+app.get('/build.html', function(req, res) {
+    res.sendFile(__dirname + '/build.html');
+});
+
 app.get('/logo.png', function(req, res) {
     res.sendFile(__dirname + '/logo.png');
+});
+
+app.get('/images.html', function(req, res) {
+    res.sendFile(__dirname + '/images.html');
+});
+
+app.get('/create.html', function(req, res) {
+    res.sendFile(__dirname + '/create.html');
+});
+
+app.get('/log.html', function(req, res) {
+    res.sendFile(__dirname + '/log.html');
+});
+
+app.get('/start.html', function(req, res) {
+    res.sendFile(__dirname + '/start.html');
+});
+
+app.get('/stop.html', function(req, res) {
+    res.sendFile(__dirname + '/stop.html');
+});
+
+app.get('/hb.html', function(req, res) {
+    res.sendFile(__dirname + '/hb.html');
 });
 
 app.get('/style.css', function(req, res) {
