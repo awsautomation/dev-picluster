@@ -196,6 +196,12 @@ app.get('/reloadconfig', function(req, res) {
         var responseString = '';
         request('http://' + server + ':' + server_port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
             if (!error && response.statusCode == 200) {
+                config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+                token = config.token;
+                user = config.web_username;
+                password = config.web_password;
+                server = config.web_connect;
+                server_port = config.server_port;
                 res.end('\nRequest to update configuration succeeded.');
             } else {
                 res.end('\nError connecting with server.' + error);
@@ -362,11 +368,11 @@ app.get('/blank', function(req, res) {
 });
 
 app.get('/nodes.html', function(req, res) {
-  res.sendFile(__dirname + '/nodes.html');
+    res.sendFile(__dirname + '/nodes.html');
 });
 
 app.get('/running.html', function(req, res) {
-  res.sendFile(__dirname + '/running.html');
+    res.sendFile(__dirname + '/running.html');
 });
 
 app.get('/background', function(req, res) {
