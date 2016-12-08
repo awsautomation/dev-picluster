@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - "6"
+
+script:
+- echo "Installing Modules"
+- pwd
+- cd web;npm install; node webconsole.js&
+- cd ../server;npm install; node server.js&
+- cd ../agent; npm install; node agent.js&
