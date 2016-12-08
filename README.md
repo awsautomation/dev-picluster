@@ -47,6 +47,8 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.100","mysql":"3306", "nginx": "80"},
     {"node":"192.168.0.102","openvpn":"1194"}
   ],
+  "automatic_heartbeat": "enabled",
+  "heartbeat_interval": "300000",
   "web_username": "admin",
   "web_password":"admin",
   "web_connect":"192.168.0.101",
@@ -69,6 +71,10 @@ You can run the server and agent on the same node since they are listening on di
 * web_connect - IP address of a node running the server.
 
 * web_port - Port that the web console listens on.
+
+* automatic_heartbeat - Have the server do a heartbeat check on the services in the hb section of config.json every 5 minutes by default. Valid valued are enabled or disabled.
+
+* heartbeat_interval - How often to do the heartbeat check. Requires automatic_heartbeat to be enabled.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
