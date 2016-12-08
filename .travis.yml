@@ -4,7 +4,6 @@ node_js:
 
 script:
 - echo "Installing Modules"
-- pwd;pwd
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
