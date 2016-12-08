@@ -7,6 +7,8 @@ because I found Docker Swarm not that good and Kubernetes was too difficult to i
 PiCluster will only build and run images from Dockerfile's on the host specified in the config file. This software will work
 on regular x86 hardware also and is not tied to ARM.
 
+[![Build Status](https://travis-ci.org/rusher81572/picluster.svg?branch=master)](https://travis-ci.org/rusher81572/picluster)
+
 
 ![Pic](http://i.imgur.com/BIyzDI7.png)
 
