@@ -49,6 +49,7 @@ You can run the server and agent on the same node since they are listening on di
   ],
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "300000",
+  "syslog": "dmesg",
   "web_username": "admin",
   "web_password":"admin",
   "web_connect":"192.168.0.101",
@@ -75,6 +76,8 @@ You can run the server and agent on the same node since they are listening on di
 * automatic_heartbeat - Have the server do a heartbeat check on the services in the hb section of config.json. Valid values are: enabled or disabled.
 
 * heartbeat_interval - How often to do the heartbeat check. Requires automatic_heartbeat to be enabled.
+
+* syslog - The command used to read the logs on each host.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
