@@ -10,8 +10,8 @@ services:
 
 script:
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
-- sed -i 's/192.168.0.101/$(echo $IP)/' config.json
-- sed -i 's/192.168.0.102/$(echo $IP)/' config.json
+- sed -i 's/192.168.0.101/$IP/' config.json
+- sed -i 's/192.168.0.102/$IP/' config.json
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
