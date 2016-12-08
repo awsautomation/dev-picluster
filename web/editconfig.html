@@ -1,0 +1,51 @@
+<html>
+<title>PiCluster</title>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<script src="//code.jquery.com/jquery-1.10.2.js">
+	</script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js">
+	</script>
+	<script>
+	function exec() {
+		var payload = $("#payload").val();
+		$.post("/sendconfig", {
+			token: parent.token,
+			payload: payload
+		}, function(data) {
+			var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+		alert('Successful');
+		});
+	};
+	</script>
+	<script>
+	function getconfig() {
+		$.get("/getconfig?token=" + parent.token, function(data) {
+			$("#payload").val(JSON.stringify(JSON.parse(data),null,2));
+		});
+	};
+	</script>
+</head>
+
+<body>
+	<p align=center>
+		<div id="start" title="PiCluster Configuration Editor">
+			<p align=center>
+				<table style="width:10%">
+					<tr>
+						<td>
+							<b><font size=+3>Configuration File:</font>
+								<br><textarea rows="30" cols="100" id="payload" name="payload" value="" enctype="application/json"></textarea><br><br>
+								<button onclick="exec();">Submit</button>
+							</td>
+						</tr>
+					</table>
+				</p>
+			</div>
+			<script>
+		getconfig();
+			</script>
+		</body>
+
+		</html>
