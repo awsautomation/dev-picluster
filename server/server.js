@@ -533,7 +533,7 @@ app.post('/updateconfig', function(req, res) {
     } else {
         fs.writeFile('../config.json', payload, function(err) {
             if (err) {
-                res.end('\nError while writing config.' + err);
+                console.log('\nError while writing config.' + err);
             } else {
                 res.end('Updated Configuration. Please reload it now for changes to take effect.');
             }
