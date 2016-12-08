@@ -13,14 +13,19 @@ script:
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - sed -i "s/192.168.0.101/$IP/" config.json
 - sed -i "s/192.168.0.102/$IP/" config.json
-- cat  config.json
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
 - curl -s http://`echo $IP`:3000/build?token=$token
+- sleep 120
+- curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/create?token=$token
+- curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/status?token=$token
+- curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/stop?token=$token
+- curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/hb?token=$token
+- curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/status?token=$token
 - curl -s http://`echo $IP`:3000/log?token=$token
