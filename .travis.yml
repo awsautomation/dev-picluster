@@ -18,6 +18,7 @@ script:
 - cd ../agent; npm install; node agent.js&
 - curl -s http://`echo $IP`:3000/build?token=$token
 - sleep 200
+- curl -s http://`echo $IP`:3000/images?token=$token
 - curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/create?token=$token
 - sleep 10
