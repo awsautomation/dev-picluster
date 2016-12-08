@@ -1,0 +1,45 @@
+<html>
+<title>PiCluster</title>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+	<script src="//code.jquery.com/jquery-1.10.2.js">
+	</script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script>
+		function syslog() {
+			var payload = $("#payload").val();
+				var command = parent.syslog;
+			$.post("/exec", {
+				token: parent.token,
+				command: command
+			}, function(data) {
+				$("#command_output").val(data);
+			});
+		};
+	</script>
+</head>
+
+<body>
+	<div id="editor" title="PiCluster System Log Viewer">
+		<p align=center>
+			<div id="start" title="PiCluster System Log Viewer>
+				<p align=center>
+					<table style="width:10%">
+						<tr>
+							<td>
+									<br><textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea><br><br>
+								</td>
+							</tr>
+						</table>
+					</p>
+				</div>
+				<script>
+						$("#editor").dialog({height:'auto', width:'auto'});
+						syslog();
+				</script>
+	</div>
+		</body>
+
+		</html>
