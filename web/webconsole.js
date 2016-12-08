@@ -49,32 +49,32 @@ app.post('/sendconfig', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-      var responseString = '';
-      var command = JSON.stringify({
-          "payload": payload,
-          "token": token
-      });
+        var responseString = '';
+        var command = JSON.stringify({
+            "payload": payload,
+            "token": token
+        });
 
-      var options = {
-          url: 'http://' + server + ':' + server_port + '/updateconfig',
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-          },
-          body: command,
-          token: token
-      }
+        var options = {
+            url: 'http://' + server + ':' + server_port + '/updateconfig',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+            },
+            body: command,
+            token: token
+        }
 
-      request(options, function(error, response, body) {
-          if (error) {
-              res.end(error);
-          } else {
-              display_log(function(data) {
-                  res.end(data);
-              });
-          }
-      })
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                display_log(function(data) {
+                    res.end(data);
+                });
+            }
+        })
     }
 });
 
@@ -346,7 +346,6 @@ app.get('/getconfig', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-      console.log('\nHEre');
         var responseString = '';
         request('http://' + server + ':' + server_port + '/getconfig?' + 'token=' + token, function(error, response, body) {
             if (!error && response.statusCode == 200) {
@@ -369,6 +368,9 @@ app.get('/blank', function(req, res) {
     res.end('');
 });
 
+app.get('/background', function(req, res) {
+    res.sendFile(__dirname + '/background.jpg');
+});
 
 app.get('/logo.png', function(req, res) {
     res.sendFile(__dirname + '/logo.png');
