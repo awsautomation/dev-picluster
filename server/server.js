@@ -16,6 +16,32 @@ var logFile = './log.txt';
 var log = '';
 var token = config.token;
 var dockerFolder = config.docker;
+var heartbeat_interval = '300000';
+
+if (config.automatic_heartbeat) {
+    if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+        if (config.heartbeat_interval) {
+            heartbeat_interval = config.heartbeat_interval;
+        }
+        console.log('\nAutomatic Heartbeat Enabled. Will check every: ' + heartbeat_interval + ' seconds.');
+        setTimeout(function() {
+            var options = {
+                host: '127.0.0.1',
+                path: '/hb?token=' + token,
+                port: port
+            };
+
+            var request = http.get(options, function(response) {
+            }).on('error', function(e) {
+                console.error(e);
+            });
+        }, heartbeat_interval);
+    } else {
+        console.log('\nAutomatic Heartbeat Disabled.');
+    }
+} else {
+    console.log('\nAutomatic Heartbeat Disabled.');
+}
 
 app.get('/status', function(req, res) {
     var check_token = req.query['token'];
