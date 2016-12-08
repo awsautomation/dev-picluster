@@ -9,20 +9,25 @@
 	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 	<script>
 		function exec() {
-			var command = $("#command").val();
-			hideshow('output');
-			$("#command").dialog('close');
-			$("#output").dialog({
-				height: 'auto',
-				width: 'auto'
-			});
-			$.post("/exec", {
-				token: parent.token,
-				command: command
-			}, function(data) {
-				$("#command").val(data);
-				$("#command_output").val(data);
-			});
+			var command = $("#command_entry").val();
+			if (command.length > 1) {
+				hideshow('output');
+				$("#command").dialog('close');
+				$("#output").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+
+				$.post("/exec", {
+					token: parent.token,
+					command: command
+				}, function(data) {
+					$("#command").val(data);
+					$("#command_output").val(data);
+				});
+			} else {
+				alert('\nError, no command was entered.');
+			}
 		}
 	</script>
 	<script>
@@ -61,8 +66,9 @@
 			<table style="width:10%">
 				<tr>
 					<td>
-						<b>Command:</b>
-						<input type="text" size="50" id="command" name="command" value=""></font>
+						<b>Command:</b><br><br>
+						<input type="text" size="50" id="command_entry" name="command_entry" value=""></font>
+						<br><br>
 						<button onclick="exec()"> Submit</button>
 					</td>
 				</tr>
