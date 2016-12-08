@@ -9,19 +9,19 @@ services:
   - docker
 
 script:
+- export token='1234567890ABCDEFGHJKLMNOP'
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - sed -i 's/192.168.0.101/$IP/' config.json
 - sed -i 's/192.168.0.102/$IP/' config.json
-- sed -i 's/192.168.0.101/$IP/' pictl
 - cat pictl | head -3
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
 - cd ..
-- ./pictl build
-- ./pictl create
-- ./pictl status
-- ./pictl stop
-- ./pictl hb
-- ./pictl status
-- ./pictl exec "uname -a"
+- curl -s http://$IP:3000/build?token=$token
+- curl -s http://$IP:3000/create?token=$token
+- curl -s http://$IP:3000/status?token=$token
+- curl -s http://$IP:3000/stop?token=$token
+- curl -s http://$IP:3000/hb?token=$token
+- curl -s http://$IP:3000/status?token=$token
+- curl -H "Content-Type: application/json" -X POST -d '{"command":"uname -a","token":"'"$token"'"}' http://$IP:3000/exec
