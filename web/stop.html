@@ -11,7 +11,7 @@
 		function exec() {
 			$.get("/stop?token=" + parent.token, function(data) {
 					var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-						$("#command_output").val('Sent request to stop all running containers. If there is any output, it will be displayed here\n\n' + data);
+						$("#command_output").val('Sent request to stop all running containers. Please check the log for the latest information.\n\n' + data);
 			});
 		}
 	</script>
