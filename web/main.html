@@ -19,17 +19,6 @@
         }
 
         $(document).ready(function() {
-
-            $('#nodes').click(function() {
-                var iframe = document.getElementById('iframe_a').contentWindow.document;
-                clear(function(data) {
-                    $.get("/nodes?token=" + token, function(data) {
-                        var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-                        iframe.write('<pre style="word-wrap: break-word; white-space: pre-wrap;"<body><font size="4">' + output);
-                    });
-                });
-            });
-
             $('#status').click(function() {
                 var iframe = document.getElementById('iframe_a').contentWindow.document;
                 clear(function(data) {
@@ -121,6 +110,9 @@
             });
             $('#sandbox').click(function() {
                 $('#iframe_a').attr('src', '/sandbox?token=' + token);
+            });
+            $('#nodes').click(function() {
+                $('#iframe_a').attr('src', '/nodes.html');
             });
             $('#reloadconfig').click(function() {
                 $('#iframe_a').attr('src', '/editconfig?token=' + token);
