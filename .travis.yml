@@ -16,6 +16,11 @@ script:
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
+- cd ..
 - ./pictl build
+- sleep 3000
 - ./pictl create
+- ./pictl status
+- ./pictl stop
+- ./pictl hb
 - ./pictl status
