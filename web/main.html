@@ -106,12 +106,9 @@
 
                 var iframe = document.getElementById('iframe_a').contentWindow.document;
                 clear(function(data) {
-                    iframe.write('\nNot implemented.');
-/**
                     $.get("/editconfig?token=" + token, function(data) {
                         iframe.write(data);
                     });
-                    **/
                 });
             });
             $('#log').click(function() {
