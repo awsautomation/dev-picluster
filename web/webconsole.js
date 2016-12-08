@@ -361,6 +361,10 @@ app.get('/blank', function(req, res) {
     res.end('');
 });
 
+app.get('/nodes.html', function(req, res) {
+  res.sendFile(__dirname + '/nodes.html');
+});
+
 app.get('/background', function(req, res) {
     res.sendFile(__dirname + '/background.jpg');
 });
