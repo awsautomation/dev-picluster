@@ -24,3 +24,4 @@ script:
 - ./pictl stop
 - ./pictl hb
 - ./pictl status
+- ./pictl exec "uname -a"
