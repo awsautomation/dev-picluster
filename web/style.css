@@ -5,6 +5,8 @@
 
 body {
 background: #FFFFFF;
+background-image: url("/background");
+background-size: 100%;
 font-family: Verdana, Arial, Helvetica, sans-serif;
 font-size: 11px;
 line-height: 18px;
@@ -12,7 +14,7 @@ color: #333333;;
 }
 
 img { border: none; }
-a { color: ##3964C3;  }
+a { color: ##4D95CB;  }
 a:hover { text-decoration: none; color : #000; }
 
 #wrap {
@@ -49,7 +51,7 @@ line-height: 12px;
 #menu {
 height: 30px;
 line-height: 30px;
-background: #3964C3 no-repeat;
+background: #4D95CB no-repeat;
 }
 #menu ul {
 padding-left: 10px;
