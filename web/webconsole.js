@@ -23,14 +23,7 @@ app.get('/sandbox', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-        res.write('<html><title>PiCluster</title>' +
-            '<head> <style type="text/css">.myinput { width:200px; height:50px; } </style></head>' +
-            '<p align=center> <table style="width:10%"><tr>' +
-            '<td><form action="/exec" method="POST">' +
-            '<b><font size="4">Run a command on each server:</b><br>' +
-            '<input type="text" size="50" name="command" value=""></font><br>' +
-            '<input type="hidden" size="50" name="token" value="' + token + '">' +
-            '<br><br><input type="submit" value="Submit"/></form></td></tr></table></p></html>')
+        res.sendFile(__dirname + '/exec.html');
     }
 });
 
