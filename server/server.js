@@ -487,7 +487,6 @@ app.get('/getconfig', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-      console.log('\nDebug: ' + config);
         res.send(config);
     }
 });
