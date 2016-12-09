@@ -7,7 +7,6 @@ var port = config.agent_port;
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
-require('request-debug')(request);
 var exec = require('child_process').exec;
 var server = require("http").createServer(app);
 var node = 'null';
