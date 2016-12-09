@@ -10,7 +10,7 @@ on regular x86 hardware also and is not tied to ARM.
 [![Build Status](https://travis-ci.org/rusher81572/picluster.svg?branch=master)](https://travis-ci.org/rusher81572/picluster)
 
 
-![Pic](http://i.imgur.com/BIyzDI7.png)
+![Pic](http://i.imgur.com/4l15YjW.png)
 
 ## Features
 
