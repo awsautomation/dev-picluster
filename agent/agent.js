@@ -64,6 +64,7 @@ function send_ping() {
         var token_body = JSON.stringify({
             "token": token
         });
+        console.log('\nDebug Token=' + token);
         var options = {
             url: 'http://' + vip_slave + ':' + port + '/pong',
             method: 'POST',
