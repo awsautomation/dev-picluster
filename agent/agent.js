@@ -123,9 +123,9 @@ function send_ping() {
     }, vip_ping_time);
 };
 
-app.get('/killvip', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
+app.post('/killvip', function(req, res) {
+  var check_token = req.body.token;
+  if (!check_token == token) {
         res.end('\nError: Invalid Credentials')
     } else {
         if (config.vip_ip) {
