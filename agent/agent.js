@@ -63,7 +63,7 @@ function send_ping() {
     setTimeout(function() {
         var responseString = "";
         var body = {
-          "token": token;
+          "token": token
         }
         var options = {
             url: 'http://' + vip_slave + ':' + port + '/pong',
