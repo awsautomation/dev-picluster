@@ -15,7 +15,6 @@ var os = require('os');
 var vip = ''
 var vip_slave = '';
 var vip_device = '';
-var vip_port = '';
 var ip_add_command = '';
 var ip_delete_command ='';
 
@@ -41,7 +40,6 @@ if ((config.vip_ip) && (config.vip_ping_time) && (config.vip_ping_time)) {
                         var alias = iface[h];
                         if (alias.address == node) {
                             vip_slave = config.vip[i].slave;
-                            vip_port = config.vip[i].vip_port;
                             vip_eth_device = config.vip[i].vip_eth_device;
                             ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
                             ip_delete_command = 'ip addr del ' + config.vip_ip + ' dev ' + vip_eth_device;
@@ -63,7 +61,7 @@ function send_ping() {
     setTimeout(function() {
         var responseString = "";
         var options = {
-            url: 'http://' + vip_slave + ':' + vip_port + '/pong',
+            url: 'http://' + vip_slave + ':' + port + '/pong',
             method: 'POST'
         };
 
