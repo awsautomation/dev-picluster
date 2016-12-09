@@ -68,7 +68,7 @@ function send_ping() {
         var options = {
             url: 'http://' + vip_slave + ':' + port + '/pong',
             method: 'POST',
-            body: body;
+            body: body
         };
 
         request(options, function(error, response, body) {
