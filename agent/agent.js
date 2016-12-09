@@ -27,7 +27,7 @@ exec('hostname', function(error, stdout, stderr) {
     }
 });
 
-if ((config.vip_ip) && (config.vip)) {
+if (config.vip_ip) {
     var vip = config.vip_ip;
     var vip_ping_time = config.vip_ping_time;
     for (var i = 0; i < config.vip.length; i++) {
