@@ -140,7 +140,7 @@ app.post('/pong', function(req, res) {
         };
         res.send(body);
     } else {
-        res.end({
+        res.send({
             output: "Not Authorized to connect to this agent!"
         });
     }
