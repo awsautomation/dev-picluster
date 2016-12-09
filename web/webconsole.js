@@ -424,10 +424,6 @@ app.get('/syslog.html', function(req, res) {
     res.sendFile(__dirname + '/syslog.html');
 });
 
-app.get('/style.css', function(req, res) {
-    res.sendFile(__dirname + '/style.css');
-});
-
 
 webconsole.listen(port, function() {
     console.log('Listening on port %d', webconsole.address().port);
