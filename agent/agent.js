@@ -29,27 +29,28 @@ exec('hostname', function(error, stdout, stderr) {
 
 if (config.vip_ip) {
     var vip = config.vip_ip;
-    var vip_ping_time = config.vip_ping_time;
-    for (var i = 0; i < config.vip.length; i++) {
-        var node = config.vip[i].node;
-        for (var key in config.vip[i]) {
-            if (config.vip[i].hasOwnProperty(key)) {
-                var interfaces = require('os').networkInterfaces();
-                for (var devName in interfaces) {
-                    var iface = interfaces[devName];
-                    for (var h = 0; h < iface.length; h++) {
-                        var alias = iface[h];
-                        if (alias.address == node) {
-                            vip_slave = config.vip[i].slave;
-                            vip_eth_device = config.vip[i].vip_eth_device;
-                            ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
-                            ip_delete_command = 'ip addr del ' + config.vip_ip + ' dev ' + vip_eth_device;
-                            vip_ping_time = config.vip[i].vip_ping_time;
-                            var exec = require('child_process').exec;
-                            var cmd = ip_delete_command;
-                            exec(cmd, function(error, stdout, stderr) {
-                                send_ping();
-                            });
+    if (config.vip) {
+        for (var i = 0; i < config.vip.length; i++) {
+            var node = config.vip[i].node;
+            for (var key in config.vip[i]) {
+                if (config.vip[i].hasOwnProperty(key)) {
+                    var interfaces = require('os').networkInterfaces();
+                    for (var devName in interfaces) {
+                        var iface = interfaces[devName];
+                        for (var h = 0; h < iface.length; h++) {
+                            var alias = iface[h];
+                            if (alias.address == node) {
+                                vip_slave = config.vip[i].slave;
+                                vip_eth_device = config.vip[i].vip_eth_device;
+                                ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
+                                ip_delete_command = 'ip addr del ' + config.vip_ip + ' dev ' + vip_eth_device;
+                                vip_ping_time = config.vip[i].vip_ping_time;
+                                var exec = require('child_process').exec;
+                                var cmd = ip_delete_command;
+                                exec(cmd, function(error, stdout, stderr) {
+                                    send_ping();
+                                });
+                            }
                         }
                     }
                 }
@@ -124,8 +125,8 @@ function send_ping() {
 };
 
 app.post('/killvip', function(req, res) {
-  var check_token = req.body.token;
-  if (!check_token == token) {
+    var check_token = req.body.token;
+    if (!check_token == token) {
         res.end('\nError: Invalid Credentials')
     } else {
         if (config.vip_ip) {
