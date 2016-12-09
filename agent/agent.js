@@ -47,8 +47,8 @@ if (config.vip_ip) {
                             vip_ping_time = config.vip[i].vip_ping_time;
                             var exec = require('child_process').exec;
                             var cmd = ip_delete_command;
+                              console.log('\nVirtual IP Manager Running: ' + config.vip_ip);
                             exec(cmd, function(error, stdout, stderr) {
-                                console.log('\nVirtual IP Manager Running: ' + config.vip_ip);
                                 send_ping();
                             });
                         }
