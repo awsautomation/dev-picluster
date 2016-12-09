@@ -233,6 +233,23 @@ app.get('/images', function(req, res) {
     }
 });
 
+app.get('/killvip', function(req, res) {
+    var check_token = req.query['token'];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        request('http://' + server + ':' + server_port + '/killvip?' + 'token=' + token, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                display_log(function(data) {
+                    res.end(data);
+                });
+            } else {
+                res.end('\nError connecting with server.');
+            }
+        })
+    }
+});
 
 app.get('/build', function(req, res) {
     var check_token = req.query['token'];
@@ -418,6 +435,10 @@ app.get('/stop.html', function(req, res) {
 
 app.get('/hb.html', function(req, res) {
     res.sendFile(__dirname + '/hb.html');
+});
+
+app.get('/killvip.html', function(req, res) {
+    res.sendFile(__dirname + '/killvip.html');
 });
 
 app.get('/syslog.html', function(req, res) {
