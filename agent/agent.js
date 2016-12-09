@@ -17,6 +17,7 @@ var vip_device = '';
 var ip_add_command = '';
 var ip_delete_command = '';
 var vip_ping_time = '';
+var token = config.token;
 
 exec('hostname', function(error, stdout, stderr) {
     if (error) {
@@ -63,7 +64,8 @@ function send_ping() {
         var responseString = "";
         var options = {
             url: 'http://' + vip_slave + ':' + port + '/pong',
-            method: 'POST'
+            method: 'POST',
+            body: { "token": token};
         };
 
         request(options, function(error, response, body) {
@@ -116,27 +118,32 @@ function send_ping() {
 };
 
 app.post('/pong', function(req, res) {
-    var responseString = "";
-    var vip_status = "false";
-    var interfaces = require('os').networkInterfaces();
-    for (var devName in interfaces) {
-        var iface = interfaces[devName];
-        for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i];
-            if (alias.address == vip) {
-                vip_status = "true";
+    var check_token = req.body.token;
+    if (check_token == token) {
+        var responseString = "";
+        var vip_status = "false";
+        var interfaces = require('os').networkInterfaces();
+        for (var devName in interfaces) {
+            var iface = interfaces[devName];
+            for (var i = 0; i < iface.length; i++) {
+                var alias = iface[i];
+                if (alias.address == vip) {
+                    vip_status = "true";
+                }
             }
         }
+        var body = {
+            "vip_detected": vip_status
+        };
+        res.send(body);
+    } else {
+        res.end({
+            output: "Not Authorized to connect to this agent!"
+        });
     }
-    var body = {
-        "vip_detected": vip_status
-    };
-    res.send(body);
 });
 
 app.post('/run', function(req, res) {
-    var token = config.token;
-
     var output = {
         "output": "",
         "node": node
