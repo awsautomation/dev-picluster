@@ -125,7 +125,6 @@ function send_ping() {
 
 app.post('/pong', function(req, res) {
     var check_token = req.body.token;
-    console.log('\nDebug:' + check_token);
     if (check_token == token) {
         var responseString = "";
         var vip_status = "false";
