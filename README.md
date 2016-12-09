@@ -54,7 +54,6 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.101","vip_eth_device":"eth0", "slave": "192.168.0.102", "vip_ping_time": "10000"},
     {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
-  "vip_ping_time": "10000",
   "vip_ip": "192.168.0.15",
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "300000",
