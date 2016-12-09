@@ -62,7 +62,7 @@ if (config.vip_ip) {
 function send_ping() {
     setTimeout(function() {
         var responseString = "";
-        var body {
+        var body = {
           "token": token;
         }
         var options = {
