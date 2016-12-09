@@ -139,9 +139,7 @@ app.post('/pong', function(req, res) {
         };
         res.send(body);
     } else {
-        res.send({
-            output: "Not Authorized to connect to this agent!"
-        });
+        res.status(500).send('Something broke!')
     }
 });
 
