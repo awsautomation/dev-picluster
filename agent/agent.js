@@ -16,7 +16,7 @@ var vip = ''
 var vip_slave = '';
 var vip_device = '';
 var ip_add_command = '';
-var ip_delete_command ='';
+var ip_delete_command = '';
 
 exec('hostname', function(error, stdout, stderr) {
     if (error) {
@@ -48,13 +48,13 @@ if ((config.vip_ip) && (config.vip_ping_time) && (config.vip_ping_time)) {
                             exec(cmd, function(error, stdout, stderr) {
                                 send_ping();
                             });
+                            console.log('\nVirtual IP Manager Running: ' + config.vip_ip);
                         }
                     }
                 }
             }
         }
     }
-    console.log('\nVirtual IP Manager Running: ' + config.vip_ip);
 }
 
 function send_ping() {
