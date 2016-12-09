@@ -2,8 +2,6 @@
 <title>PiCluster Web Console</title>
 
 <head>
-
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -110,6 +108,66 @@
             });
         }
     </script>
+    <style>
+        body {
+            background: #FFFFFF;
+            background-image: url("/background");
+            background-size: 100%;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            line-height: 18px;
+            color: #333333;
+            ;
+        }
+        #menu {
+        height: 70px;
+        line-height: 30px;
+        background: #4D95CB no-repeat;
+        }
+
+        .dropbtn {
+            background-color: #4D95CB;
+            color: white;
+            padding: 16px;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropbtn:hover,
+        .dropbtn:focus {
+            background-color: #4D95CB;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            overflow: auto;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown a:hover {
+            background-color: #f1f1f1
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
@@ -128,34 +186,102 @@
             </p>
     </div>
 
-    <div id="top"> </div>
-
     <div id="menu">
-        <ul>
-            <li><a href="#" id="nodes">List all Nodes</a></li>
-            <li><a href="#" id="running">Running Containers</a></li>
-            <li><a href="#" id="create">Create and Run Containers</a></li>
-            <li><a href="#" id="images">List Images</a></li>
-            <li><a href="#" id="build">Build all Images</a></li>
-            <li><a href="#" id="sandbox"> Run Command</a></li>
-            <li><a href="#" id="hb">Heartbeat</a></li>
-            <li><a href="#" id="stop">Stop All Containers</a></li>
-            <li><a href="#" id="start">Start All Containers</a></li>
-            <li><a href="#" id="reloadconfig">Reload Config</a></li>
-            <li><a href="#" id="editconfig">Edit Config</a></li>
-            <li><a href="#" id="log">View Log</a></li>
-            <li><a href="#" id="syslog">System Log</a></li>
-        </ul>
-    </div>
+        <p align=center>
+            <table style="width:40%">
+                <tr>
+                    <td>
+                        <div class="dropdown">
+                            <button onclick="system()" class="dropbtn">System</button>
+                            <div id="system" class="dropdown-content">
+                                <a href="#" id="nodes">Nodes</a>
+                                <a href="#" id="editconfig">Edit Configuration</a>
+                                <a href="#" id="reloadconfig">Reload Configuration</a>
+                            </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button onclick="container()" class="dropbtn">Containers</button>
+                            <div id="container" class="dropdown-content">
+                                <a href="#" id="create">Create and Run</a>
+                                <a href="#" id="stop">Stop All</a>
+                                <a href="#" id="start">Start All</a>
+                            </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button onclick="imagecontrol()" class="dropbtn">Images</button>
+                            <div id="imagecontrol" class="dropdown-content">
+                                <a href="#" id="build">Build Images</a>
+                                <a href="#" id="images">List Images</a>
+                            </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button onclick="operations()" class="dropbtn">Operations</button>
+                            <div id="operations" class="dropdown-content">
+                                <a href="#" id="sandbox">Run Command </a>
+                                <a href="#" id="hb">Heartbeat</a>
+                                <a href="#" id="running">Running Containers</a>
+                            </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button onclick="logging()" class="dropbtn">Logs</button>
+                            <div id="logging" class="dropdown-content">
+                                <a href="#" id="log">PiCluster Logs</a>
+                                <a href="#" id="syslog">System Logs</a>
+                            </div>
+                    </td>
+                </tr>
+            </table>
+            </div>
+            <div id="top"> </div>
+            <script>
+                function system() {
+                    document.getElementById("system").classList.toggle("show");
+                }
 
-    <div id="content">
-        <div class="left">
-        </div>
+                function container() {
+                    document.getElementById("container").classList.toggle("show");
+                }
 
-        <div style="clear: both;"> </div>
-    </div>
+                function operations() {
+                    document.getElementById("operations").classList.toggle("show");
+                }
 
-    <p align=center>
-        <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
+                function imagecontrol() {
+                    document.getElementById("imagecontrol").classList.toggle("show");
+                }
+
+                function logging() {
+                    document.getElementById("logging").classList.toggle("show");
+                }
+
+                window.onclick = function(event) {
+                    if (!event.target.matches('.dropbtn')) {
+
+                        var dropdowns = document.getElementsByClassName("dropdown-content");
+                        var i;
+                        for (i = 0; i < dropdowns.length; i++) {
+                            var openDropdown = dropdowns[i];
+                            if (openDropdown.classList.contains('show')) {
+                                openDropdown.classList.remove('show');
+                            }
+                        }
+                    }
+                }
+            </script>
+
+
+            <div id="content">
+                <div class="left">
+                </div>
+
+                <div style="clear: both;"> </div>
+            </div>
+
+            <p align=center>
+                <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
   </body>
   </html>
