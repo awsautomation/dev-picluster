@@ -64,10 +64,13 @@ function send_ping() {
         var token_body = JSON.stringify({
             "token": token
         });
-        console.log('\nDebug Token=' + token);
         var options = {
             url: 'http://' + vip_slave + ':' + port + '/pong',
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': token_body.length
+            },
             body: token_body
         };
 
