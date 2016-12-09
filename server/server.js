@@ -554,10 +554,7 @@ app.get('/killvip', function(req,res) {
             request(options, function(error, response, body) {
               if (error) {
                 res.end("An error has occurred.");
-              } else {
-                var results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
+              } 
             })
         }
       }
