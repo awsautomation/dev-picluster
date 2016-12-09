@@ -135,7 +135,7 @@ app.post('/killvip', function(req, res) {
                 if (error) {
                     console.log(error);
                 } else {
-                  console.log('\nCompleted');
+                  console.log('\nDebug: Completed');
                     res.end('\nCompleted.');
                 }
             });
