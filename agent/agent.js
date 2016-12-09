@@ -61,13 +61,13 @@ if (config.vip_ip) {
 function send_ping() {
     setTimeout(function() {
         var responseString = "";
-        var token = JSON.stringify({
+        var token_body = JSON.stringify({
             "token": token
         });
         var options = {
             url: 'http://' + vip_slave + ':' + port + '/pong',
             method: 'POST',
-            body: token
+            body: token_body
         };
 
         request(options, function(error, response, body) {
