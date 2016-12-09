@@ -51,8 +51,8 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.102","openvpn":"1194"}
   ],
   "vip": [
-    {"node":"192.168.0.101","vip_eth_device":"eth0", "slave": "192.168.0.102"},
-    {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101"}
+    {"node":"192.168.0.101","vip_eth_device":"eth0", "slave": "192.168.0.102", "vip_ping_time": "10000"},
+    {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
   "vip_ping_time": "10000",
   "vip_ip": "192.168.0.15",
@@ -90,7 +90,7 @@ You can run the server and agent on the same node since they are listening on di
 
 * vip - This section contains the agent nodes that the VIP can run on, the ethernet device on each node, and the slave node to run checks against.
 
-* vip_ping_time - Time in ms to ping each slave.
+* vip_ping_time - Time in ms to ping each slave. Each host should have different times.
 
 * vip_ip - The Virtual IP address to use in the cluster
 
