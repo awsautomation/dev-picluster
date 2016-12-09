@@ -40,6 +40,7 @@ if (config.vip_ip) {
                     for (var h = 0; h < iface.length; h++) {
                         var alias = iface[h];
                         if (alias.address == node) {
+                          console.log('\nHere');
                             vip_slave = config.vip[i].slave;
                             vip_eth_device = config.vip[i].vip_eth_device;
                             ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
