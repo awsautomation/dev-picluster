@@ -533,10 +533,10 @@ app.get('/killvip', function(req,res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var responseString = '';
-    for (var i = 0; i < config.layout.length; i++) {
+    for (var i = 0; i < config.vip.length; i++) {
       var node = config.vip[i].node;
       for (var key in config.vip[i]) {
-        if (config.layout[i].hasOwnProperty(key)) { //Builds the required images on each host
+        if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
             var token_body = JSON.stringify({
               "token": token
             });
