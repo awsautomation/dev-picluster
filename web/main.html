@@ -59,6 +59,9 @@
             $('#reloadconfig').click(function() {
                 $('#iframe_a').attr('src', '/reloadconfig.html');
             });
+            $('#killvip').click(function() {
+                $('#iframe_a').attr('src', '/killvip.html');
+            });
         });
     </script>
     <script>
@@ -220,6 +223,7 @@
                         <div class="dropdown">
                             <button onclick="operations()" class="dropbtn">Operations</button>
                             <div id="operations" class="dropdown-content">
+                                <a href="#" id="killvip">Reset Virtual IP</a>
                                 <a href="#" id="sandbox">Run Command </a>
                                 <a href="#" id="hb">Heartbeat</a>
                                 <a href="#" id="running">Running Containers</a>
