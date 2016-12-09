@@ -556,13 +556,13 @@ app.get('/killvip', function(req, res) {
                   var token_body = JSON.stringify({
                       "token": token
                   });
-                  
+
                     var options = {
                         url: 'http://' + node + ':' + agentPort + '/run',
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Content-Length': command.length
+                            'Content-Length': token_body.length
                         },
                         body: token_body
                     }
