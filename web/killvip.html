@@ -10,7 +10,7 @@
 		function exec() {
 			$.get("/killvip?token=" + parent.token, function(data) {
 					var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-						$("#command_output").val('\nBuilding the Docker images now and no response may be shown here or in the log for a while because this process can take a long time. You will be able to see the current build tasks by clicking on "Running Containers". Please check the log for the latest information after a few minutes. ' + data);
+						$("#command_output").val('\nSent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data);
 			});
 		}
 	</script>
