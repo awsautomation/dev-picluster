@@ -68,8 +68,8 @@ function send_ping() {
             url: 'http://' + vip_slave + ':' + port + '/pong',
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': token_body.length
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
             },
             body: token_body
         };
@@ -122,6 +122,25 @@ function send_ping() {
         send_ping();
     }, vip_ping_time);
 };
+
+app.get('/killvip', function(req, res) {
+    var check_token = req.query['token'];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        if (config.vip_ip) {
+            var exec = require('child_process').exec;
+            var cmd = ip_delete_command;
+            exec(cmd, function(error, stdout, stderr) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    res.end('\nCompleted.');
+                }
+            });
+        }
+    }
+});
 
 app.post('/pong', function(req, res) {
     var check_token = req.body.token;
