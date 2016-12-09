@@ -48,7 +48,6 @@ if (config.vip_ip) {
                             var exec = require('child_process').exec;
                             var cmd = ip_delete_command;
                             exec(cmd, function(error, stdout, stderr) {
-                                console.log('\nVirtual IP Manager Running: ' + config.vip_ip);
                                 send_ping();
                             });
                         }
