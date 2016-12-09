@@ -17,6 +17,7 @@ var vip_slave = '';
 var vip_device = '';
 var ip_add_command = '';
 var ip_delete_command = '';
+var vip_ping_time = '';
 
 exec('hostname', function(error, stdout, stderr) {
     if (error) {
@@ -26,7 +27,7 @@ exec('hostname', function(error, stdout, stderr) {
     }
 });
 
-if ((config.vip_ip) && (config.vip_ping_time) && (config.vip_ping_time)) {
+if ((config.vip_ip) && (config.vip_ping_time)) {
     var vip = config.vip_ip;
     var vip_ping_time = config.vip_ping_time;
     for (var i = 0; i < config.vip.length; i++) {
@@ -43,6 +44,7 @@ if ((config.vip_ip) && (config.vip_ping_time) && (config.vip_ping_time)) {
                             vip_eth_device = config.vip[i].vip_eth_device;
                             ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
                             ip_delete_command = 'ip addr del ' + config.vip_ip + ' dev ' + vip_eth_device;
+                            vip_ping_time = config.vip[i].vip_ping_time;
                             var exec = require('child_process').exec;
                             var cmd = ip_delete_command;
                             exec(cmd, function(error, stdout, stderr) {
@@ -111,7 +113,7 @@ function send_ping() {
             }
         });
         send_ping();
-    }, config.vip_ping_time);
+    }, vip_ping_time);
 };
 
 app.post('/pong', function(req, res) {
