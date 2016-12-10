@@ -129,6 +129,43 @@ app.post('/exec', function(req, res) {
     }
 });
 
+app.post('/singleton', function(req, res) {
+    var check_token = req.body.token
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+            var node = req.body.node;
+        var command = JSON.stringify({
+            "command": req.body.command,
+            "token": token,
+            "node": node
+        });
+
+        var options = {
+            url: 'http://' + server + ':' + server_port + '/exec',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+            },
+            body: command,
+            token: token
+        }
+
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                display_log(function(data) {
+                    res.end(data);
+                });
+            }
+        })
+    }
+});
+
 function display_log(callback) {
     var responseString = '';
     clear_log(function(data) {
