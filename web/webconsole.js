@@ -445,6 +445,11 @@ app.get('/syslog.html', function(req, res) {
     res.sendFile(__dirname + '/syslog.html');
 });
 
+app.get('/manage.html', function(req, res) {
+    res.sendFile(__dirname + '/manage.html');
+});
+
+
 
 webconsole.listen(port, function() {
     console.log('Listening on port %d', webconsole.address().port);
