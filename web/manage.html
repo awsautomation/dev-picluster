@@ -8,34 +8,34 @@
 	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script>
 		function exec() {
-			var command = $("#command_entry").val();
+			var container = $("#container_entry").val();
 			var node = $("#node_entry").val();
 			var radio_one = $('input[name=radio-1]:checked').val();
 			var radio_two = $('input[name=radio-2]:checked').val();
 			var radio_three = $('input[name=radio-3]:checked').val();
-			var path = '';
+			var command = '';
 
 			if (radio_one) {
 				if (radio_one.indexOf('on') > -1) {
-					path = "/start";
+					command = "docker start " + container;
 				}
 			}
 			if (radio_two) {
 				if (radio_two.indexOf('on') > -1) {
-					path = "/stop";
+					command = "docker stop " + container;
 				}
 			}
 
 			if (radio_three) {
 				if (radio_three.indexOf('on') > -1) {
-					path = "/restart";
+						command = "docker restart " + container;
 				}
 			}
 
 			if ((!radio_one) || (!radio_two) || (radio_three)) {
 
 				if (node.length > 1) {
-					if (command.length > 1) {
+					if (container.length > 1) {
 						hideshow('output');
 						$("#command").dialog('close');
 						$("#output").dialog({
@@ -43,15 +43,16 @@
 							width: 'auto'
 						});
 
-						$.post(path, {
+						$.post('/singleton', {
 							token: parent.token,
-							command: command
+							command: command,
+							node: node
 						}, function(data) {
 							$("#command").val(data);
-							$("#command_output").val(data);
+							$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
 						});
 					} else {
-						alert('\nError, no command was entered.');
+						alert('\nError, no container was entered.');
 					}
 				} else {
 					alert('\nError, no node was entered.');
@@ -93,11 +94,11 @@
 			</script>
 	</div>
 
-	<div id="command" title="Manage a single container">
+	<div id="container" title="Manage a single container">
 		<p align=left>
 
 			<b>Container Name</b><br><br>
-			<input type="text" size="50" id="command_entry" name="command_entry" value=""></font>
+			<input type="text" size="50" id="container_entry" name="container_entry" value=""></font>
 			<br><br><b>Node</b><br><br>
 			<input type="text" size="50" id="node_entry" name="node_entry" value=""></font>
 
@@ -115,7 +116,7 @@
 				<button onclick="exec()"> Submit</button>
 			</p>
 			<script>
-				$("#command").dialog({
+				$("#container").dialog({
 					height: 'auto',
 					width: 'auto'
 				});
