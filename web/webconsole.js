@@ -144,7 +144,7 @@ app.post('/singleton', function(req, res) {
         });
 
         var options = {
-            url: 'http://' + server + ':' + server_port + '/exec',
+            url: 'http://' + server + ':' + server_port + '/singleton',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
