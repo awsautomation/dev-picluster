@@ -8,8 +8,10 @@
 	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script>
 		function exec() {
-			var container = $("#container_entry").val();
-			var node = $("#node_entry").val();
+			var e = document.getElementById("containerlist");
+			var container = e.options[e.selectedIndex].value;
+			e = document.getElementById("nodelist");
+			var node = e.options[e.selectedIndex].value;
 			var radio_one = $('input[name=radio-1]:checked').val();
 			var radio_two = $('input[name=radio-2]:checked').val();
 			var radio_three = $('input[name=radio-3]:checked').val();
@@ -28,7 +30,7 @@
 
 			if (radio_three) {
 				if (radio_three.indexOf('on') > -1) {
-						command = "docker restart " + container;
+					command = "docker restart " + container;
 				}
 			}
 
@@ -96,31 +98,68 @@
 
 	<div id="container" title="Manage a single container">
 		<p align=left>
+			<fieldset>
+	    <label for="containerlist">Select a Container to Manage</label>
+	    <select name="containerlist" id="containerlist">
+	    </select>
+				<br><br><br>
 
-			<b>Container Name</b><br><br>
-			<input type="text" size="50" id="container_entry" name="container_entry" value=""></font>
-			<br><br><b>Node</b><br><br>
-			<input type="text" size="50" id="node_entry" name="node_entry" value=""></font>
+		    <label for="nodelist">Select a Node that the container is on</label>
+		    <select name="nodelist" id="nodelist">
+		    </select>
+				<br>
+				<fieldset name="options" id="options">
+					<legend>Options</legend>
+					<label for="radio-1">Start</label>
+					<input type="radio" name="radio-1" id="radio-1">
+					<label for="radio-2">Stop</label>
+					<input type="radio" name="radio-2" id="radio-2">
+					<label for="radio-3">Restart</label>
+					<input type="radio" name="radio-3" id="radio-3">
+				</fieldset>
+				<br>
+				<p align=center>
+					<button onclick="exec()"> Submit</button>
+				</p>
+				<script>
 
-			<fieldset name="options" id="options">
-				<legend>Options</legend>
-				<label for="radio-1">Start</label>
-				<input type="radio" name="radio-1" id="radio-1">
-				<label for="radio-2">Stop</label>
-				<input type="radio" name="radio-2" id="radio-2">
-				<label for="radio-3">Restart</label>
-				<input type="radio" name="radio-3" id="radio-3">
-			</fieldset>
-			<br>
-			<p align=center>
-				<button onclick="exec()"> Submit</button>
-			</p>
-			<script>
-				$("#container").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-			</script>
+					$("#container").dialog({
+						height: 'auto',
+						width: 'auto'
+					});
+					$(function() {
+							var option = '';
+						$.post('/listcontainers', {
+							token: parent.token
+						}, function(data) {
+							data = data.replace(/\[/gi,'');
+							data = data.replace(/\]/gi,'');
+							data = data.replace(/\"/gi,'');
+							var parse_data = data.split(',');
+							for (var i = 0; i < parse_data.length; i++) {
+								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							}
+
+							$('#containerlist').append(option);
+						});
+					});
+					$(function() {
+						var option = '';
+						$.post('/listnodes', {
+							token: parent.token
+						}, function(data) {
+							data = data.replace(/\[/gi,'');
+							data = data.replace(/\]/gi,'');
+							data = data.replace(/\"/gi,'');
+							var parse_data = data.split(',');
+							for (var i = 0; i < parse_data.length; i++) {
+								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							}
+
+							$('#nodelist').append(option);
+						});
+					});
+				</script>
 	</div>
 	<div class="widget">
 	</div>
