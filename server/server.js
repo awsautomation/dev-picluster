@@ -798,29 +798,33 @@ app.get('/killvip', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-        for (var i = 0; i < config.vip.length; i++) {
-            var node = config.vip[i].node;
-            for (var key in config.vip[i]) {
-                if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
-                    var token_body = JSON.stringify({
-                        "token": token
-                    });
+        if (!config.vip) {
+            res.end('\nError: VIP not configured.');
+        } else {
+            for (var i = 0; i < config.vip.length; i++) {
+                var node = config.vip[i].node;
+                for (var key in config.vip[i]) {
+                    if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
+                        var token_body = JSON.stringify({
+                            "token": token
+                        });
 
-                    var options = {
-                        url: 'http://' + node + ':' + agentPort + '/killvip',
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Content-Length': token_body.length
-                        },
-                        body: token_body
-                    }
-
-                    request(options, function(error, response, body) {
-                        if (error) {
-                            res.end("An error has occurred.");
+                        var options = {
+                            url: 'http://' + node + ':' + agentPort + '/killvip',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Content-Length': token_body.length
+                            },
+                            body: token_body
                         }
-                    })
+
+                        request(options, function(error, response, body) {
+                            if (error) {
+                                res.end("An error has occurred.");
+                            }
+                        })
+                    }
                 }
             }
         }
