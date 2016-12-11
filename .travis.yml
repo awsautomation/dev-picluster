@@ -19,6 +19,8 @@ script:
 - cd ../agent; npm install; node agent.js&
 - curl -s http://`echo $IP`:3000/build?token=$token
 - sleep 300
+- docker images
+- docker ps -a
 - curl -s http://`echo $IP`:3000/images?token=$token
 - curl -s http://`echo $IP`:3000/log?token=$token
 - curl -s http://`echo $IP`:3000/create?token=$token
