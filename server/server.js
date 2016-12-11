@@ -200,6 +200,11 @@ app.get('/build', function(req, res) {
     if (req.query['image']) {
         image = req.query['image'];
     }
+
+    if (image.indexOf("*") > -1) {
+        image = '';
+    }
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
@@ -224,7 +229,7 @@ app.get('/build', function(req, res) {
                             },
                             body: command
                         }
-                        if (image) {
+                        if (image.length > 0) {
                             if (key.indexOf(image) > -1) {
                                 request(options, function(error, response, body) {
                                     if (error) {
@@ -262,6 +267,10 @@ app.get('/create', function(req, res) {
         container = req.query['container'];
     }
 
+    if (container.indexOf('*') > -1) {
+        container = '';
+    }
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
@@ -287,7 +296,7 @@ app.get('/create', function(req, res) {
                         }
                     }
 
-                    if (container.indexOf('Everything') > -1) {
+                    if (container.length == 0) {
                         var request = http.request(options, function(response) {
                             response.on('data', function(data) {
                                 responseString += data;
@@ -342,6 +351,9 @@ app.get('/start', function(req, res) {
     if (req.query['container']) {
         container = req.query['container'];
     }
+    if (container.indexOf('*') > -1) {
+        var container = '';
+    }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -366,7 +378,7 @@ app.get('/start', function(req, res) {
                             },
                             body: command
                         }
-                        if (container.length > 1) {
+                        if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
                                 request(options, function(error, response, body) {
                                     if (error) {
@@ -398,8 +410,12 @@ app.get('/start', function(req, res) {
 app.get('/stop', function(req, res) {
     var check_token = req.query['token'];
     var container = '';
+
     if (req.query['container']) {
         container = req.query['container'];
+    }
+    if (container.indexOf("*") > -1) {
+        container = container = '';
     }
 
     if ((check_token != token) || (!check_token)) {
@@ -425,7 +441,7 @@ app.get('/stop', function(req, res) {
                             },
                             body: command
                         }
-                        if (container) {
+                        if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
                                 request(options, function(error, response, body) {
                                     if (error) {
@@ -463,6 +479,10 @@ app.get('/delete', function(req, res) {
         container = req.query['container'];
     }
 
+    if (container.indexOf('*') > -1) {
+        container = '';
+    }
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
@@ -486,7 +506,7 @@ app.get('/delete', function(req, res) {
                             },
                             body: command
                         }
-                        if (container) {
+                        if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
                                 request(options, function(error, response, body) {
                                     if (error) {
@@ -521,6 +541,9 @@ app.get('/restart', function(req, res) {
     if (req.query['container']) {
         selected_container = req.query['container'];
     }
+    if (selected_container.indexOf('*') > -1) {
+        selected_container = '';
+    }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -545,7 +568,7 @@ app.get('/restart', function(req, res) {
                             },
                             body: command
                         }
-                        if (selected_container) {
+                        if (selected_container.length > 0) {
                             if (key.indexOf(selected_container) > -1) {
                                 request(options, function(error, response, body) {
                                     if (error) {

@@ -50,7 +50,6 @@
 
 			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four) || (!radio_five)) {
 
-					if (container.length > 1) {
 						hideshow('output');
 						$("#command").dialog('close');
 						$("#output").dialog({
@@ -66,9 +65,6 @@
 							$("#command").val(data);
 							$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
 						});
-					} else {
-						alert('\nError, no container was entered.');
-					}
 			} else {
 				alert('Error, you did not select an operation.')
 			}
@@ -153,7 +149,7 @@
 							for (var i = 0; i < parse_data.length; i++) {
 								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
 							}
-							option += '<option value="' + 'Everything' + '">' + 'Everything' + '</option>';
+							option += '<option value="' + '*' + '">' + '*' + '</option>';
 							$('#containerlist').append(option);
 						});
 					});
