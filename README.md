@@ -152,6 +152,9 @@ Pictl is a bash client to easily control the cluster. It will make all the HTTP 
 
 #### 2. Using the client
 
+Unless a command below has arguments([image] or [container]), the commands will
+run globally (cluster wide/config wide).
+
 To get a list of accepted arguments:
 ```
 pictl
@@ -162,19 +165,29 @@ To get a list of all the nodes in PiCluster:
 pictl nodes
 ```
 
-To build all of the Docker images from your config:
+To build a Docker image from the config:
 ```
-pictl build
-```
-
-To run all of the Docker images from your config:
-```
-pictl run
+pictl build [image]
 ```
 
-To stop all of the Docker images from your config:
+To create and start a container from the config:
 ```
-pictl stop
+pictl create [container]
+```
+
+To stop a container from the config:
+```
+pictl stop [container]
+```
+
+To delete a container from the config:
+```
+pictl delete [container]
+```
+
+To restart a container from the config:
+```
+pictl restart [container]
 ```
 
 To execute a command on all of the hosts
