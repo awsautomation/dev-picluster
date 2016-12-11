@@ -40,7 +40,7 @@ function automatic_heartbeat() {
                 path: '/hb?token=' + token,
                 port: port
             };
-
+            console.log('\nDebug:' + JSON.stringify(options));
             var request = http.get(options, function(response) {}).on('error', function(e) {
                 console.error(e);
             });
@@ -639,8 +639,8 @@ app.post('/listnodes', function(req, res) {
                 if (config.layout[i].hasOwnProperty(key)) {
                     container = key;
                     node = config.layout[i].node;
-                    port = config.layout[i][key];
-                    if (port != node) {
+                    var port_check = config.layout[i][key];
+                    if (port_check != node) {
                         output.push(node);
                     }
                 }
@@ -657,7 +657,7 @@ app.post('/exec', function(req, res) {
         selected_node = req.body.node;
     }
 
-    if(selected_node.indexOf('*') > -1){
+    if (selected_node.indexOf('*') > -1) {
         var selected_node = '';
     }
 
@@ -682,18 +682,18 @@ app.post('/exec', function(req, res) {
                 },
                 body: command
             }
-              console.log('\nNode=' + selected_node + ' ' + selected_node.length);
+
             if (selected_node.length == 0) {
-                  request(options, function(error, response, body) {
-                      if (error) {
-                          res.end("An error has occurred.");
-                      } else {
-                          var results = JSON.parse(response.body);
-                          addLog('\nNode:' + results.node + '\n' + results.output);
-                      }
-                  });
+                request(options, function(error, response, body) {
+                    if (error) {
+                        res.end("An error has occurred.");
+                    } else {
+                        var results = JSON.parse(response.body);
+                        addLog('\nNode:' + results.node + '\n' + results.output);
+                    }
+                });
             }
-             if (selected_node.indexOf(node) > -1) {
+            if (selected_node.indexOf(node) > -1) {
                 request(options, function(error, response, body) {
                     if (error) {
                         res.end("An error has occurred.");
