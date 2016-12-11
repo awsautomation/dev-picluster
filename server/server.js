@@ -650,41 +650,6 @@ app.post('/listnodes', function(req, res) {
     }
 });
 
-app.post('/singleton', function(req, res) {
-    var command = req.body.command;
-    var node = req.body.node;
-    var check_token = req.body.token;
-    if ((check_token != token) || (!check_token)) {
-        res.end('\nError: Invalid Credentials')
-    } else {
-        var command = JSON.stringify({
-            "command": req.body.command,
-            "token": token
-        });
-
-        var responseString = '';
-        var options = {
-            url: 'http://' + node + ':' + agentPort + '/run',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-            },
-            body: command
-        }
-
-        request(options, function(error, response, body) {
-            if (error) {
-                res.end("An error has occurred.");
-            } else {
-                var results = JSON.parse(response.body);
-                addLog('\nNode:' + results.node + '\n' + results.output);
-            }
-        })
-    }
-    res.end('');
-});
-
 app.post('/exec', function(req, res) {
     var check_token = req.body.token;
     var selected_node = '';
