@@ -96,13 +96,16 @@ app.post('/', function(req, res) {
 
 app.post('/exec', function(req, res) {
     var check_token = req.body.token
+    var node =  req.body.node;
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
         var command = JSON.stringify({
             "command": req.body.command,
-            "token": token
+            "token": token,
+            "node": node
         });
 
         var options = {
@@ -112,58 +115,21 @@ app.post('/exec', function(req, res) {
                 'Content-Type': 'application/json',
                 'Content-Length': command.length
             },
-            body: command,
-            token: token
+            body: command
         }
 
-        request(options, function(error, response, body) {
-            if (error) {
-                res.end(error);
-            } else {
-                display_log(function(data) {
-                    res.end(data);
-                });
-            }
-        })
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                }
+            });
     }
 });
 
-app.post('/singleton', function(req, res) {
-    var check_token = req.body.token
-
-    if ((check_token != token) || (!check_token)) {
-        res.end('\nError: Invalid Credentials')
-    } else {
-        var responseString = '';
-        var node = req.body.node;
-        var command = JSON.stringify({
-            "command": req.body.command,
-            "token": token,
-            "node": node
-        });
-
-        var options = {
-            url: 'http://' + server + ':' + server_port + '/singleton',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-            },
-            body: command,
-            token: token
-        }
-
-        request(options, function(error, response, body) {
-            if (error) {
-                res.end(error);
-            } else {
-                display_log(function(data) {
-                    res.end(data);
-                });
-            }
-        })
-    }
-});
 
 app.post('/listcontainers', function(req, res) {
     var check_token = req.body.token;
@@ -196,6 +162,7 @@ app.post('/listcontainers', function(req, res) {
     }
 });
 
+
 app.post('/listnodes', function(req, res) {
     var check_token = req.body.token;
     if ((check_token != token) || (!check_token)) {
@@ -226,7 +193,6 @@ app.post('/listnodes', function(req, res) {
         })
     }
 });
-
 
 
 function display_log(callback) {
@@ -399,12 +365,12 @@ app.post('/delete', function(req, res) {
     var check_token = req.body.token;
     var container = "";
 
-    if(req.body.container){
-      container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-        container = '';
+    if (req.body.container) {
+        container = req.body.container;
+        if (container.indexOf('Everything') > -1) {
+            container = '';
+        }
     }
-  }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -438,12 +404,12 @@ app.post('/stop', function(req, res) {
     var check_token = req.body.token;
     var container = "";
 
-    if(req.body.container){
-      container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-        container = '';
+    if (req.body.container) {
+        container = req.body.container;
+        if (container.indexOf('Everything') > -1) {
+            container = '';
+        }
     }
-  }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -477,12 +443,12 @@ app.post('/stop', function(req, res) {
 app.post('/start', function(req, res) {
     var check_token = req.body.token;
 
-    if(req.body.container){
-      container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-        container = '';
+    if (req.body.container) {
+        container = req.body.container;
+        if (container.indexOf('Everything') > -1) {
+            container = '';
+        }
     }
-  }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -516,12 +482,12 @@ app.post('/start', function(req, res) {
 app.post('/restart', function(req, res) {
     var check_token = req.body.token;
 
-    if(req.body.container){
-      container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-        container = '';
+    if (req.body.container) {
+        container = req.body.container;
+        if (container.indexOf('Everything') > -1) {
+            container = '';
+        }
     }
-  }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')

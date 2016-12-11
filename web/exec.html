@@ -10,23 +10,16 @@
 
 		function exec() {
 			var e = document.getElementById("nodelist");
-			var path = '';
+			var path = '/exec';
 			var node = e.options[e.selectedIndex].value;
 			var command = $("#command_entry").val();
 
-				if (node.length > 1) {
 						hideshow('output');
 						$("#command").dialog('close');
 						$("#output").dialog({
 							height: 'auto',
 							width: 'auto'
 						});
-
-						if(node.indexOf('Every') > -1){
-							path = "/exec";
-						} else {
-							path = "/singleton"
-						}
 
 						$.post(path, {
 							token: parent.token,
@@ -36,9 +29,6 @@
 							$("#command").val(data);
 							$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
 						});
-				} else {
-					alert('\nError, no node was entered.');
-				}
 			}
 	</script>
 	<script>
@@ -102,7 +92,7 @@
 							for (var i = 0; i < parse_data.length; i++) {
 								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
 							}
-								option += '<option value="' + 'Every Node' + '">' + 'Every Node' + '</option>';
+								option += '<option value="' + '*' + '">' + '*' + '</option>';
 							$('#nodelist').append(option);
 						});
 					});
