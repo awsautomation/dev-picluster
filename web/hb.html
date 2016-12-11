@@ -10,7 +10,7 @@
 		function exec() {
 			$.get("/hb?token=" + parent.token, function(data) {
 					var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-						$("#command_output").val(data);
+						$("#command_output").val('\nSent request to do a manual heartbeat. Check the logs for the latest information.' + data);
 			});
 		}
 	</script>
