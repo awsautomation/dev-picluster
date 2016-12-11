@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-server='192.168.0.101'
+server='192.168.0.116'
 port='3000'
 token='1234567890ABCDEFGHJKLMNOP'
 
@@ -15,7 +15,6 @@ nodes(){
 clear
 echo "Active Nodes:"
 curl -s $server:$port/nodes?token=$token
-sleep 1
 logs
 }
 
@@ -23,7 +22,6 @@ stop(){
 clear
 echo "Stopping the containers....."
 curl -s  http://$server:$port/stop?token=$token
-sleep 2
 logs
 }
 
@@ -31,7 +29,6 @@ images(){
 clear
 echo "Gathering a list of images....."
 curl -s  http://$server:$port/images?token=$token
-sleep 2
 logs
 }
 
@@ -39,7 +36,6 @@ start(){
 clear
 echo "Starting the containers....."
 curl -s  http://$server:$port/start?token=$token
-sleep 5
 logs
 }
 
@@ -55,7 +51,6 @@ shell(){
   clear
   echo "Running the command....."
    curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"$token"'"}' http://$server:$port/exec
-   sleep 1
    logs
 }
 
@@ -64,12 +59,12 @@ build() {
   clear
   echo "Building the containers in the background. This may take a while. Continue to check the logs for progress."
   curl -s http://$server:$port/build?token=$token
-  sleep 10
   logs
 }
 
 
 logs(){
+  sleep 5
   clear
   echo "Checking the logs....."
   curl -s http://$server:$port/log?token=$token
@@ -78,7 +73,7 @@ logs(){
 create() {
   clear
   echo "Running the containers....."
-curl -s http://$server:$port/create?token=$token
+curl -s -G -d "token=$token&container=$1" http://$server:$port/create
 logs
 }
 
@@ -86,7 +81,6 @@ status() {
   clear
   echo "Checking the status....."
 curl -s http://$server:$port/status?token=$token
-sleep 5
 logs
 }
 
