@@ -13,6 +13,5 @@ script:
 - cd ..
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
-- ./pictl status
 - ./pictl nodes
 - ./pictl reloadconfig
