@@ -455,58 +455,128 @@ app.get('/stop', function(req, res) {
     }
 });
 
-app.get('/restart', function(req, res) {
-    var check_token = req.query['token'];
 
+
+app.get('/delete', function(req, res) {
+    var check_token = req.query['token'];
     var container = '';
     if (req.query['container']) {
         container = req.query['container'];
     }
 
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        for (var i = 0; i < config.layout.length; i++) {
+            var node = config.layout[i].node;
+            for (var key in config.layout[i]) {
+                if (config.layout[i].hasOwnProperty(key)) {
+                    if (key.indexOf('node') > -1) {} else {
+                        //Starts the Docker images assigned to each host.
+                        var command = JSON.stringify({
+                            "command": 'docker rm -f ' + key,
+                            "token": token
+                        });
+                        var options = {
+                            url: 'http://' + node + ':' + agentPort + '/run',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Content-Length': command.length
+                            },
+                            body: command
+                        }
+                        if (container) {
+                            if (key.indexOf(container) > -1) {
+                                request(options, function(error, response, body) {
+                                    if (error) {
+                                        res.end("An error has occurred.");
+                                    } else {
+                                        var results = JSON.parse(response.body);
+                                        addLog('\nStopping: ' + key + '\n' + results.output);
+                                    }
+                                });
+                            }
+                        } else {
+                            request(options, function(error, response, body) {
+                                if (error) {
+                                    res.end("An error has occurred.");
+                                } else {
+                                    var results = JSON.parse(response.body);
+                                    addLog('\nStopping: ' + key + '\n' + results.output);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        res.end('');
+    }
+});
+
+app.get('/restart', function(req, res) {
+    var check_token = req.query['token'];
+    var selected_container = '';
+    if (req.query['container']) {
+        selected_container = req.query['container'];
+    }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-        var node = req.query['node'];
-        var container = req.query['container'];
         var responseString = '';
-        var command = JSON.stringify({
-            "command": 'docker restart ' + container,
-            "token": token
-        });
-
-        var options = {
-            url: 'http://' + node + ':' + agentPort + '/run',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-            },
-            body: command
-        }
-        if (container) {
-            if (key.indexOf(container) > -1) {
-                request(options, function(error, response, body) {
-                    if (error) {
-                        res.end("An error has occurred.");
-                    } else {
-                        var results = JSON.parse(response.body);
-                        addLog('\nRestarting: ' + container + '\n' + results.output);
+        for (var i = 0; i < config.layout.length; i++) {
+            var node = config.layout[i].node;
+            for (var key in config.layout[i]) {
+                if (config.layout[i].hasOwnProperty(key)) {
+                    if (key.indexOf('node') > -1) {} else {
+                        //Starts the Docker images assigned to each host.
+                        var command = JSON.stringify({
+                            "command": 'docker restart ' + key,
+                            "token": token
+                        });
+                        var options = {
+                            url: 'http://' + node + ':' + agentPort + '/run',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Content-Length': command.length
+                            },
+                            body: command
+                        }
+                        if (selected_container) {
+                            if (key.indexOf(selected_container) > -1) {
+                                request(options, function(error, response, body) {
+                                    if (error) {
+                                        res.end("An error has occurred.");
+                                    } else {
+                                        var results = JSON.parse(response.body);
+                                        addLog('\nStopping: ' + key + '\n' + results.output);
+                                    }
+                                });
+                            }
+                        } else {
+                            request(options, function(error, response, body) {
+                                if (error) {
+                                    res.end("An error has occurred.");
+                                } else {
+                                    var results = JSON.parse(response.body);
+                                    addLog('\nStopping: ' + key + '\n' + results.output);
+                                }
+                            });
+                        }
                     }
-                });
-            }
-        } else {
-            request(options, function(error, response, body) {
-                if (error) {
-                    res.end("An error has occurred.");
-                } else {
-                    var results = JSON.parse(response.body);
-                    addLog('\nRestarting: ' + container + '\n' + results.output);
                 }
-            });
+            }
         }
+        res.end('');
     }
 });
+
+
+
 
 app.post('/listcontainers', function(req, res) {
     var command = req.body.command;
