@@ -23,18 +23,18 @@
 
 			if (radio_one) {
 				if (radio_one.indexOf('on') > -1) {
-					command = "docker start " + container;
+					path = '/start';
 				}
 			}
 			if (radio_two) {
 				if (radio_two.indexOf('on') > -1) {
-					command = "docker stop " + container;
+					path = '/stop';
 				}
 			}
 
 			if (radio_three) {
 				if (radio_three.indexOf('on') > -1) {
-					command = "docker restart " + container;
+					path = '/restart';
 				}
 			}
 
@@ -46,13 +46,11 @@
 
 			if (radio_five) {
 				if (radio_five.indexOf('on') > -1) {
-				path = '/create';
+					path = '/create';
 				}
 			}
 
-
-
-			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four)|| (!radio_five)) {
+			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four) || (!radio_five)) {
 
 				if (node.length > 1) {
 					if (container.length > 1) {
@@ -118,13 +116,13 @@
 	<div id="container" title="Manage Containers">
 		<p align=left>
 			<fieldset>
-	    <label for="containerlist">Select a Container</label>
-	    <select name="containerlist" id="containerlist">
+				<label for="containerlist">Select a Container</label>
+				<select name="containerlist" id="containerlist">
 	    </select>
 				<br><br><br>
 
-		    <label for="nodelist">Select a Node</label>
-		    <select name="nodelist" id="nodelist">
+				<label for="nodelist">Select a Node</label>
+				<select name="nodelist" id="nodelist">
 		    </select>
 				<br><br>
 				<fieldset name="options" id="options">
@@ -135,7 +133,7 @@
 					<input type="radio" name="radio-2" id="radio-2">
 					<label for="radio-3">Restart</label>
 					<input type="radio" name="radio-3" id="radio-3">
-								<br>
+					<br>
 					<label for="radio-4">Delete</label>
 					<input type="radio" name="radio-4" id="radio-4">
 					<label for="radio-5">Create and Run</label>
@@ -148,24 +146,23 @@
 					<button onclick="exec()"> Submit</button>
 				</p>
 				<script>
-
 					$("#container").dialog({
 						height: 'auto',
 						width: 'auto'
 					});
 					$(function() {
-							var option = '';
+						var option = '';
 						$.post('/listcontainers', {
 							token: parent.token
 						}, function(data) {
-							data = data.replace(/\[/gi,'');
-							data = data.replace(/\]/gi,'');
-							data = data.replace(/\"/gi,'');
+							data = data.replace(/\[/gi, '');
+							data = data.replace(/\]/gi, '');
+							data = data.replace(/\"/gi, '');
 							var parse_data = data.split(',');
 							for (var i = 0; i < parse_data.length; i++) {
 								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
 							}
-								option += '<option value="' + 'Everything' + '">' + 'Everything' + '</option>';
+							option += '<option value="' + 'Everything' + '">' + 'Everything' + '</option>';
 							$('#containerlist').append(option);
 						});
 					});
@@ -174,9 +171,9 @@
 						$.post('/listnodes', {
 							token: parent.token
 						}, function(data) {
-							data = data.replace(/\[/gi,'');
-							data = data.replace(/\]/gi,'');
-							data = data.replace(/\"/gi,'');
+							data = data.replace(/\[/gi, '');
+							data = data.replace(/\]/gi, '');
+							data = data.replace(/\"/gi, '');
 							var parse_data = data.split(',');
 							for (var i = 0; i < parse_data.length; i++) {
 								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
