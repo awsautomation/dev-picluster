@@ -590,8 +590,8 @@ app.post('/listcontainers', function(req, res) {
                 if (config.layout[i].hasOwnProperty(key)) {
                     container = key;
                     node = config.layout[i].node;
-                    port = config.layout[i][key];
-                    if (port != node) {
+                    var check_port = config.layout[i][key];
+                    if (check_port != node) {
                         output.push(container);
                     }
                 }
@@ -601,29 +601,6 @@ app.post('/listcontainers', function(req, res) {
     }
 });
 
-app.post('/listcontainers', function(req, res) {
-    var command = req.body.command;
-    var node = req.body.node;
-    var check_token = req.body.token;
-    var output = [];
-    if ((check_token != token) || (!check_token)) {
-        res.end('\nError: Invalid Credentials')
-    } else {
-        for (var i = 0; i < config.layout.length; i++) {
-            for (var key in config.layout[i]) {
-                if (config.layout[i].hasOwnProperty(key)) {
-                    container = key;
-                    node = config.layout[i].node;
-                    port = config.layout[i][key];
-                    if (port != node) {
-                        output.push(container);
-                    }
-                }
-            }
-        }
-        res.send(output);
-    }
-});
 
 app.post('/listnodes', function(req, res) {
     var command = req.body.command;
@@ -739,16 +716,16 @@ app.get('/hb', function(req, res) {
     } else {
         var responseString = '';
         var node = '';
-        var port = ''
+        var check_port = ''
         var container = '';
         for (var i = 0; i < config.hb.length; i++) {
             for (var key in config.hb[i]) {
                 if (config.hb[i].hasOwnProperty(key)) {
                     container = key;
                     node = config.hb[i].node;
-                    port = config.hb[i][key];
-                    if (port != node) {
-                        hb_check(node, port, container);
+                    check_port = config.hb[i][key];
+                    if (check_port != node) {
+                        hb_check(node, check_port, container);
                     }
                 }
             }
