@@ -153,7 +153,8 @@ Pictl is a bash client to easily control the cluster. It will make all the HTTP 
 #### 2. Using the client
 
 Unless a command below has arguments([image] or [container]), the commands will
-run globally (cluster wide/config wide).
+run globally (cluster wide/config wide). For example if you run "pictl delete" without
+specifying a container, all of the containers will be deleted.
 
 To get a list of accepted arguments:
 ```
