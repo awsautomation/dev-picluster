@@ -604,7 +604,6 @@ app.post('/listcontainers', function(req, res) {
 
 app.post('/listnodes', function(req, res) {
     var command = req.body.command;
-    var node = req.body.node;
     var check_token = req.body.token;
     var output = [];
     if ((check_token != token) || (!check_token)) {
@@ -616,7 +615,7 @@ app.post('/listnodes', function(req, res) {
                     container = key;
                     node = config.layout[i].node;
                     var port_check = config.layout[i][key];
-                    if (port_check != node) {
+                    if (port_check == node) {
                         output.push(node);
                     }
                 }
