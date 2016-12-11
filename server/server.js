@@ -650,9 +650,6 @@ app.post('/listnodes', function(req, res) {
     }
 });
 
-
-
-
 app.post('/singleton', function(req, res) {
     var command = req.body.command;
     var node = req.body.node;
@@ -690,6 +687,15 @@ app.post('/singleton', function(req, res) {
 
 app.post('/exec', function(req, res) {
     var check_token = req.body.token;
+    var selected_node = '';
+    if (req.body.node) {
+        selected_node = req.body.node;
+    }
+
+    if(selected_node.indexOf('*') > -1){
+        var selected_node = '';
+    }
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
@@ -697,11 +703,10 @@ app.post('/exec', function(req, res) {
             "command": req.body.command,
             "token": token
         });
+
         for (var i = 0; i < config.layout.length; i++) {
             var node = config.layout[i].node;
             var responseString = '';
-
-            //Runs a command on each node
 
             var options = {
                 url: 'http://' + node + ':' + agentPort + '/run',
@@ -712,17 +717,29 @@ app.post('/exec', function(req, res) {
                 },
                 body: command
             }
-
-            request(options, function(error, response, body) {
-                if (error) {
-                    res.end("An error has occurred.");
-                } else {
-                    var results = JSON.parse(response.body);
-                    addLog('\nNode:' + results.node + '\n' + results.output);
-                }
-            })
+              console.log('\nNode=' + selected_node + ' ' + selected_node.length);
+            if (selected_node.length == 0) {
+                  request(options, function(error, response, body) {
+                      if (error) {
+                          res.end("An error has occurred.");
+                      } else {
+                          var results = JSON.parse(response.body);
+                          addLog('\nNode:' + results.node + '\n' + results.output);
+                      }
+                  });
+            }
+             if (selected_node.indexOf(node) > -1) {
+                request(options, function(error, response, body) {
+                    if (error) {
+                        res.end("An error has occurred.");
+                    } else {
+                        var results = JSON.parse(response.body);
+                        addLog('\nNode:' + results.node + '\n' + results.output);
+                    }
+                });
+            }
+            res.end('');
         }
-        res.end('');
     }
 });
 
@@ -749,7 +766,6 @@ function hb_check(node, container_port, container) {
         });
         client.destroy();
     });
-
 };
 
 app.get('/hb', function(req, res) {
