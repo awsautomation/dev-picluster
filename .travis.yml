@@ -14,8 +14,6 @@ script:
 - sed -i "s/192.168.0.101/$IP/" config.json
 - sed -i "s/192.168.0.102/$IP/" config.json
 - sed -i "s/3306/32400/g" config.json
-- cat config.json | grep -vi vip > temp.txt
-- mv temp.txt config.json
 - cd web;npm install; node webconsole.js&
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
