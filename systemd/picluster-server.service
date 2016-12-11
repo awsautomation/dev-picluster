@@ -4,12 +4,11 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-#Restart=always
-RemainAfterExit=yes
+Restart=always
+RemainAfterExit=no
 TimeoutStartSec=0
 ExecStart=/bin/bash /root/picluster/systemd/start-server.sh
 ExecStop=/bin/bash /root/picluster/systemd/stop-server.sh
-Type=oneshot
 
 [Install]
 WantedBy=multi-user.target

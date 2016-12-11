@@ -1,2 +1,2 @@
 #!/bin/bash
-kill -9 $(ps aux | grep -i server.js | tail -1 | cut -d ' ' -f7)
+pgrep -lf 'nodejs server.js' | kill -9 $(cut -d ' ' -f1)

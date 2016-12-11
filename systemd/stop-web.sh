@@ -1,2 +1,2 @@
 #!/bin/bash
-kill -9 $(ps aux | grep -i webconsole.js | tail -1 | cut -d ' ' -f7)
+pgrep -lf 'nodejs webconsole.js' | kill -9 $(cut -d ' ' -f1)
