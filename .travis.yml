@@ -15,5 +15,4 @@ script:
 - ./pictl exec "uname -a"
 - ./pictl status
 - ./pictl nodes
-- docker images
 - ./pictl reloadconfig
