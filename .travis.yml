@@ -16,10 +16,9 @@ script:
 - cd ../server;npm install; node server.js&
 - cd ../agent; npm install; node agent.js&
 - cd ..
-- docker pull ubuntu
 - chmod +x ./pictl
 - ./pictl build
-- sleep 180
+- sleep 300
 - ./pictl images
 - ./pictl create
 - ./pictl status
