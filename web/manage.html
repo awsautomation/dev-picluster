@@ -15,7 +15,11 @@
 			var radio_one = $('input[name=radio-1]:checked').val();
 			var radio_two = $('input[name=radio-2]:checked').val();
 			var radio_three = $('input[name=radio-3]:checked').val();
+			var radio_four = $('input[name=radio-4]:checked').val();
+			var radio_five = $('input[name=radio-5]:checked').val();
 			var command = '';
+			var path = '/singleton'
+
 
 			if (radio_one) {
 				if (radio_one.indexOf('on') > -1) {
@@ -34,7 +38,21 @@
 				}
 			}
 
-			if ((!radio_one) || (!radio_two) || (radio_three)) {
+			if (radio_four) {
+				if (radio_four.indexOf('on') > -1) {
+					command = "docker rm -f " + container;
+				}
+			}
+
+			if (radio_five) {
+				if (radio_five.indexOf('on') > -1) {
+				path = '/create';
+				}
+			}
+
+
+
+			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four)|| (!radio_five)) {
 
 				if (node.length > 1) {
 					if (container.length > 1) {
@@ -45,10 +63,11 @@
 							width: 'auto'
 						});
 
-						$.post('/singleton', {
+						$.post(path, {
 							token: parent.token,
 							command: command,
-							node: node
+							node: node,
+							container: container
 						}, function(data) {
 							$("#command").val(data);
 							$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
@@ -96,7 +115,7 @@
 			</script>
 	</div>
 
-	<div id="container" title="Manage a single container">
+	<div id="container" title="Manage Containers">
 		<p align=left>
 			<fieldset>
 	    <label for="containerlist">Select a Container</label>
@@ -116,6 +135,13 @@
 					<input type="radio" name="radio-2" id="radio-2">
 					<label for="radio-3">Restart</label>
 					<input type="radio" name="radio-3" id="radio-3">
+								<br>
+					<label for="radio-4">Delete</label>
+					<input type="radio" name="radio-4" id="radio-4">
+					<label for="radio-5">Create and Run</label>
+					<input type="radio" name="radio-5" id="radio-5">
+					<br>
+
 				</fieldset>
 				<br>
 				<p align=center>
@@ -139,7 +165,7 @@
 							for (var i = 0; i < parse_data.length; i++) {
 								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
 							}
-
+								option += '<option value="' + 'Everything' + '">' + 'Everything' + '</option>';
 							$('#containerlist').append(option);
 						});
 					});
