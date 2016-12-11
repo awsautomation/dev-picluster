@@ -40,7 +40,6 @@ function automatic_heartbeat() {
                 path: '/hb?token=' + token,
                 port: port
             };
-            console.log('\nDebug:' + JSON.stringify(options));
             var request = http.get(options, function(response) {}).on('error', function(e) {
                 console.error(e);
             });
