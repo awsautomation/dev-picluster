@@ -5,19 +5,49 @@
 	<script src="//code.jquery.com/jquery-1.10.2.js">
 	</script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
-	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script>
 		function exec() {
-			$.get("/build?token=" + parent.token, function(data) {
-					var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-						$("#command_output").val('\nBuilding the Docker images now and no response may be shown here or in the log for a while because this process can take a long time. You will be able to see the current build tasks by clicking on "Running Containers". Please check the log for the latest information after a few minutes. ' + data);
-			});
+			var e = document.getElementById("imagelist");
+			var image = e.options[e.selectedIndex].value;
+
+			if (image) {
+				hideshow('output');
+				$("#command").dialog('close');
+				$("#output").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+
+				$.post('/build', {
+					token: parent.token,
+					image: image
+				}, function(data) {
+					$("#command").val(data);
+					$("#command_output").val('Sent request to the server. Please check the logs and image list for updated information.\n' + data);
+				});
+			} else {
+				alert('Error, you did not select an image.')
+			}
+
 		}
+	</script>
+	<script>
+		function hideshow(id) {
+			var e = document.getElementById(id);
+			if (e.style.display == 'block')
+				e.style.display = 'none';
+			else
+				e.style.display = 'block';
+		}
+		$(function() {
+			hideshow('output');
+		});
 	</script>
 </head>
 
 <body>
-	<div id="output" title="Building Images">
+	<div id="output" title="Command Output">
 		<p align=center>
 			<table style="width:10%">
 				<tr>
@@ -27,12 +57,46 @@
 				</tr>
 			</table>
 			<script>
-				$("#output").dialog({
-					height: 'auto',
-					width: 'auto'
+				$(function() {
+					hideshow('output');
 				});
-				exec();
 			</script>
+	</div>
+
+	<div id="image" title="Build Docker Images">
+		<p align=left>
+			<fieldset>
+				<label for="imagelist">Select a Container</label>
+				<select name="imagelist" id="imagelist">
+	    </select>
+				<br> <br>
+				<p align=center>
+					<button onclick="exec()"> Submit</button>
+				</p>
+				<script>
+					$("#image").dialog({
+						height: 'auto',
+						width: 'auto'
+					});
+					$(function() {
+						var option = '';
+						$.post('/listcontainers', {
+							token: parent.token
+						}, function(data) {
+							data = data.replace(/\[/gi, '');
+							data = data.replace(/\]/gi, '');
+							data = data.replace(/\"/gi, '');
+							var parse_data = data.split(',');
+							for (var i = 0; i < parse_data.length; i++) {
+								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							}
+							option += '<option value="' + 'Everthing' + '">' + 'Everything' + '</option>';
+							$('#imagelist').append(option);
+						});
+					});
+				</script>
+	</div>
+	<div class="widget">
 	</div>
 	</p>
 

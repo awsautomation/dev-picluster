@@ -94,7 +94,6 @@ app.post('/', function(req, res) {
     }
 });
 
-
 app.post('/exec', function(req, res) {
     var check_token = req.body.token
     if ((check_token != token) || (!check_token)) {
@@ -136,7 +135,7 @@ app.post('/singleton', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-            var node = req.body.node;
+        var node = req.body.node;
         var command = JSON.stringify({
             "command": req.body.command,
             "token": token,
@@ -172,7 +171,7 @@ app.post('/listcontainers', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-            var node = req.body.node;
+        var node = req.body.node;
         var token_body = JSON.stringify({
             "token": token
         });
@@ -191,7 +190,7 @@ app.post('/listcontainers', function(req, res) {
             if (error) {
                 res.end(error);
             } else {
-                    res.end(body);
+                res.end(body);
             }
         })
     }
@@ -203,7 +202,7 @@ app.post('/listnodes', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-            var node = req.body.node;
+        var node = req.body.node;
         var token_body = JSON.stringify({
             "token": token
         });
@@ -222,7 +221,7 @@ app.post('/listnodes', function(req, res) {
             if (error) {
                 res.end(error);
             } else {
-                    res.end(body);
+                res.end(body);
             }
         })
     }
@@ -258,16 +257,22 @@ function clear_log(callback) {
     })
 }
 
-app.get('/create', function(req, res) {
-    var check_token = req.query['token'];
+app.post('/create', function(req, res) {
+    var check_token = req.body.token;
+    var container = '';
+    
+    if (req.body.token) {
+        container = req.body.container;
+    }
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-        request('http://' + server + ':' + server_port + '/create?' + 'token=' + token, function(error, response, body) {
+        request('http://' + server + ':' + server_port + '/create?' + 'token=' + token + '&container=' + container, function(error, response, body) {
             if (!error && response.statusCode == 200) {
                 display_log(function(data) {
-                    res.end('\nSent request to run all the containers in the configuration file.');
+                    res.end('\nSent request to create the containers.');
                 });
             } else {
                 res.end('\nError connecting with server.');
@@ -352,21 +357,41 @@ app.get('/killvip', function(req, res) {
     }
 });
 
-app.get('/build', function(req, res) {
-    var check_token = req.query['token'];
+app.post('/build', function(req, res) {
+    var check_token = req.body.token;
+    var image = req.body.image;
+
+    if (image.indexOf('Everthing') > -1) {
+        image = '';
+    }
+
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-        request('http://' + server + ':' + server_port + '/build?' + 'token=' + token, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                display_log(function(data) {
-                    res.end(data);
-                });
-            } else {
-                res.end('\nError connecting with server.');
-            }
-        })
+        if (image.length > 1) {
+
+            request('http://' + server + ':' + server_port + '/build?' + 'token=' + token + '?image=' + image, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                } else {
+                    res.end('\nError connecting with server.');
+                }
+            });
+        } else {
+
+            request('http://' + server + ':' + server_port + '/build?' + 'token=' + token, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                } else {
+                    res.end('\nError connecting with server.');
+                }
+            });
+        }
     }
 });
 
@@ -389,44 +414,6 @@ app.get('/hb', function(req, res) {
     }
 });
 
-
-
-app.get('/stop', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-        res.end('\nError: Invalid Credentials')
-    } else {
-        var responseString = '';
-        request('http://' + server + ':' + server_port + '/stop?' + 'token=' + token, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                display_log(function(data) {
-                    res.end(data);
-                });
-            } else {
-                res.end('\nError connecting with server.');
-            }
-        })
-    }
-});
-
-
-app.get('/start', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-        res.end('\nError: Invalid Credentials')
-    } else {
-        var responseString = '';
-        request('http://' + server + ':' + server_port + '/start?' + 'token=' + token, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                display_log(function(data) {
-                    res.end(data);
-                });
-            } else {
-                res.end('\nError connecting with server.');
-            }
-        })
-    }
-});
 
 app.get('/log', function(req, res) {
     var check_token = req.query['token'];
@@ -518,20 +505,8 @@ app.get('/images.html', function(req, res) {
     res.sendFile(__dirname + '/images.html');
 });
 
-app.get('/create.html', function(req, res) {
-    res.sendFile(__dirname + '/create.html');
-});
-
 app.get('/log.html', function(req, res) {
     res.sendFile(__dirname + '/log.html');
-});
-
-app.get('/start.html', function(req, res) {
-    res.sendFile(__dirname + '/start.html');
-});
-
-app.get('/stop.html', function(req, res) {
-    res.sendFile(__dirname + '/stop.html');
 });
 
 app.get('/hb.html', function(req, res) {

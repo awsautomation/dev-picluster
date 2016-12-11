@@ -35,9 +35,6 @@
             $('#editconfig').click(function() {
                 $('#iframe_a').attr('src', '/editconfig?token=' + token);
             });
-            $('#create').click(function() {
-                $('#iframe_a').attr('src', '/create.html');
-            });
             $('#log').click(function() {
                 $('#iframe_a').attr('src', '/log.html');
             });
@@ -46,12 +43,6 @@
             });
             $('#build').click(function() {
                 $('#iframe_a').attr('src', '/build.html');
-            });
-            $('#start').click(function() {
-                $('#iframe_a').attr('src', '/start.html');
-            });
-            $('#stop').click(function() {
-                $('#iframe_a').attr('src', '/stop.html');
             });
             $('#stop').click(function() {
                 $('#iframe_a').attr('src', '/stop.html');
@@ -209,10 +200,8 @@
                         <div class="dropdown">
                             <button onclick="container()" class="dropbtn">Containers</button>
                             <div id="container" class="dropdown-content">
-                                <a href="#" id="create">Create and Run</a>
-                                <a href="#" id="stop">Stop All</a>
-                                <a href="#" id="start">Start All</a>
                                 <a href="#" id="manage">Manage</a>
+                                <a href="#" id="running">Running Containers</a>
                             </div>
                     </td>
                     <td>
@@ -230,7 +219,6 @@
                                 <a href="#" id="killvip">Reset Virtual IP</a>
                                 <a href="#" id="sandbox">Run Command </a>
                                 <a href="#" id="hb">Heartbeat</a>
-                                <a href="#" id="running">Running Containers</a>
                             </div>
                     </td>
                     <td>
