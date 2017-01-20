@@ -400,6 +400,36 @@ app.post('/delete', function(req, res) {
     }
 });
 
+app.get('/prune', function(req, res) {
+  var node =  "*";
+  command = 'docker system prune -a -f';
+    var check_token = req.query['token'];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        var options = {
+            url: 'http://' + server + ':' + server_port + '/exec',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+            },
+            body: command
+        }
+
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                }
+            });
+    }
+});
+
 app.post('/stop', function(req, res) {
     var check_token = req.body.token;
     var container = "";
