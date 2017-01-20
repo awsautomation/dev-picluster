@@ -56,7 +56,7 @@ app.get('/status', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         var command = JSON.stringify({
-            "command": 'docker ps',
+            "command": 'docker container ps',
             "token": token
         });
         for (var i = 0; i < config.layout.length; i++) {
@@ -151,7 +151,7 @@ app.get('/images', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         var command = JSON.stringify({
-            "command": 'docker images',
+            "command": 'docker image list',
             "token": token
         });
         for (var i = 0; i < config.layout.length; i++) {
@@ -216,7 +216,7 @@ app.get('/build', function(req, res) {
                     if (key.indexOf("node") > -1) {} else {
 
                         var command = JSON.stringify({
-                            "command": 'docker build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
+                            "command": 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
                             "token": token
                         });
 
@@ -281,7 +281,7 @@ app.get('/create', function(req, res) {
                 if (config.layout[i].hasOwnProperty(key)) {
                     //Creates and runs the Docker images assigned to each host.
                     var command = JSON.stringify({
-                        "command": 'docker run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+                        "command": 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
                         "token": token
                     });
 
@@ -366,7 +366,7 @@ app.get('/start', function(req, res) {
                     if (key.indexOf('node') > -1) {} else {
                         //Starts the Docker images assigned to each host.
                         var command = JSON.stringify({
-                            "command": 'docker start ' + key,
+                            "command": 'docker container start ' + key,
                             "token": token
                         });
                         var options = {
@@ -429,7 +429,7 @@ app.get('/stop', function(req, res) {
                     if (key.indexOf('node') > -1) {} else {
                         //Starts the Docker images assigned to each host.
                         var command = JSON.stringify({
-                            "command": 'docker stop ' + key,
+                            "command": 'docker container stop ' + key,
                             "token": token
                         });
                         var options = {
@@ -494,7 +494,7 @@ app.get('/delete', function(req, res) {
                     if (key.indexOf('node') > -1) {} else {
                         //Starts the Docker images assigned to each host.
                         var command = JSON.stringify({
-                            "command": 'docker rm -f ' + key,
+                            "command": 'docker container rm -f ' + key,
                             "token": token
                         });
                         var options = {
@@ -556,7 +556,7 @@ app.get('/restart', function(req, res) {
                     if (key.indexOf('node') > -1) {} else {
                         //Starts the Docker images assigned to each host.
                         var command = JSON.stringify({
-                            "command": 'docker restart ' + key,
+                            "command": 'docker container restart ' + key,
                             "token": token
                         });
                         var options = {
