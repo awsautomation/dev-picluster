@@ -401,8 +401,12 @@ app.post('/delete', function(req, res) {
 });
 
 app.get('/prune', function(req, res) {
-  var node =  "*";
-  command = 'docker system prune -a -f';
+  var command = JSON.stringify({
+      "command":'docker system prune -a -f',
+      "token": token,
+      "node": '*'
+  });
+
     var check_token = req.query['token'];
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
