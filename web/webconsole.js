@@ -638,6 +638,10 @@ app.get('/running.html', function(req, res) {
     res.sendFile(__dirname + '/running.html');
 });
 
+app.get('/prune.html', function(req, res) {
+    res.sendFile(__dirname + '/prune.html');
+});
+
 app.get('/background', function(req, res) {
     res.sendFile(__dirname + '/background.jpg');
 });
