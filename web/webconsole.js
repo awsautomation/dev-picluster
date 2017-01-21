@@ -401,36 +401,20 @@ app.post('/delete', function(req, res) {
 });
 
 app.get('/prune', function(req, res) {
-  var command = JSON.stringify({
-      "command":'docker system prune -a -f',
-      "token": token,
-      "node": '*'
-  });
-
     var check_token = req.query['token'];
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
         var responseString = '';
-        var options = {
-            url: 'http://' + server + ':' + server_port + '/exec',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-            },
-            body: command
-        }
-
-            request(options, function(error, response, body) {
-                if (error) {
-                    res.end(error);
-                } else {
-                    display_log(function(data) {
-                        res.end(data);
-                    });
-                }
-            });
+        request('http://' + server + ':' + server_port + '/prune?' + 'token=' + token, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                display_log(function(data) {
+                    res.end(data);
+                });
+            } else {
+                res.end('\nError connecting with server.');
+            }
+        });
     }
 });
 
