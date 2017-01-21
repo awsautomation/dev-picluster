@@ -56,6 +56,9 @@
             $('#manage').click(function() {
                 $('#iframe_a').attr('src', '/manage.html');
             });
+            $('#prune').click(function() {
+                $('#iframe_a').attr('src', '/prune.html');
+            });
         });
     </script>
     <script>
@@ -169,7 +172,7 @@
 
 <body>
 
-    <div id="login" title="PiCluster Login">
+    <div id="login" title="PiCluster v1.1 Login">
         <p align=center>
             <img src="/logo.png" height="165" width="150">
             <br> Please login to continue
@@ -219,6 +222,7 @@
                                 <a href="#" id="killvip">Reset Virtual IP</a>
                                 <a href="#" id="sandbox">Run Command </a>
                                 <a href="#" id="hb">Heartbeat</a>
+                                <a href="#" id="prune">Clean Docker</a>
                             </div>
                     </td>
                     <td>

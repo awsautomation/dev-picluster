@@ -27,6 +27,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Docker
 * Node.js
 
+If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/rusher81572/picluster/tree/1.0)
 
 ## Server Installation
 

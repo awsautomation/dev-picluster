@@ -400,6 +400,24 @@ app.post('/delete', function(req, res) {
     }
 });
 
+app.get('/prune', function(req, res) {
+    var check_token = req.query['token'];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        request('http://' + server + ':' + server_port + '/prune?' + 'token=' + token, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                display_log(function(data) {
+                    res.end(data);
+                });
+            } else {
+                res.end('\nError connecting with server.');
+            }
+        });
+    }
+});
+
 app.post('/stop', function(req, res) {
     var check_token = req.body.token;
     var container = "";
@@ -606,6 +624,10 @@ app.get('/nodes.html', function(req, res) {
 
 app.get('/running.html', function(req, res) {
     res.sendFile(__dirname + '/running.html');
+});
+
+app.get('/prune.html', function(req, res) {
+    res.sendFile(__dirname + '/prune.html');
 });
 
 app.get('/background', function(req, res) {
