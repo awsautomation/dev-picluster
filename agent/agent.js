@@ -117,7 +117,7 @@ function send_ping() {
                         }
                     });
                 }
-                console.log('\n' + vip_slave + ' is alive');
+                //console.log('\n' + vip_slave + ' is alive');
             }
         });
         send_ping();
