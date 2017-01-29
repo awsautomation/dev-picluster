@@ -81,7 +81,7 @@ function send_ping() {
             if ((error || response.statusCode != "200")) {
                 var exec = require('child_process').exec;
                 var cmd = ip_add_command;
-                console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+                //console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
                 exec(cmd, function(error, stdout, stderr) {});
             } else {
 
@@ -117,7 +117,7 @@ function send_ping() {
                         }
                     });
                 }
-                console.log('\n' + vip_slave + ' is alive');
+                //console.log('\n' + vip_slave + ' is alive');
             }
         });
         send_ping();

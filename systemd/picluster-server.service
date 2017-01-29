@@ -4,8 +4,9 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-Restart=always
+#Restart=always
 RemainAfterExit=no
+Restart=on-failure
 TimeoutStartSec=0
 ExecStart=/bin/bash /root/picluster/systemd/start-server.sh
 ExecStop=/bin/bash /root/picluster/systemd/stop-server.sh
