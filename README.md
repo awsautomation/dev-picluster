@@ -56,6 +56,7 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
   "vip_ip": "192.168.0.15",
+  "autostart_containers": "enabled",
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "300000",
   "syslog": "dmesg",
@@ -94,6 +95,7 @@ You can run the server and agent on the same node since they are listening on di
 
 * vip_ip - The Virtual IP address to use in the cluster
 
+* autostart_containers - If set, the agent will connect to the server specififed in web_connect to start all of the containers.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
