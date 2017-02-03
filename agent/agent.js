@@ -27,6 +27,30 @@ exec('hostname', function(error, stdout, stderr) {
     }
 });
 
+if(config.autostart_containers) {
+  console.log('Starting all the containers.....');
+  var payload = JSON.stringify({
+      "container": "*",
+      "token": token
+  });
+
+  var options = {
+      url: 'http://' + config.web_connect + ':' + config.server_port + '/start',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': payload.length
+      },
+      body: payload
+  }
+
+  request(options, function(error, response, body) {
+      if (error) {
+          console.log('\nError: ' + error);
+      }
+  })
+}
+
 if (config.vip_ip) {
     var vip = config.vip_ip;
     if (config.vip) {
