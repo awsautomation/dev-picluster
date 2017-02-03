@@ -133,7 +133,7 @@ app.get('/nodes', function(req, res) {
                 if (error) {
                     res.end(error);
                 } else {
-                    console.log(response);
+                    //console.log(response);
                     var results = JSON.parse(response.body);
                     addLog('\nNode Online: ' + results.output);
                 }
