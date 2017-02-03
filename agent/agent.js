@@ -34,7 +34,7 @@ if(config.autostart_containers) {
       path: '/start?token=' + token + '&container=*',
       port: config.server_port
   };
-  var request = http.get(options, function(response) {}).on('error', function(e) {
+  var autostart_request = http.get(options, function(response) {}).on('error', function(e) {
       console.error(e);
   });
 
