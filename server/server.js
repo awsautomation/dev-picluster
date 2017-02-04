@@ -809,6 +809,21 @@ app.get('/log', function(req, res) {
     }
 });
 
+app.get('/rsyslog', function(req, res) {
+    var check_token = req.query['token'];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+      request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
+          if (!error && response.statusCode == 200) {
+              res.end(body);
+          } else {
+              res.end('Error connecting with server. ' + error);
+          }
+      })
+    }
+});
+
 app.get('/reloadconfig', function(req, res) {
     var check_token = req.query['token'];
     if ((check_token != token) || (!check_token)) {

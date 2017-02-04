@@ -247,6 +247,22 @@ app.post('/create', function(req, res) {
     }
 });
 
+app.get('/rsyslog', function(req, res) {
+    var check_token = req.query['token'];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        request('http://' + server + ':' + server_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+              res.end(body);
+            } else {
+                res.end('\nError connecting with server.');
+            }
+        })
+    }
+});
+
 app.get('/status', function(req, res) {
     var check_token = req.query['token'];
     if ((check_token != token) || (!check_token)) {
@@ -670,7 +686,9 @@ app.get('/manage.html', function(req, res) {
     res.sendFile(__dirname + '/manage.html');
 });
 
-
+app.get('/rsyslog.html', function(req, res) {
+    res.sendFile(__dirname + '/rsyslog.html');
+});
 
 webconsole.listen(port, function() {
     console.log('Listening on port %d', webconsole.address().port);
