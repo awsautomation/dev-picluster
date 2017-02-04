@@ -21,6 +21,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Web interface
 * HTTP interface
 * Virtual IP Manager
+* Rsyslog Analytics
 
 ## Prerequisites
 
