@@ -137,6 +137,15 @@ function send_ping() {
     }, vip_ping_time);
 };
 
+app.get('/rsyslog', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials')
+  } else {
+    res.sendFile(config.rsyslog_logfile);
+  }
+});
+
 app.post('/killvip', function(req, res) {
     var check_token = req.body.token;
     if (!check_token == token) {

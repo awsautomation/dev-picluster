@@ -21,6 +21,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Web interface
 * HTTP interface
 * Virtual IP Manager
+* Rsyslog Analytics
 
 ## Prerequisites
 
@@ -57,6 +58,8 @@ You can run the server and agent on the same node since they are listening on di
   ],
   "vip_ip": "192.168.0.15",
   "autostart_containers": "enabled",
+  "rsyslog_logfile": "/var/log/syslog",
+  "rsyslog_host": "192.168.0.15",
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "300000",
   "syslog": "dmesg",
@@ -96,6 +99,10 @@ You can run the server and agent on the same node since they are listening on di
 * vip_ip - The Virtual IP address to use in the cluster
 
 * autostart_containers - If set, the agent will connect to the server specififed in web_connect to start all of the containers.
+
+* rsyslog_logfile - Location of the log file on the Rsyslog server
+
+* rsyslog_host - The host running the PiCluster Agent with a Rsyslog server running or has access to the log drain file.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.

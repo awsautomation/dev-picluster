@@ -26,6 +26,9 @@
             $('#syslog').click(function() {
                 $('#iframe_a').attr('src', '/syslog.html');
             });
+            $('#rsyslog').click(function() {
+                $('#iframe_a').attr('src', '/rsyslog.html');
+            });
             $('#nodes').click(function() {
                 $('#iframe_a').attr('src', '/nodes.html');
             });
@@ -172,7 +175,7 @@
 
 <body>
 
-    <div id="login" title="PiCluster v1.3 Login">
+    <div id="login" title="PiCluster v1.4 Login">
         <p align=center>
             <img src="/logo.png" height="165" width="150">
             <br> Please login to continue
@@ -231,6 +234,7 @@
                             <div id="logging" class="dropdown-content">
                                 <a href="#" id="log">PiCluster Logs</a>
                                 <a href="#" id="syslog">System Logs</a>
+                                <a href="#" id="rsyslog">Rsyslog Analytics</a>
                             </div>
                     </td>
                 </tr>
