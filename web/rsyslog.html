@@ -1,0 +1,62 @@
+<html>
+<title>PiCluster</title>
+
+<head>
+	<script src="//code.jquery.com/jquery-1.10.2.js">
+	</script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script>
+		function exec() {
+			$.get("/rsyslog?token=" + parent.token, function(data) {
+				//	var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+				if ($('#query').val()) {
+					var search_string = $('#query').val();
+					var modified_data = data.split("\n");
+					var search_output = "";
+					for (i = 0; i != modified_data.length; i++) {
+						if (modified_data[i].toLowerCase().indexOf(search_string.toLowerCase()) > -1) {
+							search_output += "\n" + modified_data[i];
+						}
+					}
+					$("#command_output").val(search_output);
+				} else {
+					$("#command_output").val(data);
+				}
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<div id="output" title="Rsyslog">
+		<p align=center>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<input type="text" rows="30" cols="100" id="query" name="query" name="query"><br>
+					</td>
+					<td>
+						<button onclick="exec()">Search</button>
+					</td>
+				</tr>
+
+			</table>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+					</td>
+				</tr>
+			</table>
+			<script>
+				$("#output").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+				exec();
+			</script>
+	</div>
+	</p>
+
+</html>
