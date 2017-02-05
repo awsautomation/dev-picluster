@@ -6,6 +6,7 @@
 	</script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
 	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 	<script>
 		function exec() {
 			$.get("/rsyslog?token=" + parent.token, function(data) {
@@ -27,7 +28,12 @@
 		}
 
 		function search(what, id) {
-			$("#query").val(what);
+			if(what.indexOf("today") > -1){
+				var date = moment().format("MMM  D");
+					$("#query").val(date);
+			} else {
+					$("#query").val(what);
+			}
 			exec();
 			document.getElementById(id).checked = false;
 		};
@@ -48,7 +54,7 @@
 				</tr>
 
 			</table>
-			<table style="width:20%">
+			<table style="width:28%">
 				<tr>
 					<td>
 						<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
@@ -59,6 +65,9 @@
 					</td>
 					<td>
 						<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
+					</td>
+					<td>
+						<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
 					</td>
 				</tr>
 			</table>
