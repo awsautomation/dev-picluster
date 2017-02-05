@@ -25,6 +25,10 @@
 				}
 			});
 		}
+	function change(){
+        $("#query").val("error");
+				exec();
+};
 	</script>
 </head>
 
@@ -41,6 +45,13 @@
 					</td>
 				</tr>
 
+			</table>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<label><input type="checkbox" id="error" onchange="change()" value="error">Errors</label><br>
+					</td>
+				</tr>
 			</table>
 			<table style="width:10%">
 				<tr>
