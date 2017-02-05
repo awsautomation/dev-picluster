@@ -26,22 +26,10 @@
 			});
 		}
 
-		function error_search() {
-			$("#query").val("error");
+		function search(what, id) {
+			$("#query").val(what);
 			exec();
-			document.getElementById("error").checked = false;
-		};
-
-		function warning_search() {
-			$("#query").val("warning");
-			exec();
-			document.getElementById("warning").checked = false;
-		};
-
-		function failure_search() {
-			$("#query").val("failure");
-			exec();
-			document.getElementById("failure").checked = false;
+			document.getElementById(id).checked = false;
 		};
 	</script>
 </head>
@@ -63,14 +51,14 @@
 			<table style="width:20%">
 				<tr>
 					<td>
-						<label><input type="checkbox" id="error" onchange="error_search()" value="error">Errors</label><br>
+						<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
 					</td>
 					<td>
-						<label><input type="checkbox" id="warning" onchange="warning_search()" value="warning">Warnings</label><br>
+						<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
 					</td>
 					</td>
 					<td>
-						<label><input type="checkbox" id="failure" onchange="failure_search()" value="failure">Failures</label><br>
+						<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
 					</td>
 				</tr>
 			</table>
