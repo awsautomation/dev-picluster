@@ -603,6 +603,9 @@ app.get('/containerlog', function(req, res) {
     if (req.query['container']) {
         selected_container = req.query['container'];
     }
+    if (selected_container.indexOf('*') > -1) {
+        selected_container = '';
+    }
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -638,7 +641,16 @@ app.get('/containerlog', function(req, res) {
                                     }
                                 });
                             }
-                        } 
+                        } else {
+                            request(options, function(error, response, body) {
+                                if (error) {
+                                    res.end("An error has occurred.");
+                                } else {
+                                    var results = JSON.parse(response.body);
+                                    addLog('\nLogs for Container: ' + key + '\n' + results.output);
+                                }
+                            });
+                        }
                     }
                 }
             }
