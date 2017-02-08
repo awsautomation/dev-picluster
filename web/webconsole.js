@@ -223,6 +223,30 @@ function clear_log(callback) {
     })
 }
 
+app.post('/containerlog', function(req, res) {
+    var check_token = req.body.token;
+    var container = '';
+
+    if (req.body.token) {
+        container = req.body.container;
+    }
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        request('http://' + server + ':' + server_port + '/containerlog?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                display_log(function(data) {
+                    res.end('\n' + data);
+                });
+            } else {
+                res.end('\nError connecting with server.');
+            }
+        })
+    }
+});
+
 app.post('/create', function(req, res) {
     var check_token = req.body.token;
     var container = '';

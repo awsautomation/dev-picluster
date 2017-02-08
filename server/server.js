@@ -597,8 +597,55 @@ app.get('/restart', function(req, res) {
     }
 });
 
+app.get('/containerlog', function(req, res) {
+    var check_token = req.query['token'];
+    var selected_container = '';
+    if (req.query['container']) {
+        selected_container = req.query['container'];
+    }
 
-
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        for (var i = 0; i < config.layout.length; i++) {
+            var node = config.layout[i].node;
+            for (var key in config.layout[i]) {
+                if (config.layout[i].hasOwnProperty(key)) {
+                    if (key.indexOf('node') > -1) {} else {
+                        //Starts the Docker images assigned to each host.
+                        var command = JSON.stringify({
+                            "command": 'docker container logs ' + key,
+                            "token": token
+                        });
+                        var options = {
+                            url: 'http://' + node + ':' + agentPort + '/run',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Content-Length': command.length
+                            },
+                            body: command
+                        }
+                        if (selected_container.length > 0) {
+                            if (key.indexOf(selected_container) > -1) {
+                                request(options, function(error, response, body) {
+                                    if (error) {
+                                        res.end("An error has occurred.");
+                                    } else {
+                                        var results = JSON.parse(response.body);
+                                        addLog('\nLogs for Container: ' + key + '\n' + results.output);
+                                    }
+                                });
+                            }
+                        } 
+                    }
+                }
+            }
+        }
+        res.end('');
+    }
+});
 
 app.post('/listcontainers', function(req, res) {
     var command = req.body.command;
