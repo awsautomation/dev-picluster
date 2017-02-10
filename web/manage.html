@@ -15,6 +15,7 @@
 			var radio_three = $('input[name=radio-3]:checked').val();
 			var radio_four = $('input[name=radio-4]:checked').val();
 			var radio_five = $('input[name=radio-5]:checked').val();
+			var radio_five = $('input[name=radio-6]:checked').val();
 			var command = '';
 			var path = '';
 
@@ -48,7 +49,13 @@
 				}
 			}
 
-			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four) || (!radio_five)) {
+				if (radio_five) {
+					if (radio_five.indexOf('on') > -1) {
+						path = '/containerlog';
+					}
+			}
+
+			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four) || (!radio_five) || (!radio_six)) {
 
 						hideshow('output');
 						$("#command").dialog('close');
@@ -126,6 +133,9 @@
 							<br>
 					<label for="radio-5">Create and Run</label>
 					<input type="radio" name="radio-5" id="radio-5">
+					<br>
+			<label for="radio-6">View Logs</label>
+			<input type="radio" name="radio-6" id="radio-6">
 					<br>
 				</select>
 				</fieldset>
