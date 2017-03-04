@@ -432,7 +432,7 @@ app.get('/changehost', function(req, res) {
                             original_container_data = config.layout[i][key];
                             delete config.layout[i][key];
                             if(Object.keys( config.layout[i]).length == 1){
-                            delete config.layout[i];
+                            config.layout.splice(i, 1);
                             }
                         }
                     }
@@ -449,7 +449,7 @@ app.get('/changehost', function(req, res) {
                             original_heartbeat_data = config.hb[i][key];
                             delete config.hb[i][key];
                             if(Object.keys( config.hb[i]).length == 1){
-                            delete config.hb[i];
+                            config.hb.splice(i, 1);
                             }
                         }
                     }
@@ -503,6 +503,7 @@ app.get('/changehost', function(req, res) {
             if (error) {
                 res.end(error);
             } else {
+/**
                 request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
                     if (!error && response.statusCode == 200) {
                         request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
@@ -522,6 +523,8 @@ app.get('/changehost', function(req, res) {
                         res.end('\nError connecting with server.');
                     }
                 });
+                **/
+                  res.end('Done');
             }
         });
     }
