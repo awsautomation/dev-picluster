@@ -422,6 +422,26 @@ app.get('/changehost', function(req, res) {
     } else {
         var responseString = '';
 
+        //Ensures that the host exists
+        var proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (key.indexOf(container) > -1) {
+                            if (key.indexOf(config.layout[i].node)) {
+                                proceed = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (proceed == 0) {
+            res.end('\nError: Node does not exist!');
+        } else {
+
         //Find Current Host
         for (var i = 0; i < config.layout.length; i++) {
             for (var key in config.layout[i]) {
@@ -431,8 +451,8 @@ app.get('/changehost', function(req, res) {
                             original_host = config.layout[i].node;
                             original_container_data = config.layout[i][key];
                             delete config.layout[i][key];
-                            if(Object.keys( config.layout[i]).length == 1){
-                            config.layout.splice(i, 1);
+                            if (Object.keys(config.layout[i]).length == 1) {
+                                config.layout.splice(i, 1);
                             }
                         }
                     }
@@ -448,8 +468,8 @@ app.get('/changehost', function(req, res) {
                         if (key.indexOf(container) > -1) {
                             original_heartbeat_data = config.hb[i][key];
                             delete config.hb[i][key];
-                            if(Object.keys( config.hb[i]).length == 1){
-                            config.hb.splice(i, 1);
+                            if (Object.keys(config.hb[i]).length == 1) {
+                                config.hb.splice(i, 1);
                             }
                         }
                     }
@@ -503,30 +523,31 @@ app.get('/changehost', function(req, res) {
             if (error) {
                 res.end(error);
             } else {
-/**
-                request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                    if (!error && response.statusCode == 200) {
-                        request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
-                            if (!error && response.statusCode == 200) {
-                                request('http://127.0.0.1' + ':' + port + '/start?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                /**
+                                request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
                                     if (!error && response.statusCode == 200) {
-                                        res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
+                                        request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
+                                            if (!error && response.statusCode == 200) {
+                                                request('http://127.0.0.1' + ':' + port + '/start?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                                    if (!error && response.statusCode == 200) {
+                                                        res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
+                                                    } else {
+                                                        res.end('\nError connecting with server.');
+                                                    }
+                                                });
+                                            } else {
+                                                res.end('\nError connecting with server.');
+                                            }
+                                        });
                                     } else {
                                         res.end('\nError connecting with server.');
                                     }
                                 });
-                            } else {
-                                res.end('\nError connecting with server.');
-                            }
-                        });
-                    } else {
-                        res.end('\nError connecting with server.');
-                    }
-                });
-                **/
-                  res.end('Done');
+                                **/
+                res.end('Done');
             }
         });
+      }
     }
 });
 
