@@ -431,6 +431,9 @@ app.get('/changehost', function(req, res) {
                             original_host = config.layout[i].node;
                             original_container_data = config.layout[i][key];
                             delete config.layout[i][key];
+                            if(Object.keys( config.layout[i]).length == 1){
+                            delete config.layout[i];
+                            }
                         }
                     }
                 }
@@ -445,6 +448,9 @@ app.get('/changehost', function(req, res) {
                         if (key.indexOf(container) > -1) {
                             original_heartbeat_data = config.hb[i][key];
                             delete config.hb[i][key];
+                            if(Object.keys( config.hb[i]).length == 1){
+                            delete config.hb[i];
+                            }
                         }
                     }
                 }
