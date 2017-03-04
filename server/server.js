@@ -527,7 +527,7 @@ app.get('/changehost', function(req, res) {
                         if (!error && response.statusCode == 200) {
                             request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
                                 if (!error && response.statusCode == 200) {
-                                    request('http://127.0.0.1' + ':' + port + '/start?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                    request('http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container, function(error, response, body) {
                                         if (!error && response.statusCode == 200) {
                                             res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
                                         } else {
