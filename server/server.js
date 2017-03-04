@@ -406,6 +406,121 @@ app.get('/start', function(req, res) {
         res.end('');
     }
 });
+app.get('/changehost', function(req, res) {
+    var check_token = req.query['token'];
+    var container = '';
+    var original_host = '';
+    var original_container_data = '';
+    var original_heartbeat_data = '';
+    var new_host = req.query['newhost'];
+    if (req.query['container']) {
+        container = req.query['container'];
+    }
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+
+        //Find Current Host
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (key.indexOf(container) > -1) {
+                            original_host = config.layout[i].node;
+                            original_container_data = config.layout[i][key];
+                            delete config.layout[i][key];
+                        }
+                    }
+                }
+            }
+        }
+
+        //Checks for HB
+        for (var i = 0; i < config.hb.length; i++) {
+            for (var key in config.hb[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (key.indexOf(container) > -1) {
+                            original_heartbeat_data = config.hb[i][key];
+                            delete config.hb[i][key];
+                        }
+                    }
+                }
+            }
+        }
+
+        //Add Data to New Host
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (config.layout[i].node.indexOf(new_host) > -1) {
+                            config.layout[i][container] = original_container_data;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Adds Heartbeat Data to New Host
+        for (var i = 0; i < config.hb.length; i++) {
+            for (var key in config.hb[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (config.hb[i].node.indexOf(new_host) > -1) {
+                            config.hb[i][container] = original_heartbeat_data;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        //Save Configuration
+        var new_config = JSON.stringify({
+            "payload": JSON.stringify(config),
+            "token": token
+        });
+        var options = {
+            url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': new_config.length
+            },
+            body: new_config,
+        }
+
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
+                            if (!error && response.statusCode == 200) {
+                                request('http://127.0.0.1' + ':' + port + '/start?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                    if (!error && response.statusCode == 200) {
+                                        res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
+                                    } else {
+                                        res.end('\nError connecting with server.');
+                                    }
+                                });
+                            } else {
+                                res.end('\nError connecting with server.');
+                            }
+                        });
+                    } else {
+                        res.end('\nError connecting with server.');
+                    }
+                });
+            }
+        });
+    }
+});
+
 
 app.get('/stop', function(req, res) {
     var check_token = req.query['token'];
@@ -765,6 +880,8 @@ app.post('/exec', function(req, res) {
     }
 });
 
+
+
 app.get('/prune', function(req, res) {
     var check_token = req.query['token'];
     if ((check_token != token) || (!check_token)) {
@@ -788,15 +905,15 @@ app.get('/prune', function(req, res) {
                 body: command
             }
 
-                request(options, function(error, response, body) {
-                    if (error) {
-                        res.end("An error has occurred.");
-                    } else {
-                        var results = JSON.parse(response.body);
-                        addLog('\nNode:' + results.node + '\n' + results.output);
-                        console.log('\nNode:' + results.node + '\n' + results.output);
-                    }
-                });
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end("An error has occurred.");
+                } else {
+                    var results = JSON.parse(response.body);
+                    addLog('\nNode:' + results.node + '\n' + results.output);
+                    console.log('\nNode:' + results.node + '\n' + results.output);
+                }
+            });
             res.end('');
         }
     }
@@ -873,13 +990,13 @@ app.get('/rsyslog', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-      request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
-          if (!error && response.statusCode == 200) {
-              res.end(body);
-          } else {
-              res.end('Error connecting with server. ' + error);
-          }
-      })
+        request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                res.end(body);
+            } else {
+                res.end('Error connecting with server. ' + error);
+            }
+        })
     }
 });
 
