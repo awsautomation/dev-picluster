@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-server='192.168.0.116'
+server='192.168.0.120'
 port='3000'
 token='1234567890ABCDEFGHJKLMNOP'
 
@@ -89,6 +89,13 @@ curl -s -G -d "token=$token&container=$1" http://$server:$port/restart
 logs
 }
 
+migrate(){
+clear
+echo "Restarting the container(s)....."
+curl -s -G -d "token=$token&newhost=$2&container=$1" http://$server:$port/changehost
+logs
+}
+
 delete(){
 clear
 echo "Deleting the container(s)....."
@@ -125,6 +132,7 @@ if [ "$1" = "images" ]; then images;exit; fi;
 if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
 if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
 if [ "$1" = "restart" ]; then restart "$2";exit; fi;
+if [ "$1" = "migrate" ]; then migrate "$2" "$3";exit; fi;
 if [ "$1" = "delete" ]; then delete "$2";exit; fi;
 if [ "$1" = "build" ]; then echo "Building Images....";build "$2"; fi;
 if [ "$1" = "start" ]; then echo "Running container(s)....";start "$2"; fi;
