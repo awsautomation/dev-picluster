@@ -478,12 +478,14 @@ app.get('/changehost', function(req, res) {
             }
 
             //Add Data to New Host
+            var found_hb_data = 0;
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (config.layout[i].node.indexOf(new_host) > -1) {
                                 config.layout[i][container] = original_container_data;
+                                found_hb_data = 1;
                             }
                         }
                     }
@@ -491,18 +493,19 @@ app.get('/changehost', function(req, res) {
             }
 
             //Adds Heartbeat Data to New Host
-            for (var i = 0; i < config.hb.length; i++) {
-                for (var key in config.hb[i]) {
-                    if (!key.indexOf('node') == 0) {
-                        if (container.length > 0) {
-                            if (config.hb[i].node.indexOf(new_host) > -1) {
-                                config.hb[i][container] = original_heartbeat_data;
+            if (found_hb_data = 1) {
+                for (var i = 0; i < config.hb.length; i++) {
+                    for (var key in config.hb[i]) {
+                        if (!key.indexOf('node') == 0) {
+                            if (container.length > 0) {
+                                if (config.hb[i].node.indexOf(new_host) > -1) {
+                                    config.hb[i][container] = original_heartbeat_data;
+                                }
                             }
                         }
                     }
                 }
             }
-
 
             //Save Configuration
             var new_config = JSON.stringify({
