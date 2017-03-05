@@ -470,6 +470,7 @@ app.get('/changehost', function(req, res) {
                                 delete config.hb[i][key];
                                 if (Object.keys(config.hb[i]).length == 1) {
                                     config.hb.splice(i, 1);
+                                    original_heartbeat_data = '';
                                 }
                             }
                         }
@@ -492,7 +493,7 @@ app.get('/changehost', function(req, res) {
             }
 
             //Adds Heartbeat Data to New Host
-            if (original_heartbeat_data = 1) {
+            if (original_heartbeat_data) {
                 for (var i = 0; i < config.hb.length; i++) {
                     for (var key in config.hb[i]) {
                         if (!key.indexOf('node') == 0) {
