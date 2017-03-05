@@ -461,12 +461,14 @@ app.get('/changehost', function(req, res) {
             }
 
             //Checks for HB
+            var found_hb_data = 0;
             for (var i = 0; i < config.hb.length; i++) {
                 for (var key in config.hb[i]) {
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
                                 original_heartbeat_data = config.hb[i][key];
+                                found_hb_data = 1;
                                 delete config.hb[i][key];
                                 if (Object.keys(config.hb[i]).length == 1) {
                                     config.hb.splice(i, 1);
@@ -478,14 +480,13 @@ app.get('/changehost', function(req, res) {
             }
 
             //Add Data to New Host
-            var found_hb_data = 0;
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (config.layout[i].node.indexOf(new_host) > -1) {
                                 config.layout[i][container] = original_container_data;
-                                found_hb_data = 1;
+
                             }
                         }
                     }
