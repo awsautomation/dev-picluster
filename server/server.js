@@ -453,8 +453,7 @@ app.get('/changehost', function(req, res) {
                                 var options = {
                                     uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
                                 };
-                                var stop_container = request.get(options, function(error, response, body) {    
-                                });
+                                var stop_container = request.get(options, function(error, response, body) {});
                                 delete config.layout[i][key];
                                 if (Object.keys(config.layout[i]).length == 1) {
                                     config.layout.splice(i, 1);
@@ -547,7 +546,9 @@ app.get('/changehost', function(req, res) {
                                 var options = {
                                     uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
                                 };
-                                var restart_containers = request.get(options, function(error, response, body) {});
+                                var restart_containers = request.get(options, function(error, response, body) {
+                                    res.send('\nMigrated ' + container + " from " + original_host + " to " + new_host);
+                                });
                             });
                         });
                     });
