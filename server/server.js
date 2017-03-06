@@ -450,6 +450,10 @@ app.get('/changehost', function(req, res) {
                             if (key.indexOf(container) > -1) {
                                 original_host = config.layout[i].node;
                                 original_container_data = config.layout[i][key];
+                                var options = {
+                                    uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
+                                };
+                                var stop_container = request.get(options, function(error, response, body) {});
                                 delete config.layout[i][key];
                                 if (Object.keys(config.layout[i]).length == 1) {
                                     config.layout.splice(i, 1);
@@ -507,57 +511,49 @@ app.get('/changehost', function(req, res) {
                 }
             }
 
-            //Stops container from running on old host
-            var options = {
-                uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
-            };
-            var stop_container = request.get(options, function(error, response, body) {
-                //Save Configuration
-                var options = {
-                    url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Content-Length': new_config.length
-                    },
-                    body: new_config,
-                }
-
-                request(options, function(error, response, body) {
-                    if (error) {
-                        res.end(error);
-                    } else {
-                        var option = {
-                            uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
-                        };
-                        var build_container = request.get(options, function(response) {
-                            var options = {
-                                uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
-                            };
-                            var create_container = request.get(options, function(error, response, body) {
-                                var options = {
-                                    uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
-                                };
-                                var reload_config = request.get(options, function(error, response, body) {
-                                    setTimeout(function() {
-                                        var options = {
-                                            uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
-                                        };
-                                        var restart_containers = request.get(options, function(error, response, body) {});
-                                    });
-                                }, 3000);
-                            });
-                        });
-                    }
-                });
-            });
-
             var new_config = JSON.stringify({
                 "payload": JSON.stringify(config),
                 "token": token
             });
 
+            //Save Configuration
+            var options = {
+                url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': new_config.length
+                },
+                body: new_config,
+            }
 
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    var option = {
+                        uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
+                    };
+                    var build_container = request.get(options, function(response) {
+                        var options = {
+                            uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
+                        };
+                        var create_container = request.get(options, function(error, response, body) {
+                            var options = {
+                                uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
+                            };
+                            var reload_config = request.get(options, function(error, response, body) {
+                                setTimeout(function() {
+                                    var options = {
+                                        uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
+                                    };
+                                    var restart_containers = request.get(options, function(error, response, body) {});
+                                });
+                            }, 3000);
+                        });
+                    });
+                }
+            });
         };
     };
 });
