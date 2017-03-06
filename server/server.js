@@ -445,6 +445,7 @@ app.get('/changehost', function(req, res) {
             //Find Current Host
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
+                  console.log('\nDebug 1');
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
@@ -454,7 +455,7 @@ app.get('/changehost', function(req, res) {
                                     uri: 'http://127.0.0.1' + ':' + port + '/delete?' + 'token=' + token + '&container=' + container
                                 };
                                 var stop_container = request.get(options, function(error, response, body) {
-                                    console.log('\nStopped ' + container + " on " + original_host);
+                                    console.log('\nDeleted ' + container + " on " + original_host);
                                 });
                                 delete config.layout[i][key];
                                 if (Object.keys(config.layout[i]).length == 1) {
@@ -469,6 +470,7 @@ app.get('/changehost', function(req, res) {
             //Checks for HB
             for (var i = 0; i < config.hb.length; i++) {
                 for (var key in config.hb[i]) {
+                    console.log('\nDebug 2');
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
