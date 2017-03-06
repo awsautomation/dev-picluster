@@ -542,9 +542,6 @@ app.get('/changehost', function(req, res) {
                         };
                         var create_container = request.get(options, function(error, response, body) {
                             var options = {
-                                uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
-                            };
-                            var options = {
                                 uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
                             };
                             var reload_config = request.get(options, function(error, response, body) {
