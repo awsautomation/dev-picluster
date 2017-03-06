@@ -445,7 +445,6 @@ app.get('/changehost', function(req, res) {
             //Find Current Host
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
-                  console.log('\nDebug 1');
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
@@ -454,7 +453,7 @@ app.get('/changehost', function(req, res) {
                                 var options = {
                                     uri: 'http://127.0.0.1' + ':' + port + '/delete?' + 'token=' + token + '&container=' + container
                                 };
-                                var stop_container = request.get(options, function(error, response, body) {
+                                var delete_container = request.get(options, function(error, response, body) {
                                     console.log('\nDeleted ' + container + " on " + original_host);
                                 });
                                 delete config.layout[i][key];
@@ -470,7 +469,6 @@ app.get('/changehost', function(req, res) {
             //Checks for HB
             for (var i = 0; i < config.hb.length; i++) {
                 for (var key in config.hb[i]) {
-                    console.log('\nDebug 2');
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
@@ -535,10 +533,11 @@ app.get('/changehost', function(req, res) {
                 if (error) {
                     res.end(error);
                 } else {
-                    var options = {
-                        uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
-                    };
-                    var reload_config = request.get(options, function(error, response, body) {
+
+                //    var options = {
+                //        uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
+              //      };
+                //   var reload_config = request.get(options, function(error, response, body) {
                         var option = {
                             uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
                         };
@@ -556,7 +555,7 @@ app.get('/changehost', function(req, res) {
                             });
 
                         });
-                    });
+                //    });
                 }
             });
         };
