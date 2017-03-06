@@ -547,7 +547,7 @@ app.get('/changehost', function(req, res) {
                                     uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
                                 };
                                 var restart_containers = request.get(options, function(error, response, body) {
-                                    res.send('\nMigrated ' + container + " from " + original_host + " to " + new_host);
+                                    res.end('\nMigrated ' + container + " from " + original_host + " to " + new_host);
                                 });
                             });
                         });
