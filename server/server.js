@@ -507,15 +507,18 @@ app.get('/changehost', function(req, res) {
                 }
             }
 
+            //Stops container from running on old host
             var options = {
                 uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
             };
             var stop_container = request.get(options, function(error, response, body) {});
-            //Save Configuration
+
             var new_config = JSON.stringify({
                 "payload": JSON.stringify(config),
                 "token": token
             });
+
+            //Save Configuration
             var options = {
                 url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
                 method: 'POST',
