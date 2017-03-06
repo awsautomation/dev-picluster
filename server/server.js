@@ -528,21 +528,21 @@ app.get('/changehost', function(req, res) {
                 } else {
                     var build_container = http.get('http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container, function(response) {
                         response.on('end', function(data) {
-                          var create_container = http.get('http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                              response.on('end', function(data) {
-                                      var stop_container = http.get('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                            response.on('end', function(data) {
-                                              var reload_config = http.get('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
-                                                    response.on('end', function(data) {
-                                                          var restart_containers = http.get('http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                                            response.on('end', function(data) {
-                                                                res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
-                                                            });
+                            var create_container = http.get('http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                response.on('end', function(data) {
+                                    var stop_container = http.get('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                        response.on('end', function(data) {
+                                            var reload_config = http.get('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
+                                                response.on('end', function(data) {
+                                                    var restart_containers = http.get('http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                                        response.on('end', function(data) {
+                                                            res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
                                                         });
                                                     });
                                                 });
                                             });
                                         });
+                                    });
                                 });
                             });
                         });
