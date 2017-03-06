@@ -530,7 +530,6 @@ app.get('/changehost', function(req, res) {
                         response.on('end', function(data) {
                           var create_container = http.get('http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container, function(error, response, body) {
                               response.on('end', function(data) {
-                                    setTimeout(function() {
                                       var stop_container = http.get('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
                                             response.on('end', function(data) {
                                               var reload_config = http.get('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
@@ -544,8 +543,6 @@ app.get('/changehost', function(req, res) {
                                                 });
                                             });
                                         });
-
-                                    }, 3000);
                                 });
                             });
                         });
