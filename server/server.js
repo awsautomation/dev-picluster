@@ -540,7 +540,7 @@ app.get('/changehost', function(req, res) {
                                 };
                                 var reload_config = request.get(options, function(error, response, body) {
                                     var options = {
-                                        uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token
+                                        uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
                                     };
                                     var restart_containers = request.get(options, function(error, response, body) {});
                                 });
