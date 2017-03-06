@@ -522,35 +522,38 @@ app.get('/changehost', function(req, res) {
                 body: new_config,
             }
 
-
-            var option = {
-                uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
-            };
-            var build_container = request.get(options, function(response) {
-                var options = {
-                    uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
-                };
-                var create_container = request.get(options, function(error, response, body) {
-                    var options = {
-                        uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    var option = {
+                        uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
                     };
-                    var stop_container = request.get(options, function(error, response, body) {
+                    var build_container = request.get(options, function(response) {
                         var options = {
-                            uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
+                            uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
                         };
-                        var reload_config = request.get(options, function(error, response, body) {
-                            setTimeout(function() {
+                        var create_container = request.get(options, function(error, response, body) {
+                            var options = {
+                                uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
+                            };
+                            var stop_container = request.get(options, function(error, response, body) {
                                 var options = {
-                                    uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
+                                    uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
                                 };
-                                var restart_containers = request.get(options, function(error, response, body) {});
+                                var reload_config = request.get(options, function(error, response, body) {
+                                    setTimeout(function() {
+                                        var options = {
+                                            uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
+                                        };
+                                        var restart_containers = request.get(options, function(error, response, body) {});
+                                    });
+                                }, 3000);
                             });
-                        }, 3000);
-
+                        });
                     });
-                });
+                }
             });
-
         };
     };
 });
