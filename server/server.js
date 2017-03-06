@@ -544,7 +544,7 @@ app.get('/changehost', function(req, res) {
                                                 });
                                             });
                                         });
-                                    }, 1000)
+                                    }, 3000)
                                 });
                             });
                         });
