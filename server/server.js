@@ -530,20 +530,21 @@ app.get('/changehost', function(req, res) {
                         response.on('end', function(data) {
                             request('http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container, function(error, response, body) {
                                 response.on('end', function(data) {
-                                    request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                        response.on('end', function(data) {
-                                            request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
-                                                response.on('end', function(data) {
-                                                    request('http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                                        response.on('end', function(data) {
-                                                            res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
+                                    setTimeout(function() {
+                                        request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                            response.on('end', function(data) {
+                                                request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
+                                                    response.on('end', function(data) {
+                                                        request('http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                                                            response.on('end', function(data) {
+                                                                res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
+                                                            });
                                                         });
                                                     });
                                                 });
                                             });
                                         });
-                                    });
-
+                                    }, 1000)
                                 });
                             });
                         });
