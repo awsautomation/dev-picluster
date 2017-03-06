@@ -453,7 +453,9 @@ app.get('/changehost', function(req, res) {
                                 var options = {
                                     uri: 'http://127.0.0.1' + ':' + port + '/delete?' + 'token=' + token + '&container=' + container
                                 };
-                                var delete_container = request.get(options, function(error, response, body) {});
+                                var delete_container = request.get(options, function(error, response, body) {
+
+                                });
                                 delete config.layout[i][key];
                                 if (Object.keys(config.layout[i]).length == 1) {
                                     config.layout.splice(i, 1);
@@ -526,32 +528,28 @@ app.get('/changehost', function(req, res) {
                 body: new_config,
             }
 
-            setTimeout(function() {
-                request(options, function(error, response, body) {
-                    if (error) {
-                        res.end(error);
-                    } else {
-                        var option = {
-                            uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    var option = {
+                        uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
+                    };
+                    var build_container = request.get(options, function(response) {
+                        var options = {
+                            uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
                         };
-                        var build_container = request.get(options, function(response) {
-                            setTimeout(function() {
-                                var options = {
-                                    uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
-                                };
-                                var create_container = request.get(options, function(error, response, body) {
-                                    var options = {
-                                        uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
-                                    };
-                                    var restart_containers = request.get(options, function(error, response, body) {
-                                        res.end('\nMigrated ' + container + " from " + original_host + " to " + new_host);
-                                    });
-                                }, 5000);
+                        var create_container = request.get(options, function(error, response, body) {
+                            var options = {
+                                uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
+                            };
+                            var restart_containers = request.get(options, function(error, response, body) {
+                                res.end('\nMigrated ' + container + " from " + original_host + " to " + new_host);
                             });
                         });
-                    }
-                });
-            }, 5000);
+                    });
+                }
+            });
         };
     };
 });
