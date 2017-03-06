@@ -552,7 +552,6 @@ app.get('/changehost', function(req, res) {
                                     var restart_containers = request.get(options, function(error, response, body) {});
                                 });
                             }, 3000);
-
                         });
                     });
                 }
