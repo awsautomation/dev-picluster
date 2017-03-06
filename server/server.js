@@ -529,30 +529,22 @@ app.get('/changehost', function(req, res) {
                     var build_container = http.get('http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&image=' + container, function(response) {
                         response.on('end', function(data) {
                             request('http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                if (!error && response.statusCode == 200) {
+                                response.on('end', function(data) {
                                     request('http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                        if (!error && response.statusCode == 200) {
+                                        response.on('end', function(data) {
                                             request('http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
-                                                if (!error && response.statusCode == 200) {
+                                                response.on('end', function(data) {
                                                     request('http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container, function(error, response, body) {
-                                                        if (!error && response.statusCode == 200) {
+                                                        response.on('end', function(data) {
                                                             res.end('Migrated ' + container + ' from ' + original_host + ' to ' + new_host);
-                                                        } else {
-                                                            res.end('\nError connecting with server.');
-                                                        }
+                                                        });
                                                     });
-                                                } else {
-                                                    res.end('\nError connecting with server.');
-                                                }
+                                                });
                                             });
-                                        } else {
-                                            res.end('\nError connecting with server.');
-                                        }
+                                        });
                                     });
 
-                                } else {
-                                    res.end('\nError connecting with server.');
-                                }
+                                });
                             });
                         });
                     });
