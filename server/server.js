@@ -453,9 +453,7 @@ app.get('/changehost', function(req, res) {
                                 var options = {
                                     uri: 'http://127.0.0.1' + ':' + port + '/delete?' + 'token=' + token + '&container=' + container
                                 };
-                                var delete_container = request.get(options, function(error, response, body) {
-                                    console.log('\nDeleted ' + container + " on " + original_host);
-                                });
+                                var delete_container = request.get(options, function(error, response, body) {});
                                 delete config.layout[i][key];
                                 if (Object.keys(config.layout[i]).length == 1) {
                                     config.layout.splice(i, 1);
@@ -491,7 +489,6 @@ app.get('/changehost', function(req, res) {
                         if (container.length > 0) {
                             if (config.layout[i].node.indexOf(new_host) > -1) {
                                 config.layout[i][container] = original_container_data;
-
                             }
                         }
                     }
@@ -529,15 +526,11 @@ app.get('/changehost', function(req, res) {
                 body: new_config,
             }
 
-            request(options, function(error, response, body) {
-                if (error) {
-                    res.end(error);
-                } else {
-
-                //    var options = {
-                //        uri: 'http://127.0.0.1' + ':' + port + '/reloadconfig?' + 'token=' + token
-              //      };
-                //   var reload_config = request.get(options, function(error, response, body) {
+            setTimeout(function() {
+                request(options, function(error, response, body) {
+                    if (error) {
+                        res.end(error);
+                    } else {
                         var option = {
                             uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
                         };
@@ -555,9 +548,11 @@ app.get('/changehost', function(req, res) {
                             });
 
                         });
-                //    });
-                }
-            });
+                    }
+                });
+            }, 5000);
+
+
         };
     };
 });
