@@ -535,24 +535,23 @@ app.get('/changehost', function(req, res) {
                             uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
                         };
                         var build_container = request.get(options, function(response) {
-                            var options = {
-                                uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
-                            };
-                            var create_container = request.get(options, function(error, response, body) {
+                            setTimeout(function() {
                                 var options = {
-                                    uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
+                                    uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
                                 };
-                                var restart_containers = request.get(options, function(error, response, body) {
-                                    res.end('\nMigrated ' + container + " from " + original_host + " to " + new_host);
-                                });
+                                var create_container = request.get(options, function(error, response, body) {
+                                    var options = {
+                                        uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
+                                    };
+                                    var restart_containers = request.get(options, function(error, response, body) {
+                                        res.end('\nMigrated ' + container + " from " + original_host + " to " + new_host);
+                                    });
+                                }, 5000);
                             });
-
                         });
                     }
                 });
             }, 5000);
-
-
         };
     };
 });
