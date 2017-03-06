@@ -451,7 +451,7 @@ app.get('/changehost', function(req, res) {
                                 original_host = config.layout[i].node;
                                 original_container_data = config.layout[i][key];
                                 var options = {
-                                    uri: 'http://127.0.0.1' + ':' + port + '/stop?' + 'token=' + token + '&container=' + container
+                                    uri: 'http://127.0.0.1' + ':' + port + '/delete?' + 'token=' + token + '&container=' + container
                                 };
                                 var stop_container = request.get(options, function(error, response, body) {
                                   console.log('\nStopped ' + container + " on " + original_host);
