@@ -407,7 +407,7 @@ app.get('/start', function(req, res) {
     }
 });
 
-function migrate(container, original_host, new_host) {
+function migrate(container, original_host, new_host, original_container_data) {
     var command = JSON.stringify({
         "command": 'docker rm -f ' + container,
         "token": token
@@ -426,20 +426,47 @@ function migrate(container, original_host, new_host) {
         if (error) {
             addLog("An error has occurred.");
         } else {
-            request('http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container, function(error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    var option = {
-                        uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
-                    };
-                    var build_container = request.get(options, function(response) {
-                        var options = {
-                            uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
-                        };
-                        var create_container = request.get(options, function(error, response, body) {
-                            addLog('\nMigrated ' + container + " from " + original_host + " to " + new_host);
-                        });
+
+            var command = JSON.stringify({
+                "command": 'docker image build ' + dockerFolder + '/' + container + ' -t ' + container + ' -f ' + dockerFolder + '/' + container + '/Dockerfile',
+                "token": token
+            });
+
+            var options = {
+                url: 'http://' + new_host + ':' + agentPort + '/run',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': command.length
+                },
+                body: command
+            }
+
+
+            request(options, function(error, response, body) {
+                if (error) {
+                    addLog("An error has occurred.");
+                } else {
+                    var command = JSON.stringify({
+                        "command": 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+                        "token": token
                     });
-                };
+
+                    var options = {
+                        url: 'http://' + new_host + ':' + agentPort + '/run',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Content-Length': command.length
+                        },
+                        body: command
+                    }
+                    request(options, function(error, response, body) {
+                        if (error) {
+                            addLog("An error has occurred.");
+                        }
+                    });
+                }
             });
         }
     });
@@ -565,7 +592,7 @@ app.get('/changehost', function(req, res) {
                 if (error) {
                     res.end(error);
                 } else {
-                    migrate(container, original_host, new_host);
+                    migrate(container, original_host, new_host, original_container_data);
                     res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
                 }
             });
