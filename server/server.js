@@ -465,7 +465,7 @@ function migrate(container, original_host, new_host, original_container_data) {
                         if (error) {
                             addLog("An error has occurred.");
                         } else {
-                          addLog('\nStarting ' + container);
+                            addLog('\nStarting ' + container);
                         }
                     });
                 }
@@ -496,9 +496,34 @@ app.get('/changehost', function(req, res) {
             for (var key in config.layout[i]) {
                 if (!key.indexOf('node') == 0) {
                     if (container.length > 0) {
+                        if (config.layout[i].node.indexOf(new_host) > -1) {
+                        proceed++;
+                    }
+                    if (key.indexOf(container) > -1) {
+                        if (key.indexOf(config.layout[i].node)) {
+                            proceed++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (proceed < 2) {
+        res.end('\nError: Node or Container does not exist!');
+    } else {
+
+        //Find Current Host
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
                         if (key.indexOf(container) > -1) {
-                            if (key.indexOf(config.layout[i].node)) {
-                                proceed = 1;
+                            original_host = config.layout[i].node;
+                            original_container_data = config.layout[i][key];
+                            delete config.layout[i][key];
+                            if (Object.keys(config.layout[i]).length == 1) {
+                                config.layout.splice(i, 1);
                             }
                         }
                     }
@@ -506,100 +531,78 @@ app.get('/changehost', function(req, res) {
             }
         }
 
-        if (proceed == 0) {
-            res.end('\nError: Node or Container does not exist!');
-        } else {
-
-            //Find Current Host
-            for (var i = 0; i < config.layout.length; i++) {
-                for (var key in config.layout[i]) {
-                    if (!key.indexOf('node') == 0) {
-                        if (container.length > 0) {
-                            if (key.indexOf(container) > -1) {
-                                original_host = config.layout[i].node;
-                                original_container_data = config.layout[i][key];
-                                delete config.layout[i][key];
-                                if (Object.keys(config.layout[i]).length == 1) {
-                                    config.layout.splice(i, 1);
-                                }
+        //Checks for HB
+        for (var i = 0; i < config.hb.length; i++) {
+            for (var key in config.hb[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (key.indexOf(container) > -1) {
+                            original_heartbeat_data = config.hb[i][key];
+                            delete config.hb[i][key];
+                            if (Object.keys(config.hb[i]).length == 1) {
+                                config.hb.splice(i, 1);
+                                original_heartbeat_data = '';
                             }
                         }
                     }
                 }
             }
+        }
 
-            //Checks for HB
+        //Add Data to New Host
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (!key.indexOf('node') == 0) {
+                    if (container.length > 0) {
+                        if (config.layout[i].node.indexOf(new_host) > -1) {
+                            config.layout[i][container] = original_container_data;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Adds Heartbeat Data to New Host
+        if (original_heartbeat_data) {
             for (var i = 0; i < config.hb.length; i++) {
                 for (var key in config.hb[i]) {
                     if (!key.indexOf('node') == 0) {
                         if (container.length > 0) {
-                            if (key.indexOf(container) > -1) {
-                                original_heartbeat_data = config.hb[i][key];
-                                delete config.hb[i][key];
-                                if (Object.keys(config.hb[i]).length == 1) {
-                                    config.hb.splice(i, 1);
-                                    original_heartbeat_data = '';
-                                }
+                            if (config.hb[i].node.indexOf(new_host) > -1) {
+                                config.hb[i][container] = original_heartbeat_data;
                             }
                         }
                     }
                 }
             }
+        }
 
-            //Add Data to New Host
-            for (var i = 0; i < config.layout.length; i++) {
-                for (var key in config.layout[i]) {
-                    if (!key.indexOf('node') == 0) {
-                        if (container.length > 0) {
-                            if (config.layout[i].node.indexOf(new_host) > -1) {
-                                config.layout[i][container] = original_container_data;
-                            }
-                        }
-                    }
-                }
+        var new_config = JSON.stringify({
+            "payload": JSON.stringify(config),
+            "token": token
+        });
+
+        //Save Configuration
+        var options = {
+            url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': new_config.length
+            },
+            body: new_config,
+        }
+
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                migrate(container, original_host, new_host, original_container_data);
+                res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
             }
-
-            //Adds Heartbeat Data to New Host
-            if (original_heartbeat_data) {
-                for (var i = 0; i < config.hb.length; i++) {
-                    for (var key in config.hb[i]) {
-                        if (!key.indexOf('node') == 0) {
-                            if (container.length > 0) {
-                                if (config.hb[i].node.indexOf(new_host) > -1) {
-                                    config.hb[i][container] = original_heartbeat_data;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            var new_config = JSON.stringify({
-                "payload": JSON.stringify(config),
-                "token": token
-            });
-
-            //Save Configuration
-            var options = {
-                url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': new_config.length
-                },
-                body: new_config,
-            }
-
-            request(options, function(error, response, body) {
-                if (error) {
-                    res.end(error);
-                } else {
-                    migrate(container, original_host, new_host, original_container_data);
-                    res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
-                }
-            });
-        };
+        });
     };
+};
 });
 
 
