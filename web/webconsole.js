@@ -96,7 +96,7 @@ app.post('/', function(req, res) {
 
 app.post('/exec', function(req, res) {
     var check_token = req.body.token
-    var node =  req.body.node;
+    var node = req.body.node;
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
@@ -118,15 +118,15 @@ app.post('/exec', function(req, res) {
             body: command
         }
 
-            request(options, function(error, response, body) {
-                if (error) {
-                    res.end(error);
-                } else {
-                    display_log(function(data) {
-                        res.end(data);
-                    });
-                }
-            });
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                display_log(function(data) {
+                    res.end(data);
+                });
+            }
+        });
     }
 });
 
@@ -279,7 +279,7 @@ app.get('/rsyslog', function(req, res) {
         var responseString = '';
         request('http://' + server + ':' + server_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
             if (!error && response.statusCode == 200) {
-              res.end(body);
+                res.end(body);
             } else {
                 res.end('\nError connecting with server.');
             }
@@ -497,6 +497,35 @@ app.post('/stop', function(req, res) {
     }
 });
 
+app.post('/changehost', function(req, res) {
+    var check_token = req.body.token;
+    var newhost = req.body.newhost;
+    
+    if (req.body.container) {
+        container = req.body.container;
+        if (container.indexOf('Everything') > -1) {
+            container = '';
+        }
+    }
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        if (container.length > 1) {
+
+            request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                } else {
+                    res.end('\nError connecting with server.');
+                }
+            });
+        }
+    }
+});
 
 app.post('/start', function(req, res) {
     var check_token = req.body.token;
