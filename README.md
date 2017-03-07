@@ -13,7 +13,7 @@ on regular x86 hardware also and is not tied to ARM.
 ![Pic](http://i.imgur.com/4l15YjW.png)
 
 ## Features
-
+* Move containers to different hosts in the cluster
 * Run commands in parallel across Nodes
 * Heartbeat for services
 * Easily build and orchestrate Docker images across nodes
