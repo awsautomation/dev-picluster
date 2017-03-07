@@ -406,6 +406,41 @@ app.get('/start', function(req, res) {
         res.end('');
     }
 });
+
+function migrate(container, original_host, new_host) {
+    var command = JSON.stringify({
+        "command": 'docker rm -f ' + container,
+        "token": token
+    });
+    var options = {
+        url: 'http://' + original_host + ':' + agentPort + '/run',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+        },
+        body: command
+    }
+
+    request(options, function(error, response, body) {
+        if (error) {
+            addLog("An error has occurred.");
+        } else {
+            var option = {
+                uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
+            };
+            var build_container = request.get(options, function(response) {
+                var options = {
+                    uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
+                };
+                var create_container = request.get(options, function(error, response, body) {
+                    addLog('\nMigrated ' + container + " from " + original_host + " to " + new_host);
+                });
+            });
+        }
+    });
+}
+
 app.get('/changehost', function(req, res) {
     var check_token = req.query['token'];
     var container = '';
@@ -450,12 +485,6 @@ app.get('/changehost', function(req, res) {
                             if (key.indexOf(container) > -1) {
                                 original_host = config.layout[i].node;
                                 original_container_data = config.layout[i][key];
-                                var options = {
-                                    uri: 'http://127.0.0.1' + ':' + port + '/delete?' + 'token=' + token + '&container=' + container
-                                };
-                                var delete_container = request.get(options, function(error, response, body) {
-
-                                });
                                 delete config.layout[i][key];
                                 if (Object.keys(config.layout[i]).length == 1) {
                                     config.layout.splice(i, 1);
@@ -532,22 +561,8 @@ app.get('/changehost', function(req, res) {
                 if (error) {
                     res.end(error);
                 } else {
-                    var option = {
-                        uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
-                    };
-                    var build_container = request.get(options, function(response) {
-                        var options = {
-                            uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
-                        };
-                        var create_container = request.get(options, function(error, response, body) {
-                            var options = {
-                                uri: 'http://127.0.0.1' + ':' + port + '/restart?' + 'token=' + token + '&container=' + container
-                            };
-                            var restart_containers = request.get(options, function(error, response, body) {
-                                res.end('\nMigrated ' + container + " from " + original_host + " to " + new_host);
-                            });
-                        });
-                    });
+                    migrate(container, original_host, new_host);
+                    res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
                 }
             });
         };

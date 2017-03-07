@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "6"
+  - "node"
 
 script:
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
