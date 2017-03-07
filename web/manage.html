@@ -78,7 +78,7 @@
 					token: parent.token,
 					command: command,
 					container: container,
-					node: node
+					newhost: node
 				}, function(data) {
 					$("#command").val(data);
 					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
