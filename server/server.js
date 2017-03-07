@@ -426,20 +426,24 @@ function migrate(container, original_host, new_host) {
         if (error) {
             addLog("An error has occurred.");
         } else {
-            var option = {
-                uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
-            };
-            var build_container = request.get(options, function(response) {
-                var options = {
-                    uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
+            request('http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    var option = {
+                        uri: 'http://127.0.0.1' + ':' + port + '/build?' + 'token=' + token + '&image=' + container
+                    };
+                    var build_container = request.get(options, function(response) {
+                        var options = {
+                            uri: 'http://127.0.0.1' + ':' + port + '/create?' + 'token=' + token + '&container=' + container
+                        };
+                        var create_container = request.get(options, function(error, response, body) {
+                            addLog('\nMigrated ' + container + " from " + original_host + " to " + new_host);
+                        });
+                    });
                 };
-                var create_container = request.get(options, function(error, response, body) {
-                    addLog('\nMigrated ' + container + " from " + original_host + " to " + new_host);
-                });
             });
         }
     });
-}
+};
 
 app.get('/changehost', function(req, res) {
     var check_token = req.query['token'];
