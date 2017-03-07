@@ -507,7 +507,7 @@ app.get('/changehost', function(req, res) {
         }
 
         if (proceed == 0) {
-            res.end('\nError: Node does not exist!');
+            res.end('\nError: Node or Container does not exist!');
         } else {
 
             //Find Current Host
