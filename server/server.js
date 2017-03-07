@@ -464,6 +464,8 @@ function migrate(container, original_host, new_host, original_container_data) {
                     request(options, function(error, response, body) {
                         if (error) {
                             addLog("An error has occurred.");
+                        } else {
+                          addLog('\nStarting ' + container);
                         }
                     });
                 }
