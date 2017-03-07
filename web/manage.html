@@ -9,7 +9,9 @@
 	<script>
 		function exec() {
 			var e = document.getElementById("containerlist");
+			var i = document.getElementById("nodelist");
 			var container = e.options[e.selectedIndex].value;
+			var node = i.options[i.selectedIndex].value;
 			var radio_one = $('input[name=radio-1]:checked').val();
 			var radio_two = $('input[name=radio-2]:checked').val();
 			var radio_three = $('input[name=radio-3]:checked').val();
@@ -39,7 +41,7 @@
 
 			if (radio_four) {
 				if (radio_four.indexOf('on') > -1) {
-				path = '/delete';
+					path = '/delete';
 				}
 			}
 
@@ -49,29 +51,37 @@
 				}
 			}
 
-				if (radio_six) {
-					if (radio_six.indexOf('on') > -1) {
-						path = '/containerlog';
-					}
+			if (radio_six) {
+				if (radio_six.indexOf('on') > -1) {
+					path = '/containerlog';
+				}
 			}
 
-			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four) || (!radio_five) || (!radio_six)) {
+			if (radio_seven) {
+				if (radio_seven.indexOf('on') > -1) {
+					path = '/containermove';
+				}
+			}
 
-						hideshow('output');
-						$("#command").dialog('close');
-						$("#output").dialog({
-							height: 'auto',
-							width: 'auto'
-						});
 
-						$.post(path, {
-							token: parent.token,
-							command: command,
-							container: container
-						}, function(data) {
-							$("#command").val(data);
-							$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
-						});
+			if ((!radio_one) || (!radio_two) || (!radio_three) || (!radio_four) || (!radio_five) || (!radio_six) || (!radio_seven)) {
+
+				hideshow('output');
+				$("#command").dialog('close');
+				$("#output").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+
+				$.post(path, {
+					token: parent.token,
+					command: command,
+					container: container,
+					node: node
+				}, function(data) {
+					$("#command").val(data);
+					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+				});
 			} else {
 				alert('Error, you did not select an operation.')
 			}
@@ -117,53 +127,75 @@
 	    </select>
 				<br><br>
 			</fieldset>
-				<fieldset name="options" id="options">
-					<legend>Options</legend>
-					<label for="radio-1">Start</label>
-					<input type="radio" name="radio-1" id="radio-1">
-							<br>
-					<label for="radio-2">Stop</label>
-					<input type="radio" name="radio-2" id="radio-2">
-							<br>
-					<label for="radio-3">Restart</label>
-					<input type="radio" name="radio-3" id="radio-3">
-					<br>
-					<label for="radio-4">Delete</label>
-					<input type="radio" name="radio-4" id="radio-4">
-							<br>
-					<label for="radio-5">Create and Run</label>
-					<input type="radio" name="radio-5" id="radio-5">
-					<br>
-			<label for="radio-6">View Logs</label>
-			<input type="radio" name="radio-6" id="radio-6">
-					<br>
+			<fieldset name="options" id="options">
+				<legend>Options</legend>
+				<label for="radio-1">Start</label>
+				<input type="radio" name="radio-1" id="radio-1">
+				<br>
+				<label for="radio-2">Stop</label>
+				<input type="radio" name="radio-2" id="radio-2">
+				<br>
+				<label for="radio-3">Restart</label>
+				<input type="radio" name="radio-3" id="radio-3">
+				<br>
+				<label for="radio-4">Delete</label>
+				<input type="radio" name="radio-4" id="radio-4">
+				<br>
+				<label for="radio-5">Create and Run</label>
+				<input type="radio" name="radio-5" id="radio-5">
+				<br>
+				<label for="radio-6">View Logs</label>
+				<input type="radio" name="radio-6" id="radio-6">
+				<br>
 				</select>
-				</fieldset>
-				<p align=center>
-					<button onclick="exec()"> Submit</button>
-				</p>
-				<script>
-					$("#container").dialog({
-						height: 'auto',
-						width: 'auto'
+			</fieldset>
+			<fieldset>
+				<label for="radio-7">Migrate To</label>
+				<select name="nodelist" id="nodelist">
+						<input type="radio" name="radio-6" id="radio-6">
+		    </select>
+				<br><br>
+			</fieldset>
+			<p align=center>
+				<button onclick="exec()"> Submit</button>
+			</p>
+			<script>
+				$("#container").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+				$(function() {
+					var option = '';
+					$.post('/listcontainers', {
+						token: parent.token
+					}, function(data) {
+						data = data.replace(/\[/gi, '');
+						data = data.replace(/\]/gi, '');
+						data = data.replace(/\"/gi, '');
+						var parse_data = data.split(',');
+						for (var i = 0; i < parse_data.length; i++) {
+							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+						}
+						option += '<option value="' + '*' + '">' + '*' + '</option>';
+						$('#containerlist').append(option);
 					});
-					$(function() {
-						var option = '';
-						$.post('/listcontainers', {
-							token: parent.token
-						}, function(data) {
-							data = data.replace(/\[/gi, '');
-							data = data.replace(/\]/gi, '');
-							data = data.replace(/\"/gi, '');
-							var parse_data = data.split(',');
-							for (var i = 0; i < parse_data.length; i++) {
-								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-							}
-							option += '<option value="' + '*' + '">' + '*' + '</option>';
-							$('#containerlist').append(option);
-						});
+				});
+				$(function() {
+					var option = '';
+					$.post('/listnodes', {
+						token: parent.token
+					}, function(data) {
+						data = data.replace(/\[/gi, '');
+						data = data.replace(/\]/gi, '');
+						data = data.replace(/\"/gi, '');
+						var parse_data = data.split(',');
+						for (var i = 0; i < parse_data.length; i++) {
+							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+						}
+						$('#nodelist').append(option);
 					});
-				</script>
+				});
+			</script>
 	</div>
 	<div class="widget">
 	</div>
