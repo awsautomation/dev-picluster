@@ -578,6 +578,29 @@ app.post('/addhost', function(req, res) {
     }
 });
 
+app.post('/rmhost', function(req, res) {
+    var check_token = req.body.token;
+    var host = req.body.host;
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        if (host) {
+            request('http://' + server + ':' + server_port + '/rmhost?' + 'token=' + token + '&host=' + host, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                } else {
+                    res.end('\nError connecting with server.');
+                }
+            });
+        } else {
+            res.end('\nError missing host name.');
+        }
+
+    }
+});
 
 app.post('/start', function(req, res) {
     var check_token = req.body.token;
@@ -795,6 +818,9 @@ app.get('/addcontainer.html', function(req, res) {
 });
 app.get('/addhost.html', function(req, res) {
     res.sendFile(__dirname + '/addhost.html');
+});
+app.get('/rmhost.html', function(req, res) {
+    res.sendFile(__dirname + '/rmhost.html');
 });
 app.get('/rsyslog.html', function(req, res) {
     res.sendFile(__dirname + '/rsyslog.html');

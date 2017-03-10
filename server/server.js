@@ -519,6 +519,66 @@ app.get('/addhost', function(req, res) {
     };
 });
 
+app.get('/rmhost', function(req, res) {
+    var check_token = req.query['token'];
+    var host = req.query['host'];
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+
+        //Ensures that the host exists
+        var hb_proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (config.layout[i].node.indexOf(host) > -1) {
+                    config.layout.splice(i, 1);
+                    hb_proceed = 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (hb_proceed) {
+        if (config.hb) {
+            for (var i = 0; i < config.hb.length; i++) {
+                for (var key in config.hb[i]) {
+                    if (config.hb[i].node.indexOf(host) > -1) {
+                        config.hb.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    var new_config = JSON.stringify({
+        "payload": JSON.stringify(config),
+        "token": token
+    });
+
+    //Save Configuration
+    var options = {
+        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+        },
+        body: new_config,
+    }
+
+    request(options, function(error, response, body) {
+        if (error) {
+            res.end(error);
+        } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+        }
+    });
+
+});
+
+
 app.get('/addcontainer', function(req, res) {
     var check_token = req.query['token'];
     var host = req.query['host'];
