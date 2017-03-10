@@ -66,23 +66,26 @@
 
 
 			if (path) {
+				if ((radio_seven) && (container.indexOf('*') > -1)) {
+					alert('\nError: You can not migrate everything.');
+				} else {
+					hideshow('output');
+					$("#command").dialog('close');
+					$("#output").dialog({
+						height: 'auto',
+						width: 'auto'
+					});
 
-				hideshow('output');
-				$("#command").dialog('close');
-				$("#output").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-
-				$.post(path, {
-					token: parent.token,
-					command: command,
-					container: container,
-					newhost: node
-				}, function(data) {
-					$("#command").val(data);
-					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
-				});
+					$.post(path, {
+						token: parent.token,
+						command: command,
+						container: container,
+						newhost: node
+					}, function(data) {
+						$("#command").val(data);
+						$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+					});
+				}
 			} else {
 				alert('Error, you did not select an operation.')
 			}
