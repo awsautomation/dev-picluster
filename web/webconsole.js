@@ -554,6 +554,31 @@ app.post('/addcontainer', function(req, res) {
     }
 });
 
+app.post('/removecontainerconfig', function(req, res) {
+    var check_token = req.body.token;
+    var container = req.body.container;
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        if (container) {
+            request('http://' + server + ':' + server_port + '/removecontainerconfig?' + 'token=' + token + '&container=' + container, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                } else {
+                    res.end('\nError connecting with server.');
+                }
+            });
+        } else {
+            res.end('\nError container name.');
+        }
+
+    }
+});
+
+
 app.post('/addhost', function(req, res) {
     var check_token = req.body.token;
     var host = req.body.host;
