@@ -500,7 +500,7 @@ app.post('/stop', function(req, res) {
 app.post('/changehost', function(req, res) {
     var check_token = req.body.token;
     var newhost = req.body.newhost;
-    
+
     if (req.body.container) {
         container = req.body.container;
         if (container.indexOf('Everything') > -1) {
@@ -524,6 +524,33 @@ app.post('/changehost', function(req, res) {
                 }
             });
         }
+    }
+});
+
+app.post('/addcontainer', function(req, res) {
+    var check_token = req.body.token;
+    var host = req.body.host;
+    var container_args = req.body.container_args;
+    var heartbeat_args = req.body.heartbeat_args;
+    var container = req.body.container;
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        if ((container) && (container_args) && (host)) {
+            request('http://' + server + ':' + server_port + '/addcontainer?' + 'token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    display_log(function(data) {
+                        res.end(data);
+                    });
+                } else {
+                    res.end('\nError connecting with server.');
+                }
+            });
+        } else {
+            res.end('\nError missing some parameters.');
+        }
+
     }
 });
 
@@ -738,7 +765,9 @@ app.get('/syslog.html', function(req, res) {
 app.get('/manage.html', function(req, res) {
     res.sendFile(__dirname + '/manage.html');
 });
-
+app.get('/addcontainer.html', function(req, res) {
+    res.sendFile(__dirname + '/addcontainer.html');
+});
 app.get('/rsyslog.html', function(req, res) {
     res.sendFile(__dirname + '/rsyslog.html');
 });
