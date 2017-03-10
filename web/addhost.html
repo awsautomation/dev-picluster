@@ -1,0 +1,83 @@
+<html>
+<title>PiCluster</title>
+
+<head>
+	<script src="//code.jquery.com/jquery-1.10.2.js">
+	</script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+		function exec() {
+			var e = document.getElementById("nodelist");
+			var path = '/addhost';
+			var host = $("#host").val();
+
+			hideshow('output');
+			$("#command").dialog('close');
+			$("#output").dialog({
+				height: 'auto',
+				width: 'auto'
+			});
+
+			$.post(path, {
+				token: parent.token,
+				host: host
+			}, function(data) {
+				$("#command").val(data);
+				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+			});
+		}
+	</script>
+	<script>
+		function hideshow(id) {
+			var e = document.getElementById(id);
+			if (e.style.display == 'block')
+				e.style.display = 'none';
+			else
+				e.style.display = 'block';
+		}
+		$(function() {
+			hideshow('output');
+		});
+	</script>
+</head>
+
+<body>
+	<div id="output" title="Command Output">
+		<p align=center>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+					</td>
+				</tr>
+			</table>
+			<script>
+				$(function() {
+					hideshow('output');
+				});
+			</script>
+	</div>
+
+	<div id="container" title="Add a new Host">
+		<p align=left>
+			This will add a new host to the PiCluster configuration file.
+			<br><br>
+			<b>Host Name or IP:</b>
+			<input type="text" size="30" id="host" name="host" value=""></font>
+			<br><br>
+			<p align=center>
+				<button onclick="exec()"> Submit</button>
+			</p>
+			<script>
+				$("#container").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+			</script>
+	</div>
+	<div class="widget">
+	</div>
+	</p>
+
+</html>

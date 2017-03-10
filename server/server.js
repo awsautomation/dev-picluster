@@ -474,6 +474,43 @@ function migrate(container, original_host, new_host, original_container_data) {
     });
 };
 
+app.get('/addhost', function(req, res) {
+    var check_token = req.query['token'];
+    var host = req.query['host'];
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+
+        //Add New Host
+        config.layout.push({"node":host});
+
+        var new_config = JSON.stringify({
+            "payload": JSON.stringify(config),
+            "token": token
+        });
+
+        //Save Configuration
+        var options = {
+            url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': new_config.length
+            },
+            body: new_config,
+        }
+
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                res.end('\nAdded host ' + host + ' to the configuration.');
+            }
+        });
+    };
+});
+
 app.get('/addcontainer', function(req, res) {
     var check_token = req.query['token'];
     var host = req.query['host'];
@@ -490,25 +527,23 @@ app.get('/addcontainer', function(req, res) {
         var proceed = 0;
         for (var i = 0; i < config.layout.length; i++) {
             for (var key in config.layout[i]) {
-                if (!key.indexOf('node') == 0) {
                     if (config.layout[i].node.indexOf(host) > -1) {
                         proceed++;
                     }
-                }
             }
         }
 
         if (proceed < 1) {
             res.end('\nError: Node does not exist!');
         } else {
+
             //Add Data to New Host
+
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
-                    if (!key.indexOf('node') == 0) {
                         if (config.layout[i].node.indexOf(host) > -1) {
                             config.layout[i][container] = container_args;
                         }
-                    }
                 }
             }
 
@@ -516,11 +551,9 @@ app.get('/addcontainer', function(req, res) {
             if (heartbeat_args) {
                 for (var i = 0; i < config.hb.length; i++) {
                     for (var key in config.hb[i]) {
-                        if (!key.indexOf('node') == 0) {
                             if (config.hb[i].node.indexOf(host) > -1) {
                                 config.hb[i][container] = heartbeat_args;
                             }
-                        }
                     }
                 }
             }

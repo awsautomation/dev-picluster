@@ -38,6 +38,9 @@
             $('#addcontainer').click(function() {
                 $('#iframe_a').attr('src', '/addcontainer.html');
             });
+            $('#addhost').click(function() {
+                $('#iframe_a').attr('src', '/addhost.html');
+            });
             $('#editconfig').click(function() {
                 $('#iframe_a').attr('src', '/editconfig?token=' + token);
             });
@@ -203,6 +206,7 @@
                                 <a href="#" id="nodes">Nodes</a>
                                 <a href="#" id="editconfig">Edit Configuration</a>
                                 <a href="#" id="reloadconfig">Reload Configuration</a>
+                                  <a href="#" id="addhost">Add Host</a>
                             </div>
                     </td>
                     <td>
