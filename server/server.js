@@ -578,6 +578,70 @@ app.get('/rmhost', function(req, res) {
 
 });
 
+app.get('/removecontainerconfig', function(req, res) {
+    var check_token = req.query['token'];
+    var container = req.query['container'];
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+
+
+        var hb_proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (container.length > 0) {
+                    if (key.indexOf(container) > -1) {
+                        delete config.layout[i][key];
+                        hb_proceed = 1;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (hb_proceed) {
+            if (config.hb) {
+                for (var i = 0; i < config.hb.length; i++) {
+                    for (var key in config.hb[i]) {
+                        if (container.length > 0) {
+                            if (key.indexOf(container) > -1) {
+                                delete config.hb[i][key];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        var new_config = JSON.stringify({
+            "payload": JSON.stringify(config),
+            "token": token
+        });
+
+        //Save Configuration
+        var options = {
+            url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': new_config.length
+            },
+            body: new_config,
+        }
+
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                res.end('\nRemoved Container ' + container + ' from the configuration.');
+            }
+        });
+    };
+
+});
+
 
 app.get('/addcontainer', function(req, res) {
     var check_token = req.query['token'];
