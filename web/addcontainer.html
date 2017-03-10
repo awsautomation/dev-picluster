@@ -1,0 +1,114 @@
+<html>
+<title>PiCluster</title>
+
+<head>
+	<script src="//code.jquery.com/jquery-1.10.2.js">
+	</script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+		function exec() {
+			var e = document.getElementById("nodelist");
+			var path = '/addcontainer';
+			var host = e.options[e.selectedIndex].value;
+			var container = $("#container_name").val();
+			var container_args = $("#container_args").val();
+			var heartbeat_args = $("#heartbeat_args").val();
+			hideshow('output');
+			$("#command").dialog('close');
+			$("#output").dialog({
+				height: 'auto',
+				width: 'auto'
+			});
+
+			$.post(path, {
+				token: parent.token,
+				container: container,
+				host: host,
+				container_args: container_args,
+				heartbeat_args: heartbeat_args
+			}, function(data) {
+				$("#command").val(data);
+				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+			});
+		}
+	</script>
+	<script>
+		function hideshow(id) {
+			var e = document.getElementById(id);
+			if (e.style.display == 'block')
+				e.style.display = 'none';
+			else
+				e.style.display = 'block';
+		}
+		$(function() {
+			hideshow('output');
+		});
+	</script>
+</head>
+
+<body>
+	<div id="output" title="Command Output">
+		<p align=center>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+					</td>
+				</tr>
+			</table>
+			<script>
+				$(function() {
+					hideshow('output');
+				});
+			</script>
+	</div>
+
+	<div id="container" title="Add a new Container">
+		<p align=left>
+			This will add a new container to the PiCluster configuration file.
+			<br><br> Please ensure that the Dockerfile's are already on the node.
+			<br><br>
+			<label for="nodelist"><b>Select a Node</b></label>
+			<select name="nodelist" id="nodelist">
+		    </select>
+			<br><br>
+			<b>Container Name:</b>
+			<input type="text" size="50" id="container_name" name="container_name" value=""></font>
+			<br><br>
+			<b>Container Arguments:</b>
+			<input type="text" size="50" id="container_args" name="container_args" value=""></font>
+			<br><br>
+			<b>Heartbeat Port (Optional):</b>
+			<input type="text" size="50" id="heartbeat_args" name="heartbeat_args" value=""></font>
+			<br><br>
+			<p align=center>
+				<button onclick="exec()"> Submit</button>
+			</p>
+			<script>
+				$("#container").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+				$(function() {
+					var option = '';
+					$.post('/listnodes', {
+						token: parent.token
+					}, function(data) {
+						data = data.replace(/\[/gi, '');
+						data = data.replace(/\]/gi, '');
+						data = data.replace(/\"/gi, '');
+						var parse_data = data.split(',');
+						for (var i = 0; i < parse_data.length; i++) {
+							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+						}
+						$('#nodelist').append(option);
+					});
+				});
+			</script>
+	</div>
+	<div class="widget">
+	</div>
+	</p>
+
+</html>
