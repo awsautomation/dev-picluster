@@ -483,7 +483,15 @@ app.get('/addhost', function(req, res) {
     } else {
 
         //Add New Host
-        config.layout.push({"node":host});
+        config.layout.push({
+            "node": host
+        });
+
+        if (config.hb) {
+            config.hb.push({
+                "node": host
+            });
+        }
 
         var new_config = JSON.stringify({
             "payload": JSON.stringify(config),
@@ -527,9 +535,9 @@ app.get('/addcontainer', function(req, res) {
         var proceed = 0;
         for (var i = 0; i < config.layout.length; i++) {
             for (var key in config.layout[i]) {
-                    if (config.layout[i].node.indexOf(host) > -1) {
-                        proceed++;
-                    }
+                if (config.layout[i].node.indexOf(host) > -1) {
+                    proceed++;
+                }
             }
         }
 
@@ -541,19 +549,21 @@ app.get('/addcontainer', function(req, res) {
 
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
-                        if (config.layout[i].node.indexOf(host) > -1) {
-                            config.layout[i][container] = container_args;
-                        }
+                    if (config.layout[i].node.indexOf(host) > -1) {
+                        config.layout[i][container] = container_args;
+                    }
                 }
             }
 
             //Adds Heartbeat Data
-            if (heartbeat_args) {
-                for (var i = 0; i < config.hb.length; i++) {
-                    for (var key in config.hb[i]) {
+            if (config.hb) {
+                if (heartbeat_args) {
+                    for (var i = 0; i < config.hb.length; i++) {
+                        for (var key in config.hb[i]) {
                             if (config.hb[i].node.indexOf(host) > -1) {
                                 config.hb[i][container] = heartbeat_args;
                             }
+                        }
                     }
                 }
             }
@@ -585,8 +595,6 @@ app.get('/addcontainer', function(req, res) {
     };
 });
 
-
-
 app.get('/changehost', function(req, res) {
     var check_token = req.query['token'];
     var container = '';
@@ -607,15 +615,13 @@ app.get('/changehost', function(req, res) {
         var proceed = 0;
         for (var i = 0; i < config.layout.length; i++) {
             for (var key in config.layout[i]) {
-                if (!key.indexOf('node') == 0) {
-                    if (container.length > 0) {
-                        if (config.layout[i].node.indexOf(new_host) > -1) {
+                if (container.length > 0) {
+                    if (config.layout[i].node.indexOf(new_host) > -1) {
+                        proceed++;
+                    }
+                    if (key.indexOf(container) > -1) {
+                        if (key.indexOf(config.layout[i].node)) {
                             proceed++;
-                        }
-                        if (key.indexOf(container) > -1) {
-                            if (key.indexOf(config.layout[i].node)) {
-                                proceed++;
-                            }
                         }
                     }
                 }
@@ -629,25 +635,23 @@ app.get('/changehost', function(req, res) {
             //Find Current Host
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
-                    if (!key.indexOf('node') == 0) {
-                        if (container.length > 0) {
-                            if (key.indexOf(container) > -1) {
-                                original_host = config.layout[i].node;
-                                original_container_data = config.layout[i][key];
-                                delete config.layout[i][key];
-                                if (Object.keys(config.layout[i]).length == 1) {
-                                    config.layout.splice(i, 1);
-                                }
+                    if (container.length > 0) {
+                        if (key.indexOf(container) > -1) {
+                            original_host = config.layout[i].node;
+                            original_container_data = config.layout[i][key];
+                            delete config.layout[i][key];
+                            if (Object.keys(config.layout[i]).length == 1) {
+                                config.layout.splice(i, 1);
                             }
                         }
                     }
                 }
             }
 
-            //Checks for HB
-            for (var i = 0; i < config.hb.length; i++) {
-                for (var key in config.hb[i]) {
-                    if (!key.indexOf('node') == 0) {
+            if (config.hb) {
+                //Checks for HB
+                for (var i = 0; i < config.hb.length; i++) {
+                    for (var key in config.hb[i]) {
                         if (container.length > 0) {
                             if (key.indexOf(container) > -1) {
                                 original_heartbeat_data = config.hb[i][key];
@@ -662,28 +666,21 @@ app.get('/changehost', function(req, res) {
                 }
             }
 
-            //Add Data to New Host
             for (var i = 0; i < config.layout.length; i++) {
                 for (var key in config.layout[i]) {
-                    if (!key.indexOf('node') == 0) {
-                        if (container.length > 0) {
-                            if (config.layout[i].node.indexOf(new_host) > -1) {
-                                config.layout[i][container] = original_container_data;
-                            }
-                        }
+                    if (config.layout[i].node.indexOf(new_host) > -1) {
+                        config.layout[i][container] = original_container_data;
                     }
                 }
             }
 
-            //Adds Heartbeat Data to New Host
-            if (original_heartbeat_data) {
-                for (var i = 0; i < config.hb.length; i++) {
-                    for (var key in config.hb[i]) {
-                        if (!key.indexOf('node') == 0) {
-                            if (container.length > 0) {
-                                if (config.hb[i].node.indexOf(new_host) > -1) {
-                                    config.hb[i][container] = original_heartbeat_data;
-                                }
+            //Adds Heartbeat Data
+            if (config.hb) {
+                if (original_heartbeat_data) {
+                    for (var i = 0; i < config.hb.length; i++) {
+                        for (var key in config.hb[i]) {
+                            if (config.hb[i].node.indexOf(new_host) > -1) {
+                                config.hb[i][container] = original_heartbeat_data;
                             }
                         }
                     }
@@ -717,8 +714,6 @@ app.get('/changehost', function(req, res) {
         };
     };
 });
-
-
 
 app.get('/stop', function(req, res) {
     var check_token = req.query['token'];
