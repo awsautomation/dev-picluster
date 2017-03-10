@@ -481,41 +481,53 @@ app.get('/addhost', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
+        var proceed = 1;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (config.layout[i].node.indexOf(host) > -1) {
+                    proceed = 0;
+                }
+            }
+        }
 
-        //Add New Host
-        config.layout.push({
-            "node": host
-        });
-
-        if (config.hb) {
-            config.hb.push({
+        if (proceed) {
+            //Add New Host
+            config.layout.push({
                 "node": host
             });
-        }
 
-        var new_config = JSON.stringify({
-            "payload": JSON.stringify(config),
-            "token": token
-        });
-
-        //Save Configuration
-        var options = {
-            url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': new_config.length
-            },
-            body: new_config,
-        }
-
-        request(options, function(error, response, body) {
-            if (error) {
-                res.end(error);
-            } else {
-                res.end('\nAdded host ' + host + ' to the configuration.');
+            if (config.hb) {
+                config.hb.push({
+                    "node": host
+                });
             }
-        });
+
+            var new_config = JSON.stringify({
+                "payload": JSON.stringify(config),
+                "token": token
+            });
+
+            //Save Configuration
+            var options = {
+                url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': new_config.length
+                },
+                body: new_config,
+            }
+
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    res.end('\nAdded host ' + host + ' to the configuration.');
+                }
+            });
+        } else {
+            res.end('\nError: Host already exists');
+        }
     };
 });
 
