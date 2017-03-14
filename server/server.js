@@ -474,102 +474,152 @@ function migrate(container, original_host, new_host, original_container_data) {
     });
 };
 
-app.get('/changehost', function(req, res) {
+app.get('/addhost', function(req, res) {
     var check_token = req.query['token'];
-    var container = '';
-    var original_host = '';
-    var original_container_data = '';
-    var original_heartbeat_data = '';
-    var new_host = req.query['newhost'];
-    if (req.query['container']) {
-        container = req.query['container'];
-    }
+    var host = req.query['host'];
 
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-        var responseString = '';
-
-        //Ensures that the host exists
-        var proceed = 0;
+        var proceed = 1;
         for (var i = 0; i < config.layout.length; i++) {
             for (var key in config.layout[i]) {
-                if (!key.indexOf('node') == 0) {
-                    if (container.length > 0) {
-                        if (config.layout[i].node.indexOf(new_host) > -1) {
-                        proceed++;
-                    }
-                    if (key.indexOf(container) > -1) {
-                        if (key.indexOf(config.layout[i].node)) {
-                            proceed++;
-                        }
-                    }
+                if (config.layout[i].node.indexOf(host) > -1) {
+                    proceed = 0;
+                }
+            }
+        }
+
+        if (proceed) {
+            //Add New Host
+            config.layout.push({
+                "node": host
+            });
+
+            if (config.hb) {
+                config.hb.push({
+                    "node": host
+                });
+            }
+
+            var new_config = JSON.stringify({
+                "payload": JSON.stringify(config),
+                "token": token
+            });
+
+            //Save Configuration
+            var options = {
+                url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': new_config.length
+                },
+                body: new_config,
+            }
+
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    res.end('\nAdded host ' + host + ' to the configuration.');
+                }
+            });
+        } else {
+            res.end('\nError: Host already exists');
+        }
+    };
+});
+
+app.get('/rmhost', function(req, res) {
+    var check_token = req.query['token'];
+    var host = req.query['host'];
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+
+        //Ensures that the host exists
+        var hb_proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (config.layout[i].node.indexOf(host) > -1) {
+                    config.layout.splice(i, 1);
+                    hb_proceed = 1;
+                    break;
                 }
             }
         }
     }
 
-    if (proceed < 2) {
-        res.end('\nError: Node or Container does not exist!');
-    } else {
-
-        //Find Current Host
-        for (var i = 0; i < config.layout.length; i++) {
-            for (var key in config.layout[i]) {
-                if (!key.indexOf('node') == 0) {
-                    if (container.length > 0) {
-                        if (key.indexOf(container) > -1) {
-                            original_host = config.layout[i].node;
-                            original_container_data = config.layout[i][key];
-                            delete config.layout[i][key];
-                            if (Object.keys(config.layout[i]).length == 1) {
-                                config.layout.splice(i, 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        //Checks for HB
-        for (var i = 0; i < config.hb.length; i++) {
-            for (var key in config.hb[i]) {
-                if (!key.indexOf('node') == 0) {
-                    if (container.length > 0) {
-                        if (key.indexOf(container) > -1) {
-                            original_heartbeat_data = config.hb[i][key];
-                            delete config.hb[i][key];
-                            if (Object.keys(config.hb[i]).length == 1) {
-                                config.hb.splice(i, 1);
-                                original_heartbeat_data = '';
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        //Add Data to New Host
-        for (var i = 0; i < config.layout.length; i++) {
-            for (var key in config.layout[i]) {
-                if (!key.indexOf('node') == 0) {
-                    if (container.length > 0) {
-                        if (config.layout[i].node.indexOf(new_host) > -1) {
-                            config.layout[i][container] = original_container_data;
-                        }
-                    }
-                }
-            }
-        }
-
-        //Adds Heartbeat Data to New Host
-        if (original_heartbeat_data) {
+    if (hb_proceed) {
+        if (config.hb) {
             for (var i = 0; i < config.hb.length; i++) {
                 for (var key in config.hb[i]) {
-                    if (!key.indexOf('node') == 0) {
+                    if (config.hb[i].node.indexOf(host) > -1) {
+                        config.hb.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    var new_config = JSON.stringify({
+        "payload": JSON.stringify(config),
+        "token": token
+    });
+
+    //Save Configuration
+    var options = {
+        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+        },
+        body: new_config,
+    }
+
+    request(options, function(error, response, body) {
+        if (error) {
+            res.end(error);
+        } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+        }
+    });
+
+});
+
+app.get('/removecontainerconfig', function(req, res) {
+    var check_token = req.query['token'];
+    var container = req.query['container'];
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+
+
+        var hb_proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (container.length > 0) {
+                    if (key.indexOf(container) > -1) {
+                        delete config.layout[i][key];
+                        hb_proceed = 1;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (hb_proceed) {
+            if (config.hb) {
+                for (var i = 0; i < config.hb.length; i++) {
+                    for (var key in config.hb[i]) {
                         if (container.length > 0) {
-                            if (config.hb[i].node.indexOf(new_host) > -1) {
-                                config.hb[i][container] = original_heartbeat_data;
+                            if (key.indexOf(container) > -1) {
+                                delete config.hb[i][key];
+                                break;
                             }
                         }
                     }
@@ -597,15 +647,202 @@ app.get('/changehost', function(req, res) {
             if (error) {
                 res.end(error);
             } else {
-                migrate(container, original_host, new_host, original_container_data);
-                res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+                res.end('\nRemoved Container ' + container + ' from the configuration.');
             }
         });
     };
-};
+
 });
 
 
+app.get('/addcontainer', function(req, res) {
+    var check_token = req.query['token'];
+    var host = req.query['host'];
+    var container = req.query['container'];
+    var container_args = req.query['container_args'];
+    var heartbeat_args = req.query['heartbeat_args'];
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+
+        //Ensures that the host exists
+        var proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (config.layout[i].node.indexOf(host) > -1) {
+                    proceed++;
+                }
+            }
+        }
+
+        if (proceed < 1) {
+            res.end('\nError: Node does not exist!');
+        } else {
+
+            //Add Data to New Host
+
+            for (var i = 0; i < config.layout.length; i++) {
+                for (var key in config.layout[i]) {
+                    if (config.layout[i].node.indexOf(host) > -1) {
+                        config.layout[i][container] = container_args;
+                    }
+                }
+            }
+
+            //Adds Heartbeat Data
+            if (config.hb) {
+                if (heartbeat_args) {
+                    for (var i = 0; i < config.hb.length; i++) {
+                        for (var key in config.hb[i]) {
+                            if (config.hb[i].node.indexOf(host) > -1) {
+                                config.hb[i][container] = heartbeat_args;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var new_config = JSON.stringify({
+                "payload": JSON.stringify(config),
+                "token": token
+            });
+
+            //Save Configuration
+            var options = {
+                url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': new_config.length
+                },
+                body: new_config,
+            }
+
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    res.end('\nAdded ' + container + ' to the configuration.');
+                }
+            });
+        };
+    };
+});
+
+app.get('/changehost', function(req, res) {
+    var check_token = req.query['token'];
+    var container = '';
+    var original_host = '';
+    var original_container_data = '';
+    var original_heartbeat_data = '';
+    var new_host = req.query['newhost'];
+    if (req.query['container']) {
+        container = req.query['container'];
+    }
+
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+
+        //Ensures that the host exists
+        var proceed = 0;
+        for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+                if (container.length > 0) {
+                    if (config.layout[i].node.indexOf(new_host) > -1) {
+                        proceed++;
+                    }
+                    if (key.indexOf(container) > -1) {
+                        if (key.indexOf(config.layout[i].node)) {
+                            proceed++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (proceed < 2) {
+            res.end('\nError: Node or Container does not exist!');
+        } else {
+
+            //Find Current Host
+            for (var i = 0; i < config.layout.length; i++) {
+                for (var key in config.layout[i]) {
+                    if (container.length > 0) {
+                        if (key.indexOf(container) > -1) {
+                            original_host = config.layout[i].node;
+                            original_container_data = config.layout[i][key];
+                            delete config.layout[i][key];
+                        }
+                    }
+                }
+            }
+
+            if (config.hb) {
+                //Checks for HB
+                for (var i = 0; i < config.hb.length; i++) {
+                    for (var key in config.hb[i]) {
+                        if (container.length > 0) {
+                            if (key.indexOf(container) > -1) {
+                                original_heartbeat_data = config.hb[i][key];
+                                delete config.hb[i][key];
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (var i = 0; i < config.layout.length; i++) {
+                for (var key in config.layout[i]) {
+                    if (config.layout[i].node.indexOf(new_host) > -1) {
+                        config.layout[i][container] = original_container_data;
+                    }
+                }
+            }
+
+            //Adds Heartbeat Data
+            if (config.hb) {
+                if (original_heartbeat_data) {
+                    for (var i = 0; i < config.hb.length; i++) {
+                        for (var key in config.hb[i]) {
+                            if (config.hb[i].node.indexOf(new_host) > -1) {
+                                config.hb[i][container] = original_heartbeat_data;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var new_config = JSON.stringify({
+                "payload": JSON.stringify(config),
+                "token": token
+            });
+
+            //Save Configuration
+            var options = {
+                url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': new_config.length
+                },
+                body: new_config,
+            }
+
+            request(options, function(error, response, body) {
+                if (error) {
+                    res.end(error);
+                } else {
+                    migrate(container, original_host, new_host, original_container_data);
+                    res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+                }
+            });
+        };
+    };
+});
 
 app.get('/stop', function(req, res) {
     var check_token = req.query['token'];

@@ -35,6 +35,15 @@
             $('#running').click(function() {
                 $('#iframe_a').attr('src', '/running.html');
             });
+            $('#addcontainer').click(function() {
+                $('#iframe_a').attr('src', '/addcontainer.html');
+            });
+            $('#addhost').click(function() {
+                $('#iframe_a').attr('src', '/addhost.html');
+            });
+            $('#rmhost').click(function() {
+                $('#iframe_a').attr('src', '/rmhost.html');
+            });
             $('#editconfig').click(function() {
                 $('#iframe_a').attr('src', '/editconfig?token=' + token);
             });
@@ -122,10 +131,11 @@
             color: #333333;
             ;
         }
+
         #menu {
-        height: 70px;
-        line-height: 30px;
-        background: #4D95CB no-repeat;
+            height: 70px;
+            line-height: 30px;
+            background: #4D95CB no-repeat;
         }
 
         .dropbtn {
@@ -175,7 +185,7 @@
 
 <body>
 
-    <div id="login" title="PiCluster v1.6 Login">
+    <div id="login" title="PiCluster v1.7 Login">
         <p align=center>
             <img src="/logo.png" height="165" width="150">
             <br> Please login to continue
@@ -200,6 +210,8 @@
                                 <a href="#" id="nodes">Nodes</a>
                                 <a href="#" id="editconfig">Edit Configuration</a>
                                 <a href="#" id="reloadconfig">Reload Configuration</a>
+                                <a href="#" id="addhost">Add Host</a>
+                                <a href="#" id="rmhost">Remove Host</a>
                             </div>
                     </td>
                     <td>
@@ -208,6 +220,7 @@
                             <div id="container" class="dropdown-content">
                                 <a href="#" id="manage">Manage</a>
                                 <a href="#" id="running">Running Containers</a>
+                                <a href="#" id="addcontainer">Add Container</a>
                             </div>
                     </td>
                     <td>

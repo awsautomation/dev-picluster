@@ -19,6 +19,7 @@
 			var radio_five = $('input[name=radio-5]:checked').val();
 			var radio_six = $('input[name=radio-6]:checked').val();
 			var radio_seven = $('input[name=radio-7]:checked').val();
+			var radio_eight = $('input[name=radio-8]:checked').val();
 			var command = '';
 			var path = '';
 
@@ -64,25 +65,33 @@
 				}
 			}
 
+			if (radio_eight) {
+				if (radio_eight.indexOf('on') > -1) {
+					path = '/removecontainerconfig';
+				}
+			}
 
 			if (path) {
+				if ((radio_seven) && (container.indexOf('*') > -1) || (radio_eight) && (container.indexOf('*') > -1)) {
+					alert('\nError: You cannot control all of these containers at once for chosen action.');
+				} else {
+					hideshow('output');
+					$("#command").dialog('close');
+					$("#output").dialog({
+						height: 'auto',
+						width: 'auto'
+					});
 
-				hideshow('output');
-				$("#command").dialog('close');
-				$("#output").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-
-				$.post(path, {
-					token: parent.token,
-					command: command,
-					container: container,
-					newhost: node
-				}, function(data) {
-					$("#command").val(data);
-					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
-				});
+					$.post(path, {
+						token: parent.token,
+						command: command,
+						container: container,
+						newhost: node
+					}, function(data) {
+						$("#command").val(data);
+						$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+					});
+				}
 			} else {
 				alert('Error, you did not select an operation.')
 			}
@@ -147,6 +156,9 @@
 				<br>
 				<label for="radio-6">View Logs</label>
 				<input type="radio" name="radio-6" id="radio-6">
+				<br>
+				<label for="radio-8">Remove Config</label>
+				<input type="radio" name="radio-8" id="radio-8">
 				<br>
 				</select>
 			</fieldset>
