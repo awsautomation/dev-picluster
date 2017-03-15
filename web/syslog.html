@@ -6,39 +6,96 @@
 	</script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
 	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
 	<script>
-		function syslog() {
-			var payload = $("#payload").val();
-				var command = parent.syslog;
+		function exec() {
+			var command = parent.syslog;
 			$.post("/exec", {
 				token: parent.token,
 				command: command
 			}, function(data) {
-				$("#command_output").val(data);
+				if ($('#query').val()) {
+					var search_string = $('#query').val();
+					var modified_data = data.split("\n");
+					var search_output = "";
+					for (i = 0; i != modified_data.length; i++) {
+						if (modified_data[i].toLowerCase().indexOf(search_string.toLowerCase()) > -1) {
+							search_output += "\n" + modified_data[i];
+						}
+					}
+					$("#command_output").val(search_output);
+				} else {
+					$("#command_output").val(data);
+				}
 			});
+		}
+
+		function search(what, id) {
+			var date = "";
+			if (what.indexOf("today") > -1) {
+
+				var day_check = moment().format("D");
+				if (day_check.length > 1) {
+					date = moment().format("MMM D");
+				} else {
+					date = moment().format("MMM  D");
+				}
+				$("#query").val(date);
+			} else {
+				$("#query").val(what);
+			}
+			exec();
+			document.getElementById(id).checked = false;
 		};
 	</script>
 </head>
 
 <body>
-	<div id="editor" title="PiCluster System Log Viewer">
+	<div id="output" title="Syslog Analytics">
 		<p align=center>
-			<div id="start" title="PiCluster System Log Viewer>
-				<p align=center>
-					<table style="width:10%">
-						<tr>
-							<td>
-									<br><textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea><br><br>
-								</td>
-							</tr>
-						</table>
-					</p>
-				</div>
-				<script>
-						$("#editor").dialog({height:'auto', width:'auto'});
-						syslog();
-				</script>
-	</div>
-		</body>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<input type="text" rows="30" cols="100" id="query" name="query" name="query"><br>
+					</td>
+					<td>
+						<button onclick="exec()">Search</button>
+					</td>
+				</tr>
 
-		</html>
+			</table>
+			<table style="width:28%">
+				<tr>
+					<td>
+						<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
+					</td>
+					<td>
+						<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
+					</td>
+					</td>
+					<td>
+						<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
+					</td>
+					<td>
+						<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
+					</td>
+				</tr>
+			</table>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+					</td>
+				</tr>
+			</table>
+			<script>
+				$("#output").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+				exec();
+			</script>
+	</div>
+	</p>
+
+</html>
