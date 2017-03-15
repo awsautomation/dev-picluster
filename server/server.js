@@ -428,7 +428,7 @@ function migrate(container, original_host, new_host, original_container_data) {
         } else {
 
             var command = JSON.stringify({
-                "command": 'docker image build ' + dockerFolder + '/' + container + ' -t ' + container + ' -f ' + dockerFolder + '/' + container + '/Dockerfile',
+                "command": 'docker image build ' + dockerFolder + '/' + container + ' -t ' + container + ' -f ' + dockerFolder + '/' + container + '/Dockerfile' + ';docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
                 "token": token
             });
 
