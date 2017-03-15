@@ -1012,7 +1012,7 @@ app.get('/restart', function(req, res) {
                                         res.end("An error has occurred.");
                                     } else {
                                         var results = JSON.parse(response.body);
-                                        addLog('\nStopping: ' + key + '\n' + results.output);
+                                        addLog('\nRestarting: ' + key + '\n' + results.output);
                                     }
                                 });
                             }
@@ -1022,7 +1022,7 @@ app.get('/restart', function(req, res) {
                                     res.end("An error has occurred.");
                                 } else {
                                     var results = JSON.parse(response.body);
-                                    addLog('\nStopping: ' + key + '\n' + results.output);
+                                    addLog('\nRestarting: ' + key + '\n' + results.output);
                                 }
                             });
                         }
