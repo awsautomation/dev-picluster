@@ -162,6 +162,36 @@ app.post('/listcontainers', function(req, res) {
     }
 });
 
+app.post('/listcommands', function(req, res) {
+    var check_token = req.body.token;
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        var responseString = '';
+        var node = req.body.node;
+        var token_body = JSON.stringify({
+            "token": token
+        });
+
+        var options = {
+            url: 'http://' + server + ':' + server_port + '/listcommands',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+            },
+            body: token_body
+        }
+
+        request(options, function(error, response, body) {
+            if (error) {
+                res.end(error);
+            } else {
+                res.end(body);
+            }
+        })
+    }
+});
 
 app.post('/listnodes', function(req, res) {
     var check_token = req.body.token;

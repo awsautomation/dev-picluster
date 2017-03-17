@@ -1131,6 +1131,22 @@ app.post('/listnodes', function(req, res) {
     }
 });
 
+app.post('/listcommands', function(req, res) {
+    var command = req.body.command;
+    var check_token = req.body.token;
+    var output = [];
+    if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
+    } else {
+        if (config.commandlist) {
+            res.end(JSON.stringify(config.commandlist));
+        } else {
+            res.end('');
+        }
+    }
+});
+
+
 app.post('/exec', function(req, res) {
     var check_token = req.body.token;
     var selected_node = '';

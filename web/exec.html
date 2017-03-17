@@ -7,29 +7,36 @@
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
 	<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script>
-
 		function exec() {
 			var e = document.getElementById("nodelist");
+			var c = document.getElementById("commandlist");
 			var path = '/exec';
 			var node = e.options[e.selectedIndex].value;
-			var command = $("#command_entry").val();
+			var saved_command = c.options[c.selectedIndex].value;
+			var command = '';
 
-						hideshow('output');
-						$("#command").dialog('close');
-						$("#output").dialog({
-							height: 'auto',
-							width: 'auto'
-						});
-
-						$.post(path, {
-							token: parent.token,
-							command: command,
-							node: node
-						}, function(data) {
-							$("#command").val(data);
-							$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
-						});
+			if (saved_command.indexOf('Choose') > -1) {
+				command = $("#command_entry").val();
+			} else {
+				command = saved_command;
 			}
+
+			hideshow('output');
+			$("#command").dialog('close');
+			$("#output").dialog({
+				height: 'auto',
+				width: 'auto'
+			});
+
+			$.post(path, {
+				token: parent.token,
+				command: command,
+				node: node
+			}, function(data) {
+				$("#command").val(data);
+				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+			});
+		}
 	</script>
 	<script>
 		function hideshow(id) {
@@ -64,39 +71,61 @@
 
 	<div id="container" title="Run Commands on the Cluster">
 		<p align=left>
-		    <label for="nodelist"><b>Select a Node</b></label>
-		    <select name="nodelist" id="nodelist">
+			<label for="nodelist"><b>Select a Node</b></label>
+			<select name="nodelist" id="nodelist">
 		    </select>
-				<br><br>
-				<b>Command:</b><br><br>
-				<input type="text" size="50" id="command_entry" name="command_entry" value=""></font>
-				<br><br>
-				<p align=center>
-					<button onclick="exec()"> Submit</button>
-				</p>
-				<script>
-
-					$("#container").dialog({
-						height: 'auto',
-						width: 'auto'
+			<br><br>
+			<label for="commandlist"><b>Saved Commands</b></label>
+			<select name="commandlist" id="commandlist">
+			 </select>
+			<br><br>
+			<b>Command:</b><br><br>
+			<input type="text" size="50" id="command_entry" name="command_entry" value=""></font>
+			<br><br>
+			<p align=center>
+				<button onclick="exec()"> Submit</button>
+			</p>
+			<script>
+				$("#container").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+				$(function() {
+					var option = '';
+					$.post('/listnodes', {
+						token: parent.token
+					}, function(data) {
+						data = data.replace(/\[/gi, '');
+						data = data.replace(/\]/gi, '');
+						data = data.replace(/\"/gi, '');
+						var parse_data = data.split(',');
+						for (var i = 0; i < parse_data.length; i++) {
+							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+						}
+						option += '<option value="' + '*' + '">' + '*' + '</option>';
+						$('#nodelist').append(option);
 					});
-					$(function() {
-						var option = '';
-						$.post('/listnodes', {
-							token: parent.token
-						}, function(data) {
-							data = data.replace(/\[/gi,'');
-							data = data.replace(/\]/gi,'');
-							data = data.replace(/\"/gi,'');
-							var parse_data = data.split(',');
-							for (var i = 0; i < parse_data.length; i++) {
-								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+				});
+				$(function() {
+					var option = '';
+					$.post('/listcommands', {
+						token: parent.token
+					}, function(data) {
+						option += '<option value="' + 'Choose' + '">' + 'Choose' + '</option>';
+						if (data) {
+							data = JSON.parse(data);
+							for (var i = 0; i < data.length; i++) {
+								for (var key in data[i]) {
+									if (data[i].hasOwnProperty(key)) {
+										option += '<option value="' + data[i][key] + '">' + key + '</option>';
+									}
+								}
 							}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-							$('#nodelist').append(option);
-						});
+						}
+						$('#commandlist').append(option);
 					});
-				</script>
+				});
+			</script>
 	</div>
 	<div class="widget">
 	</div>
