@@ -56,6 +56,9 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.101","vip_eth_device":"eth0", "slave": "192.168.0.102", "vip_ping_time": "10000"},
     {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
+  "commandlist": [{
+  "SystemUpdate": "apt-get update;apt-get dist-upgrade -y"
+  }],
   "vip_ip": "192.168.0.15",
   "autostart_containers": "enabled",
   "rsyslog_logfile": "/var/log/syslog",
@@ -103,6 +106,8 @@ You can run the server and agent on the same node since they are listening on di
 * rsyslog_logfile - Location of the log file on the Rsyslog server
 
 * rsyslog_host - The host running the PiCluster Agent with a Rsyslog server running or has access to the log drain file.
+
+* commandlist - A set of commands to run on the nodes on demand from the web console under Operations -> Run Command.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
