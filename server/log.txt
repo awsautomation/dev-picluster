@@ -1,7 +1,0 @@
-
-
-Registered Node:192.168.0.119
-Hostname:MacBook-Pro.local
-
-Registered Node:192.168.0.119
-Hostname:MacBook-Pro.local
