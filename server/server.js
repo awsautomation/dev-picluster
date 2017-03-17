@@ -12,7 +12,6 @@ app.use(bodyParser());
 //require('request-debug')(request);
 var exec = require('child_process').exec;
 var server = require("http").createServer(app);
-var logFile = './log.txt';
 var log = '';
 var token = config.token;
 var dockerFolder = config.docker;
@@ -94,13 +93,7 @@ app.get('/clearlog', function(req, res) {
         res.end('\nError: Invalid Credentials')
     } else {
         log = '';
-        fs.writeFile(logFile, log, function(err) {
-            if (err) {
-                console.log('\nError while adding data to the log' + err);
-            } else {
-                res.end('');
-            }
-        });
+        res.end();
     }
 });
 
@@ -186,12 +179,6 @@ app.get('/images', function(req, res) {
 
 function addLog(data) {
     log += data;
-    fs.appendFile(logFile, log, function(err) {
-        if (err) {
-            console.log('\nError while adding data to the log' + err);
-        }
-    });
-    log = '';
 }
 
 app.get('/build', function(req, res) {
@@ -1303,7 +1290,7 @@ app.get('/log', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-        res.sendFile(__dirname + '/log.txt');
+        res.send(log);
     }
 });
 
