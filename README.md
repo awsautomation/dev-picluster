@@ -8,7 +8,7 @@ PiCluster will only build and run images from Dockerfile's on the host specified
 on regular x86 hardware also and is not tied to ARM.
 
 [![Build Status](https://travis-ci.org/rusher81572/picluster.svg?branch=master)](https://travis-ci.org/rusher81572/picluster)
-
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 ![Pic](http://i.imgur.com/4l15YjW.png)
 
