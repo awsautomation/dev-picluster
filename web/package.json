@@ -1,12 +1,13 @@
 {
-"name": "apidemo",
-"version": "0.0.1",
+  "name": "apidemo",
+  "version": "0.0.1",
   "dependencies": {
     "express": "",
     "line-reader": "",
     "exec": "",
+    "node-gyp": "",
     "request-debug": "",
-        "fs": "",
+    "fs": "",
     "body-parser": "latest",
     "sys": "",
     "request": ""
