@@ -4,6 +4,7 @@
   "dependencies": {
     "express": "",
     "line-reader": "",
+    "node-gyp": "",
     "fs": "",
     "socket": "",
     "exec": "",
