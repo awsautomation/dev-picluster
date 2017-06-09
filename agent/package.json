@@ -2,15 +2,16 @@
   "name": "apidemo",
   "version": "0.0.1",
   "dependencies": {
-    "express": "",
-    "line-reader": "",
-    "fs": "",
-    "socket": "",
-    "exec": "",
-    "request-debug": "",
     "body-parser": "latest",
-    "sys": "",
+    "exec": "",
+    "express": "",
+    "fs": "",
+    "line-reader": "",
+    "node-gyp": "",
+    "os": "",
     "request": "",
-    "os": ""
+    "request-debug": "",
+    "socket": "",
+    "sys": ""
   }
 }
