@@ -126,14 +126,31 @@ When it is time to build the containers, PiCluster will use the "docker" variabl
 
 ##### 2. Running the Application
 
+This section will cover how to install and run each component of PiCluster.
 
-The following environment variables need to be set:
+## Server Installation
+
+The server is the brain of PiCluster and the agents and web console connect to it.
 
 ```
 cd server
 npm install -g node-gyp
 npm install
 node server.js
+```
+
+##### You can safely ignore the following error if found when running npm install
+```
+sh: 1: node-waf: not found
+npm WARN apidemo@0.0.1 No description
+npm WARN apidemo@0.0.1 No repository field.
+npm WARN apidemo@0.0.1 No license field.
+npm ERR! file sh
+npm ERR! code ELIFECYCLE
+npm ERR! errno ENOENT
+npm ERR! syscall spawn
+npm ERR! microtime@0.2.0 install: `node-waf configure build`
+npm ERR! spawn ENOENT
 ```
 
 ## Agent Installation
@@ -149,7 +166,7 @@ node agent.js
 
 ## Web Console Installation
 
-The web console will send commands to the server.
+The web console will send commands to the server that will run commands or gather information from the agent nodes.
 
 ```
 cd web
