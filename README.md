@@ -134,7 +134,6 @@ The server is the brain of PiCluster and the agents and web console connect to i
 
 ```
 cd server
-npm install -g node-gyp
 npm install
 node server.js
 ```
@@ -160,7 +159,6 @@ The server will send commands to be executed on the agents nodes. The agent shou
 
 ```
 cd agent
-npm install -g node-gyp
 npm install
 node agent.js
 ```
@@ -171,7 +169,6 @@ The web console will send commands to the server that will run commands or gathe
 
 ```
 cd web
-npm install -g node-gyp
 npm install
 node webconsole.js
 ```
