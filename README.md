@@ -131,6 +131,7 @@ The following environment variables need to be set:
 
 ```
 cd server
+npm install node-gyp
 npm install
 node server.js
 ```
@@ -141,6 +142,7 @@ The server will send commands to be executed on the agents nodes. The agent shou
 
 ```
 cd agent
+npm install node-gyp
 npm install
 node agent.js
 ```
@@ -151,6 +153,7 @@ The web console will send commands to the server.
 
 ```
 cd web
+npm install node-gyp
 npm install
 node webconsole.js
 ```
