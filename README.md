@@ -141,16 +141,17 @@ node server.js
 
 ##### You can safely ignore the following error if found when running npm install
 ```
-sh: 1: node-waf: not found
-npm WARN apidemo@0.0.1 No description
-npm WARN apidemo@0.0.1 No repository field.
-npm WARN apidemo@0.0.1 No license field.
+npm WARN picluster-agent@0.0.1 No description
+npm WARN picluster-agent@0.0.1 No repository field.
+npm WARN picluster-agent@0.0.1 No license field.
 npm ERR! file sh
 npm ERR! code ELIFECYCLE
 npm ERR! errno ENOENT
 npm ERR! syscall spawn
 npm ERR! microtime@0.2.0 install: `node-waf configure build`
 npm ERR! spawn ENOENT
+npm ERR!
+npm ERR! Failed at the microtime@0.2.0 install script.
 ```
 
 ## Agent Installation
