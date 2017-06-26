@@ -14,9 +14,13 @@
 			var node = e.options[e.selectedIndex].value;
 			var command = $("#terminal").val();
 			if (command.length == 0) {
-				$("#command_output").val('\nConnecting to terminal on node ' + node);
+				$("#command_output").val('\nConnecting to terminal on node ' + node + '. There will be a short delay when returning each command output.');
 				command = 'uptime';
+			} else {
+				$("#terminal").val('');
+				$('#command_output').val($('#command_output').val() + '\n$ ' + command);
 			}
+
 			hideshow('output');
 			$("#command").dialog('close');
 			$("#output").dialog({
@@ -30,8 +34,8 @@
 				node: node
 			}, function(data) {
 				$("#command").val(data);
-				$("#command_output").val('\n' + data + '\n\n$');
-				$("#terminal").val('');
+				//$("#command_output").val($('#command_output').val() + '\n' + data + '\n\n$');
+				$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
 			});
 		}
 	</script>
@@ -45,6 +49,11 @@
 		}
 		$(function() {
 			hideshow('output');
+		});
+		$(document).keyup(function(e) {
+			if ($("#command") && (e.keyCode === 13)) {
+				exec();
+			}
 		});
 	</script>
 </head>
