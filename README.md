@@ -22,6 +22,7 @@ on regular x86 hardware also and is not tied to ARM.
 * HTTP interface
 * Virtual IP Manager
 * Rsyslog Analytics
+* Built-in web terminal to easily run commands on nodes
 
 ## Prerequisites
 
