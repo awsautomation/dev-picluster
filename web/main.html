@@ -20,6 +20,9 @@
             $('#sandbox').click(function() {
                 $('#iframe_a').attr('src', '/sandbox?token=' + token);
             });
+            $('#terminal').click(function() {
+                $('#iframe_a').attr('src', '/terminal?token=' + token);
+            });
             $('#images').click(function() {
                 $('#iframe_a').attr('src', '/images.html');
             });
@@ -70,6 +73,9 @@
             });
             $('#prune').click(function() {
                 $('#iframe_a').attr('src', '/prune.html');
+            });
+            $('#terminal').click(function() {
+                $('#iframe_a').attr('src', '/terminal.html');
             });
         });
     </script>
@@ -185,7 +191,7 @@
 
 <body>
 
-    <div id="login" title="PiCluster v1.7 Login">
+    <div id="login" title="PiCluster v1.8 Login">
         <p align=center>
             <img src="/logo.png" height="165" width="150">
             <br> Please login to continue
@@ -239,6 +245,7 @@
                                 <a href="#" id="sandbox">Run Command </a>
                                 <a href="#" id="hb">Heartbeat</a>
                                 <a href="#" id="prune">Clean Docker</a>
+                                <a href="#" id="terminal">Terminal</a>
                             </div>
                     </td>
                     <td>
