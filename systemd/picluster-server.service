@@ -5,6 +5,7 @@ After=docker.service
 
 [Service]
 #Restart=always
+LimitNOFILE=65536
 RemainAfterExit=no
 Restart=on-failure
 TimeoutStartSec=0

@@ -4,6 +4,7 @@ Requires=docker.service
 After=docker.service
 
 [Service]
+LimitNOFILE=65536
 Restart=on-failure
 RemainAfterExit=no
 TimeoutStartSec=0
