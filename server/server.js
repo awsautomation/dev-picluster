@@ -6,8 +6,10 @@ var net = require('net');
 var fs = require('fs');
 if (process.env.PICLUSTER_CONFIG) {
   var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+  var config_file = process.env.PICLUSTER_CONFIG;
 } else {
   var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  var config_file = '../config.json';
 }
 var port = config.server_port;
 var agentPort = config.agent_port;
