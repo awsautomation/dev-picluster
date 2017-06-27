@@ -902,6 +902,12 @@ app.get('/rmhost.html', function(req, res) {
 app.get('/rsyslog.html', function(req, res) {
   res.sendFile(__dirname + '/rsyslog.html');
 });
+app.get('/server.jpeg', function(req, res) {
+  res.sendFile(__dirname + '/server.jpeg');
+});
+app.get('/searching.jpeg', function(req, res) {
+  res.sendFile(__dirname + '/searching.jpeg');
+});
 
 webconsole.listen(port, function() {
   console.log('Listening on port %d', webconsole.address().port);

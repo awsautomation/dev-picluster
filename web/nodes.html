@@ -8,32 +8,23 @@
 	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 	<script>
 		function exec() {
+			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3>Searching for nodes</font>');
 			$.get("/nodes?token=" + parent.token, function(data) {
-					var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-						$("#command_output").val(data);
+				var test = data.split('\n');
+				for (i = 0; i != test.length; i++) {
+					if (test[i].length > 2) {
+						document.write('<br><br><p align=center><img heigth="100" width="100" src="/server.jpeg"><br><font size=+3>' + test[i] + "</font>");
+					}
+				}
 			});
 		}
 	</script>
 </head>
 
 <body>
-	<div id="output" title="Node List">
-		<p align=center>
-			<table style="width:10%">
-				<tr>
-					<td>
-						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-					</td>
-				</tr>
-			</table>
-			<script>
-				$("#output").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-				exec();
-			</script>
-	</div>
+	<script>
+		exec();
+	</script>
 	</p>
 
 </html>
