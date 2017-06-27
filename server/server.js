@@ -1403,7 +1403,7 @@ app.post('/updateconfig', function(req, res) {
   if ((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
-    fs.writeFile(config, payload, function(err) {
+    fs.writeFile(config_file, payload, function(err) {
       if (err) {
         console.log('\nError while writing config.' + err);
       } else {
