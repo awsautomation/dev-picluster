@@ -134,12 +134,10 @@ This section will cover how to install and run each component of PiCluster.
 The server is the brain of PiCluster and the agents and web console connect to it.
 
 ```
-export picluster_config='/root/picluster/config.json'
 cd server
 npm install
 node server.js
 ```
-Modify picluster_config to the exact location of the PiCluster configuration file.
 
 ##### You can safely ignore the following error if found when running npm install
 ```
@@ -161,24 +159,20 @@ npm ERR! Failed at the microtime@0.2.0 install script.
 The server will send commands to be executed on the agents nodes. The agent should be installed on each host in the cluster.
 
 ```
-export picluster_config='/root/picluster/config.json'
 cd agent
 npm install
 node agent.js
 ```
-Modify picluster_config to the exact location of the PiCluster configuration file.
 
 ## Web Console Installation
 
 The web console will send commands to the server that will run commands or gather information from the agent nodes.
 
 ```
-export picluster_config='/root/picluster/config.json'
 cd web
 npm install
 node webconsole.js
 ```
-Modify picluster_config to the exact location of the PiCluster configuration file.
 
 ## Configuring and using the client "pictl"
 
