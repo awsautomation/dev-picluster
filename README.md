@@ -10,7 +10,7 @@ on regular x86 hardware also and is not tied to ARM.
 [![Build Status](https://travis-ci.org/rusher81572/picluster.svg?branch=master)](https://travis-ci.org/rusher81572/picluster)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-![Pic](http://i.imgur.com/4l15YjW.png)
+![Pic](http://i.imgur.com/dzSXMoE.png)
 
 ## Features
 * Move containers to different hosts in the cluster
