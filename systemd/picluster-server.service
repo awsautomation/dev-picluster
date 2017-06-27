@@ -5,7 +5,7 @@ After=docker.service
 
 [Service]
 #Restart=always
-Environment=picluster_config=/root/picluster/config.json
+Environment=PICLUSTER_CONFIG=/root/picluster/config.json
 LimitNOFILE=65536
 RemainAfterExit=no
 Restart=on-failure
