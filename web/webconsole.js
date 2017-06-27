@@ -1,6 +1,6 @@
 var http = require('http');
 var fs = require('fs');
-var config = JSON.parse(fs.readFileSync(PICLUSTER_CONFIG, 'utf8'));
+var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 var express = require('express');
 var request = require('request');
 var app = express();
@@ -343,7 +343,7 @@ app.get('/reloadconfig', function(req, res) {
     var responseString = '';
     request('http://' + server + ':' + server_port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
       if (!error && response.statusCode == 200) {
-        config = JSON.parse(fs.readFileSync(PICLUSTER_CONFIG, 'utf8'));
+        config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
         token = config.token;
         user = config.web_username;
         password = config.web_password;

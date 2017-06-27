@@ -4,7 +4,7 @@ var app = express();
 var http = require('http');
 var net = require('net');
 var fs = require('fs');
-var config = JSON.parse(fs.readFileSync(PICLUSTER_CONFIG, 'utf8'));
+var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 var port = config.server_port;
 var agentPort = config.agent_port;
 var bodyParser = require('body-parser');
@@ -1330,7 +1330,7 @@ app.get('/reloadconfig', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-        config = JSON.parse(fs.readFileSync(PICLUSTER_CONFIG, 'utf8'));
+        config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
         token = config.token;
         dockerFolder = config.docker;
         addLog('\nReloading Config.json\n');
@@ -1393,7 +1393,7 @@ app.post('/updateconfig', function(req, res) {
     if ((check_token != token) || (!check_token)) {
         res.end('\nError: Invalid Credentials')
     } else {
-        fs.writeFile(PICLUSTER_CONFIG, payload, function(err) {
+        fs.writeFile(process.env.PICLUSTER_CONFIG, payload, function(err) {
             if (err) {
                 console.log('\nError while writing config.' + err);
             } else {
