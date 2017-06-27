@@ -23,6 +23,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Virtual IP Manager
 * Rsyslog Analytics
 * Built-in web terminal to easily run commands on nodes
+* Integrate the Kibana dashboard into PiCluster
 
 ## Prerequisites
 
@@ -66,6 +67,7 @@ You can run the server and agent on the same node since they are listening on di
   "rsyslog_host": "192.168.0.15",
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "300000",
+  "kibana": "https://127.0.0.1:5601",
   "syslog": "dmesg",
   "web_username": "admin",
   "web_password":"admin",
@@ -109,6 +111,8 @@ You can run the server and agent on the same node since they are listening on di
 * rsyslog_host - The host running the PiCluster Agent with a Rsyslog server running or has access to the log drain file.
 
 * commandlist - A list of commands to run on the nodes on demand from the web console under Operations -> Run Command.
+
+* kibana - The is for the URL to Kibana to integrate the console inside PiCluster.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.

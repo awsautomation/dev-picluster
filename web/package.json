@@ -2,14 +2,14 @@
   "name": "picluster-webconsole",
   "version": "0.0.1",
   "dependencies": {
-    "express": "",
-    "line-reader": "",
+    "body-parser": "^1.17.2",
     "exec": "",
-    "node-gyp": "",
-    "request-debug": "",
+    "express": "^4.15.3",
     "fs": "",
-    "body-parser": "latest",
-    "sys": "",
-    "request": ""
+    "line-reader": "^0.4.0",
+    "node-gyp": "",
+    "request": "",
+    "request-debug": "",
+    "sys": ""
   }
 }

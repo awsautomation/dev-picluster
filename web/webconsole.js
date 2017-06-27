@@ -44,6 +44,15 @@ app.get('/editconfig', function(req, res) {
   }
 });
 
+app.get('/kibana', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token) || (!config.kibana)) {
+    res.end('\nError: Invalid Credentials or invalid configuration.')
+  } else {
+    res.redirect(config.kibana);
+  }
+});
+
 app.post('/sendconfig', function(req, res) {
   var check_token = req.body.token;
   var payload = req.body.payload;
@@ -348,9 +357,9 @@ app.get('/reloadconfig', function(req, res) {
     request('http://' + server + ':' + server_port + '/reloadconfig?' + 'token=' + token, function(error, response, body) {
       if (!error && response.statusCode == 200) {
         if (process.env.PICLUSTER_CONFIG) {
-           config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+          config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
         } else {
-           config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+          config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
         }
         token = config.token;
         user = config.web_username;

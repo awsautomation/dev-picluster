@@ -29,6 +29,9 @@
             $('#syslog').click(function() {
                 $('#iframe_a').attr('src', '/syslog.html');
             });
+            $('#kibana').click(function() {
+                $('#iframe_a').attr('src', '/kibana?token=' + token);
+            });
             $('#rsyslog').click(function() {
                 $('#iframe_a').attr('src', '/rsyslog.html');
             });
@@ -246,6 +249,7 @@
                                 <a href="#" id="hb">Heartbeat</a>
                                 <a href="#" id="prune">Clean Docker</a>
                                 <a href="#" id="terminal">Terminal</a>
+                                <a href="#" id="kibana">Kibana</a>
                             </div>
                     </td>
                     <td>
