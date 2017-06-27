@@ -1,6 +1,10 @@
 var http = require('http');
 var fs = require('fs');
-var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+if (process.env.PICLUSTER_CONFIG) {
+  var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+} else {
+  var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+}
 var express = require('express');
 var request = require('request');
 var app = express();

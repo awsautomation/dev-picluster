@@ -4,7 +4,11 @@ var app = express();
 var http = require('http');
 var net = require('net');
 var fs = require('fs');
-var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+if (process.env.PICLUSTER_CONFIG) {
+  var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+} else {
+  var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+}
 var port = config.server_port;
 var agentPort = config.agent_port;
 var bodyParser = require('body-parser');
