@@ -110,7 +110,7 @@ app.get('/nodes', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname',
+      "command": 'hostname;echo;uname -a;df -h /',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -132,9 +132,8 @@ app.get('/nodes', function(req, res) {
         if (error) {
           res.end(error);
         } else {
-          //console.log(response);
           var results = JSON.parse(response.body);
-          addLog(results.output);
+          addLog('Node: ' + results.output);
         }
       })
 
