@@ -1,0 +1,40 @@
+<html>
+<title>PiCluster</title>
+
+<head>
+	<script src="//code.jquery.com/jquery-1.10.2.js">
+	</script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script>
+		function exec() {
+			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3>Searching for containers</font>');
+			$.get("/status?token=" + parent.token, function(data) {
+					var get_data = data.split('Node:');
+					for (i = 0; i != get_data.length; i++) {
+						if (get_data[i].length > 2) {
+							var hostname = get_data[i].split('CONTAINER');
+							var containers = hostname[1].split('NAMES');
+							var show_containers = containers[1].split('\n');
+							document.write('<br><br><p align=left><img heigth="100" width="100" src="/server.jpeg"><br><font size=+3>' + hostname[0] + '</font><br>');
+
+							for (j = 0; j != show_containers.length; j++) {
+								var parse_output = show_containers[j].split('  ');
+								if (parse_output.length > 1) {
+									document.write('<br><font size=+1>' +  parse_output[parse_output.length - 1] + '</font>');
+								}
+							}
+						}
+					}
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<script>
+		exec();
+	</script>
+	</p>
+
+</html>
