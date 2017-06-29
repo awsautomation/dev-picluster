@@ -842,6 +842,10 @@ app.get('/running.html', function(req, res) {
   res.sendFile(__dirname + '/running.html');
 });
 
+app.get('/container-layout.html', function(req, res) {
+  res.sendFile(__dirname + '/container-layout.html');
+});
+
 app.get('/prune.html', function(req, res) {
   res.sendFile(__dirname + '/prune.html');
 });

@@ -41,6 +41,9 @@
             $('#running').click(function() {
                 $('#iframe_a').attr('src', '/running.html');
             });
+            $('#layout').click(function() {
+                $('#iframe_a').attr('src', '/container-layout.html');
+            });
             $('#addcontainer').click(function() {
                 $('#iframe_a').attr('src', '/addcontainer.html');
             });
@@ -194,7 +197,7 @@
 
 <body>
 
-    <div id="login" title="PiCluster v1.9 Login">
+    <div id="login" title="PiCluster v1.9.1 Login">
         <p align=center>
             <img src="/logo.png" height="165" width="150">
             <br> Please login to continue
@@ -227,8 +230,9 @@
                         <div class="dropdown">
                             <button onclick="container()" class="dropbtn">Containers</button>
                             <div id="container" class="dropdown-content">
+                                <a href="#" id="layout">View Running</a>
+                                <a href="#" id="running">View Stats</a>
                                 <a href="#" id="manage">Manage</a>
-                                <a href="#" id="running">Running Containers</a>
                                 <a href="#" id="addcontainer">Add Container</a>
                             </div>
                     </td>
