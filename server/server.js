@@ -149,7 +149,7 @@ app.get('/images', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'docker image list',
+      "command": 'hostname;docker image list',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -172,7 +172,7 @@ app.get('/images', function(req, res) {
           res.end("An error has occurred.");
         } else {
           var results = JSON.parse(response.body);
-          addLog('\nNode:' + results.node + '\n' + results.output);
+            addLog('\nNode: ' + results.output);
         }
       })
 

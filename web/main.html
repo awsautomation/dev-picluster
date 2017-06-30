@@ -2,318 +2,322 @@
 <title>PiCluster Web Console</title>
 
 <head>
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <p align=center>
-        <a href="https://github.com/rusher81572/picluster"><img src="/logo.png" height="250" width="250"></a>
-    </p>
-    <script>
-        function clear(callback) {
-            var iframe = document.getElementById('iframe_a').contentWindow.document;
-            iframe.write('<html>');
-            iframe.close();
-            callback();
-        }
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/redmond/jquery-ui.css">
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <p align=center>
+    <a href="https://github.com/rusher81572/picluster"><img src="/logo.png" height="250" width="250"></a>
+  </p>
+  <script>
+    function clear(callback) {
+      var iframe = document.getElementById('iframe_a').contentWindow.document;
+      iframe.write('<html>');
+      iframe.close();
+      callback();
+    }
 
-        $(document).ready(function() {
-            $('#sandbox').click(function() {
-                $('#iframe_a').attr('src', '/sandbox?token=' + token);
-            });
-            $('#terminal').click(function() {
-                $('#iframe_a').attr('src', '/terminal?token=' + token);
-            });
-            $('#images').click(function() {
-                $('#iframe_a').attr('src', '/images.html');
-            });
-            $('#syslog').click(function() {
-                $('#iframe_a').attr('src', '/syslog.html');
-            });
-            $('#kibana').click(function() {
-                $('#iframe_a').attr('src', '/kibana?token=' + token);
-            });
-            $('#rsyslog').click(function() {
-                $('#iframe_a').attr('src', '/rsyslog.html');
-            });
-            $('#nodes').click(function() {
-                $('#iframe_a').attr('src', '/nodes.html');
-            });
-            $('#running').click(function() {
-                $('#iframe_a').attr('src', '/running.html');
-            });
-            $('#layout').click(function() {
-                $('#iframe_a').attr('src', '/container-layout.html');
-            });
-            $('#addcontainer').click(function() {
-                $('#iframe_a').attr('src', '/addcontainer.html');
-            });
-            $('#addhost').click(function() {
-                $('#iframe_a').attr('src', '/addhost.html');
-            });
-            $('#rmhost').click(function() {
-                $('#iframe_a').attr('src', '/rmhost.html');
-            });
-            $('#editconfig').click(function() {
-                $('#iframe_a').attr('src', '/editconfig?token=' + token);
-            });
-            $('#log').click(function() {
-                $('#iframe_a').attr('src', '/log.html');
-            });
-            $('#hb').click(function() {
-                $('#iframe_a').attr('src', '/hb.html');
-            });
-            $('#build').click(function() {
-                $('#iframe_a').attr('src', '/build.html');
-            });
-            $('#stop').click(function() {
-                $('#iframe_a').attr('src', '/stop.html');
-            });
-            $('#reloadconfig').click(function() {
-                $('#iframe_a').attr('src', '/reloadconfig.html');
-            });
-            $('#killvip').click(function() {
-                $('#iframe_a').attr('src', '/killvip.html');
-            });
-            $('#manage').click(function() {
-                $('#iframe_a').attr('src', '/manage.html');
-            });
-            $('#prune').click(function() {
-                $('#iframe_a').attr('src', '/prune.html');
-            });
-            $('#terminal').click(function() {
-                $('#iframe_a').attr('src', '/terminal.html');
-            });
-        });
-    </script>
-    <script>
-        function hideshow(id) {
-            var e = document.getElementById(id);
-            if (e.style.display == 'block')
-                e.style.display = 'none';
-            else
-                e.style.display = 'block';
-        }
-        $(function() {
-            hideshow('menu');
-            hideshow('content');
-            hideshow('menu');
-            hideshow('content');
-            $("#login").dialog();
-        });
-    </script>
+    $(document).ready(function() {
+      $('#sandbox').click(function() {
+        $('#iframe_a').attr('src', '/sandbox?token=' + token);
+      });
+      $('#terminal').click(function() {
+        $('#iframe_a').attr('src', '/terminal?token=' + token);
+      });
+      $('#images').click(function() {
+        $('#iframe_a').attr('src', '/images.html');
+      });
+      $('#image-layout').click(function() {
+        $('#iframe_a').attr('src', '/image-layout.html');
+      });
+      $('#syslog').click(function() {
+        $('#iframe_a').attr('src', '/syslog.html');
+      });
+      $('#kibana').click(function() {
+        $('#iframe_a').attr('src', '/kibana?token=' + token);
+      });
+      $('#rsyslog').click(function() {
+        $('#iframe_a').attr('src', '/rsyslog.html');
+      });
+      $('#nodes').click(function() {
+        $('#iframe_a').attr('src', '/nodes.html');
+      });
+      $('#running').click(function() {
+        $('#iframe_a').attr('src', '/running.html');
+      });
+      $('#layout').click(function() {
+        $('#iframe_a').attr('src', '/container-layout.html');
+      });
+      $('#addcontainer').click(function() {
+        $('#iframe_a').attr('src', '/addcontainer.html');
+      });
+      $('#addhost').click(function() {
+        $('#iframe_a').attr('src', '/addhost.html');
+      });
+      $('#rmhost').click(function() {
+        $('#iframe_a').attr('src', '/rmhost.html');
+      });
+      $('#editconfig').click(function() {
+        $('#iframe_a').attr('src', '/editconfig?token=' + token);
+      });
+      $('#log').click(function() {
+        $('#iframe_a').attr('src', '/log.html');
+      });
+      $('#hb').click(function() {
+        $('#iframe_a').attr('src', '/hb.html');
+      });
+      $('#build').click(function() {
+        $('#iframe_a').attr('src', '/build.html');
+      });
+      $('#stop').click(function() {
+        $('#iframe_a').attr('src', '/stop.html');
+      });
+      $('#reloadconfig').click(function() {
+        $('#iframe_a').attr('src', '/reloadconfig.html');
+      });
+      $('#killvip').click(function() {
+        $('#iframe_a').attr('src', '/killvip.html');
+      });
+      $('#manage').click(function() {
+        $('#iframe_a').attr('src', '/manage.html');
+      });
+      $('#prune').click(function() {
+        $('#iframe_a').attr('src', '/prune.html');
+      });
+      $('#terminal').click(function() {
+        $('#iframe_a').attr('src', '/terminal.html');
+      });
+    });
+  </script>
+  <script>
+    function hideshow(id) {
+      var e = document.getElementById(id);
+      if (e.style.display == 'block')
+        e.style.display = 'none';
+      else
+        e.style.display = 'block';
+    }
+    $(function() {
+      hideshow('menu');
+      hideshow('content');
+      hideshow('menu');
+      hideshow('content');
+      $("#login").dialog();
+    });
+  </script>
 
-    <script>
-        var token = "";
-        var syslog = "";
+  <script>
+    var token = "";
+    var syslog = "";
 
-        function getToken() {
-            return token;
-        }
+    function getToken() {
+      return token;
+    }
 
-        function login() {
-            var username = document.getElementById("user").value;;
-            var password = document.getElementById("password").value;
-            $.post("/", {
-                username: username,
-                password: password
-            }, function(auth) {
-                if (auth.token) {
-                    token = auth.token;
-                    if (auth.syslog) {
-                        syslog = auth.syslog;
-                    }
-                    $("#login").dialog('close');
-                    hideshow('login');
-                    hideshow('menu');
-                    hideshow('content');
-                } else {
-                    alert('Access Denied!');
-                }
-            });
+    function login() {
+      var username = document.getElementById("user").value;;
+      var password = document.getElementById("password").value;
+      $.post("/", {
+        username: username,
+        password: password
+      }, function(auth) {
+        if (auth.token) {
+          token = auth.token;
+          if (auth.syslog) {
+            syslog = auth.syslog;
+          }
+          $("#login").dialog('close');
+          hideshow('login');
+          hideshow('menu');
+          hideshow('content');
+        } else {
+          alert('Access Denied!');
         }
-    </script>
-    <style>
-        body {
-            background: #FFFFFF;
-            background-image: url("/background");
-            background-size: 100%;
-            font-family: Verdana, Arial, Helvetica, sans-serif;
-            font-size: 11px;
-            line-height: 18px;
-            color: #333333;
-            ;
-        }
+      });
+    }
+  </script>
+  <style>
+    body {
+      background: #FFFFFF;
+      background-image: url("/background");
+      background-size: 100%;
+      font-family: Verdana, Arial, Helvetica, sans-serif;
+      font-size: 11px;
+      line-height: 18px;
+      color: #333333;
+      ;
+    }
 
-        #menu {
-            height: 70px;
-            line-height: 30px;
-            background: #4D95CB no-repeat;
-        }
+    #menu {
+      height: 70px;
+      line-height: 30px;
+      background: #4D95CB no-repeat;
+    }
 
-        .dropbtn {
-            background-color: #4D95CB;
-            color: white;
-            padding: 16px;
-            font-size: 24px;
-            border: none;
-            cursor: pointer;
-        }
+    .dropbtn {
+      background-color: #4D95CB;
+      color: white;
+      padding: 16px;
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+    }
 
-        .dropbtn:hover,
-        .dropbtn:focus {
-            background-color: #4D95CB;
-        }
+    .dropbtn:hover,
+    .dropbtn:focus {
+      background-color: #4D95CB;
+    }
 
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            overflow: auto;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-        }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      overflow: auto;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    }
 
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
 
-        .dropdown a:hover {
-            background-color: #f1f1f1
-        }
+    .dropdown a:hover {
+      background-color: #f1f1f1
+    }
 
-        .show {
-            display: block;
-        }
-    </style>
+    .show {
+      display: block;
+    }
+  </style>
 </head>
 
 <body>
 
-    <div id="login" title="PiCluster v1.9.1 Login">
-        <p align=center>
-            <img src="/logo.png" height="165" width="150">
-            <br> Please login to continue
-            <br>
-            <p align=center>
-                <input type="text" id="user" name="username">
-                <input type="password" id="password" name="password">
-                <br>
-                <button onclick="login()">Connect</button>
-                <br>
-            </p>
-    </div>
+  <div id="login" title="PiCluster v1.9.2 Login">
+    <p align=center>
+      <img src="/logo.png" height="165" width="150">
+      <br> Please login to continue
+      <br>
+      <p align=center>
+        <input type="text" id="user" name="username">
+        <input type="password" id="password" name="password">
+        <br>
+        <button onclick="login()">Connect</button>
+        <br>
+      </p>
+  </div>
 
-    <div id="menu">
-        <p align=center>
-            <table style="width:40%">
-                <tr>
-                    <td>
-                        <div class="dropdown">
-                            <button onclick="system()" class="dropbtn">System</button>
-                            <div id="system" class="dropdown-content">
-                                <a href="#" id="nodes">Nodes</a>
-                                <a href="#" id="editconfig">Edit Configuration</a>
-                                <a href="#" id="reloadconfig">Reload Configuration</a>
-                                <a href="#" id="addhost">Add Host</a>
-                                <a href="#" id="rmhost">Remove Host</a>
-                            </div>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button onclick="container()" class="dropbtn">Containers</button>
-                            <div id="container" class="dropdown-content">
-                                <a href="#" id="layout">View Running</a>
-                                <a href="#" id="running">View Stats</a>
-                                <a href="#" id="manage">Manage</a>
-                                <a href="#" id="addcontainer">Add Container</a>
-                            </div>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button onclick="imagecontrol()" class="dropbtn">Images</button>
-                            <div id="imagecontrol" class="dropdown-content">
-                                <a href="#" id="build">Build Images</a>
-                                <a href="#" id="images">List Images</a>
-                            </div>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button onclick="operations()" class="dropbtn">Operations</button>
-                            <div id="operations" class="dropdown-content">
-                                <a href="#" id="killvip">Reset Virtual IP</a>
-                                <a href="#" id="sandbox">Run Command </a>
-                                <a href="#" id="hb">Heartbeat</a>
-                                <a href="#" id="prune">Clean Docker</a>
-                                <a href="#" id="terminal">Terminal</a>
-                                <a href="#" id="kibana">Kibana</a>
-                            </div>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button onclick="logging()" class="dropbtn">Logs</button>
-                            <div id="logging" class="dropdown-content">
-                                <a href="#" id="log">PiCluster Logs</a>
-                                <a href="#" id="syslog">Syslog Analytics</a>
-                                <a href="#" id="rsyslog">Rsyslog Analytics</a>
-                            </div>
-                    </td>
-                </tr>
-            </table>
-            </div>
-            <div id="top"> </div>
-            <script>
-                function system() {
-                    document.getElementById("system").classList.toggle("show");
-                }
+  <div id="menu">
+    <p align=center>
+      <table style="width:40%">
+        <tr>
+          <td>
+            <div class="dropdown">
+              <button onclick="system()" class="dropbtn">System</button>
+              <div id="system" class="dropdown-content">
+                <a href="#" id="nodes">Nodes</a>
+                <a href="#" id="editconfig">Edit Configuration</a>
+                <a href="#" id="reloadconfig">Reload Configuration</a>
+                <a href="#" id="addhost">Add Host</a>
+                <a href="#" id="rmhost">Remove Host</a>
+              </div>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button onclick="container()" class="dropbtn">Containers</button>
+              <div id="container" class="dropdown-content">
+                <a href="#" id="layout">View Running</a>
+                <a href="#" id="running">View Stats</a>
+                <a href="#" id="manage">Manage</a>
+                <a href="#" id="addcontainer">Add Container</a>
+              </div>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button onclick="imagecontrol()" class="dropbtn">Images</button>
+              <div id="imagecontrol" class="dropdown-content">
+                <a href="#" id="build">Build Images</a>
+                <a href="#" id="image-layout">List Images</a>
+                <a href="#" id="images">Image Details</a>
+              </div>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button onclick="operations()" class="dropbtn">Operations</button>
+              <div id="operations" class="dropdown-content">
+                <a href="#" id="killvip">Reset Virtual IP</a>
+                <a href="#" id="sandbox">Run Command </a>
+                <a href="#" id="hb">Heartbeat</a>
+                <a href="#" id="prune">Clean Docker</a>
+                <a href="#" id="terminal">Terminal</a>
+                <a href="#" id="kibana">Kibana</a>
+              </div>
+          </td>
+          <td>
+            <div class="dropdown">
+              <button onclick="logging()" class="dropbtn">Logs</button>
+              <div id="logging" class="dropdown-content">
+                <a href="#" id="log">PiCluster Logs</a>
+                <a href="#" id="syslog">Syslog Analytics</a>
+                <a href="#" id="rsyslog">Rsyslog Analytics</a>
+              </div>
+          </td>
+        </tr>
+      </table>
+      </div>
+      <div id="top"> </div>
+      <script>
+        function system() {
+          document.getElementById("system").classList.toggle("show");
+        }
 
-                function container() {
-                    document.getElementById("container").classList.toggle("show");
-                }
+        function container() {
+          document.getElementById("container").classList.toggle("show");
+        }
 
-                function operations() {
-                    document.getElementById("operations").classList.toggle("show");
-                }
+        function operations() {
+          document.getElementById("operations").classList.toggle("show");
+        }
 
-                function imagecontrol() {
-                    document.getElementById("imagecontrol").classList.toggle("show");
-                }
+        function imagecontrol() {
+          document.getElementById("imagecontrol").classList.toggle("show");
+        }
 
-                function logging() {
-                    document.getElementById("logging").classList.toggle("show");
-                }
+        function logging() {
+          document.getElementById("logging").classList.toggle("show");
+        }
 
-                window.onclick = function(event) {
-                    if (!event.target.matches('.dropbtn')) {
+        window.onclick = function(event) {
+          if (!event.target.matches('.dropbtn')) {
 
-                        var dropdowns = document.getElementsByClassName("dropdown-content");
-                        var i;
-                        for (i = 0; i < dropdowns.length; i++) {
-                            var openDropdown = dropdowns[i];
-                            if (openDropdown.classList.contains('show')) {
-                                openDropdown.classList.remove('show');
-                            }
-                        }
-                    }
-                }
-            </script>
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            var i;
+            for (i = 0; i < dropdowns.length; i++) {
+              var openDropdown = dropdowns[i];
+              if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+              }
+            }
+          }
+        }
+      </script>
 
 
-            <div id="content">
-                <div class="left">
-                </div>
+      <div id="content">
+        <div class="left">
+        </div>
 
-                <div style="clear: both;"> </div>
-            </div>
+        <div style="clear: both;"> </div>
+      </div>
 
-            <p align=center>
-                <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
+      <p align=center>
+        <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
   </body>
   </html>

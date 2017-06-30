@@ -870,6 +870,10 @@ app.get('/images.html', function(req, res) {
   res.sendFile(__dirname + '/images.html');
 });
 
+app.get('/image-layout.html', function(req, res) {
+  res.sendFile(__dirname + '/image-layout.html');
+});
+
 app.get('/log.html', function(req, res) {
   res.sendFile(__dirname + '/log.html');
 });
