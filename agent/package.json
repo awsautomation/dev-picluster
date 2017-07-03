@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "dependencies": {
     "body-parser": "latest",
-    "exec": "",
     "express": "^4.15.3",
     "fs": "",
     "line-reader": "",
@@ -11,7 +10,6 @@
     "os": "",
     "request": "",
     "request-debug": "",
-    "socket": "",
     "sys": ""
   }
 }

@@ -6,8 +6,6 @@
     "line-reader": "",
     "node-gyp": "",
     "fs": "",
-    "socket": "",
-    "exec": "",
     "request-debug": "",
     "body-parser": "latest",
     "sys": "",
