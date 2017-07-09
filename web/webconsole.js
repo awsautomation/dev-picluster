@@ -22,6 +22,8 @@ var server_port = config.server_port;
 var syslog = "";
 var request_timeout = 5000;
 
+app.use('/assets', express.static(path.join(__dirname, 'assets')))
+
 if (config.syslog) {
   syslog = config.syslog;
 }
