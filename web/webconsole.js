@@ -80,9 +80,7 @@ app.post('/sendconfig', function(req, res) {
       if (error) {
         res.end(error);
       } else {
-        display_log(function(data) {
-          res.end(data);
-        });
+        res.end(body);
       }
     })
   }

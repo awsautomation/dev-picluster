@@ -172,7 +172,7 @@ app.get('/images', function(req, res) {
           res.end("An error has occurred.");
         } else {
           var results = JSON.parse(response.body);
-            addLog('\nNode: ' + results.output);
+          addLog('\nNode: ' + results.output);
         }
       })
 
@@ -1399,17 +1399,24 @@ app.get('/killvip', function(req, res) {
 app.post('/updateconfig', function(req, res) {
   var payload = req.body.payload;
   var check_token = req.body.token;
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    fs.writeFile(config_file, payload, function(err) {
-      if (err) {
-        console.log('\nError while writing config.' + err);
-      } else {
-        res.end('Updated Configuration. Please reload it now for changes to take effect.');
-      }
-    });
+
+  try {
+    var verify_payload = JSON.parse(req.body.payload);
+    if ((check_token != token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials')
+    } else {
+      fs.writeFile(config_file, payload, function(err) {
+        if (err) {
+          console.log('\nError while writing config.' + err);
+        } else {
+          res.end('Updated Configuration. Please reload it now for changes to take effect.');
+        }
+      });
+    }
+  } catch (e) {
+    res.end('Error: Invalid JSON. Configuration not saved.');
   }
+
 });
 
 
