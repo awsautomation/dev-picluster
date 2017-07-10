@@ -911,6 +911,9 @@ app.get('/rsyslog.html', function(req, res) {
 app.get('/server.jpeg', function(req, res) {
   res.sendFile(__dirname + '/server.jpeg');
 });
+app.get('/favicon.ico', function(req, res) {
+  res.sendFile(__dirname + '/favicon.ico');
+});
 app.get('/searching.jpeg', function(req, res) {
   res.sendFile(__dirname + '/searching.jpeg');
 });
