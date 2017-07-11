@@ -11,6 +11,7 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 //require('request-debug')(request);
+var path = require('path');
 var port = config.web_port;
 var lineReader = require('line-reader');
 var webconsole = require("http").createServer(app);
@@ -21,6 +22,8 @@ var server = config.web_connect;
 var server_port = config.server_port;
 var syslog = "";
 var request_timeout = 5000;
+
+app.use('/assets', express.static(path.join(__dirname, 'assets')))
 
 if (config.syslog) {
   syslog = config.syslog;
