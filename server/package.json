@@ -2,13 +2,14 @@
   "name": "picluster-server",
   "version": "0.0.1",
   "dependencies": {
-    "express": "",
-    "line-reader": "",
-    "node-gyp": "",
-    "fs": "",
-    "request-debug": "",
     "body-parser": "latest",
-    "sys": "",
-    "request": ""
+    "express": "",
+    "fs": "",
+    "line-reader": "",
+    "node-datetime": "^1.0.1",
+    "node-gyp": "",
+    "request": "",
+    "request-debug": "",
+    "sys": ""
   }
 }

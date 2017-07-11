@@ -1,4 +1,5 @@
 var express = require('express');
+var dateTime = require('node-datetime');
 var request = require('request');
 var app = express();
 var http = require('http');
@@ -22,6 +23,47 @@ var log = '';
 var token = config.token;
 var dockerFolder = config.docker;
 
+if (config.elasticsearch && config.elasticsearch_index) {
+  var mapping = {
+    "settings": {
+      "index": {
+        "number_of_shards": 3,
+        "number_of_replicas": 2
+      }
+    },
+    "mappings": {
+      "picluster": {
+        "properties": {
+          "date": {
+            "type": "keyword",
+            "index": "true"
+          },
+          "data": {
+            "type": "keyword",
+            "index": "true"
+          }
+        }
+      }
+    }
+  }
+
+  var options = {
+    url: config.elasticsearch + '/' + config.elasticsearch_index,
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': mapping.length
+    },
+    body: JSON.stringify(mapping)
+  }
+
+  request(options, function(error, response, body) {
+    console.log('\nCreating Elasticsearch Map......')
+    if (error) {
+      console.log(error);
+    }
+  });
+}
 if (config.automatic_heartbeat) {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     if (config.heartbeat_interval) {
@@ -520,6 +562,68 @@ app.get('/addhost', function(req, res) {
     } else {
       res.end('\nError: Host already exists');
     }
+  };
+});
+
+function elasticsearch(data) {
+  var dt = dateTime.create();
+  
+  var elasticsearch_data = JSON.stringify({
+    "data": data,
+    "date": dt.format('Y/m/d H:M:S')
+  });
+
+  var options = {
+    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': elasticsearch_data.length
+    },
+    body: elasticsearch_data
+  }
+
+  request(options, function(error, response, body) {
+    if (error) {
+      console.log(error);
+    }
+  });
+};
+
+app.get('/clear-elasticsearch', function(req, res) {
+  var check_token = req.query['token'];
+  var host = req.query['host'];
+  var data = req.query['data'];
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var message = {
+      "query": {
+        "match_all": {}
+      }
+
+    }
+
+    var options = {
+      url: config.elasticsearch + '/' + config.elasticsearch_index,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': message.length
+      },
+      body: JSON.stringify(message)
+    }
+
+    request(options, function(error, response, body) {
+      if (error) {
+        res.end(error);
+        console.log(error);
+      } else {
+        res.end('\nCleared Elasticsearch data');
+        console.log('\nCleared Elasticsearch data:' + body);
+      }
+    });
   };
 });
 
@@ -1311,6 +1415,9 @@ app.get('/log', function(req, res) {
   if ((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
+    if (config.elasticsearch && config.elasticsearch_index) {
+      elasticsearch(log);
+    }
     res.send(log);
   }
 });

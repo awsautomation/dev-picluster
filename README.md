@@ -24,6 +24,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Rsyslog Analytics
 * Built-in web terminal to easily run commands on nodes
 * Integrate the Kibana dashboard into PiCluster
+* Integrates with Elasticsearch to store the PiCluster logs.
 
 ## Prerequisites
 
@@ -72,7 +73,9 @@ You can run the server and agent on the same node since they are listening on di
   "web_username": "admin",
   "web_password":"admin",
   "web_connect":"192.168.0.101",
-  "web_port":"3003"
+  "web_port":"3003",
+  "elasticsearch": "http://127.0.0.1:9200",
+  "elasticsearch_index": "picluster"
 }
 
 ```
@@ -113,6 +116,10 @@ You can run the server and agent on the same node since they are listening on di
 * commandlist - A list of commands to run on the nodes on demand from the web console under Operations -> Run Command.
 
 * kibana - The is for the URL to Kibana to integrate the console inside PiCluster.
+
+* elasticsearch - The URL for your Elasticsearch server. 
+
+* elasticsearch_index - The Elasticsearch index to use for PiCluster.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
