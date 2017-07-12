@@ -104,7 +104,7 @@ app.get('/status', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;docker container ps',
+      "command": 'hostname;docker container ps -a',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -587,7 +587,7 @@ function elasticsearch(data) {
   request(options, function(error, response, body) {
     if (error) {
       console.log(error);
-    } 
+    }
   });
 };
 
