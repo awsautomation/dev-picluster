@@ -35,8 +35,9 @@ if (config.elasticsearch && config.elasticsearch_index) {
       "picluster": {
         "properties": {
           "date": {
-            "type": "keyword",
-            "index": "true"
+            "type": "date",
+            "index": "true",
+            "format": "yyyy-MM-dd HH:mm:ss"
           },
           "data": {
             "type": "keyword",
@@ -567,10 +568,10 @@ app.get('/addhost', function(req, res) {
 
 function elasticsearch(data) {
   var dt = dateTime.create();
-  
+
   var elasticsearch_data = JSON.stringify({
     "data": data,
-    "date": dt.format('Y/m/d H:M:S')
+    "date": dt.format('Y-m-d H:M:S')
   });
 
   var options = {
@@ -586,7 +587,7 @@ function elasticsearch(data) {
   request(options, function(error, response, body) {
     if (error) {
       console.log(error);
-    }
+    } 
   });
 };
 
