@@ -104,7 +104,7 @@ app.get('/status', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;docker container ps -a',
+      "command": 'hostname;docker container ps',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
