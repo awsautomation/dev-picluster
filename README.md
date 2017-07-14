@@ -25,6 +25,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Built-in web terminal to easily run commands on nodes
 * Integrate the Kibana dashboard into PiCluster
 * Integrates with Elasticsearch to store the PiCluster logs.
+* Automatic container failover to different nodes.
 
 ## Prerequisites
 
@@ -59,6 +60,11 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.101","vip_eth_device":"eth0", "slave": "192.168.0.102", "vip_ping_time": "10000"},
     {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
+  "container_host_constraints": [{
+    "container": "containerName,192.168.0.101,192.168.0.102"
+  }, {
+    "container": "containerName,192.168.0.103,192.168.0.104"
+  }],
   "commandlist": [{
   "SystemUpdate": "apt-get update;apt-get dist-upgrade -y"
   }],
@@ -117,9 +123,11 @@ You can run the server and agent on the same node since they are listening on di
 
 * kibana - The is for the URL to Kibana to integrate the console inside PiCluster.
 
-* elasticsearch - The URL for your Elasticsearch server. 
+* elasticsearch - The URL for your Elasticsearch server.
 
 * elasticsearch_index - The Elasticsearch index to use for PiCluster.
+
+* container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container. 
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
