@@ -446,7 +446,7 @@ app.get('/start', function(req, res) {
 function migrate(container, original_host, new_host, original_container_data) {
   var existing_automatic_heartbeat_value = '';
   if (config.automatic_heartbeat) {
-     existing_automatic_heartbeat_value = config.automatic_heartbeat;
+    existing_automatic_heartbeat_value = config.automatic_heartbeat;
     if (config.automatic_heartbeat.indexOf('enabled') > -1) {
       config.automatic_heartbeat = 'disabled';
     }
@@ -466,195 +466,255 @@ function migrate(container, original_host, new_host, original_container_data) {
   }
 
   request(options, function(error, response, body) {
-      if (error) {
-        addLog("An error has occurred.");
-      } else {
+    if (error) {
+      addLog("An error has occurred.");
+    } else {
 
-        var command = JSON.stringify({
-          "command": 'docker image build ' + dockerFolder + '/' + container + ' -t ' + container + ' -f ' + dockerFolder + '/' + container + '/Dockerfile' + ';docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-          "token": token
-        });
+      var command = JSON.stringify({
+        "command": 'docker image build ' + dockerFolder + '/' + container + ' -t ' + container + ' -f ' + dockerFolder + '/' + container + '/Dockerfile' + ';docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+        "token": token
+      });
 
-        var options = {
-          url: 'http://' + new_host + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
+      var options = {
+        url: 'http://' + new_host + ':' + agentPort + '/run',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      }
 
 
-        request(options, function(error, response, body) {
+      request(options, function(error, response, body) {
+        if (error) {
+          addLog("An error has occurred.");
+        } else {
+          var command = JSON.stringify({
+            "command": 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+            "token": token
+          });
+
+          var options = {
+            url: 'http://' + new_host + ':' + agentPort + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          }
+          request(options, function(error, response, body) {
             if (error) {
               addLog("An error has occurred.");
             } else {
-              var command = JSON.stringify({
-                "command": 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-                "token": token
-              });
-
-              var options = {
-                url: 'http://' + new_host + ':' + agentPort + '/run',
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': command.length
-                },
-                body: command
+              addLog('\nStarting ' + container);
+              if (config.automatic_heartbeat) {
+                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                }
               }
-              request(options, function(error, response, body) {
-                  if (error) {
-                    addLog("An error has occurred.");
-                  } else {
-                    addLog('\nStarting ' + container);
-                    if (config.automatic_heartbeat) {
-                      if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                          config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                        }
-                      }
-                    }
-                  });
-              }
-            });
-        }
-      });
-  };
-
-  app.get('/addhost', function(req, res) {
-    var check_token = req.query['token'];
-    var host = req.query['host'];
-
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var proceed = 1;
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].node.indexOf(host) > -1) {
-            proceed = 0;
-          }
-        }
-      }
-
-      if (proceed) {
-        //Add New Host
-        config.layout.push({
-          "node": host
-        });
-
-        if (config.hb) {
-          config.hb.push({
-            "node": host
+            }
           });
         }
-
-        var new_config = JSON.stringify({
-          "payload": JSON.stringify(config),
-          "token": token
-        });
-
-        //Save Configuration
-        var options = {
-          url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config,
-        }
-
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end(error);
-          } else {
-            res.end('\nAdded host ' + host + ' to the configuration.');
-          }
-        });
-      } else {
-        res.end('\nError: Host already exists');
-      }
-    };
+      });
+    }
   });
+};
 
-  function elasticsearch(data) {
-    var dt = dateTime.create();
+app.get('/addhost', function(req, res) {
+  var check_token = req.query['token'];
+  var host = req.query['host'];
 
-    var elasticsearch_data = JSON.stringify({
-      "data": data,
-      "date": dt.format('Y-m-d H:M:S')
-    });
-
-    var options = {
-      url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': elasticsearch_data.length
-      },
-      body: elasticsearch_data
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var proceed = 1;
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (config.layout[i].node.indexOf(host) > -1) {
+          proceed = 0;
+        }
+      }
     }
 
-    request(options, function(error, response, body) {
-      if (error) {
-        console.log(error);
-      }
-    });
-  };
+    if (proceed) {
+      //Add New Host
+      config.layout.push({
+        "node": host
+      });
 
-  app.get('/clear-elasticsearch', function(req, res) {
-    var check_token = req.query['token'];
-    var host = req.query['host'];
-    var data = req.query['data'];
-
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var message = {
-        "query": {
-          "match_all": {}
-        }
-
+      if (config.hb) {
+        config.hb.push({
+          "node": host
+        });
       }
 
+      var new_config = JSON.stringify({
+        "payload": JSON.stringify(config),
+        "token": token
+      });
+
+      //Save Configuration
       var options = {
-        url: config.elasticsearch + '/' + config.elasticsearch_index,
-        method: 'DELETE',
+        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': message.length
+          'Content-Length': new_config.length
         },
-        body: JSON.stringify(message)
+        body: new_config,
       }
 
       request(options, function(error, response, body) {
         if (error) {
           res.end(error);
-          console.log(error);
         } else {
-          res.end('\nCleared Elasticsearch data');
-          console.log('\nCleared Elasticsearch data:' + body);
+          res.end('\nAdded host ' + host + ' to the configuration.');
         }
       });
-    };
+    } else {
+      res.end('\nError: Host already exists');
+    }
+  };
+});
+
+function elasticsearch(data) {
+  var dt = dateTime.create();
+
+  var elasticsearch_data = JSON.stringify({
+    "data": data,
+    "date": dt.format('Y-m-d H:M:S')
   });
 
-  app.get('/rmhost', function(req, res) {
-    var check_token = req.query['token'];
-    var host = req.query['host'];
+  var options = {
+    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': elasticsearch_data.length
+    },
+    body: elasticsearch_data
+  }
 
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
+  request(options, function(error, response, body) {
+    if (error) {
+      console.log(error);
+    }
+  });
+};
+
+app.get('/clear-elasticsearch', function(req, res) {
+  var check_token = req.query['token'];
+  var host = req.query['host'];
+  var data = req.query['data'];
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var message = {
+      "query": {
+        "match_all": {}
+      }
+
+    }
+
+    var options = {
+      url: config.elasticsearch + '/' + config.elasticsearch_index,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': message.length
+      },
+      body: JSON.stringify(message)
+    }
+
+    request(options, function(error, response, body) {
+      if (error) {
+        res.end(error);
+        console.log(error);
+      } else {
+        res.end('\nCleared Elasticsearch data');
+        console.log('\nCleared Elasticsearch data:' + body);
+      }
+    });
+  };
+});
+
+app.get('/rmhost', function(req, res) {
+  var check_token = req.query['token'];
+  var host = req.query['host'];
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+
+    //Ensures that the host exists
+    var hb_proceed = 0;
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (config.layout[i].node.indexOf(host) > -1) {
+          config.layout.splice(i, 1);
+          hb_proceed = 1;
+          break;
+        }
+      }
+    }
+  }
+
+  if (hb_proceed) {
+    if (config.hb) {
+      for (var i = 0; i < config.hb.length; i++) {
+        for (var key in config.hb[i]) {
+          if (config.hb[i].node.indexOf(host) > -1) {
+            config.hb.splice(i, 1);
+            break;
+          }
+        }
+      }
+    }
+  }
+  var new_config = JSON.stringify({
+    "payload": JSON.stringify(config),
+    "token": token
+  });
+
+  //Save Configuration
+  var options = {
+    url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': new_config.length
+    },
+    body: new_config,
+  }
+
+  request(options, function(error, response, body) {
+    if (error) {
+      res.end(error);
     } else {
+      res.end('\nAdded host ' + host + ' to the configuration.');
+    }
+  });
 
-      //Ensures that the host exists
-      var hb_proceed = 0;
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].node.indexOf(host) > -1) {
-            config.layout.splice(i, 1);
+});
+
+app.get('/removecontainerconfig', function(req, res) {
+  var check_token = req.query['token'];
+  var container = req.query['container'];
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+
+
+    var hb_proceed = 0;
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (container.length > 0) {
+          if (key.indexOf(container) > -1) {
+            delete config.layout[i][key];
             hb_proceed = 1;
             break;
           }
@@ -666,14 +726,30 @@ function migrate(container, original_host, new_host, original_container_data) {
       if (config.hb) {
         for (var i = 0; i < config.hb.length; i++) {
           for (var key in config.hb[i]) {
-            if (config.hb[i].node.indexOf(host) > -1) {
-              config.hb.splice(i, 1);
-              break;
+            if (container.length > 0) {
+              if (key.indexOf(container) > -1) {
+                delete config.hb[i][key];
+                break;
+              }
             }
           }
         }
       }
     }
+
+    if (config.container_host_constraints) {
+      for (var i = 0; i < config.container_host_constraints.length; i++) {
+        for (var key in config.container_host_constraints[i]) {
+          if (container.length > 0) {
+            var analyze = config.container_host_constraints[i][key].split(',');
+            if (container.indexOf(analyze[0]) > -1) {
+               config.container_host_constraints.splice(i,i+1);
+            }
+          }
+        }
+      }
+    }
+
     var new_config = JSON.stringify({
       "payload": JSON.stringify(config),
       "token": token
@@ -694,43 +770,179 @@ function migrate(container, original_host, new_host, original_container_data) {
       if (error) {
         res.end(error);
       } else {
-        res.end('\nAdded host ' + host + ' to the configuration.');
+        res.end('\nRemoved Container ' + container + ' from the configuration.');
       }
     });
+  };
 
-  });
+});
 
-  app.get('/removecontainerconfig', function(req, res) {
-    var check_token = req.query['token'];
-    var container = req.query['container'];
 
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
+app.get('/addcontainer', function(req, res) {
+  var check_token = req.query['token'];
+  var host = req.query['host'];
+  var container = req.query['container'];
+  var container_args = req.query['container_args'];
+  var heartbeat_args = req.query['heartbeat_args'];
+  var failover_constraints = req.query['failover_constraints'];
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+
+    //Ensures that the host exists
+    var proceed = 0;
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (config.layout[i].node.indexOf(host) > -1) {
+          proceed++;
+        }
+      }
+    }
+
+    if (proceed < 1) {
+      res.end('\nError: Node does not exist!');
     } else {
 
+      //Add Data to New Host
 
-      var hb_proceed = 0;
       for (var i = 0; i < config.layout.length; i++) {
         for (var key in config.layout[i]) {
-          if (container.length > 0) {
-            if (key.indexOf(container) > -1) {
-              delete config.layout[i][key];
-              hb_proceed = 1;
-              break;
+          if (config.layout[i].node.indexOf(host) > -1) {
+            config.layout[i][container] = container_args;
+          }
+        }
+      }
+
+      //Adds Heartbeat Data
+      if (config.hb) {
+        if (heartbeat_args) {
+          for (var i = 0; i < config.hb.length; i++) {
+            for (var key in config.hb[i]) {
+              if (config.hb[i].node.indexOf(host) > -1) {
+                config.hb[i][container] = heartbeat_args;
+              }
             }
           }
         }
       }
 
-      if (hb_proceed) {
-        if (config.hb) {
+      if (config.container_host_constraints) {
+        var found = '';
+        if (failover_constraints) {
+          config.container_host_constraints.push({
+            "container": failover_constraints
+          });
+        }
+      }
+      var new_config = JSON.stringify({
+        "payload": JSON.stringify(config),
+        "token": token
+      });
+
+      //Save Configuration
+      var options = {
+        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config,
+      }
+
+      request(options, function(error, response, body) {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nAdded ' + container + ' to the configuration.');
+        }
+      });
+    };
+  };
+});
+
+app.get('/changehost', function(req, res) {
+  var check_token = req.query['token'];
+  var container = '';
+  var original_host = '';
+  var original_container_data = '';
+  var original_heartbeat_data = '';
+  var new_host = req.query['newhost'];
+
+  if (req.query['container']) {
+    container = req.query['container'];
+  }
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+
+    //Ensures that the host exists
+    var proceed = 0;
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (container.length > 0) {
+          if (config.layout[i].node.indexOf(new_host) > -1) {
+            proceed++;
+          }
+          if (key.indexOf(container) > -1) {
+            if (key.indexOf(config.layout[i].node)) {
+              proceed++;
+            }
+          }
+        }
+      }
+    }
+
+    if (proceed < 2) {
+      res.end('\nError: Node or Container does not exist!');
+    } else {
+
+      //Find Current Host
+      for (var i = 0; i < config.layout.length; i++) {
+        for (var key in config.layout[i]) {
+          if (container.length > 0) {
+            if (key.indexOf(container) > -1) {
+              original_host = config.layout[i].node;
+              original_container_data = config.layout[i][key];
+              delete config.layout[i][key];
+            }
+          }
+        }
+      }
+
+      if (config.hb) {
+        //Checks for HB
+        for (var i = 0; i < config.hb.length; i++) {
+          for (var key in config.hb[i]) {
+            if (container.length > 0) {
+              if (key.indexOf(container) > -1) {
+                original_heartbeat_data = config.hb[i][key];
+                delete config.hb[i][key];
+              }
+            }
+          }
+        }
+      }
+
+      for (var i = 0; i < config.layout.length; i++) {
+        for (var key in config.layout[i]) {
+          if (config.layout[i].node.indexOf(new_host) > -1) {
+            config.layout[i][container] = original_container_data;
+          }
+        }
+      }
+
+      //Adds Heartbeat Data
+      if (config.hb) {
+        if (original_heartbeat_data) {
           for (var i = 0; i < config.hb.length; i++) {
             for (var key in config.hb[i]) {
-              if (container.length > 0) {
-                if (key.indexOf(container) > -1) {
-                  delete config.hb[i][key];
-                  break;
-                }
+              if (config.hb[i].node.indexOf(new_host) > -1) {
+                config.hb[i][container] = original_heartbeat_data;
               }
             }
           }
@@ -757,250 +969,50 @@ function migrate(container, original_host, new_host, original_container_data) {
         if (error) {
           res.end(error);
         } else {
-          res.end('\nRemoved Container ' + container + ' from the configuration.');
+          migrate(container, original_host, new_host, original_container_data);
+          res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
         }
       });
     };
+  };
+});
 
-  });
+app.get('/stop', function(req, res) {
+  var check_token = req.query['token'];
+  var container = '';
 
+  if (req.query['container']) {
+    container = req.query['container'];
+  }
+  if (container.indexOf("*") > -1) {
+    container = container = '';
+  }
 
-  app.get('/addcontainer', function(req, res) {
-    var check_token = req.query['token'];
-    var host = req.query['host'];
-    var container = req.query['container'];
-    var container_args = req.query['container_args'];
-    var heartbeat_args = req.query['heartbeat_args'];
-
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-
-      //Ensures that the host exists
-      var proceed = 0;
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].node.indexOf(host) > -1) {
-            proceed++;
-          }
-        }
-      }
-
-      if (proceed < 1) {
-        res.end('\nError: Node does not exist!');
-      } else {
-
-        //Add Data to New Host
-
-        for (var i = 0; i < config.layout.length; i++) {
-          for (var key in config.layout[i]) {
-            if (config.layout[i].node.indexOf(host) > -1) {
-              config.layout[i][container] = container_args;
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    for (var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      for (var key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          if (key.indexOf('node') > -1) {} else {
+            //Starts the Docker images assigned to each host.
+            var command = JSON.stringify({
+              "command": 'docker container stop ' + key,
+              "token": token
+            });
+            var options = {
+              url: 'http://' + node + ':' + agentPort + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
             }
-          }
-        }
-
-        //Adds Heartbeat Data
-        if (config.hb) {
-          if (heartbeat_args) {
-            for (var i = 0; i < config.hb.length; i++) {
-              for (var key in config.hb[i]) {
-                if (config.hb[i].node.indexOf(host) > -1) {
-                  config.hb[i][container] = heartbeat_args;
-                }
-              }
-            }
-          }
-        }
-
-        var new_config = JSON.stringify({
-          "payload": JSON.stringify(config),
-          "token": token
-        });
-
-        //Save Configuration
-        var options = {
-          url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config,
-        }
-
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end(error);
-          } else {
-            res.end('\nAdded ' + container + ' to the configuration.');
-          }
-        });
-      };
-    };
-  });
-
-  app.get('/changehost', function(req, res) {
-    var check_token = req.query['token'];
-    var container = '';
-    var original_host = '';
-    var original_container_data = '';
-    var original_heartbeat_data = '';
-    var new_host = req.query['newhost'];
-
-    if (req.query['container']) {
-      container = req.query['container'];
-    }
-
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-
-      //Ensures that the host exists
-      var proceed = 0;
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (container.length > 0) {
-            if (config.layout[i].node.indexOf(new_host) > -1) {
-              proceed++;
-            }
-            if (key.indexOf(container) > -1) {
-              if (key.indexOf(config.layout[i].node)) {
-                proceed++;
-              }
-            }
-          }
-        }
-      }
-
-      if (proceed < 2) {
-        res.end('\nError: Node or Container does not exist!');
-      } else {
-
-        //Find Current Host
-        for (var i = 0; i < config.layout.length; i++) {
-          for (var key in config.layout[i]) {
             if (container.length > 0) {
               if (key.indexOf(container) > -1) {
-                original_host = config.layout[i].node;
-                original_container_data = config.layout[i][key];
-                delete config.layout[i][key];
-              }
-            }
-          }
-        }
-
-        if (config.hb) {
-          //Checks for HB
-          for (var i = 0; i < config.hb.length; i++) {
-            for (var key in config.hb[i]) {
-              if (container.length > 0) {
-                if (key.indexOf(container) > -1) {
-                  original_heartbeat_data = config.hb[i][key];
-                  delete config.hb[i][key];
-                }
-              }
-            }
-          }
-        }
-
-        for (var i = 0; i < config.layout.length; i++) {
-          for (var key in config.layout[i]) {
-            if (config.layout[i].node.indexOf(new_host) > -1) {
-              config.layout[i][container] = original_container_data;
-            }
-          }
-        }
-
-        //Adds Heartbeat Data
-        if (config.hb) {
-          if (original_heartbeat_data) {
-            for (var i = 0; i < config.hb.length; i++) {
-              for (var key in config.hb[i]) {
-                if (config.hb[i].node.indexOf(new_host) > -1) {
-                  config.hb[i][container] = original_heartbeat_data;
-                }
-              }
-            }
-          }
-        }
-
-        var new_config = JSON.stringify({
-          "payload": JSON.stringify(config),
-          "token": token
-        });
-
-        //Save Configuration
-        var options = {
-          url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config,
-        }
-
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end(error);
-          } else {
-            migrate(container, original_host, new_host, original_container_data);
-            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
-          }
-        });
-      };
-    };
-  });
-
-  app.get('/stop', function(req, res) {
-    var check_token = req.query['token'];
-    var container = '';
-
-    if (req.query['container']) {
-      container = req.query['container'];
-    }
-    if (container.indexOf("*") > -1) {
-      container = container = '';
-    }
-
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-      for (var i = 0; i < config.layout.length; i++) {
-        var node = config.layout[i].node;
-        for (var key in config.layout[i]) {
-          if (config.layout[i].hasOwnProperty(key)) {
-            if (key.indexOf('node') > -1) {} else {
-              //Starts the Docker images assigned to each host.
-              var command = JSON.stringify({
-                "command": 'docker container stop ' + key,
-                "token": token
-              });
-              var options = {
-                url: 'http://' + node + ':' + agentPort + '/run',
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': command.length
-                },
-                body: command
-              }
-              if (container.length > 0) {
-                if (key.indexOf(container) > -1) {
-                  request(options, function(error, response, body) {
-                    if (error) {
-                      res.end("An error has occurred.");
-                    } else {
-                      var results = JSON.parse(response.body);
-                      addLog('\nStopping: ' + key + '\n' + results.output);
-                    }
-                  });
-                }
-              } else {
                 request(options, function(error, response, body) {
                   if (error) {
                     res.end("An error has occurred.");
@@ -1010,62 +1022,62 @@ function migrate(container, original_host, new_host, original_container_data) {
                   }
                 });
               }
+            } else {
+              request(options, function(error, response, body) {
+                if (error) {
+                  res.end("An error has occurred.");
+                } else {
+                  var results = JSON.parse(response.body);
+                  addLog('\nStopping: ' + key + '\n' + results.output);
+                }
+              });
             }
           }
         }
       }
-      res.end('');
     }
-  });
+    res.end('');
+  }
+});
 
 
 
-  app.get('/delete', function(req, res) {
-    var check_token = req.query['token'];
-    var container = '';
-    if (req.query['container']) {
-      container = req.query['container'];
-    }
+app.get('/delete', function(req, res) {
+  var check_token = req.query['token'];
+  var container = '';
+  if (req.query['container']) {
+    container = req.query['container'];
+  }
 
-    if (container.indexOf('*') > -1) {
-      container = '';
-    }
+  if (container.indexOf('*') > -1) {
+    container = '';
+  }
 
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-      for (var i = 0; i < config.layout.length; i++) {
-        var node = config.layout[i].node;
-        for (var key in config.layout[i]) {
-          if (config.layout[i].hasOwnProperty(key)) {
-            if (key.indexOf('node') > -1) {} else {
-              //Starts the Docker images assigned to each host.
-              var command = JSON.stringify({
-                "command": 'docker container rm -f ' + key,
-                "token": token
-              });
-              var options = {
-                url: 'http://' + node + ':' + agentPort + '/run',
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': command.length
-                },
-                body: command
-              }
-              if (container.length > 0) {
-                if (key.indexOf(container) > -1) {
-                  request(options, function(error, response, body) {
-                    if (error) {
-                      res.end("An error has occurred.");
-                    } else {
-                      var results = JSON.parse(response.body);
-                      addLog('\nStopping: ' + key + '\n' + results.output);
-                    }
-                  });
-                }
-              } else {
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    for (var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      for (var key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          if (key.indexOf('node') > -1) {} else {
+            //Starts the Docker images assigned to each host.
+            var command = JSON.stringify({
+              "command": 'docker container rm -f ' + key,
+              "token": token
+            });
+            var options = {
+              url: 'http://' + node + ':' + agentPort + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            }
+            if (container.length > 0) {
+              if (key.indexOf(container) > -1) {
                 request(options, function(error, response, body) {
                   if (error) {
                     res.end("An error has occurred.");
@@ -1075,59 +1087,59 @@ function migrate(container, original_host, new_host, original_container_data) {
                   }
                 });
               }
+            } else {
+              request(options, function(error, response, body) {
+                if (error) {
+                  res.end("An error has occurred.");
+                } else {
+                  var results = JSON.parse(response.body);
+                  addLog('\nStopping: ' + key + '\n' + results.output);
+                }
+              });
             }
           }
         }
       }
-      res.end('');
     }
-  });
+    res.end('');
+  }
+});
 
-  app.get('/restart', function(req, res) {
-    var check_token = req.query['token'];
-    var selected_container = '';
-    if (req.query['container']) {
-      selected_container = req.query['container'];
-    }
-    if (selected_container.indexOf('*') > -1) {
-      selected_container = '';
-    }
+app.get('/restart', function(req, res) {
+  var check_token = req.query['token'];
+  var selected_container = '';
+  if (req.query['container']) {
+    selected_container = req.query['container'];
+  }
+  if (selected_container.indexOf('*') > -1) {
+    selected_container = '';
+  }
 
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-      for (var i = 0; i < config.layout.length; i++) {
-        var node = config.layout[i].node;
-        for (var key in config.layout[i]) {
-          if (config.layout[i].hasOwnProperty(key)) {
-            if (key.indexOf('node') > -1) {} else {
-              //Starts the Docker images assigned to each host.
-              var command = JSON.stringify({
-                "command": 'docker container restart ' + key,
-                "token": token
-              });
-              var options = {
-                url: 'http://' + node + ':' + agentPort + '/run',
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': command.length
-                },
-                body: command
-              }
-              if (selected_container.length > 0) {
-                if (key.indexOf(selected_container) > -1) {
-                  request(options, function(error, response, body) {
-                    if (error) {
-                      res.end("An error has occurred.");
-                    } else {
-                      var results = JSON.parse(response.body);
-                      addLog('\nRestarting: ' + key + '\n' + results.output);
-                    }
-                  });
-                }
-              } else {
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    for (var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      for (var key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          if (key.indexOf('node') > -1) {} else {
+            //Starts the Docker images assigned to each host.
+            var command = JSON.stringify({
+              "command": 'docker container restart ' + key,
+              "token": token
+            });
+            var options = {
+              url: 'http://' + node + ':' + agentPort + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            }
+            if (selected_container.length > 0) {
+              if (key.indexOf(selected_container) > -1) {
                 request(options, function(error, response, body) {
                   if (error) {
                     res.end("An error has occurred.");
@@ -1137,59 +1149,59 @@ function migrate(container, original_host, new_host, original_container_data) {
                   }
                 });
               }
+            } else {
+              request(options, function(error, response, body) {
+                if (error) {
+                  res.end("An error has occurred.");
+                } else {
+                  var results = JSON.parse(response.body);
+                  addLog('\nRestarting: ' + key + '\n' + results.output);
+                }
+              });
             }
           }
         }
       }
-      res.end('');
     }
-  });
+    res.end('');
+  }
+});
 
-  app.get('/containerlog', function(req, res) {
-    var check_token = req.query['token'];
-    var selected_container = '';
-    if (req.query['container']) {
-      selected_container = req.query['container'];
-    }
-    if (selected_container.indexOf('*') > -1) {
-      selected_container = '';
-    }
+app.get('/containerlog', function(req, res) {
+  var check_token = req.query['token'];
+  var selected_container = '';
+  if (req.query['container']) {
+    selected_container = req.query['container'];
+  }
+  if (selected_container.indexOf('*') > -1) {
+    selected_container = '';
+  }
 
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-      for (var i = 0; i < config.layout.length; i++) {
-        var node = config.layout[i].node;
-        for (var key in config.layout[i]) {
-          if (config.layout[i].hasOwnProperty(key)) {
-            if (key.indexOf('node') > -1) {} else {
-              //Starts the Docker images assigned to each host.
-              var command = JSON.stringify({
-                "command": 'docker container logs ' + key,
-                "token": token
-              });
-              var options = {
-                url: 'http://' + node + ':' + agentPort + '/run',
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': command.length
-                },
-                body: command
-              }
-              if (selected_container.length > 0) {
-                if (key.indexOf(selected_container) > -1) {
-                  request(options, function(error, response, body) {
-                    if (error) {
-                      res.end("An error has occurred.");
-                    } else {
-                      var results = JSON.parse(response.body);
-                      addLog('\nLogs for Container: ' + key + '\n' + results.output);
-                    }
-                  });
-                }
-              } else {
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    for (var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      for (var key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          if (key.indexOf('node') > -1) {} else {
+            //Starts the Docker images assigned to each host.
+            var command = JSON.stringify({
+              "command": 'docker container logs ' + key,
+              "token": token
+            });
+            var options = {
+              url: 'http://' + node + ':' + agentPort + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            }
+            if (selected_container.length > 0) {
+              if (key.indexOf(selected_container) > -1) {
                 request(options, function(error, response, body) {
                   if (error) {
                     res.end("An error has occurred.");
@@ -1199,405 +1211,415 @@ function migrate(container, original_host, new_host, original_container_data) {
                   }
                 });
               }
+            } else {
+              request(options, function(error, response, body) {
+                if (error) {
+                  res.end("An error has occurred.");
+                } else {
+                  var results = JSON.parse(response.body);
+                  addLog('\nLogs for Container: ' + key + '\n' + results.output);
+                }
+              });
             }
           }
         }
       }
+    }
+    res.end('');
+  }
+});
+
+app.post('/listcontainers', function(req, res) {
+  var command = req.body.command;
+  var node = req.body.node;
+  var check_token = req.body.token;
+  var output = [];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          container = key;
+          node = config.layout[i].node;
+          var check_port = config.layout[i][key];
+          if (check_port != node) {
+            output.push(container);
+          }
+        }
+      }
+    }
+    res.send(output);
+  }
+});
+
+
+app.post('/listnodes', function(req, res) {
+  var command = req.body.command;
+  var check_token = req.body.token;
+  var output = [];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    for (var i = 0; i < config.layout.length; i++) {
+      for (var key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          container = key;
+          node = config.layout[i].node;
+          var port_check = config.layout[i][key];
+          if (port_check == node) {
+            output.push(node);
+          }
+        }
+      }
+    }
+    res.send(output);
+  }
+});
+
+app.post('/listcommands', function(req, res) {
+  var command = req.body.command;
+  var check_token = req.body.token;
+  var output = [];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    if (config.commandlist) {
+      res.end(JSON.stringify(config.commandlist));
+    } else {
       res.end('');
     }
-  });
-
-  app.post('/listcontainers', function(req, res) {
-    var command = req.body.command;
-    var node = req.body.node;
-    var check_token = req.body.token;
-    var output = [];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].hasOwnProperty(key)) {
-            container = key;
-            node = config.layout[i].node;
-            var check_port = config.layout[i][key];
-            if (check_port != node) {
-              output.push(container);
-            }
-          }
-        }
-      }
-      res.send(output);
-    }
-  });
+  }
+});
 
 
-  app.post('/listnodes', function(req, res) {
-    var command = req.body.command;
-    var check_token = req.body.token;
-    var output = [];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].hasOwnProperty(key)) {
-            container = key;
-            node = config.layout[i].node;
-            var port_check = config.layout[i][key];
-            if (port_check == node) {
-              output.push(node);
-            }
-          }
-        }
-      }
-      res.send(output);
-    }
-  });
+app.post('/exec', function(req, res) {
+  var check_token = req.body.token;
+  var selected_node = '';
+  if (req.body.node) {
+    selected_node = req.body.node;
+  }
 
-  app.post('/listcommands', function(req, res) {
-    var command = req.body.command;
-    var check_token = req.body.token;
-    var output = [];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      if (config.commandlist) {
-        res.end(JSON.stringify(config.commandlist));
-      } else {
-        res.end('');
-      }
-    }
-  });
-
-
-  app.post('/exec', function(req, res) {
-    var check_token = req.body.token;
+  if (selected_node.indexOf('*') > -1) {
     var selected_node = '';
-    if (req.body.node) {
-      selected_node = req.body.node;
-    }
+  }
 
-    if (selected_node.indexOf('*') > -1) {
-      var selected_node = '';
-    }
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var command = JSON.stringify({
+      "command": req.body.command,
+      "token": token
+    });
 
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var command = JSON.stringify({
-        "command": req.body.command,
-        "token": token
-      });
+    for (var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      var responseString = '';
 
-      for (var i = 0; i < config.layout.length; i++) {
-        var node = config.layout[i].node;
-        var responseString = '';
-
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-
-        if (selected_node.length == 0) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nNode:' + results.node + '\n' + results.output);
-            }
-          });
-        }
-        if (selected_node.indexOf(node) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nNode:' + results.node + '\n' + results.output);
-            }
-          });
-        }
-        res.end('');
+      var options = {
+        url: 'http://' + node + ':' + agentPort + '/run',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
       }
-    }
-  });
 
-  app.get('/prune', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var command = JSON.stringify({
-        "command": 'docker system prune -a -f',
-        "token": token
-      });
-      for (var i = 0; i < config.layout.length; i++) {
-        var node = config.layout[i].node;
-        var responseString = '';
-
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-
+      if (selected_node.length == 0) {
         request(options, function(error, response, body) {
           if (error) {
             res.end("An error has occurred.");
           } else {
             var results = JSON.parse(response.body);
             addLog('\nNode:' + results.node + '\n' + results.output);
-            console.log('\nNode:' + results.node + '\n' + results.output);
           }
         });
-        res.end('');
       }
-    }
-  });
-
-  function move_container(container, newhost) {
-    console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
-    addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
-    var options = {
-      url: 'http://127.0.0.1:3000' + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost,
-      method: 'GET'
-    }
-
-    request(options, function(error, response, body) {
-      if (error) {
-        console.log('Error connecting with server. ' + error);
-      } else {
-        config.automatic_heartbeat = 'enabled';
-      }
-    });
-  }
-
-  function container_failover(container) {
-    var container_fail_counter = 0;
-    var proceed = '';
-
-    for (var key in container_faillog) {
-      if (log.hasOwnProperty(key)) {
-        if (container_faillog[key].indexOf(container) > -1) {
-          container_fail_counter++;
-        }
-      }
-    }
-
-    if (container_fail_counter >= 3) {
-      for (var bkey in container_faillog) {
-        if (container_faillog[bkey].indexOf(container) > -1) {
-          delete container_faillog[bkey];
-          proceed = 1;
-        }
-      }
-
-      if (proceed) {
-        for (var key in config.container_host_constraints) {
-          if (config.container_host_constraints.hasOwnProperty(key)) {
-            var analyze = config.container_host_constraints[key].container.split(',');
-            if (container.indexOf(analyze[0]) > -1) {
-              analyze.splice(0, 1);
-              var newhost = analyze[Math.floor(Math.random() * analyze.length)];
-              move_container(container, newhost);
-              config.automatic_heartbeat = 'disabled';
-            }
+      if (selected_node.indexOf(node) > -1) {
+        request(options, function(error, response, body) {
+          if (error) {
+            res.end("An error has occurred.");
+          } else {
+            var results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
           }
-        }
+        });
       }
+      res.end('');
     }
   }
+});
 
-
-  function hb_check(node, container_port, container) {
-    var client = new net.Socket();
-
-    client.connect(container_port, node, container, function() {});
-
-    client.on('end', function(data) {
-      addLog('\nA Heart Beat Check Just Ran.');
+app.get('/prune', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var command = JSON.stringify({
+      "command": 'docker system prune -a -f',
+      "token": token
     });
-
-    client.on('error', function(data) {
-      addLog('\n' + container + ' failed on: ' + node);
-
-      if (config.container_host_constraints) {
-        container_faillog.push(container);
-        container_failover(container);
-      }
+    for (var i = 0; i < config.layout.length; i++) {
+      var node = config.layout[i].node;
+      var responseString = '';
 
       var options = {
-        host: '127.0.0.1',
-        path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-        port: port
-      };
-
-      var request = http.get(options, function(response) {}).on('error', function(e) {
-        console.error(e);
-      });
-      client.destroy();
-    });
-  };
-
-  app.get('/hb', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-      var node = '';
-      var check_port = ''
-      var container = '';
-      for (var i = 0; i < config.hb.length; i++) {
-        for (var key in config.hb[i]) {
-          if (config.hb[i].hasOwnProperty(key)) {
-            container = key;
-            node = config.hb[i].node;
-            check_port = config.hb[i][key];
-            if (check_port != node) {
-              hb_check(node, check_port, container);
-            }
-          }
-        }
+        url: 'http://' + node + ':' + agentPort + '/run',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
       }
+
+      request(options, function(error, response, body) {
+        if (error) {
+          res.end("An error has occurred.");
+        } else {
+          var results = JSON.parse(response.body);
+          addLog('\nNode:' + results.node + '\n' + results.output);
+          console.log('\nNode:' + results.node + '\n' + results.output);
+        }
+      });
       res.end('');
     }
-  });
+  }
+});
 
-
-
-  function gatherLog(callback) {
-    callback(log);
+function move_container(container, newhost) {
+  console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
+  addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
+  var options = {
+    url: 'http://127.0.0.1:3000' + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost,
+    method: 'GET'
   }
 
-  app.get('/log', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
+  request(options, function(error, response, body) {
+    if (error) {
+      console.log('Error connecting with server. ' + error);
     } else {
-      if (config.elasticsearch && config.elasticsearch_index) {
-        elasticsearch(log);
-      }
-      res.send(log);
+      config.automatic_heartbeat = 'enabled';
     }
   });
+}
 
-  app.get('/rsyslog', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
-          res.end(body);
-        } else {
-          res.end('Error connecting with server. ' + error);
+function container_failover(container) {
+  var container_fail_counter = 0;
+  var proceed = '';
+
+  for (var key in container_faillog) {
+    if (log.hasOwnProperty(key)) {
+      if (container_faillog[key].indexOf(container) > -1) {
+        container_fail_counter++;
+      }
+    }
+  }
+
+  if (container_fail_counter >= 3) {
+    for (var bkey in container_faillog) {
+      if (container_faillog[bkey].indexOf(container) > -1) {
+        delete container_faillog[bkey];
+        proceed = 1;
+      }
+    }
+
+    if (proceed) {
+      for (var key in config.container_host_constraints) {
+        if (config.container_host_constraints.hasOwnProperty(key)) {
+          var analyze = config.container_host_constraints[key].container.split(',');
+          if (container.indexOf(analyze[0]) > -1) {
+            analyze.splice(0, 1);
+            var newhost = analyze[Math.floor(Math.random() * analyze.length)];
+            move_container(container, newhost);
+            config.automatic_heartbeat = 'disabled';
+          }
         }
-      })
-    }
-  });
-
-  app.get('/reloadconfig', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      if (process.env.PICLUSTER_CONFIG) {
-        config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-      } else {
-        config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
       }
-      token = config.token;
-      dockerFolder = config.docker;
-      addLog('\nReloading Config.json\n');
-      res.end('');
     }
+  }
+}
+
+
+function hb_check(node, container_port, container) {
+  var client = new net.Socket();
+
+  client.connect(container_port, node, container, function() {});
+
+  client.on('end', function(data) {
+    addLog('\nA Heart Beat Check Just Ran.');
   });
 
-  app.get('/getconfig', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      res.send(config);
-    }
-  });
+  client.on('error', function(data) {
+    addLog('\n' + container + ' failed on: ' + node);
 
-  app.get('/killvip', function(req, res) {
-    var check_token = req.query['token'];
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      var responseString = '';
-      if (!config.vip) {
-        res.end('\nError: VIP not configured.');
+    if (config.container_host_constraints) {
+      container_faillog.push(container);
+      container_failover(container);
+    }
+
+    var options = {
+      host: '127.0.0.1',
+      path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+      port: port
+    };
+
+    var request = http.get(options, function(response) {}).on('error', function(e) {
+      console.error(e);
+    });
+    client.destroy();
+  });
+};
+
+app.get('/hb', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    var node = '';
+    var check_port = ''
+    var container = '';
+    for (var i = 0; i < config.hb.length; i++) {
+      for (var key in config.hb[i]) {
+        if (config.hb[i].hasOwnProperty(key)) {
+          container = key;
+          node = config.hb[i].node;
+          check_port = config.hb[i][key];
+          if (check_port != node) {
+            hb_check(node, check_port, container);
+          }
+        }
+      }
+    }
+    res.end('');
+  }
+});
+
+
+
+function gatherLog(callback) {
+  callback(log);
+}
+
+app.get('/log', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    if (config.elasticsearch && config.elasticsearch_index) {
+      elasticsearch(log);
+    }
+    res.send(log);
+  }
+});
+
+app.get('/rsyslog', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        res.end(body);
       } else {
-        for (var i = 0; i < config.vip.length; i++) {
-          var node = config.vip[i].node;
-          for (var key in config.vip[i]) {
-            if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
-              var token_body = JSON.stringify({
-                "token": token
-              });
+        res.end('Error connecting with server. ' + error);
+      }
+    })
+  }
+});
 
-              var options = {
-                url: 'http://' + node + ':' + agentPort + '/killvip',
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': token_body.length
-                },
-                body: token_body
-              }
+app.get('/reloadconfig', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    if (process.env.PICLUSTER_CONFIG) {
+      config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+    } else {
+      config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+    }
+    token = config.token;
+    dockerFolder = config.docker;
+    addLog('\nReloading Config.json\n');
+    res.end('');
+  }
+});
 
-              request(options, function(error, response, body) {
-                if (error) {
-                  res.end("An error has occurred.");
-                }
-              })
+app.get('/getconfig', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    res.send(config);
+  }
+});
+
+app.get('/killvip', function(req, res) {
+  var check_token = req.query['token'];
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    if (!config.vip) {
+      res.end('\nError: VIP not configured.');
+    } else {
+      for (var i = 0; i < config.vip.length; i++) {
+        var node = config.vip[i].node;
+        for (var key in config.vip[i]) {
+          if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
+            var token_body = JSON.stringify({
+              "token": token
+            });
+
+            var options = {
+              url: 'http://' + node + ':' + agentPort + '/killvip',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
             }
+
+            request(options, function(error, response, body) {
+              if (error) {
+                res.end("An error has occurred.");
+              }
+            })
           }
         }
       }
-      res.end('');
     }
-  });
+    res.end('');
+  }
+});
 
-  app.post('/updateconfig', function(req, res) {
-    var payload = req.body.payload;
-    var check_token = req.body.token;
+app.post('/updateconfig', function(req, res) {
+  var payload = req.body.payload;
+  var check_token = req.body.token;
 
-    try {
-      var verify_payload = JSON.parse(req.body.payload);
-      if ((check_token != token) || (!check_token)) {
-        res.end('\nError: Invalid Credentials')
-      } else {
-        fs.writeFile(config_file, payload, function(err) {
-          if (err) {
-            console.log('\nError while writing config.' + err);
-          } else {
-            res.end('Updated Configuration. Please reload it now for changes to take effect.');
-          }
-        });
-      }
-    } catch (e) {
-      res.end('Error: Invalid JSON. Configuration not saved.');
+  try {
+    var verify_payload = JSON.parse(req.body.payload);
+    if ((check_token != token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials')
+    } else {
+      fs.writeFile(config_file, payload, function(err) {
+        if (err) {
+          console.log('\nError while writing config.' + err);
+        } else {
+          res.end('Updated Configuration. Please reload it now for changes to take effect.');
+        }
+      });
     }
+  } catch (e) {
+    res.end('Error: Invalid JSON. Configuration not saved.');
+  }
 
-  });
+});
 
 
-  server.listen(port, function() {
-    console.log('Listening on port %d', port);
-  });
+server.listen(port, function() {
+  console.log('Listening on port %d', port);
+});
