@@ -293,7 +293,7 @@ Reboot
 
 # Automatic Container failover to other hosts
 
-This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it;s data on any host.
+This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it's data on any host.
 
 ### Overview of the process.
 
@@ -311,6 +311,10 @@ When container_host_constraints is enabled in config.json, each failed heartbeat
 ```
 "container_host_constraints": [],
 ```
+### How to assign container_host_constraints to a container and hosts?
+
+1. Manually in config.json
+2. Once container_host_constraints is enabled in config.json, you can add the hosts when you choose "Add Container" in the web console.
 
 ### Sample configuration and Testing
 The following config.json is a minimal configuration needed to try this out on your laptop. It consists of two nodes (localhost and 127.0.0.1) that will run Minio in a container. Currently, Minio is only on the node called localhost.  
@@ -350,10 +354,7 @@ The following config.json is a minimal configuration needed to try this out on y
 }
 ```
 
-Based on the sample above, PiCluster will check if Minio is running every 30 seconds. Since Minio is not created yet, the failover event should start after about 90 seconds. 
-
-
-
+Based on the sample above, PiCluster will check if Minio is running every 30 seconds. Since Minio is not created yet, the failover event should start after about 90 seconds.
 
 # Authors and Contributions
 
