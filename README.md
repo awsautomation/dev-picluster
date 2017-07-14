@@ -291,6 +291,70 @@ systemctl enable picluster-web.service
 Reboot
 ```
 
+# Automatic Container failover to other hosts
+
+This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it;s data on any host.
+
+### Overview of the process.
+
+When container_host_constraints is enabled in config.json, each failed heartbeat attempt to a container is logged. When three failed heartbeat attempts occur, the following action is taken:
+
+* A new host is chosen randomly from the container map that you designated in container_host_constraints.
+* The container is deleted on it's current host.
+* The configuration file is updated with the new host layout.
+* The container image is built and run on the new host.
+
+### Prerequisites
+
+1. Heartbeat configured in config.json (automatic_heartbeat,heartbeat_interval, and container added to heartbeat section)
+2. container_host_constraints enabled in config.json
+```
+"container_host_constraints": [],
+```
+
+### Sample configuration and Testing
+The following config.json is a minimal configuration needed to try this out on your laptop. It consists of two nodes (localhost and 127.0.0.1) that will run Minio in a container. Currently, Minio is only on the node called localhost.  
+```
+{
+  "token": "1234567890ABCDEFGHJKLMNOP",
+  "docker": "../docker",
+  "server_port": "3000",
+  "agent_port": "3001",
+  "layout": [{
+      "node": "localhost",
+      "minio": "-p 9000:9000"
+    },
+    {
+      "node": "127.0.0.1"
+    }
+  ],
+  "hb": [{
+      "node": "localhost",
+      "minio": "9000"
+    },
+    {
+      "node": "127.0.0.1"
+    }
+  ],
+  "container_host_constraints": [
+    {
+      "container": "minio,localhost,127.0.0.1"
+    }
+  ],
+  "automatic_heartbeat": "enabled",
+  "heartbeat_interval": "300000",
+  "web_username": "admin",
+  "web_password": "admin",
+  "web_connect": "127.0.0.1",
+  "web_port": "3003"
+}
+```
+
+Based on the sample above, PiCluster will check if Minio is running every 30 seconds. Since Minio is not created yet, the failover event should start after about 90 seconds. 
+
+
+
+
 # Authors and Contributions
 
 Project created by Phillip Tribble. [LinkedIn](https://www.linkedin.com/in/philliptribble) , [Twitter](https://twitter.com/rusher81572)
