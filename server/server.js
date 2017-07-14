@@ -743,7 +743,7 @@ app.get('/removecontainerconfig', function(req, res) {
           if (container.length > 0) {
             var analyze = config.container_host_constraints[i][key].split(',');
             if (container.indexOf(analyze[0]) > -1) {
-               config.container_host_constraints.splice(i,i+1);
+              config.container_host_constraints.splice(i, i + 1);
             }
           }
         }
@@ -1443,33 +1443,35 @@ function container_failover(container) {
 
 
 function hb_check(node, container_port, container) {
-  var client = new net.Socket();
+  if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+    var client = new net.Socket();
 
-  client.connect(container_port, node, container, function() {});
+    client.connect(container_port, node, container, function() {});
 
-  client.on('end', function(data) {
-    addLog('\nA Heart Beat Check Just Ran.');
-  });
-
-  client.on('error', function(data) {
-    addLog('\n' + container + ' failed on: ' + node);
-
-    if (config.container_host_constraints) {
-      container_faillog.push(container);
-      container_failover(container);
-    }
-
-    var options = {
-      host: '127.0.0.1',
-      path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-      port: port
-    };
-
-    var request = http.get(options, function(response) {}).on('error', function(e) {
-      console.error(e);
+    client.on('end', function(data) {
+      addLog('\nA Heart Beat Check Just Ran.');
     });
-    client.destroy();
-  });
+
+    client.on('error', function(data) {
+      addLog('\n' + container + ' failed on: ' + node);
+      console.log('\n' + container + ' failed on: ' + node);
+      if (config.container_host_constraints) {
+        container_faillog.push(container);
+        container_failover(container);
+      }
+
+      var options = {
+        host: '127.0.0.1',
+        path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+        port: port
+      };
+
+      var request = http.get(options, function(response) {}).on('error', function(e) {
+        console.error(e);
+      });
+      client.destroy();
+    });
+  }
 };
 
 app.get('/hb', function(req, res) {
