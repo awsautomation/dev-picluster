@@ -127,7 +127,7 @@ You can run the server and agent on the same node since they are listening on di
 
 * elasticsearch_index - The Elasticsearch index to use for PiCluster.
 
-* container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container. 
+* container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
@@ -156,21 +156,6 @@ The server is the brain of PiCluster and the agents and web console connect to i
 cd server
 npm install
 node server.js
-```
-
-##### You can safely ignore the following error if found when running npm install
-```
-npm WARN picluster-agent@0.0.1 No description
-npm WARN picluster-agent@0.0.1 No repository field.
-npm WARN picluster-agent@0.0.1 No license field.
-npm ERR! file sh
-npm ERR! code ELIFECYCLE
-npm ERR! errno ENOENT
-npm ERR! syscall spawn
-npm ERR! microtime@0.2.0 install: `node-waf configure build`
-npm ERR! spawn ENOENT
-npm ERR!
-npm ERR! Failed at the microtime@0.2.0 install script.
 ```
 
 ## Agent Installation
