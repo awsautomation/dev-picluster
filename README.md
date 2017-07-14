@@ -61,9 +61,9 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
   "container_host_constraints": [{
-    "container": "containerName,192.168.0.101,192.168.0.102"
+    "container": "mysql,192.168.0.101,192.168.0.102"
   }, {
-    "container": "containerName,192.168.0.103,192.168.0.104"
+    "container": "nginx,192.168.0.103,192.168.0.104"
   }],
   "commandlist": [{
   "SystemUpdate": "apt-get update;apt-get dist-upgrade -y"
