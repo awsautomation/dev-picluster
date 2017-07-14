@@ -5,7 +5,7 @@ node_js:
 
 script:
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
-- sed -i "s/192.168.0.101/$IP/" config.json
+- sed -i "s/127.0.0.1/$IP/" config.json
 - sed -i "s/192.168.0.116/$IP/" pictl
 - npm install -g node-gyp
 - cd web;npm install; node webconsole.js&
