@@ -105,7 +105,7 @@ app.get('/status', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;docker container ps',
+      "command": 'hostname;docker container ps;nodejs -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist;console.log("Dist: " + dist);})\';',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
