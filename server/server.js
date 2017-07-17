@@ -154,7 +154,7 @@ app.get('/nodes', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;echo;uname -a;df -h /',
+      "command": 'hostname;echo;uname -a;df -h /;nodejs -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist;console.log("Dist: " + dist);})\'',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
