@@ -10,7 +10,7 @@
 		function exec() {
 			$.get("/status?token=" + parent.token, function(data) {
 					var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-						$("#command_output").val(data);
+					$("#command_output").val(data.replace(/Dist: .*/g, ''));
 			});
 		}
 	</script>
