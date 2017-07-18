@@ -1,2 +1,2 @@
 #!/bin/bash
-pgrep -lf 'nodejs agent.js' | kill -9 $(cut -d ' ' -f1)
+pgrep -lf 'node agent.js' | kill -9 $(cut -d ' ' -f1)
