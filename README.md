@@ -295,14 +295,14 @@ Reboot
 
 # Automatic Container failover to other hosts
 
-This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it's data on any host.
+This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesystem like GlusterFS or NFS so the container will have access to its data on any host.
 
 ### Overview of the process.
 
 When container_host_constraints is enabled in config.json, each failed heartbeat attempt to a container is logged. When three failed heartbeat attempts occur, the following action is taken:
 
 * A new host is chosen randomly from the container map that you designated in container_host_constraints.
-* The container is deleted on it's current host.
+* The container is deleted on its current host.
 * The configuration file is updated with the new host layout.
 * The container image is built and run on the new host.
 
