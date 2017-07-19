@@ -5,19 +5,23 @@
 	<script src="/assets/jquery-1.10.2.js">
 	</script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<link rel="stylesheet" href="//cdn.rawgit.com/Lukas-W/font-linux/v0.9/assets/font-linux.css">
 	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
 	<script>
 		function exec() {
 			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3>Searching for nodes</font>');
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var test = data.split('\n');
-				for (i = 0; i != test.length; i++) {
+				var dists = getDists(test);
+				for (i = 0, dist = 0; i != test.length; i++) {
 					if (test[i].length > 2) {
 						if (test[i].indexOf('Node:') > -1) {
-							document.write('<br><br><p align=left><img heigth="100" width="100" src="/server.jpeg"><br><font size=+2>' + test[i] + '<br>'+ test[i+1] + '<br>'+ test[i+2] + '<br><br>'+ test[i+3] + '<br><br>' + test[i+4] + "</font>");
+							document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+2>' + test[i] + '<br>'+ test[i+1] + '<br>'+ test[i+2] + '<br><br>'+ test[i+3] + '<br><br>' + test[i+4] + "</font>");
 						}
 					}
 				}
+				addFontLinux();
 			});
 		}
 	</script>
