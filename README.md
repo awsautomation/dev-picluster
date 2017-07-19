@@ -30,9 +30,9 @@ on regular x86 hardware also and is not tied to ARM.
 ## Prerequisites
 
 * Docker
-* Node.js
+* Node.js v8
 
-(Please note that your node.js binary should be named node and not nodejs as some distros use. If your distro uses nodejs, simply create a symlink called node)
+(Please note that your node.js binary should be named node and not nodejs as some distros use(Ubuntu, Debian). If your distro has nodejs instead of node, simply create a symlink called node)
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/rusher81572/picluster/tree/1.0)
 
