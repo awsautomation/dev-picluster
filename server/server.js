@@ -979,572 +979,558 @@ app.get('/stop', function(req, res) {
 
 
 app.get('/delete', function(req, res) {
-  var check_token = req.query['token'];
-  var container = '';
-  if (req.query['container']) {
-    container = req.query['container'];
-  }
-
-  if (container.indexOf('*') > -1) {
-    container = '';
-  }
-
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var responseString = '';
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      for (var key in config.layout[i]) {
-        if (config.layout[i].hasOwnProperty(key)) {
-          if (key.indexOf('node') > -1) {} else {
-
-            var command = JSON.stringify({
-              "command": 'docker container rm -f ' + key,
-              "token": token
-            });
-            var options = {
-              url: 'http://' + node + ':' + agentPort + '/run',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            }
-            if (container.length > 0) {
-              if (key.indexOf(container) > -1) {
-                request(options, function(error, response, body) {
-                  if (error) {
-                    res.end("An error has occurred.");
-                  } else {
-                    var results = JSON.parse(response.body);
-                    addLog('\nStopping: ' + key + '\n' + results.output);
-                  }
-                });
-              }
-            } else {
-              request(options, function(error, response, body) {
-                if (error) {
-                  res.end("An error has occurred.");
-                } else {
-                  var results = JSON.parse(response.body);
-                  addLog('\nStopping: ' + key + '\n' + results.output);
-                }
-              });
-            }
-          }
-        }
-      }
-    }
-    res.end('');
-  }
-});
-
-app.get('/restart', function(req, res) {
-  var check_token = req.query['token'];
-  var selected_container = '';
-  if (req.query['container']) {
-    selected_container = req.query['container'];
-  }
-  if (selected_container.indexOf('*') > -1) {
-    selected_container = '*';
-  }
-
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
-        const node = config.layout[i].node;
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        var command = JSON.stringify({
-          "command": 'docker container restart ' + key,
-          "token": token
-        });
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-        if ((container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nRestarting: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-    res.end('');
-  }
-});
-
-app.get('/containerlog', function(req, res) {
-  var check_token = req.query['token'];
-  var selected_container = '';
-  if (req.query['container']) {
-    selected_container = req.query['container'];
-  }
-  if (selected_container.indexOf('*') > -1) {
-    selected_container = '';
-  }
-
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var responseString = '';
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      for (var key in config.layout[i]) {
-        if (config.layout[i].hasOwnProperty(key)) {
-          if (key.indexOf('node') > -1) {} else {
-
-            var command = JSON.stringify({
-              "command": 'docker container logs ' + key,
-              "token": token
-            });
-            var options = {
-              url: 'http://' + node + ':' + agentPort + '/run',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            }
-            if (selected_container.length > 0) {
-              if (key.indexOf(selected_container) > -1) {
-                request(options, function(error, response, body) {
-                  if (error) {
-                    res.end("An error has occurred.");
-                  } else {
-                    var results = JSON.parse(response.body);
-                    addLog('\nLogs for Container: ' + key + '\n' + results.output);
-                  }
-                });
-              }
-            } else {
-              request(options, function(error, response, body) {
-                if (error) {
-                  res.end("An error has occurred.");
-                } else {
-                  var results = JSON.parse(response.body);
-                  addLog('\nLogs for Container: ' + key + '\n' + results.output);
-                }
-              });
-            }
-          }
-        }
-      }
-    }
-    res.end('');
-  }
-});
-
-app.post('/listcontainers', function(req, res) {
-  var command = req.body.command;
-  var node = req.body.node;
-  var check_token = req.body.token;
-  var output = [];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
-        if (config.layout[i].hasOwnProperty(key)) {
-          container = key;
-          node = config.layout[i].node;
-          var check_port = config.layout[i][key];
-          if (check_port != node) {
-            output.push(container);
-          }
-        }
-      }
-    }
-    res.send(output);
-  }
-});
-
-
-app.post('/listnodes', function(req, res) {
-  var command = req.body.command;
-  var check_token = req.body.token;
-  var output = [];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
-        if (config.layout[i].hasOwnProperty(key)) {
-          container = key;
-          node = config.layout[i].node;
-          var port_check = config.layout[i][key];
-          if (port_check == node) {
-            output.push(node);
-          }
-        }
-      }
-    }
-    res.send(output);
-  }
-});
-
-app.post('/listcommands', function(req, res) {
-  var command = req.body.command;
-  var check_token = req.body.token;
-  var output = [];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    if (config.commandlist) {
-      res.end(JSON.stringify(config.commandlist));
-    } else {
-      res.end('');
-    }
-  }
-});
-
-
-app.post('/exec', function(req, res) {
-  var check_token = req.body.token;
-  var selected_node = '';
-  if (req.body.node) {
-    selected_node = req.body.node;
-  }
-
-  if (selected_node.indexOf('*') > -1) {
-    var selected_node = '';
-  }
-
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var command = JSON.stringify({
-      "command": req.body.command,
-      "token": token
-    });
-
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
-
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
+      var check_token = req.query['token'];
+      var container = '';
+      if (req.query['container']) {
+        container = req.query['container'];
       }
 
-      if (selected_node.length == 0) {
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end("An error has occurred.");
-          } else {
-            var results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
-      }
-      if (selected_node.indexOf(node) > -1) {
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end("An error has occurred.");
-          } else {
-            var results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
-      }
-      res.end('');
-    }
-  }
-});
-
-app.get('/prune', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var command = JSON.stringify({
-      "command": 'docker system prune -a -f',
-      "token": token
-    });
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
-
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
+      if (container.indexOf('*') > -1) {
+        container = '*';
       }
 
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end("An error has occurred.");
-        } else {
-          var results = JSON.parse(response.body);
-          addLog('\nNode:' + results.node + '\n' + results.output);
-          console.log('\nNode:' + results.node + '\n' + results.output);
-        }
-      });
-      res.end('');
-    }
-  }
-});
-
-function move_container(container, newhost) {
-  console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
-  addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
-  var options = {
-    url: 'http://127.0.0.1:3000' + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost,
-    method: 'GET'
-  }
-
-  request(options, function(error, response, body) {
-    if (error) {
-      console.log('Error connecting with server. ' + error);
-    } else {
-      config.automatic_heartbeat = 'enabled';
-    }
-  });
-}
-
-function container_failover(container) {
-  var container_fail_counter = 0;
-  var proceed = '';
-
-  for (var key in container_faillog) {
-    if (log.hasOwnProperty(key)) {
-      if (container_faillog[key].indexOf(container) > -1) {
-        container_fail_counter++;
-      }
-    }
-  }
-
-  if (container_fail_counter >= 3) {
-    for (var bkey in container_faillog) {
-      if (container_faillog[bkey].indexOf(container) > -1) {
-        delete container_faillog[bkey];
-        proceed = 1;
-      }
-    }
-
-    if (proceed) {
-      for (var key in config.container_host_constraints) {
-        if (config.container_host_constraints.hasOwnProperty(key)) {
-          var analyze = config.container_host_constraints[key].container.split(',');
-          if (container.indexOf(analyze[0]) > -1) {
-            analyze.splice(0, 1);
-            var newhost = analyze[Math.floor(Math.random() * analyze.length)];
-            move_container(container, newhost);
-            config.automatic_heartbeat = 'disabled';
-          }
-        }
-      }
-    }
-  }
-}
-
-
-function hb_check(node, container_port, container) {
-  if (config.automatic_heartbeat.indexOf('enabled') > -1) {
-    var client = new net.Socket();
-
-    client.connect(container_port, node, container, function() {});
-
-    client.on('end', function(data) {
-      addLog('\nA Heart Beat Check Just Ran.');
-    });
-
-    client.on('error', function(data) {
-      addLog('\n' + container + ' failed on: ' + node);
-      console.log('\n' + container + ' failed on: ' + node);
-      if (config.container_host_constraints) {
-        container_faillog.push(container);
-        container_failover(container);
-      }
-
-      var options = {
-        host: '127.0.0.1',
-        path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-        port: port
-      };
-
-      var request = http.get(options, function(response) {}).on('error', function(e) {
-        console.error(e);
-      });
-      client.destroy();
-    });
-  }
-};
-
-app.get('/hb', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var responseString = '';
-    var node = '';
-    var check_port = ''
-    var container = '';
-    for (var i = 0; i < config.hb.length; i++) {
-      for (var key in config.hb[i]) {
-        if (config.hb[i].hasOwnProperty(key)) {
-          container = key;
-          node = config.hb[i].node;
-          check_port = config.hb[i][key];
-          if (check_port != node) {
-            hb_check(node, check_port, container);
-          }
-        }
-      }
-    }
-    res.end('');
-  }
-});
-
-
-
-function gatherLog(callback) {
-  callback(log);
-}
-
-app.get('/log', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    if (config.elasticsearch && config.elasticsearch_index) {
-      elasticsearch(log);
-    }
-    res.send(log);
-  }
-});
-
-app.get('/rsyslog', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
-      if (!error && response.statusCode == 200) {
-        res.end(body);
+      if ((check_token != token) || (!check_token)) {
+        res.end('\nError: Invalid Credentials')
       } else {
-        res.end('Error connecting with server. ' + error);
-      }
-    })
-  }
-});
+        var responseString = '';
+        Object.keys(config.layout).forEach(function(get_node, i) {
+            Object.keys(config.layout[i]).forEach(function(key) {
+                const node = config.layout[i].node;
+                if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+                  return;
+                }
 
-app.get('/reloadconfig', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    if (process.env.PICLUSTER_CONFIG) {
-      config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-    } else {
-      config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-    }
-    token = config.token;
-    dockerFolder = config.docker;
-    addLog('\nReloading Config.json\n');
-    res.end('');
-  }
-});
+                var command = JSON.stringify({
+                  "command": 'docker container rm -f ' + key,
+                  "token": token
+                });
+                var options = {
+                  url: 'http://' + node + ':' + agentPort + '/run',
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': command.length
+                  },
+                  body: command
+                }
 
-app.get('/getconfig', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    res.send(config);
-  }
-});
+                if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+                  request(options, function(error, response, body) {
+                    if (error) {
+                      res.end("An error has occurred.");
+                    } else {
+                      var results = JSON.parse(response.body);
+                      addLog('\nStopping: ' + key + '\n' + results.output);
+                    }
+                  });
+                });
+            }); res.end('');
+        });
 
-app.get('/killvip', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var responseString = '';
-    if (!config.vip) {
-      res.end('\nError: VIP not configured.');
-    } else {
-      for (var i = 0; i < config.vip.length; i++) {
-        var node = config.vip[i].node;
-        for (var key in config.vip[i]) {
-          if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
-            var token_body = JSON.stringify({
-              "token": token
+      app.get('/restart', function(req, res) {
+        var check_token = req.query['token'];
+        var selected_container = '';
+        if (req.query['container']) {
+          selected_container = req.query['container'];
+        }
+        if (selected_container.indexOf('*') > -1) {
+          selected_container = '*';
+        }
+
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          var responseString = '';
+          Object.keys(config.layout).forEach(function(get_node, i) {
+            Object.keys(config.layout[i]).forEach(function(key) {
+              const node = config.layout[i].node;
+              if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+                return;
+              }
+              var command = JSON.stringify({
+                "command": 'docker container restart ' + key,
+                "token": token
+              });
+              var options = {
+                url: 'http://' + node + ':' + agentPort + '/run',
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Content-Length': command.length
+                },
+                body: command
+              }
+              if ((container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+                request(options, function(error, response, body) {
+                  if (error) {
+                    res.end("An error has occurred.");
+                  } else {
+                    var results = JSON.parse(response.body);
+                    addLog('\nRestarting: ' + key + '\n' + results.output);
+                  }
+                });
+              }
             });
+          });
+          res.end('');
+        }
+      });
+
+      app.get('/containerlog', function(req, res) {
+        var check_token = req.query['token'];
+        var selected_container = '';
+        if (req.query['container']) {
+          selected_container = req.query['container'];
+        }
+        if (selected_container.indexOf('*') > -1) {
+          selected_container = '';
+        }
+
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          var responseString = '';
+          for (var i = 0; i < config.layout.length; i++) {
+            var node = config.layout[i].node;
+            for (var key in config.layout[i]) {
+              if (config.layout[i].hasOwnProperty(key)) {
+                if (key.indexOf('node') > -1) {} else {
+
+                  var command = JSON.stringify({
+                    "command": 'docker container logs ' + key,
+                    "token": token
+                  });
+                  var options = {
+                    url: 'http://' + node + ':' + agentPort + '/run',
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Content-Length': command.length
+                    },
+                    body: command
+                  }
+                  if (selected_container.length > 0) {
+                    if (key.indexOf(selected_container) > -1) {
+                      request(options, function(error, response, body) {
+                        if (error) {
+                          res.end("An error has occurred.");
+                        } else {
+                          var results = JSON.parse(response.body);
+                          addLog('\nLogs for Container: ' + key + '\n' + results.output);
+                        }
+                      });
+                    }
+                  } else {
+                    request(options, function(error, response, body) {
+                      if (error) {
+                        res.end("An error has occurred.");
+                      } else {
+                        var results = JSON.parse(response.body);
+                        addLog('\nLogs for Container: ' + key + '\n' + results.output);
+                      }
+                    });
+                  }
+                }
+              }
+            }
+          }
+          res.end('');
+        }
+      });
+
+      app.post('/listcontainers', function(req, res) {
+        var command = req.body.command;
+        var node = req.body.node;
+        var check_token = req.body.token;
+        var output = [];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+              if (config.layout[i].hasOwnProperty(key)) {
+                container = key;
+                node = config.layout[i].node;
+                var check_port = config.layout[i][key];
+                if (check_port != node) {
+                  output.push(container);
+                }
+              }
+            }
+          }
+          res.send(output);
+        }
+      });
+
+
+      app.post('/listnodes', function(req, res) {
+        var command = req.body.command;
+        var check_token = req.body.token;
+        var output = [];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          for (var i = 0; i < config.layout.length; i++) {
+            for (var key in config.layout[i]) {
+              if (config.layout[i].hasOwnProperty(key)) {
+                container = key;
+                node = config.layout[i].node;
+                var port_check = config.layout[i][key];
+                if (port_check == node) {
+                  output.push(node);
+                }
+              }
+            }
+          }
+          res.send(output);
+        }
+      });
+
+      app.post('/listcommands', function(req, res) {
+        var command = req.body.command;
+        var check_token = req.body.token;
+        var output = [];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          if (config.commandlist) {
+            res.end(JSON.stringify(config.commandlist));
+          } else {
+            res.end('');
+          }
+        }
+      });
+
+
+      app.post('/exec', function(req, res) {
+        var check_token = req.body.token;
+        var selected_node = '';
+        if (req.body.node) {
+          selected_node = req.body.node;
+        }
+
+        if (selected_node.indexOf('*') > -1) {
+          var selected_node = '';
+        }
+
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          var command = JSON.stringify({
+            "command": req.body.command,
+            "token": token
+          });
+
+          for (var i = 0; i < config.layout.length; i++) {
+            var node = config.layout[i].node;
+            var responseString = '';
 
             var options = {
-              url: 'http://' + node + ':' + agentPort + '/killvip',
+              url: 'http://' + node + ':' + agentPort + '/run',
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Content-Length': token_body.length
+                'Content-Length': command.length
               },
-              body: token_body
+              body: command
+            }
+
+            if (selected_node.length == 0) {
+              request(options, function(error, response, body) {
+                if (error) {
+                  res.end("An error has occurred.");
+                } else {
+                  var results = JSON.parse(response.body);
+                  addLog('\nNode:' + results.node + '\n' + results.output);
+                }
+              });
+            }
+            if (selected_node.indexOf(node) > -1) {
+              request(options, function(error, response, body) {
+                if (error) {
+                  res.end("An error has occurred.");
+                } else {
+                  var results = JSON.parse(response.body);
+                  addLog('\nNode:' + results.node + '\n' + results.output);
+                }
+              });
+            }
+            res.end('');
+          }
+        }
+      });
+
+      app.get('/prune', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          var command = JSON.stringify({
+            "command": 'docker system prune -a -f',
+            "token": token
+          });
+          for (var i = 0; i < config.layout.length; i++) {
+            var node = config.layout[i].node;
+            var responseString = '';
+
+            var options = {
+              url: 'http://' + node + ':' + agentPort + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
             }
 
             request(options, function(error, response, body) {
               if (error) {
                 res.end("An error has occurred.");
+              } else {
+                var results = JSON.parse(response.body);
+                addLog('\nNode:' + results.node + '\n' + results.output);
+                console.log('\nNode:' + results.node + '\n' + results.output);
               }
-            })
+            });
+            res.end('');
+          }
+        }
+      });
+
+      function move_container(container, newhost) {
+        console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
+        addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
+        var options = {
+          url: 'http://127.0.0.1:3000' + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost,
+          method: 'GET'
+        }
+
+        request(options, function(error, response, body) {
+          if (error) {
+            console.log('Error connecting with server. ' + error);
+          } else {
+            config.automatic_heartbeat = 'enabled';
+          }
+        });
+      }
+
+      function container_failover(container) {
+        var container_fail_counter = 0;
+        var proceed = '';
+
+        for (var key in container_faillog) {
+          if (log.hasOwnProperty(key)) {
+            if (container_faillog[key].indexOf(container) > -1) {
+              container_fail_counter++;
+            }
+          }
+        }
+
+        if (container_fail_counter >= 3) {
+          for (var bkey in container_faillog) {
+            if (container_faillog[bkey].indexOf(container) > -1) {
+              delete container_faillog[bkey];
+              proceed = 1;
+            }
+          }
+
+          if (proceed) {
+            for (var key in config.container_host_constraints) {
+              if (config.container_host_constraints.hasOwnProperty(key)) {
+                var analyze = config.container_host_constraints[key].container.split(',');
+                if (container.indexOf(analyze[0]) > -1) {
+                  analyze.splice(0, 1);
+                  var newhost = analyze[Math.floor(Math.random() * analyze.length)];
+                  move_container(container, newhost);
+                  config.automatic_heartbeat = 'disabled';
+                }
+              }
+            }
           }
         }
       }
-    }
-    res.end('');
-  }
-});
 
-app.post('/updateconfig', function(req, res) {
-  var payload = req.body.payload;
-  var check_token = req.body.token;
 
-  try {
-    var verify_payload = JSON.parse(req.body.payload);
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
-    } else {
-      fs.writeFile(config_file, payload, function(err) {
-        if (err) {
-          console.log('\nError while writing config.' + err);
+      function hb_check(node, container_port, container) {
+        if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+          var client = new net.Socket();
+
+          client.connect(container_port, node, container, function() {});
+
+          client.on('end', function(data) {
+            addLog('\nA Heart Beat Check Just Ran.');
+          });
+
+          client.on('error', function(data) {
+            addLog('\n' + container + ' failed on: ' + node);
+            console.log('\n' + container + ' failed on: ' + node);
+            if (config.container_host_constraints) {
+              container_faillog.push(container);
+              container_failover(container);
+            }
+
+            var options = {
+              host: '127.0.0.1',
+              path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+              port: port
+            };
+
+            var request = http.get(options, function(response) {}).on('error', function(e) {
+              console.error(e);
+            });
+            client.destroy();
+          });
+        }
+      };
+
+      app.get('/hb', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
         } else {
-          res.end('Updated Configuration. Please reload it now for changes to take effect.');
+          var responseString = '';
+          var node = '';
+          var check_port = ''
+          var container = '';
+          for (var i = 0; i < config.hb.length; i++) {
+            for (var key in config.hb[i]) {
+              if (config.hb[i].hasOwnProperty(key)) {
+                container = key;
+                node = config.hb[i].node;
+                check_port = config.hb[i][key];
+                if (check_port != node) {
+                  hb_check(node, check_port, container);
+                }
+              }
+            }
+          }
+          res.end('');
         }
       });
-    }
-  } catch (e) {
-    res.end('Error: Invalid JSON. Configuration not saved.');
-  }
-
-});
 
 
-server.listen(port, function() {
-  console.log('Listening on port %d', port);
-});
+
+      function gatherLog(callback) {
+        callback(log);
+      }
+
+      app.get('/log', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          if (config.elasticsearch && config.elasticsearch_index) {
+            elasticsearch(log);
+          }
+          res.send(log);
+        }
+      });
+
+      app.get('/rsyslog', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+              res.end(body);
+            } else {
+              res.end('Error connecting with server. ' + error);
+            }
+          })
+        }
+      });
+
+      app.get('/reloadconfig', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          if (process.env.PICLUSTER_CONFIG) {
+            config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+          } else {
+            config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+          }
+          token = config.token;
+          dockerFolder = config.docker;
+          addLog('\nReloading Config.json\n');
+          res.end('');
+        }
+      });
+
+      app.get('/getconfig', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          res.send(config);
+        }
+      });
+
+      app.get('/killvip', function(req, res) {
+        var check_token = req.query['token'];
+        if ((check_token != token) || (!check_token)) {
+          res.end('\nError: Invalid Credentials')
+        } else {
+          var responseString = '';
+          if (!config.vip) {
+            res.end('\nError: VIP not configured.');
+          } else {
+            for (var i = 0; i < config.vip.length; i++) {
+              var node = config.vip[i].node;
+              for (var key in config.vip[i]) {
+                if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
+                  var token_body = JSON.stringify({
+                    "token": token
+                  });
+
+                  var options = {
+                    url: 'http://' + node + ':' + agentPort + '/killvip',
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Content-Length': token_body.length
+                    },
+                    body: token_body
+                  }
+
+                  request(options, function(error, response, body) {
+                    if (error) {
+                      res.end("An error has occurred.");
+                    }
+                  })
+                }
+              }
+            }
+          }
+          res.end('');
+        }
+      });
+
+      app.post('/updateconfig', function(req, res) {
+        var payload = req.body.payload;
+        var check_token = req.body.token;
+
+        try {
+          var verify_payload = JSON.parse(req.body.payload);
+          if ((check_token != token) || (!check_token)) {
+            res.end('\nError: Invalid Credentials')
+          } else {
+            fs.writeFile(config_file, payload, function(err) {
+              if (err) {
+                console.log('\nError while writing config.' + err);
+              } else {
+                res.end('Updated Configuration. Please reload it now for changes to take effect.');
+              }
+            });
+          }
+        } catch (e) {
+          res.end('Error: Invalid JSON. Configuration not saved.');
+        }
+
+      });
+
+
+      server.listen(port, function() {
+        console.log('Listening on port %d', port);
+      });
