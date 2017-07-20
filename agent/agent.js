@@ -51,7 +51,7 @@ if (config.autostart_containers) {
      const interfaces = require('os').networkInterfaces;
      Object.keys(interfaces).forEach(function(devName) {
        const iface = interfaces[devName];
-       iface.forEach(function(alias, h) {
+       iface.forEach(function(alias) {
          if (alias.address !== node) { return; }
 
          vip_slave = config.vip[i].slave;
