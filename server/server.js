@@ -245,7 +245,6 @@ app.get('/build', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var responseString = '';
-    var node = '';
     Object.keys(config.layout).forEach(function(get_node, i) {
       Object.keys(config.layout[i]).forEach(function(key) {
         const node = config.layout[i].node;
