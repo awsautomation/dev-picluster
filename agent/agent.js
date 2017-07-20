@@ -57,7 +57,7 @@ if (config.autostart_containers) {
          vip_slave = config.vip[i].slave;
          vip_eth_device = config.vip[i].vip_eth_device;
          ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
-         ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
+         const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
          vip_ping_time = config.vip[i].vip_ping_time;
          exec(cmd).then(send_ping).catch(send_ping);
        });
