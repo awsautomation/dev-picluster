@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "dependencies": {
     "async": "^2.5.0",
-    "bluebird": "^3.5.0",
     "body-parser": "latest",
     "express": "^4.15.3",
     "fs": "",
