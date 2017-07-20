@@ -351,57 +351,44 @@ app.get('/start', function(req, res) {
     container = req.query['container'];
   }
   if (container.indexOf('*') > -1) {
-    var container = '';
+    var container = '*';
   }
 
   if ((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
     var responseString = '';
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      for (var key in config.layout[i]) {
-        if (config.layout[i].hasOwnProperty(key)) {
-          if (key.indexOf('node') > -1) {} else {
-            //Starts the Docker images assigned to each host.
-            var command = JSON.stringify({
-              "command": 'docker container start ' + key,
-              "token": token
-            });
-            var options = {
-              url: 'http://' + node + ':' + agentPort + '/run',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            }
-            if (container.length > 0) {
-              if (key.indexOf(container) > -1) {
-                request(options, function(error, response, body) {
-                  if (error) {
-                    res.end("An error has occurred.");
-                  } else {
-                    var results = JSON.parse(response.body);
-                    addLog('\nStarting: ' + key + '\n' + results.output);
-                  }
-                });
-              }
-            } else {
-              request(options, function(error, response, body) {
-                if (error) {
-                  res.end("An error has occurred.");
-                } else {
-                  var results = JSON.parse(response.body);
-                  addLog('\nStarting: ' + key + '\n' + results.output);
-                }
-              });
-            }
-          }
+    Object.keys(config.layout).forEach(function(get_node, i) {
+      Object.keys(config.layout[i]).forEach(function(key) {
+        const node = config.layout[i].node;
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
         }
-      }
-    }
+        var command = JSON.stringify({
+          "command": 'docker container start ' + key,
+          "token": token
+        });
+        var options = {
+          url: 'http://' + node + ':' + agentPort + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        }
+        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+          request(options, function(error, response, body) {
+            if (error) {
+              res.end("An error has occurred.");
+            } else {
+              var results = JSON.parse(response.body);
+              addLog('\nStarting: ' + key + '\n' + results.output);
+            }
+          });
+        }
+      });
+    });
     res.end('');
   }
 });
@@ -943,62 +930,48 @@ app.get('/changehost', function(req, res) {
 app.get('/stop', function(req, res) {
   var check_token = req.query['token'];
   var container = '';
-
   if (req.query['container']) {
     container = req.query['container'];
   }
-  if (container.indexOf("*") > -1) {
-    container = container = '';
+  if (container.indexOf('*') > -1) {
+    var container = '*';
   }
 
   if ((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
     var responseString = '';
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      for (var key in config.layout[i]) {
-        if (config.layout[i].hasOwnProperty(key)) {
-          if (key.indexOf('node') > -1) {} else {
-            //Starts the Docker images assigned to each host.
-            var command = JSON.stringify({
-              "command": 'docker container stop ' + key,
-              "token": token
-            });
-            var options = {
-              url: 'http://' + node + ':' + agentPort + '/run',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            }
-            if (container.length > 0) {
-              if (key.indexOf(container) > -1) {
-                request(options, function(error, response, body) {
-                  if (error) {
-                    res.end("An error has occurred.");
-                  } else {
-                    var results = JSON.parse(response.body);
-                    addLog('\nStopping: ' + key + '\n' + results.output);
-                  }
-                });
-              }
-            } else {
-              request(options, function(error, response, body) {
-                if (error) {
-                  res.end("An error has occurred.");
-                } else {
-                  var results = JSON.parse(response.body);
-                  addLog('\nStopping: ' + key + '\n' + results.output);
-                }
-              });
-            }
-          }
+    Object.keys(config.layout).forEach(function(get_node, i) {
+      Object.keys(config.layout[i]).forEach(function(key) {
+        const node = config.layout[i].node;
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
         }
-      }
-    }
+        var command = JSON.stringify({
+          "command": 'docker container stop ' + key,
+          "token": token
+        });
+        var options = {
+          url: 'http://' + node + ':' + agentPort + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        }
+        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+          request(options, function(error, response, body) {
+            if (error) {
+              res.end("An error has occurred.");
+            } else {
+              var results = JSON.parse(response.body);
+              addLog('\nStopping: ' + key + '\n' + results.output);
+            }
+          });
+        }
+      });
+    });
     res.end('');
   }
 });
