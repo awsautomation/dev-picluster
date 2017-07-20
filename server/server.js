@@ -301,7 +301,6 @@ app.get('/create', function(req, res) {
   } else {
     var responseString = '';
     Object.keys(config.layout).forEach(function(get_node, i) {
-      const node = get_node.node;
       Object.keys(config.layout[i]).forEach(function(key) {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
