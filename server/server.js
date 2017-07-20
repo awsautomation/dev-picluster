@@ -105,11 +105,7 @@ app.get('/status', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "commands": [
-        'hostname',
-        ['docker', 'container', 'ps'],
-        ['node', '-e', '"const getos = require(\'getos\');getos(function(e,os){var dist = (e) ? \'\' : os.dist || os.os;console.log(\'Dist: \' + dist);})"']
-      ],
+      "command": 'hostname;docker container ps;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -132,7 +128,7 @@ app.get('/status', function(req, res) {
           res.end("An error has occurred.");
         } else {
           var results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output.join(''));
+          addLog('\nNode: ' + results.output);
         }
       })
 
@@ -155,15 +151,10 @@ app.get('/clearlog', function(req, res) {
 app.get('/nodes', function(req, res) {
   var check_token = req.query['token'];
   if ((check_token != token) || (!check_token)) {
-    res.status(401).end('\nError: Invalid Credentials')
+    res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "commands": [
-        'hostname',
-        ['uname', '-a'],
-        ['df', '-h', '/'],
-        ['node', '-e', '"const getos = require(\'getos\');getos(function(e,os){var dist = (e) ? \'\' : os.dist || os.os;console.log(\'Dist: \' + dist);})"']
-      ],
+      "command": 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -186,7 +177,7 @@ app.get('/nodes', function(req, res) {
           res.end(error);
         } else {
           var results = JSON.parse(response.body);
-          addLog('Node: ' + results.output.join(''));
+          addLog('Node: ' + results.output);
         }
       })
 
@@ -202,11 +193,7 @@ app.get('/images', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": [
-        'hostname',
-        ['docker', 'image', 'list'],
-        ['node', '-e', '"const getos = require(\'getos\');getos(function(e,os){var dist = (e) ? \'\' : os.dist || os.os;console.log(\'Dist: \' + dist);})"']
-      ],
+      "command": 'hostname;docker image list;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -229,7 +216,7 @@ app.get('/images', function(req, res) {
           res.end("An error has occurred.");
         } else {
           var results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output.join(''));
+          addLog('\nNode: ' + results.output);
         }
       })
 
