@@ -30,9 +30,7 @@ on regular x86 hardware also and is not tied to ARM.
 ## Prerequisites
 
 * Docker
-* Node.js v8
-
-(Please note that your node.js binary should be named node and not nodejs as some distros use(Ubuntu, Debian). If your distro has nodejs instead of node, simply create a symlink called node)
+* Node.js
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/rusher81572/picluster/tree/1.0)
 
@@ -295,14 +293,14 @@ Reboot
 
 # Automatic Container failover to other hosts
 
-This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesystem like GlusterFS or NFS so the container will have access to its data on any host.
+This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it's data on any host.
 
 ### Overview of the process.
 
 When container_host_constraints is enabled in config.json, each failed heartbeat attempt to a container is logged. When three failed heartbeat attempts occur, the following action is taken:
 
 * A new host is chosen randomly from the container map that you designated in container_host_constraints.
-* The container is deleted on its current host.
+* The container is deleted on it's current host.
 * The configuration file is updated with the new host layout.
 * The container image is built and run on the new host.
 

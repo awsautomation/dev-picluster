@@ -86,11 +86,8 @@ function distLogo(dist) {
 			logo.className = "fl-opensuse";
 			logo.style.color = "#73ba25";
 			return logo.outerHTML;
-		case 'win32':
-			logo.className = "fa fa-windows";
-			return logo.outerHTML;
 		default:
-			logo.className = "fa fa-server"
+			logo.className = "fl-tux"
 			return logo.outerHTML;
 	}
 }
@@ -114,12 +111,4 @@ function addFontLinux() {
     fontLinux.rel="stylesheet";
     fontLinux.href="//cdn.rawgit.com/Lukas-W/font-linux/v0.9/assets/font-linux.css";
     document.head.appendChild(fontLinux);
-}
-
-function addFontAwesome() {
-	var fontAwesome = document.createElement("link");
-	fontAwesome.rel="stylesheet";
-	fontAwesome.id="fa-css";
-	fontAwesome.href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css";
-    document.head.appendChild(fontAwesome);
 }
