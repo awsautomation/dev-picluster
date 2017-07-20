@@ -40,7 +40,7 @@ if (config.autostart_containers) {
 }
 
 (function() {
-  if (!config.vip_ip || !config.vip) { return; }
+  if (config.vip_ip || config.vip) {
 
   var vip = config.vip_ip;
   Object.keys(config.vip).forEach(function(vips, i) {
@@ -64,7 +64,7 @@ if (config.autostart_containers) {
      })
    })
   });
-})();
+} })();
 
 function send_ping() {
   setTimeout(function() {
