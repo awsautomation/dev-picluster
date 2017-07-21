@@ -30,9 +30,7 @@ on regular x86 hardware also and is not tied to ARM.
 ## Prerequisites
 
 * Docker
-* Node.js v8
-
-(Please note that your node.js binary should be named node and not nodejs as some distros use(Ubuntu, Debian). If your distro has nodejs instead of node, simply create a symlink called node)
+* Node.js
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/rusher81572/picluster/tree/1.0)
 
@@ -246,63 +244,60 @@ To view the current log
 pictl log
 ```
 
-## Using Systemd for Server and Agent Processes
+## Using pm2 to init PiCluster on systemd
 
-The systemd folder containers the service files and scripts to make PiCluster start at boot time.
-
-#### 1. Modify the .service files in the systemd folder
-
-For each .service file, change ExecStart and ExecStop to reflect the location of the PiCluster folder.
+#### 0. Login as root to install pm2
 ```
-ExecStart=/bin/bash /root/picluster/systemd/start-agent.sh
-ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
-```
-#### 2. Modify the start scripts in the systemd folder
-
-For each file that begins with "start", modify the PICLUSTER_ variables for your installation.
-
-Example for start-agent.sh.
-```
-export PICLUSTER_AGENT_PATH="/root/picluster/agent"
+sudo -i
 ```
 
-#### 3. Copy the systemd files to the systemd directory
+#### 1. Install pm2
 ```
-cp systemd/*.service /lib/systemd/system/
-```
-
-#### 4. Enable the services
-
-To enable the server service.
-```
-systemctl enable picluster-server.service
+npm install -g pm2
 ```
 
-To enable the agent service.
+#### 2. Install the pm2 systemd unit file
 ```
-systemctl enable picluster-agent.service
-```
-
-To enable the web console service.
-```
-systemctl enable picluster-web.service
+pm2 startup systemd
 ```
 
-#### 5. Reboot for the services to be started properly
+#### 3. Export the PiCluster config path (change the path accordingly)
+```
+export PICLUSTER_CONFIG='/opt/picluster/config.json'
+```
+
+#### 4. Start the server, agent, and webconsole scripts (change the path accordingly)
+```
+pm2 start /opt/picluster/server/server.js
+pm2 start /opt/picluster/agent/agent.js
+pm2 start /opt/picluster/web/webconsole.js
+```
+
+#### 5. Save the pm2 session to restart at boot
+```
+pm2 save
+```
+
+#### 6. Enable pm2 at boot:
+```
+systemctl enable pm2-root
+```
+
+#### 7. Reboot for the services to be started properly
 ```
 Reboot
 ```
 
 # Automatic Container failover to other hosts
 
-This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesystem like GlusterFS or NFS so the container will have access to its data on any host.
+This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it's data on any host.
 
 ### Overview of the process.
 
 When container_host_constraints is enabled in config.json, each failed heartbeat attempt to a container is logged. When three failed heartbeat attempts occur, the following action is taken:
 
 * A new host is chosen randomly from the container map that you designated in container_host_constraints.
-* The container is deleted on its current host.
+* The container is deleted on it's current host.
 * The configuration file is updated with the new host layout.
 * The container image is built and run on the new host.
 
