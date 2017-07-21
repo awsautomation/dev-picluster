@@ -11,10 +11,13 @@ var port = config.agent_port;
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
-var exec = require('child_process').exec;
 var server = require("http").createServer(app);
-var node = 'null';
 var os = require('os');
+const node = os.hostname();
+const async = require('async');
+const Promisify = require('util').promisify;
+const exec = Promisify(require('child_process').exec);
+const noop = function () {};
 var vip = ''
 var vip_slave = '';
 var vip_device = '';
@@ -22,14 +25,6 @@ var ip_add_command = '';
 var ip_delete_command = '';
 var vip_ping_time = '';
 var token = config.token;
-
-exec('hostname', function(error, stdout, stderr) {
-  if (error) {
-    node = stderr;
-  } else {
-    node = stdout;
-  }
-});
 
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
@@ -44,36 +39,32 @@ if (config.autostart_containers) {
 
 }
 
-if (config.vip_ip) {
+if (config.vip_ip && config.vip) {
   var vip = config.vip_ip;
-  if (config.vip) {
-    for (var i = 0; i < config.vip.length; i++) {
-      var node = config.vip[i].node;
-      for (var key in config.vip[i]) {
-        if (config.vip[i].hasOwnProperty(key)) {
-          var interfaces = require('os').networkInterfaces();
-          for (var devName in interfaces) {
-            var iface = interfaces[devName];
-            for (var h = 0; h < iface.length; h++) {
-              var alias = iface[h];
-              if (alias.address == node) {
-                vip_slave = config.vip[i].slave;
-                vip_eth_device = config.vip[i].vip_eth_device;
-                ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
-                ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
-                vip_ping_time = config.vip[i].vip_ping_time;
-                var exec = require('child_process').exec;
-                var cmd = ip_delete_command;
-                exec(cmd, function(error, stdout, stderr) {
-                  send_ping();
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  Object.keys(config.vip).forEach(function(i) {
+   const _node = config.vip[i].node;
+   console.log('node', _node);
+   Object.keys(config.vip[i]).forEach(function(key) {
+     if (!config.vip[i].hasOwnProperty(key)) { return; }
+     const interfaces = require('os').networkInterfaces();
+     //console.log(interfaces);
+     Object.keys(interfaces).forEach(function(devName) {
+       const iface = interfaces[devName];
+       //console.log('iface', iface);
+       iface.forEach(function(alias) {
+         //console.log('alias.address', alias.address, 'node', _node);
+         if (alias.address !== _node) { return; }
+         vip_slave = config.vip[i].slave;
+         vip_eth_device = config.vip[i].vip_eth_device;
+         ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
+         //console.log('ip_add_command', ip_add_command);
+         const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
+         vip_ping_time = config.vip[i].vip_ping_time;
+         exec(cmd).then(send_ping).catch(send_ping);
+       });
+     })
+   })
+  });
 }
 
 function send_ping() {
@@ -96,42 +87,33 @@ function send_ping() {
       var found_vip = false;
 
       if ((error || response.statusCode != "200")) {
-        var exec = require('child_process').exec;
         var cmd = ip_add_command;
         //console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
-        exec(cmd, function(error, stdout, stderr) {});
+        exec(cmd).then(noop).catch(noop);
       } else {
-
-        var interfaces = require('os').networkInterfaces();
-        for (var devName in interfaces) {
+        const interfaces = require('os').networkInterfaces();
+        Object.keys(interfaces).forEach(function(devName) {
           var iface = interfaces[devName];
-          for (var i = 0; i < iface.length; i++) {
-            var alias = iface[i];
+          iface.forEach(function(alias) {
             if (alias.address == vip) {
               found_vip = true;
             }
-          }
-        }
+          });
+        });
         var json_object = JSON.parse(body);
 
         if (json_object.vip_detected == "false" && found_vip == false) {
           console.log("\nVIP not detected on either machine. Bringing up the VIP on this host.");
-          var exec = require('child_process').exec;
           var cmd = ip_add_command;
-          exec(cmd, function(error, stdout, stderr) {
-            if (error) {
-              console.log(error);
-            }
+          exec(cmd).catch(function(error) {
+            console.log(error);
           });
         }
         if ((json_object.vip_detected == "true" && found_vip == true)) {
           console.log("\nVIP detected on boths hosts! Stopping the VIP on this host.");
-          var exec = require('child_process').exec;
           var cmd = ip_delete_command;
-          exec(cmd, function(error, stdout, stderr) {
-            if (error) {
-              console.log(error);
-            }
+          exec(cmd).catch(function(error) {
+            console.log(error);
           });
         }
         //console.log('\n' + vip_slave + ' is alive');
@@ -151,71 +133,91 @@ app.get('/rsyslog', function(req, res) {
 });
 
 app.post('/killvip', function(req, res) {
-  var check_token = req.body.token;
-  if (!check_token == token) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    if (config.vip_ip) {
-      var exec = require('child_process').exec;
-      var cmd = ip_delete_command;
-      exec(cmd, function(error, stdout, stderr) {
-        if (error) {
-          console.log(error);
-        } else {
-          res.end('\nCompleted.');
-        }
-      });
-    }
+  const check_token = req.body.token;
+  if (check_token !== token) {
+    return res.status(401).end('\nError: Invalid Credentials');
+  }
+
+  if (config.vip_ip) {
+    var cmd = ip_delete_command;
+    exec(cmd).then(function(stdout, stderr) {
+        res.end('\nCompleted.');
+    }).catch(function(error) {
+        console.log(error);
+    });
   }
 });
 
 app.post('/pong', function(req, res) {
-  var check_token = req.body.token;
-  if (check_token == token) {
-    var responseString = "";
-    var vip_status = "false";
-    var interfaces = require('os').networkInterfaces();
-    for (var devName in interfaces) {
-      var iface = interfaces[devName];
-      for (var i = 0; i < iface.length; i++) {
-        var alias = iface[i];
-        if (alias.address == vip) {
-          vip_status = "true";
-        }
-      }
-    }
-    var body = {
-      "vip_detected": vip_status
-    };
-    res.send(body);
-  } else {
-    res.status(500).send('Something broke!')
+  const check_token = req.body.token;
+  if (check_token !== token) {
+    return res.status(500).send('Something broke!')
   }
+
+  var responseString = "";
+  var vip_status = "false";
+  const interfaces = require('os').networkInterfaces();
+
+  Object.keys(interfaces).forEach(function(devName) {
+    const iface = interfaces[devName];
+    iface.forEach(function(alias) {
+      if (alias.address == vip) {
+        vip_status = "true";
+      }
+    });
+  });
+
+  var body = {
+    "vip_detected": vip_status
+  };
+  res.send(body);
 });
 
 app.post('/run', function(req, res) {
   var output = {
-    "output": "",
+    "output": [],
     "node": node
   };
 
-  var cmd = req.body.command;
-  var check_token = req.body.token;
-  if (check_token == token) {
-    exec(cmd, function(error, stdout, stderr) {
-      if (error) {
-        output.output = stderr;
-        res.send(output);
-      } else {
-        output.output = stdout;
-        res.send(output);
-      }
-    });
-  } else {
-    res.send({
+  const check_token = req.body.token;
+
+  if (check_token !== token) {
+    return res.status(401).json({
       output: "Not Authorized to connect to this agent!"
     });
   }
+
+  // Backwards compatability...
+  if (!('commands' in req.body) && 'command' in req.body) {
+    req.body.commands = req.body.command;
+  }
+
+  const commands = (typeof req.body.commands === 'string') ? [req.body.commands] : req.body.commands;
+
+  if (!(commands instanceof Array)) {
+    return res.status(400).json({
+      output: "Bad Request"
+    });
+  }
+
+  async.eachSeries(commands, function(command, cb) {
+    if (typeof command === "string") { command = [command]; }
+    if(!(command instanceof Array)) { return; }
+    //console.log('command', command);
+    exec(command.join(' ')).then(function(log) {
+      //console.log('output', log);
+      output.output.push(`${log.stdout||''}${log.stderr||''}`);
+      return cb();
+    }).catch(function(e) {
+      //console.log('error', e);
+      output.output.push(`${e.stdout||''}${e.stderr||''}`);
+      return cb(e);
+    });
+  }, function(e) {
+    if (e) { console.error('error:', e); }
+    //console.log('output', output);
+    res.json(output);
+  });
 });
 
 server.listen(port, function() {
