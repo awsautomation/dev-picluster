@@ -16,14 +16,15 @@
 						var hostname = get_data[i].split('REPOSITORY');
 						var containers = hostname[1].split('SIZE');
 						var show_containers = containers[1].split('\n');
-						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br>');
+						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>');
 
 						for (j = 0; j != show_containers.length; j++) {
 							var parse_output = show_containers[j].split('  ');
 							if (parse_output.length > 1 && parse_output[0].indexOf('<none>') < 0) {
-								document.write('<br><font size=+1>' + parse_output[0] + '</font>');
+								document.write('<font size=+2><li class="ui-state-default">' + parse_output[0] + '</li>');
 							}
 						}
+						document.write('</ol>');
 					}
 				}
 				addFontLinux();
