@@ -25,6 +25,7 @@ on regular x86 hardware also and is not tied to ARM.
 * Built-in web terminal to easily run commands on nodes
 * Integrate the Kibana dashboard into PiCluster
 * Integrates with Elasticsearch to store the PiCluster logs.
+* Automatic container failover to different nodes.
 
 ## Prerequisites
 
@@ -59,6 +60,11 @@ You can run the server and agent on the same node since they are listening on di
     {"node":"192.168.0.101","vip_eth_device":"eth0", "slave": "192.168.0.102", "vip_ping_time": "10000"},
     {"node":"192.168.0.102","vip_eth_device":"eth0","slave": "192.168.0.101", "vip_ping_time": "15000"}
   ],
+  "container_host_constraints": [{
+    "container": "mysql,192.168.0.101,192.168.0.102"
+  }, {
+    "container": "nginx,192.168.0.103,192.168.0.104"
+  }],
   "commandlist": [{
   "SystemUpdate": "apt-get update;apt-get dist-upgrade -y"
   }],
@@ -117,9 +123,11 @@ You can run the server and agent on the same node since they are listening on di
 
 * kibana - The is for the URL to Kibana to integrate the console inside PiCluster.
 
-* elasticsearch - The URL for your Elasticsearch server. 
+* elasticsearch - The URL for your Elasticsearch server.
 
 * elasticsearch_index - The Elasticsearch index to use for PiCluster.
+
+* container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container.
 
 ###### An example on the Docker folder layout:
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
@@ -148,21 +156,6 @@ The server is the brain of PiCluster and the agents and web console connect to i
 cd server
 npm install
 node server.js
-```
-
-##### You can safely ignore the following error if found when running npm install
-```
-npm WARN picluster-agent@0.0.1 No description
-npm WARN picluster-agent@0.0.1 No repository field.
-npm WARN picluster-agent@0.0.1 No license field.
-npm ERR! file sh
-npm ERR! code ELIFECYCLE
-npm ERR! errno ENOENT
-npm ERR! syscall spawn
-npm ERR! microtime@0.2.0 install: `node-waf configure build`
-npm ERR! spawn ENOENT
-npm ERR!
-npm ERR! Failed at the microtime@0.2.0 install script.
 ```
 
 ## Agent Installation
@@ -297,6 +290,71 @@ systemctl enable picluster-web.service
 ```
 Reboot
 ```
+
+# Automatic Container failover to other hosts
+
+This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it's data on any host.
+
+### Overview of the process.
+
+When container_host_constraints is enabled in config.json, each failed heartbeat attempt to a container is logged. When three failed heartbeat attempts occur, the following action is taken:
+
+* A new host is chosen randomly from the container map that you designated in container_host_constraints.
+* The container is deleted on it's current host.
+* The configuration file is updated with the new host layout.
+* The container image is built and run on the new host.
+
+### Prerequisites
+
+1. Heartbeat configured in config.json (automatic_heartbeat,heartbeat_interval, and container added to heartbeat section)
+2. container_host_constraints enabled in config.json
+```
+"container_host_constraints": [],
+```
+### How to assign container_host_constraints to a container and hosts?
+
+1. Manually in config.json
+2. Once container_host_constraints is enabled in config.json, you can add the hosts when you choose "Add Container" in the web console.
+
+### Sample configuration and Testing
+The following config.json is a minimal configuration needed to try this out on your laptop. It consists of two nodes (localhost and 127.0.0.1) that will run Minio in a container. Currently, Minio is only on the node called localhost.  
+```
+{
+  "token": "1234567890ABCDEFGHJKLMNOP",
+  "docker": "../docker",
+  "server_port": "3000",
+  "agent_port": "3001",
+  "layout": [{
+      "node": "localhost",
+      "minio": "-p 9000:9000"
+    },
+    {
+      "node": "127.0.0.1"
+    }
+  ],
+  "hb": [{
+      "node": "localhost",
+      "minio": "9000"
+    },
+    {
+      "node": "127.0.0.1"
+    }
+  ],
+  "container_host_constraints": [
+    {
+      "container": "minio,localhost,127.0.0.1"
+    }
+  ],
+  "automatic_heartbeat": "enabled",
+  "heartbeat_interval": "300000",
+  "web_username": "admin",
+  "web_password": "admin",
+  "web_connect": "127.0.0.1",
+  "web_port": "3003"
+}
+```
+
+Based on the sample above, PiCluster will check if Minio is running every 30 seconds. Since Minio is not created yet, the failover event should start after about 90 seconds.
 
 # Authors and Contributions
 

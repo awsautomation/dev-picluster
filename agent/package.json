@@ -5,6 +5,7 @@
     "body-parser": "latest",
     "express": "^4.15.3",
     "fs": "",
+    "getos": "git+https://github.com/aidanharris/getos.git",
     "line-reader": "",
     "node-gyp": "",
     "os": "",

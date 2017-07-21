@@ -8,6 +8,10 @@
 			var container = $("#container_name").val();
 			var container_args = $("#container_args").val();
 			var heartbeat_args = $("#heartbeat_args").val();
+			var failover_constraints = $("#failover_constraints").val();
+			if (!failover_constraints) {
+				failover_constraints = 'none';
+			}
 			hideshow('output');
 			$("#command").dialog('close');
 			$("#output").dialog({
@@ -20,7 +24,8 @@
 				container: container,
 				host: host,
 				container_args: container_args,
-				heartbeat_args: heartbeat_args
+				heartbeat_args: heartbeat_args,
+				failover_constraints: container + ',' + failover_constraints
 			}, function(data) {
 				$("#command").val(data);
 				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
@@ -73,9 +78,17 @@
 			<b>Container Arguments:</b>
 			<input type="text" size="25" id="container_args" name="container_args" value=""></font>
 			<br><br>
-			<b>Heartbeat Port (Optional):</b>
-			<input type="text" size="5" id="heartbeat_args" name="heartbeat_args" value=""></font>
-			<br><br>
+			<br><b>Heartbeat and Host Failover: (Optional)</b>
+			<fieldset>
+				<b>Heartbeat Port:</b>
+				<input type="text" size="5" id="heartbeat_args" name="heartbeat_args" value=""></font>
+				<br><br>
+				<b>Host Failover Constraints (Optional):</b>
+				<input type="text" size="25" id="failover_constraints" name="failover_constraints" value=""></font>
+				<br><br> This tells PiCluster which hosts that the container may failover to. Enter each host separted by a comma.
+				<br><br>
+				<br>
+			</fieldset>
 			<p align=center>
 				<button onclick="exec()"> Submit</button>
 			</p>

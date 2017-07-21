@@ -580,13 +580,20 @@ app.post('/addcontainer', function(req, res) {
   var host = req.body.host;
   var container_args = req.body.container_args;
   var heartbeat_args = req.body.heartbeat_args;
+  var failover_constraints = req.body.failover_constraints;
   var container = req.body.container;
+
+  if (failover_constraints) {
+    if (failover_constraints.indexOf('none') > -1) {
+      failover_constraints = '';
+    }
+  }
 
   if ((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
     if ((container) && (container_args) && (host)) {
-      request('http://' + server + ':' + server_port + '/addcontainer?' + 'token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args, function(error, response, body) {
+      request('http://' + server + ':' + server_port + '/addcontainer?' + 'token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints, function(error, response, body) {
         if (!error && response.statusCode == 200) {
           display_log(function(data) {
             res.end(data);
