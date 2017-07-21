@@ -15,7 +15,7 @@ var server = require("http").createServer(app);
 var os = require('os');
 const node = os.hostname();
 const async = require('async');
-const Promisify = require('bluebird').promisify;
+const Promisify = require('util').promisify;
 const exec = Promisify(require('child_process').exec);
 const noop = function () {};
 var vip = ''
@@ -39,24 +39,25 @@ if (config.autostart_containers) {
 
 }
 
-(function() {
-  if (!config.vip_ip || !config.vip) { return; }
-
+if (config.vip_ip && config.vip) {
   var vip = config.vip_ip;
-  Object.keys(config.vip).forEach(function(vips, i) {
-   const node = vips.node;
+  Object.keys(config.vip).forEach(function(i) {
+   const _node = config.vip[i].node;
+   console.log('node', _node);
    Object.keys(config.vip[i]).forEach(function(key) {
      if (!config.vip[i].hasOwnProperty(key)) { return; }
-
-     const interfaces = require('os').networkInterfaces;
+     const interfaces = require('os').networkInterfaces();
+     //console.log(interfaces);
      Object.keys(interfaces).forEach(function(devName) {
        const iface = interfaces[devName];
+       //console.log('iface', iface);
        iface.forEach(function(alias) {
-         if (alias.address !== node) { return; }
-
+         //console.log('alias.address', alias.address, 'node', _node);
+         if (alias.address !== _node) { return; }
          vip_slave = config.vip[i].slave;
          vip_eth_device = config.vip[i].vip_eth_device;
          ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
+         //console.log('ip_add_command', ip_add_command);
          const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
          vip_ping_time = config.vip[i].vip_ping_time;
          exec(cmd).then(send_ping).catch(send_ping);
@@ -64,7 +65,7 @@ if (config.autostart_containers) {
      })
    })
   });
-})();
+}
 
 function send_ping() {
   setTimeout(function() {
@@ -203,17 +204,17 @@ app.post('/run', function(req, res) {
     if (typeof command === "string") { command = [command]; }
     if(!(command instanceof Array)) { return; }
     //console.log('command', command);
-    exec(command.join(' ')).then(function(stdout) {
-      //console.log('stdout', stdout);
-      output.output.push(stdout);
+    exec(command.join(' ')).then(function(log) {
+      //console.log('output', log);
+      output.output.push(`${log.stdout||''}${log.stderr||''}`);
       return cb();
-    }).catch(function(error, stderr) {
-      //console.log('error', error,'stderr', stderr);
-      output.output.push(stderr);
-      return cb(error);
+    }).catch(function(e) {
+      //console.log('error', e);
+      output.output.push(`${e.stdout||''}${e.stderr||''}`);
+      return cb(e);
     });
   }, function(e) {
-    if (e) { console.error(e); }
+    if (e) { console.error('error:', e); }
     //console.log('output', output);
     res.json(output);
   });
