@@ -43,21 +43,16 @@ if (config.vip_ip && config.vip) {
   var vip = config.vip_ip;
   Object.keys(config.vip).forEach(function(i) {
    const _node = config.vip[i].node;
-   console.log('node', _node);
    Object.keys(config.vip[i]).forEach(function(key) {
      if (!config.vip[i].hasOwnProperty(key)) { return; }
      const interfaces = require('os').networkInterfaces();
-     //console.log(interfaces);
      Object.keys(interfaces).forEach(function(devName) {
        const iface = interfaces[devName];
-       //console.log('iface', iface);
        iface.forEach(function(alias) {
-         //console.log('alias.address', alias.address, 'node', _node);
          if (alias.address !== _node) { return; }
          vip_slave = config.vip[i].slave;
          vip_eth_device = config.vip[i].vip_eth_device;
          ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
-         //console.log('ip_add_command', ip_add_command);
          const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
          vip_ping_time = config.vip[i].vip_ping_time;
          exec(cmd).then(send_ping).catch(send_ping);
@@ -116,7 +111,6 @@ function send_ping() {
             console.log(error);
           });
         }
-        //console.log('\n' + vip_slave + ' is alive');
       }
     });
     send_ping();
