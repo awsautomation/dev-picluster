@@ -658,36 +658,46 @@ app.get('/removecontainerconfig', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
 
+    Object.keys(config.layout).forEach(function(get_node, i) {
+      Object.keys(config.layout[i]).forEach(function(key) {
+        const node = config.layout[i].node;
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
+        }
+        if (key.indexOf(container) > -1) {
+          delete config.layout[i][key];
+        }
+      });
+    });
 
-    var hb_proceed = 0;
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
-        if (container.length > 0) {
+    if (config.hb) {
+      Object.keys(config.hb).forEach(function(get_node, i) {
+        Object.keys(config.hb[i]).forEach(function(key) {
+          const node = config.hb[i].node;
+          if ((!config.hb[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
           if (key.indexOf(container) > -1) {
-            delete config.layout[i][key];
-            hb_proceed = 1;
-            break;
+            delete config.hb[i][key];
           }
-        }
-      }
-    }
-
-    if (hb_proceed) {
-      if (config.hb) {
-        for (var i = 0; i < config.hb.length; i++) {
-          for (var key in config.hb[i]) {
-            if (container.length > 0) {
-              if (key.indexOf(container) > -1) {
-                delete config.hb[i][key];
-                break;
-              }
-            }
-          }
-        }
-      }
+        });
+      });
     }
 
     if (config.container_host_constraints) {
+      Object.keys(config.container_host_constraints).forEach(function(get_node, i) {
+        Object.keys(config.container_host_constraints[i]).forEach(function(key) {
+          const node = config.container_host_constraints[i].node;
+          if ((!config.container_host_constraints[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          var analyze = config.container_host_constraints[i][key].split(',');
+          if (container.indexOf(analyze[0]) > -1) {
+            config.container_host_constraints.splice(i, i + 1);
+          }
+        });
+      });
+
       for (var i = 0; i < config.container_host_constraints.length; i++) {
         for (var key in config.container_host_constraints[i]) {
           if (container.length > 0) {
@@ -1467,35 +1477,37 @@ app.get('/killvip', function(req, res) {
     if (!config.vip) {
       res.end('\nError: VIP not configured.');
     } else {
-      for (var i = 0; i < config.vip.length; i++) {
-        var node = config.vip[i].node;
-        for (var key in config.vip[i]) {
-          if (config.vip[i].hasOwnProperty(key)) { //Builds the required images on each host
-            var token_body = JSON.stringify({
-              "token": token
-            });
-
-            var options = {
-              url: 'http://' + node + ':' + agentPort + '/killvip',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': token_body.length
-              },
-              body: token_body
-            }
-
-            request(options, function(error, response, body) {
-              if (error) {
-                res.end("An error has occurred.");
-              }
-            })
+      Object.keys(config.vip).forEach(function(get_node, i) {
+        Object.keys(config.vip[i]).forEach(function(key) {
+          const node = config.vip[i].node;
+          if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
           }
-        }
-      }
+          var token_body = JSON.stringify({
+            "token": token
+          });
+
+          var options = {
+            url: 'http://' + node + ':' + agentPort + '/killvip',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': token_body.length
+            },
+            body: token_body
+          }
+
+          request(options, function(error, response, body) {
+            if (error) {
+              res.end("An error has occurred.");
+            }
+          })
+        });
+      });
     }
-    res.end('');
   }
+  res.end('');
+
 });
 
 app.post('/updateconfig', function(req, res) {
