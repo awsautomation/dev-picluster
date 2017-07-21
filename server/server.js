@@ -666,11 +666,6 @@ app.get('/removecontainerconfig', function(req, res) {
         }
         if (key.indexOf(container) > -1) {
           delete config.layout[i][key];
-            if (config.hb) {
-                Object.keys(config.hb).forEach(function(hb_key) {
-                  console.log(hb_key);
-                });
-            }
         }
       });
     });
