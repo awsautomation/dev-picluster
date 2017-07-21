@@ -244,49 +244,46 @@ To view the current log
 pictl log
 ```
 
-## Using Systemd for Server and Agent Processes
+## Using pm2 to init PiCluster on systemd
 
-The systemd folder containers the service files and scripts to make PiCluster start at boot time.
-
-#### 1. Modify the .service files in the systemd folder
-
-For each .service file, change ExecStart and ExecStop to reflect the location of the PiCluster folder.
+#### 0. Login as root to install pm2
 ```
-ExecStart=/bin/bash /root/picluster/systemd/start-agent.sh
-ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
-```
-#### 2. Modify the start scripts in the systemd folder
-
-For each file that begins with "start", modify the PICLUSTER_ variables for your installation.
-
-Example for start-agent.sh.
-```
-export PICLUSTER_AGENT_PATH="/root/picluster/agent"
+sudo -i
 ```
 
-#### 3. Copy the systemd files to the systemd directory
+#### 1. Install pm2
 ```
-cp systemd/*.service /lib/systemd/system/
-```
-
-#### 4. Enable the services
-
-To enable the server service.
-```
-systemctl enable picluster-server.service
+npm install -g pm2
 ```
 
-To enable the agent service.
+#### 2. Install the pm2 systemd unit file
 ```
-systemctl enable picluster-agent.service
-```
-
-To enable the web console service.
-```
-systemctl enable picluster-web.service
+pm2 startup systemd
 ```
 
-#### 5. Reboot for the services to be started properly
+#### 3. Export the PiCluster config path (change the path accordingly)
+```
+export PICLUSTER_CONFIG='/opt/picluster/config.json'
+```
+
+#### 4. Start the server, agent, and webconsole scripts (change the path accordingly)
+```
+pm2 start /opt/picluster/server/server.js
+pm2 start /opt/picluster/agent/agent.js
+pm2 start /opt/picluster/web/webconsole.js
+```
+
+#### 5. Save the pm2 session to restart at boot
+```
+pm2 save
+```
+
+#### 6. Enable pm2 at boot:
+```
+systemctl enable pm2-root
+```
+
+#### 7. Reboot for the services to be started properly
 ```
 Reboot
 ```
