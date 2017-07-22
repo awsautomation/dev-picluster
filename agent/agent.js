@@ -198,7 +198,7 @@ app.post('/run', function(req, res) {
     if (typeof command === "string") { command = [command]; }
     if(!(command instanceof Array)) { return; }
     //console.log('command', command);
-    exec(command.join(' ')).then(function(log) {
+    exec(command.join(' '), {cwd: __dirname}).then(function(log) {
       //console.log('output', log);
       output.output.push(`${log.stdout||''}${log.stderr||''}`);
       return cb();
