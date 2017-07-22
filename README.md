@@ -1,6 +1,6 @@
 # PiCluster
 <p align="center">
-<img src="http://i.imgur.com/qHU41rw.png">
+<img src="http://i.imgur.com/x2Zfokp.png">
 </p>
 PiCluster is a simple way to manage Docker containers on multiple hosts. I created this
 because I found Docker Swarm not that good and Kubernetes was too difficult to install currently on ARM.
@@ -10,7 +10,7 @@ on regular x86 hardware also and is not tied to ARM.
 [![Build Status](https://travis-ci.org/rusher81572/picluster.svg?branch=master)](https://travis-ci.org/rusher81572/picluster)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-![Pic](http://i.imgur.com/G7KH00c.png)
+![Pic](http://i.imgur.com/qHU41rw.png)
 
 ## Features
 * Move containers to different hosts in the cluster
