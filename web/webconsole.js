@@ -144,6 +144,44 @@ app.post('/exec', function(req, res) {
   }
 });
 
+app.get('/listregistries', function(req, res) {
+  const check_token = req.query.token;
+  if (!check_token || check_token !== token) {
+    return res.status(401).end('\nError: Invalid Credentials');
+  }
+
+  res.json([{name: 'hub.docker.com'}, {name: 'registry.fedoraproject.org'}]);
+});
+
+app.get('/remoteimages', function(req, res) {
+  const check_token = req.query.token;
+  if (!check_token || check_token !== token) {
+    return res.status(401).end('\nError: Invalid Credentials');
+  }
+
+  const registry = req.query.registry;
+  const image = req.query.image;
+  const page = req.query.page || 1;
+
+  if (!registry || !image) {
+    return res.status(400).end('\nError: Bad Request');
+  }
+
+  var endpoint;
+  switch (registry) {
+    case 'hub.docker.com':
+      endpoint = 'https://hub.docker.com/v2/search/repositories/?page=' + page + '&query=' + image;
+      break;
+    default:
+      // Custom registries
+      endpoint = ((registry.startsWith('http://') || registry.startsWith('https://')) ? registry : 'https://' + registry) + '/v2/_catalog';
+      break;
+  }
+
+  request(endpoint, function(error, response, body) {
+    res.end((error) ? error : body);
+  });
+});
 
 app.post('/listcontainers', function(req, res) {
   var check_token = req.body.token;
@@ -864,6 +902,10 @@ app.get('/background', function(req, res) {
 
 app.get('/reloadconfig.html', function(req, res) {
   res.sendFile(__dirname + '/reloadconfig.html');
+});
+
+app.get('/pullimages.html', function(req, res) {
+  res.sendFile(__dirname + '/pullimages.html');
 });
 
 app.get('/build.html', function(req, res) {

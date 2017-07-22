@@ -68,6 +68,9 @@
       $('#hb').click(function() {
         $('#iframe_a').attr('src', '/hb.html');
       });
+      $('#pullimages').click(function() {
+        $('#iframe_a').attr('src', '/pullimages.html');
+      });
       $('#build').click(function() {
         $('#iframe_a').attr('src', '/build.html');
       });
@@ -213,6 +216,7 @@
               <div class="dropdown">
                 <button onclick="imagecontrol()" class="dropbtn">Images</button>
                 <div id="imagecontrol" class="dropdown-content">
+                  <a href="#" id="pullimages">Pull Images</a>
                   <a href="#" id="build">Build Images</a>
                   <a href="#" id="image-layout">List Images</a>
                   <a href="#" id="images">Image Details</a>
