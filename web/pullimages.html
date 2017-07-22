@@ -1,0 +1,214 @@
+<html>
+<head>
+	<script src="/assets/jquery-1.10.2.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<script>
+
+		function exec() {
+			var e = document.getElementById("containerlist");
+			var i = document.getElementById("nodelist");
+			var container = e.options[e.selectedIndex].value;
+			var node = i.options[i.selectedIndex].value;
+			var radio_one = $('input[id=radio-1]:checked').val();
+			var radio_two = $('input[id=radio-2]:checked').val();
+			var radio_three = $('input[id=radio-3]:checked').val();
+			var radio_four = $('input[id=radio-4]:checked').val();
+			var radio_five = $('input[id=radio-5]:checked').val();
+			var radio_six = $('input[id=radio-6]:checked').val();
+			var radio_seven = $('input[id=radio-7]:checked').val();
+			var radio_eight = $('input[id=radio-8]:checked').val();
+			var command = '';
+			var path = '';
+
+
+			if (radio_one) {
+				if (radio_one.indexOf('on') > -1) {
+					path = '/start';
+				}
+			}
+			if (radio_two) {
+				if (radio_two.indexOf('on') > -1) {
+					path = '/stop';
+				}
+			}
+
+			if (radio_three) {
+				if (radio_three.indexOf('on') > -1) {
+					path = '/restart';
+				}
+			}
+
+			if (radio_four) {
+				if (radio_four.indexOf('on') > -1) {
+					path = '/delete';
+				}
+			}
+
+			if (radio_five) {
+				if (radio_five.indexOf('on') > -1) {
+					path = '/create';
+				}
+			}
+
+			if (radio_six) {
+				if (radio_six.indexOf('on') > -1) {
+					path = '/containerlog';
+				}
+			}
+
+			if (radio_seven) {
+				if (radio_seven.indexOf('on') > -1) {
+					path = '/changehost';
+				}
+			}
+
+			if (radio_eight) {
+				if (radio_eight.indexOf('on') > -1) {
+					path = '/removecontainerconfig';
+				}
+			}
+
+			if (path) {
+				if ((radio_seven) && (container.indexOf('*') > -1) || (radio_eight) && (container.indexOf('*') > -1)) {
+					alert('\nError: You cannot control all of these containers at once for chosen action.');
+				} else {
+					hideshow('output');
+					$("#command").dialog('close');
+					$("#output").dialog({
+						height: 'auto',
+						width: 'auto'
+					});
+
+					$.post(path, {
+						token: parent.token,
+						command: command,
+						container: container,
+						newhost: node
+					}, function(data) {
+						$("#command").val(data);
+						$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+					});
+				}
+			} else {
+				alert('Error, you did not select an operation.')
+			}
+
+		}
+	</script>
+	<script>
+		function hideshow(id) {
+			var e = document.getElementById(id);
+			if (e.style.display == 'block')
+				e.style.display = 'none';
+			else
+				e.style.display = 'block';
+		}
+		$(function() {
+			hideshow('output');
+		});
+	</script>
+</head>
+
+<body>
+	<div id="output" title="Command Output">
+		<p align=center>
+			<table style="width:10%">
+				<tr>
+					<td>
+						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+					</td>
+				</tr>
+			</table>
+			<script>
+				$(function() {
+					hideshow('output');
+				});
+			</script>
+	</div>
+
+	<div id="container" title="Pull Images">
+		<p align=left>
+			<fieldset>
+				<label for="containerlist">Select Registry</label>
+				<select name="containerlist" id="containerlist">
+	    </select>
+        <fieldset name="imageauth" id="imageauth">
+          <legend>Authentication (optional)</legend>
+          <label for="imageauth-user">Username</label>
+          <input type="text" name="imageauth-user" id="imageauth-user"/>
+          <label for="imageauth-password">Password</label>
+          <input type="password" name="imageauth-password" id="imageauth-password"/>
+        </fieldset>
+			</fieldset>
+			<fieldset name="options" id="options">
+				<legend>Images</legend>
+        <label for="image">Image: </label>
+        <input id="image">
+			</fieldset>
+			<p align=center>
+				<button onclick="exec()"> Submit</button>
+			</p>
+			<script>
+				$("#container").dialog({
+					height: 'auto',
+					width: 'auto'
+				});
+				$(function() {
+					var option = '';
+					$.get('/listregistries', {
+						token: parent.token
+					}, function(data) {
+            data.forEach(function(e) {
+              var opt = document.createElement('option');
+              opt.value = e.name;
+              opt.innerHTML = e.name;
+              $('#containerlist').append(opt);
+            });
+					});
+				});
+				$(function() {
+					$.post('/listnodes', {
+						token: parent.token
+					}, function(data) {
+						data = data.replace(/\[/gi, '');
+						data = data.replace(/\]/gi, '');
+						data = data.replace(/\"/gi, '');
+						var parse_data = data.split(',');
+            var option = '';
+						for (var i = 0; i < parse_data.length; i++) {
+							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+						}
+						$('#nodelist').append(option);
+            $( "#image" ).autocomplete({
+              source: function (request, response) {
+                $.get('/remoteimages', {
+                  token: parent.token,
+                  registry: $('#containerlist').val(),
+                  image: $('#image').val()
+                }, function(images) {
+                  images = JSON.parse(images);
+                  if ($('#containerlist').val() === 'hub.docker.com') {
+                    return response(images.results.map(function(e) {
+                      return e.repo_name;
+                    }));
+                  } else {
+                    return response(images.repositories);
+                  }
+                });
+              },
+              minLength: 2,
+              select: function( event, ui ) {
+                log( "Selected: " + ui.item.value + " aka " + ui.item.id );
+              }
+            });
+					});
+				});
+			</script>
+	</div>
+	<div class="widget">
+	</div>
+	</p>
+
+</html>
