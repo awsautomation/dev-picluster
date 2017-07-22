@@ -132,7 +132,7 @@
 		<p align=left>
 			<fieldset>
 				<label for="containerlist">Select Registry</label>
-				<select name="containerlist" id="containerlist">
+				<select name="containerlist" id="containerlist" onchange="clearAuth()">
 	    </select>
         <fieldset name="imageauth" id="imageauth">
           <legend>Authentication (optional)</legend>
@@ -151,6 +151,10 @@
 				<button onclick="exec()"> Submit</button>
 			</p>
 			<script>
+        function clearAuth() {
+          document.getElementById('imageauth-user').value = "";
+          document.getElementById('imageauth-password').value = "";
+        }
 				$("#container").dialog({
 					height: 'auto',
 					width: 'auto'
@@ -186,7 +190,9 @@
                 $.get('/remoteimages', {
                   token: parent.token,
                   registry: $('#containerlist').val(),
-                  image: $('#image').val()
+                  image: $('#image').val(),
+                  username: $('#imageauth-user').val(),
+                  password: $('#imageauth-password').val()
                 }, function(images) {
                   images = JSON.parse(images);
                   if ($('#containerlist').val() === 'hub.docker.com') {

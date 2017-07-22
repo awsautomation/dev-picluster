@@ -163,6 +163,9 @@ app.get('/remoteimages', function(req, res) {
   const image = req.query.image;
   const page = req.query.page || 1;
 
+  const username = req.query.username || '';
+  const password = req.query.password || '';
+
   if (!registry || !image) {
     return res.status(400).end('\nError: Bad Request');
   }
@@ -178,8 +181,16 @@ app.get('/remoteimages', function(req, res) {
       break;
   }
 
-  request(endpoint, function(error, response, body) {
-    res.end((error) ? error : body);
+  const options = {
+    url: endpoint,
+    headers: ((username && password)) ? {
+      'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    } : {}
+  }
+
+  request(options, function(error, response, body) {
+    if(!error && response.statusCode !== 200) { error = body; }
+    res.end((error) ? JSON.stringify({error: error.toString()}) : body);
   });
 });
 
