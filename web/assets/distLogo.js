@@ -109,6 +109,6 @@ function getDists(arr) {
 function addFontLinux() {
     var fontLinux = document.createElement("link");
     fontLinux.rel="stylesheet";
-    fontLinux.href="//cdn.rawgit.com/Lukas-W/font-linux/v0.9/assets/font-linux.css";
+    fontLinux.href="/assets/font-linux/assets/font-linux.css";
     document.head.appendChild(fontLinux);
 }
