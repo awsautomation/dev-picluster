@@ -28,8 +28,7 @@
 						var hostname = get_data[i].split('REPOSITORY');
 						var containers = hostname[1].split('SIZE');
 						var show_containers = containers[1].split('\n');
-						document.write('<style>label {background-color: #4D95CB;border: none;color: white;padding: 2px 5px;text-align: center;text-decoration: none;display: inline-block;font-size: 24px;}</style>')
-						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3><label>' + hostname[0] + '</label></font><br><ol>');
+						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>');
 
 						for (j = 0; j != show_containers.length; j++) {
 							var parse_output = show_containers[j].split('  ');
