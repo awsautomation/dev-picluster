@@ -6,19 +6,20 @@
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
 	<style>
-	body {
-		display: block;
-		color: rgba(255, 255, 255, .9);
-		text-decoration: none;
-		padding: 1rem;
-		font-size: 0.5 rem;
-		border-top: 2px solid transparent;
-		border-bottom: 2px solid transparent;
-	}
+		label {
+			background-color: #4D95CB;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 24px;
+		}
 	</style>
 	<script>
 		function exec() {
-			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3>Searching for containers</font>');
+			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><label>Searching for containers</label>');
 			$.get("/status?token=" + parent.token, function(data) {
 				var get_data = data.split('Node:');
 				var dists = data.split('\n');
@@ -28,7 +29,8 @@
 						var hostname = get_data[i].split('CONTAINER');
 						var containers = hostname[1].split('NAMES');
 						var show_containers = containers[1].split('\n');
-						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>');
+						document.write('<style>label {background-color: #4D95CB;border: none;color: white;padding: 2px 5px;text-align: center;text-decoration: none;display: inline-block;font-size: 24px;}</style>')
+						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3><label>' + hostname[0] + '</label></font><br><ol>');
 
 						for (j = 0; j != show_containers.length; j++) {
 							var parse_output = show_containers[j].split('  ');
