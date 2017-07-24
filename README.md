@@ -34,6 +34,17 @@ on regular x86 hardware also and is not tied to ARM.
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/rusher81572/picluster/tree/1.0)
 
+## Try PiCluster in Docker
+We included a compose file to evaluate PiCluster easily on your laptop. Simply Install
+Docker on your laptop and do the following:
+
+```
+cd picluster
+docker-compose up -d
+```
+
+Finally, in your web browser go to http://127.0.0.1:3003
+
 ## Server Installation
 
 ##### 1. Modify config.json with your desired layout.
