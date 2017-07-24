@@ -1,0 +1,30 @@
+{
+  "token": "1234567890ABCDEFGHJKLMNOP",
+  "docker": "../docker",
+  "server_port": "3000",
+  "agent_port": "3001",
+  "layout": [
+    {
+      "node": "agent",
+      "nginx": "-p 80:80"
+    }
+  ],
+  "hb": [
+    {
+      "node": "agent",
+      "nginx": "80"
+    }
+  ],
+  "container_host_constraints": [
+    {
+      "container": "nginx,agent"
+    }
+  ],
+  "automatic_heartbeat": "enabled",
+  "heartbeat_interval": "300000",
+  "syslog": "dmesg",
+  "web_username": "admin",
+  "web_password": "admin",
+  "web_connect": "server",
+  "web_port": "3003"
+}
