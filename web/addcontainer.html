@@ -100,6 +100,22 @@
 			padding: 2px 16px;
 			color: black
 		}
+		textarea {
+			 font-size: 18px;
+		}
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 60%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
 	</style>
 	<script>
 		function exec() {
@@ -188,11 +204,12 @@
 						});
 					</script>
 			</div>
-		</div>
-	</div>
+			</div>
+			</div>
+
 
 	<div id="output" class="modal">
-		<div class="modal-content">
+		<div class="modal-content2">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
@@ -202,10 +219,12 @@
 					<table style="width:10%">
 						<tr>
 							<td>
-								<textarea rows="30" cols="150" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+								<textarea rows="10" cols="75" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
 							</td>
 						</tr>
 					</table>
+			</div>
+			</div>
 			</div>
 
 			<script>
@@ -241,7 +260,6 @@
 						output_modal.style.display = "none";
 					}
 				}
-
 				modal.style.display = "block";
 			</script>
 			</p>
