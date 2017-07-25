@@ -2,6 +2,7 @@
   "name": "picluster-agent",
   "version": "0.0.1",
   "dependencies": {
+    "child-process-promise": "",
     "async": "^2.5.0",
     "body-parser": "latest",
     "express": "^4.15.3",
