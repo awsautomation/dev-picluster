@@ -165,7 +165,6 @@
 					node: node
 				}, function(data) {
 					var div = document.getElementById('modal-body2');
-
 					div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 				});
 			}
@@ -191,7 +190,7 @@
 					 </select>
 					<br><br>
 					<b><label id="windowfont">Command:<label></b><br><br>
-					<input type="text" size="40" id="command_entry" name="command_entry" value=""></font>
+					<input type="text" size="30" id="command_entry" name="command_entry" value=""></font>
 					<br><br>
 					<p align=center>
 						<button id="myBtn">Submit</button>
