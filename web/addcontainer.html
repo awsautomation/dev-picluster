@@ -26,6 +26,10 @@
 			font-size: 16px;
 		}
 
+		#nodelist {
+			font-size: 18px;
+		}
+
 		.modal {
 			display: none;
 			position: fixed;
@@ -100,9 +104,11 @@
 			padding: 2px 16px;
 			color: black
 		}
+
 		textarea {
-			 font-size: 18px;
+			font-size: 18px;
 		}
+
 		.modal-content2 {
 			position: relative;
 			background-color: #fefefe;
@@ -204,8 +210,8 @@
 						});
 					</script>
 			</div>
-			</div>
-			</div>
+		</div>
+	</div>
 
 
 	<div id="output" class="modal">
@@ -224,44 +230,44 @@
 						</tr>
 					</table>
 			</div>
-			</div>
-			</div>
+		</div>
+	</div>
 
-			<script>
-				var modal = document.getElementById('myModal');
-				var span = document.getElementsByClassName("close")[0];
-				var output_modal = document.getElementById('output');
-				var output_span = document.getElementsByClassName("close")[0];
-				var btn = document.getElementById("myBtn");
+	<script>
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[0];
+		var btn = document.getElementById("myBtn");
 
-				span.onclick = function() {
-					modal.style.display = "none";
-				}
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
 
-				window.onclick = function(event) {
-					if (event.target == modal) {
-						modal.style.display = "none";
-					}
-				}
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
 
-				output_span.onclick = function() {
-					modal.style.display = "none";
-				}
-				btn.onclick = function() {
-					modal.style.display = "none";
-					output_modal.style.display = "block";
-					exec();
-				}
-				window.onclick = function(event) {
-					if (event.target == modal) {
-						modal.style.display = "none";
-					}
-					if (event.target == output_modal) {
-						output_modal.style.display = "none";
-					}
-				}
-				modal.style.display = "block";
-			</script>
-			</p>
+		output_span.onclick = function() {
+			modal.style.display = "none";
+		}
+		btn.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+			if (event.target == output_modal) {
+				output_modal.style.display = "none";
+			}
+		}
+		modal.style.display = "block";
+	</script>
+	</p>
 
 </html>
