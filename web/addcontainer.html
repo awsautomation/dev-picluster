@@ -145,8 +145,8 @@
 				heartbeat_args: heartbeat_args,
 				failover_constraints: container + ',' + failover_constraints
 			}, function(data) {
-				$("#command").val(data);
-				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+				var div = document.getElementById('modal-body2');
+				div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 			});
 		}
 	</script>
@@ -220,15 +220,8 @@
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-			<div class="modal-body">
+			<div id="modal-body2" class="modal-body">
 				<p align=center>
-					<table style="width:10%">
-						<tr>
-							<td>
-								<textarea rows="10" cols="75" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-							</td>
-						</tr>
-					</table>
 			</div>
 		</div>
 	</div>
