@@ -117,7 +117,8 @@
 			margin: auto;
 			padding: 0;
 			border: 1px solid #888;
-			width: 60%;
+			width: 70%;
+			height: : 70%;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -193,6 +194,8 @@
 			if (path) {
 				if ((radio_seven) && (container.indexOf('*') > -1) || (radio_eight) && (container.indexOf('*') > -1)) {
 					alert('\nError: You cannot control all of these containers at once for chosen action.');
+					output_modal.style.display = "none";
+					modal.style.display = "block";
 				} else {
 
 					$.post(path, {
@@ -207,6 +210,8 @@
 				}
 			} else {
 				alert('Error, you did not select an operation.')
+				output_modal.style.display = "none";
+				modal.style.display = "block";
 			}
 
 		}
@@ -318,7 +323,7 @@
 					<table style="width:10%">
 						<tr>
 							<td>
-								<textarea rows="10" cols="75" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+								<textarea rows="25" cols="90" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
 							</td>
 						</tr>
 					</table>
