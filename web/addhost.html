@@ -192,12 +192,6 @@
 			modal.style.display = "none";
 		}
 
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
-		}
-
 		output_span.onclick = function() {
 			modal.style.display = "none";
 		}
@@ -207,14 +201,7 @@
 			output_modal.style.display = "block";
 			exec();
 		}
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
-			if (event.target == output_modal) {
-				output_modal.style.display = "none";
-			}
-		}
+	
 		modal.style.display = "block";
 	</script>
 
