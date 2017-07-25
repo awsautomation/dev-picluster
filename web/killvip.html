@@ -102,8 +102,8 @@
 	<script>
 		function exec() {
 			$.get("/killvip?token=" + parent.token, function(data) {
-				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-				$("#command_output").val('\nSent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data);
+				var div = document.getElementById('modal-body2');
+				div.innerHTML = div.innerHTML + 'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data;
 			});
 		}
 	</script>
@@ -116,15 +116,8 @@
 				<span class="close">&times;</span>
 				<h2>Resetting VIP on all hosts</h2>
 			</div>
-			<div class="modal-body">
+			<div id="modal-body2" class="modal-body">
 				<p align=center>
-					<table style="width:10%">
-						<tr>
-							<td>
-								<textarea rows="20" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-							</td>
-						</tr>
-					</table>
 			</div>
 		</div>
 	</div>
