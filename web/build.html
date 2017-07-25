@@ -236,7 +236,7 @@
 		var modal = document.getElementById('myModal');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[0];
+		var output_span = document.getElementsByClassName("close")[1];
 		var btn = document.getElementById("myBtn");
 
 		span.onclick = function() {
@@ -244,8 +244,9 @@
 		}
 
 		output_span.onclick = function() {
-			modal.style.display = "none";
+			output_modal.style.display = "none";
 		}
+		
 		btn.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
