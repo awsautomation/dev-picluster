@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery-1.10.2.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -29,7 +30,14 @@
 		#nodelist {
 			font-size: 18px;
 		}
+
 		#commandlist {
+			font-size: 18px;
+		}
+		#windowfont {
+			font-size: 18px;
+		}
+		#command_entry {
 			font-size: 18px;
 		}
 		.modal {
@@ -141,15 +149,19 @@
 				command = saved_command;
 			}
 
-
-			$.post(path, {
-				token: parent.token,
-				command: command,
-				node: node
-			}, function(data) {
-				$("#command").val(data);
-				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
-			});
+			if (!command) {
+				output_modal.style.display = "none";
+				modal.style.display = "block";
+			} else {
+				$.post(path, {
+					token: parent.token,
+					command: command,
+					node: node
+				}, function(data) {
+					$("#command").val(data);
+					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+				});
+			}
 		}
 	</script>
 </head>
@@ -163,19 +175,19 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					<label for="nodelist"><b>Select a Node</b></label>
+					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
 					<select name="nodelist" id="nodelist">
 				    </select>
 					<br><br>
-					<label for="commandlist"><b>Saved Commands</b></label>
+					<label id="windowfont" for="commandlist"><b>Saved Commands</b></label>
 					<select name="commandlist" id="commandlist">
 					 </select>
 					<br><br>
-					<b>Command:</b><br><br>
+					<b><label id="windowfont">Command:<label></b><br><br>
 					<input type="text" size="50" id="command_entry" name="command_entry" value=""></font>
 					<br><br>
 					<p align=center>
-					<button id="myBtn">Submit</button>
+						<button id="myBtn">Submit</button>
 					</p>
 					<script>
 						$("#container").dialog({
