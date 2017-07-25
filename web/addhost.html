@@ -14,12 +14,15 @@
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
 		}
+
 		#windowfont {
 			font-size: 18px;
 		}
+
 		#host {
 			font-size: 18px;
 		}
+
 		button {
 			background-color: #4D95CB;
 			border: none;
@@ -58,9 +61,11 @@
 			animation-name: animatetop;
 			animation-duration: 0.4s
 		}
+
 		textarea {
-			 font-size: 18px;
+			font-size: 18px;
 		}
+
 		.modal-content2 {
 			position: relative;
 			background-color: #fefefe;
@@ -185,7 +190,7 @@
 		var modal = document.getElementById('myModal');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[0];
+		var output_span = document.getElementsByClassName("close")[1];
 		var btn = document.getElementById("myBtn");
 
 		span.onclick = function() {
@@ -193,7 +198,7 @@
 		}
 
 		output_span.onclick = function() {
-			modal.style.display = "none";
+			output_modal.style.display = "none";
 		}
 
 		btn.onclick = function() {
@@ -201,7 +206,7 @@
 			output_modal.style.display = "block";
 			exec();
 		}
-	
+
 		modal.style.display = "block";
 	</script>
 
