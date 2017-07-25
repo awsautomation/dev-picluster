@@ -282,6 +282,9 @@
 			$('#hb').click(function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
+			$('#pull').click(function() {
+        $('#iframe_a').attr('src', '/pullimages.html');
+      });
 			$('#build').click(function() {
 				$('#iframe_a').attr('src', '/build.html');
 			});
@@ -414,6 +417,7 @@
 					</li>
 					<li><a href="#!">Images</a>
 						<ul class="dropdown">
+							<li><a href="#" id="pull">Pull</a></li>
 							<li><a href="#" id="build">Build</a></li>
 							<li><a href="#" id="image-layout">List</a></li>
 							<li><a href="#" id="images">Details</a></li>
