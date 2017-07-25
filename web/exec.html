@@ -162,8 +162,7 @@
 					command: command,
 					node: node
 				}, function(data) {
-					var div = document.getElementById('modal-body2');
-					div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+						$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
 				});
 			}
 		}
@@ -234,14 +233,22 @@
 		</div>
 	</div>
 
-
 	<div id="output" class="modal">
 		<div class="modal-content2">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Command Output</h2>
+				<h2>PiCluster Terminal</h2>
 			</div>
-			<div id="modal-body2" class="modal-body">
+			<div class="modal-body">
+				<table style="width:10%">
+					<tr>
+						<td>
+							<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+						</td>
+					</tr>
+				</table>
+				<p align=left>
+					<br>
 			</div>
 		</div>
 	</div>
