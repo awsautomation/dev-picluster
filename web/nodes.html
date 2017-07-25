@@ -15,10 +15,20 @@
 		border-top: 2px solid transparent;
 		border-bottom: 2px solid transparent;
 	}
+	label {
+		background-color: #4D95CB;
+		border: none;
+		color: white;
+		padding: 15px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 24px;
+	}
 	</style>
 	<script>
 		function exec() {
-			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3>Searching for nodes</font>');
+			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for nodes</label></font>');
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var test = data.split('\n');
 				var dists = getDists(test);

@@ -2,352 +2,495 @@
 <title>PiCluster Web Console</title>
 
 <head>
-  <script src="/assets/jquery-1.10.2.js"></script>
-  <link rel="stylesheet" href="/assets/jquery-ui.css">
-  <script src="/assets/jquery-ui.js"></script>
-  <link rel="stylesheet" href="/assets/picluster-ui.css">
-  <script src="/assets/moment.min.js"></script>
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
-  <meta name="msapplication-TileColor" content="#ffffff">
-  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-  <meta name="theme-color" content="#ffffff">
-  <style>
-    html {
-      min-height: 100%;
-      font-family: 'Nunito', sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+	<script src="/assets/jquery-1.10.2.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-ui.css">
+	<script src="/assets/moment.min.js"></script>
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<style>
+		html {
+			min-height: 100%;
+			font-family: 'Nunito', sans-serif;
+			-webkit-font-smoothing: antialiased;
+		}
 
-    body {
-      line-height: 1.5;
-    }
+		body {
+			line-height: 1.5;
+		}
 
-    h1 {
-      font-weight: 200;
-      font-size: 3rem;
-      color: white;
-      text-align: center;
-    }
+		h1 {
+			font-weight: 200;
+			font-size: 3rem;
+			color: white;
+			text-align: center;
+		}
 
-    nav {
-      margin: 0 auto;
-      max-width: 100%;
-      max-height: 100%;
-      background: #4D95CB;
-    }
+		nav {
+			margin: 0 auto;
+			max-width: 100%;
+			max-height: 100%;
+			background: #4D95CB;
+		}
 
-    nav::after {
-      display: block;
-      content: '';
-      clear: both;
-    }
+		nav::after {
+			display: block;
+			content: '';
+			clear: both;
+		}
 
-    nav ul {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
+		nav ul {
+			padding: 0;
+			margin: 0;
+			list-style: none;
+		}
 
-    nav ul li {
-      float: left;
-      position: relative;
-    }
+		nav ul li {
+			float: left;
+			position: relative;
+		}
 
-    nav ul li a {
-      display: block;
-      color: rgba(255, 255, 255, .9);
-      text-decoration: none;
-      padding: 1rem;
-      font-size: 1.5rem;
-      border-top: 2px solid transparent;
-      border-bottom: 2px solid transparent;
-    }
+		nav ul li a {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 1.5rem;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
 
-    nav ul li a:hover,
-    nav ul li a:focus {
-      background: rgba(10, 20, 30, .9);
-    }
+		nav ul li a:hover,
+		nav ul li a:focus {
+			background: #4D95CB;
+		}
 
-    nav ul li a:focus {
-      color: white;
-    }
+		nav ul li a:focus {
+			color: white;
+		}
 
-    nav ul li a:not(:only-child)::after {
-      padding-left: 4px;
-      content: ' ▾';
-    }
+		nav ul li a:not(:only-child)::after {
+			padding-left: 4px;
+			content: ' ▾';
+		}
 
-    nav ul li ul li {
-      min-width: 190px;
-    }
+		nav ul li ul li {
+			min-width: 190px;
+		}
 
-    nav ul li ul li a {
-      background: transparent;
-      color: #4a5666;
-      border-bottom: 1px solid #DDE0E7;
-    }
+		nav ul li ul li a {
+			background: transparent;
+			color: #4a5666;
+			border-bottom: 1px solid #DDE0E7;
+		}
 
-    nav ul li ul li a:hover,
-    nav ul li ul li a:focus {
-      background: #e7e9ef;
-      color: #111;
-    }
+		nav ul li ul li a:hover,
+		nav ul li ul li a:focus {
+			background: #e7e9ef;
+			color: #111;
+		}
 
 
-    .dropdown {
-      display: none;
-      position: absolute;
-      margin-top: 6px;
-      background: linear-gradient(to bottom right, white, #F8F8F8) !important;
-      box-shadow: 0 4px 10px #4D95CB;
-    }
+		.dropdown {
+			display: none;
+			position: absolute;
+			margin-top: 6px;
+			background: linear-gradient(to bottom right, white, #F8F8F8) !important;
+			box-shadow: 0 4px 10px #4D95CB;
+		}
 
-    .dropdown::after {
-      content: '';
-      position: absolute;
-      left: 30px;
-      top: -8px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 8px solid white;
-    }
+		.dropdown::after {
+			content: '';
+			position: absolute;
+			left: 30px;
+			top: -8px;
+			width: 0;
+			height: 0;
+			border-left: 8px solid transparent;
+			border-right: 8px solid transparent;
+			border-bottom: 8px solid white;
+		}
 
-    .dropdown:hover::after {
-      border-bottom: 8px solid #F6F7F9;
-    }
-  </style>
-  <script>
-    function clear(callback) {
-      var iframe = document.getElementById('iframe_a').contentWindow.document;
-      iframe.write('<html>');
-      iframe.close();
-      callback();
-    }
+		.dropdown:hover::after {
+			border-bottom: 8px solid #F6F7F9;
+		}
 
-    $(document).ready(function() {
-      $('#sandbox').click(function() {
-        $('#iframe_a').attr('src', '/sandbox?token=' + token);
-      });
-      $('#terminal').click(function() {
-        $('#iframe_a').attr('src', '/terminal?token=' + token);
-      });
-      $('#images').click(function() {
-        $('#iframe_a').attr('src', '/images.html');
-      });
-      $('#image-layout').click(function() {
-        $('#iframe_a').attr('src', '/image-layout.html');
-      });
-      $('#syslog').click(function() {
-        $('#iframe_a').attr('src', '/syslog.html');
-      });
-      $('#kibana').click(function() {
-        $('#iframe_a').attr('src', '/kibana?token=' + token);
-      });
-      $('#rsyslog').click(function() {
-        $('#iframe_a').attr('src', '/rsyslog.html');
-      });
-      $('#nodes').click(function() {
-        $('#iframe_a').attr('src', '/nodes.html');
-      });
-      $('#running').click(function() {
-        $('#iframe_a').attr('src', '/running.html');
-      });
-      $('#layout').click(function() {
-        $('#iframe_a').attr('src', '/container-layout.html');
-      });
-      $('#addcontainer').click(function() {
-        $('#iframe_a').attr('src', '/addcontainer.html');
-      });
-      $('#addhost').click(function() {
-        $('#iframe_a').attr('src', '/addhost.html');
-      });
-      $('#rmhost').click(function() {
-        $('#iframe_a').attr('src', '/rmhost.html');
-      });
-      $('#editconfig').click(function() {
-        $('#iframe_a').attr('src', '/editconfig?token=' + token);
-      });
-      $('#log').click(function() {
-        $('#iframe_a').attr('src', '/log.html');
-      });
-      $('#hb').click(function() {
-        $('#iframe_a').attr('src', '/hb.html');
-      });
-      $('#pull').click(function() {
+		button {
+			background-color: #4D95CB;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 25%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #4D95CB;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
+		}
+
+		textarea {
+			font-size: 18px;
+		}
+
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 60%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+	</style>
+	<script>
+		function clear(callback) {
+			var iframe = document.getElementById('iframe_a').contentWindow.document;
+			iframe.write('<html>');
+			iframe.close();
+			callback();
+		}
+
+		$(document).ready(function() {
+			$('#sandbox').click(function() {
+				$('#iframe_a').attr('src', '/sandbox?token=' + token);
+			});
+			$('#terminal').click(function() {
+				$('#iframe_a').attr('src', '/terminal?token=' + token);
+			});
+			$('#images').click(function() {
+				$('#iframe_a').attr('src', '/images.html');
+			});
+			$('#image-layout').click(function() {
+				$('#iframe_a').attr('src', '/image-layout.html');
+			});
+			$('#syslog').click(function() {
+				$('#iframe_a').attr('src', '/syslog.html');
+			});
+			$('#kibana').click(function() {
+				$('#iframe_a').attr('src', '/kibana?token=' + token);
+			});
+			$('#rsyslog').click(function() {
+				$('#iframe_a').attr('src', '/rsyslog.html');
+			});
+			$('#nodes').click(function() {
+				$('#iframe_a').attr('src', '/nodes.html');
+			});
+			$('#running').click(function() {
+				$('#iframe_a').attr('src', '/running.html');
+			});
+			$('#layout').click(function() {
+				$('#iframe_a').attr('src', '/container-layout.html');
+			});
+			$('#addcontainer').click(function() {
+				$('#iframe_a').attr('src', '/addcontainer.html');
+			});
+			$('#addhost').click(function() {
+				$('#iframe_a').attr('src', '/addhost.html');
+			});
+			$('#rmhost').click(function() {
+				$('#iframe_a').attr('src', '/rmhost.html');
+			});
+			$('#editconfig').click(function() {
+				$('#iframe_a').attr('src', '/editconfig?token=' + token);
+			});
+			$('#log').click(function() {
+				$('#iframe_a').attr('src', '/log.html');
+			});
+			$('#hb').click(function() {
+				$('#iframe_a').attr('src', '/hb.html');
+			});
+			$('#pull').click(function() {
         $('#iframe_a').attr('src', '/pullimages.html');
       });
-      $('#build').click(function() {
-        $('#iframe_a').attr('src', '/build.html');
-      });
-      $('#stop').click(function() {
-        $('#iframe_a').attr('src', '/stop.html');
-      });
-      $('#reloadconfig').click(function() {
-        $('#iframe_a').attr('src', '/reloadconfig.html');
-      });
-      $('#killvip').click(function() {
-        $('#iframe_a').attr('src', '/killvip.html');
-      });
-      $('#manage').click(function() {
-        $('#iframe_a').attr('src', '/manage.html');
-      });
-      $('#prune').click(function() {
-        $('#iframe_a').attr('src', '/prune.html');
-      });
-      $('#terminal').click(function() {
-        $('#iframe_a').attr('src', '/terminal.html');
-      });
-    });
-  </script>
-  <script>
-    $("html").click(function() {
-      $(".dropdown").hide();
-    });
+			$('#build').click(function() {
+				$('#iframe_a').attr('src', '/build.html');
+			});
+			$('#stop').click(function() {
+				$('#iframe_a').attr('src', '/stop.html');
+			});
+			$('#reloadconfig').click(function() {
+				$('#iframe_a').attr('src', '/reloadconfig.html');
+			});
+			$('#killvip').click(function() {
+				$('#iframe_a').attr('src', '/killvip.html');
+			});
+			$('#manage').click(function() {
+				$('#iframe_a').attr('src', '/manage.html');
+			});
+			$('#prune').click(function() {
+				$('#iframe_a').attr('src', '/prune.html');
+			});
+			$('#terminal').click(function() {
+				$('#iframe_a').attr('src', '/terminal.html');
+			});
+		});
+	</script>
+	<script>
+		$("html").click(function() {
+			$(".dropdown").hide();
+		});
 
-    $("nav ul li a:not(:only-child)").click(function(e) {
-      $(this).siblings(".dropdown").toggle();
+		$("nav ul li a:not(:only-child)").click(function(e) {
+			$(this).siblings(".dropdown").toggle();
 
-      $(".dropdown").not($(this).siblings()).hide();
-      e.stopPropagation();
-    });
+			$(".dropdown").not($(this).siblings()).hide();
+			e.stopPropagation();
+		});
 
-    function hideshow(id) {
-      var e = document.getElementById(id);
-      if (e.style.display == 'block')
-        e.style.display = 'none';
-      else
-        e.style.display = 'block';
-    }
-    $(function() {
-      hideshow('menu');
-      hideshow('content');
-      hideshow('menu');
-      hideshow('content');
-      $("#login").dialog();
-    });
-  </script>
+		function hideshow(id) {
+			var e = document.getElementById(id);
+			if (e.style.display == 'block')
+				e.style.display = 'none';
+			else
+				e.style.display = 'block';
+		}
+		$(function() {
+			hideshow('menu');
+			hideshow('content');
+			hideshow('menu');
+			hideshow('content');
+		});
+	</script>
 
-  <script>
-    var token = "";
-    var syslog = "";
+	<script>
+		var token = "";
+		var syslog = "";
 
-    function getToken() {
-      return token;
-    }
+		function getToken() {
+			return token;
+		}
 
-    function login() {
-      var username = document.getElementById("user").value;;
-      var password = document.getElementById("password").value;
-      $.post("/", {
-        username: username,
-        password: password
-      }, function(auth) {
-        if (auth.token) {
-          token = auth.token;
-          if (auth.syslog) {
-            syslog = auth.syslog;
-          }
-          $("#login").dialog('close');
+		function login() {
+			var username = document.getElementById("user").value;;
+			var password = document.getElementById("password").value;
+			$.post("/", {
+				username: username,
+				password: password
+			}, function(auth) {
+				if (auth.token) {
+					token = auth.token;
+					if (auth.syslog) {
+						syslog = auth.syslog;
+					}
+					hideshow('login');
+					hideshow('login');
+					hideshow('menu');
+					hideshow('content');
+				} else {
+					alert('Access Denied!');
           hideshow('login');
-          hideshow('menu');
-          hideshow('content');
-        } else {
-          alert('Access Denied!');
-        }
-      });
-    }
-  </script>
+				}
+			});
+		}
+	</script>
 </head>
 
 <body>
-  <div id="login" title="PiCluster v2.0 Login">
-    <p align=center>
-      <img src="/logo.png" height="165" width="150">
-      <br> Please login to continue
-      <br>
-      <p align=center>
-        <input type="text" id="user" name="username">
-        <input type="password" id="password" name="password">
-        <br>
-        <button onclick="login()">Connect</button>
-        <br>
-      </p>
-  </div>
+	<div id="login" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster 2.0 Login</h2>
+			</div>
+			<div class="modal-body">
+				<p align=center>
+					<img src="/logo.png" height="165" width="150">
+					<br> Please login to continue
+					<br>
+					<p align=center>
+						<input type="text" id="user" name="username">
+						<br>
+						<input type="password" id="password" name="password">
+						<br>
+            <br>
+						<button id="myBtn">Connect</button>
+						<br>
+					</p>
+			</div>
+		</div>
+	</div>
 
-  </script>
-  <div id="menu">
-    <nav>
-      <ul>
-        <li><a href='https://github.com/rusher81572/picluster'> <img src="/assets/images/logo2.png" height="60" width="100"></a>
-          <li><a href="#!">System</a>
-            <ul class="dropdown">
-              <li><a href="#" id="nodes">Nodes</a></li>
-              <li><a href="#" id="editconfig">Edit Configuration</a></li>
-              <li><a href="#" id="reloadconfig">Reload Configuration</a></li>
-              <li><a href="#" id="addhost">Add Host</a></li>
-              <li><a href="#" id="rmhost">Remove Host</a></li>
-            </ul>
-          </li>
-          <li><a href="#!">Containers</a>
-            <ul class="dropdown">
-              <li><a href="#" id="layout">Running</a></li>
-              <li><a href="#" id="running">Stats</a></li>
-              <li><a href="#" id="manage">Manage</a></li>
-              <li><a href="#" id="addcontainer">Add</a></li>
-            </ul>
-          </li>
-          <li><a href="#!">Images</a>
-            <ul class="dropdown">
-              <li><a href="#" id="pull">Pull</a></li>
-              <li><a href="#" id="build">Build</a></li>
-              <li><a href="#" id="image-layout">List</a></li>
-              <li><a href="#" id="images">Details</a></li>
-            </ul>
-          </li>
-          <li><a href="#!">Operations</a>
-            <ul class="dropdown">
-              <li><a href="#" id="killvip">Reset Virtual IP</a></li>
-              <li><a href="#" id="sandbox">Run Command(s)</a></li>
-              <li><a href="#" id="hb">Heartbeat</a></li>
-              <li><a href="#" id="prune">Clean Docker</a></li>
-              <li><a href="#" id="terminal">Terminal</a></li>
-              <li><a href="#" id="kibana">Kibana</a></li>
-            </ul>
-          </li>
-          <li><a href="#!">Logs</a>
-            <ul class="dropdown">
-              <li><a href="#" id="log">PiCluster Logs</a></li>
-              <li><a href="#" id="syslog">Syslog Analytics</a></li>
-              <li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
-            </ul>
-          </li>
-      </ul>
-    </nav>
-    </td>
-  </div>
+	</script>
+	<div id="menu">
+		<nav>
+			<ul>
+				<li><a href='https://github.com/rusher81572/picluster'> <img src="/assets/images/logo2.png" height="60" width="100"></a>
+					<li><a href="#!">System</a>
+						<ul class="dropdown">
+							<li><a href="#" id="nodes">Nodes</a></li>
+							<li><a href="#" id="editconfig">Edit Configuration</a></li>
+							<li><a href="#" id="reloadconfig">Reload Configuration</a></li>
+							<li><a href="#" id="addhost">Add Host</a></li>
+							<li><a href="#" id="rmhost">Remove Host</a></li>
+						</ul>
+					</li>
+					<li><a href="#!">Containers</a>
+						<ul class="dropdown">
+							<li><a href="#" id="layout">Running</a></li>
+							<li><a href="#" id="running">Stats</a></li>
+							<li><a href="#" id="manage">Manage</a></li>
+							<li><a href="#" id="addcontainer">Add</a></li>
+						</ul>
+					</li>
+					<li><a href="#!">Images</a>
+						<ul class="dropdown">
+							<li><a href="#" id="pull">Pull</a></li>
+							<li><a href="#" id="build">Build</a></li>
+							<li><a href="#" id="image-layout">List</a></li>
+							<li><a href="#" id="images">Details</a></li>
+						</ul>
+					</li>
+					<li><a href="#!">Operations</a>
+						<ul class="dropdown">
+							<li><a href="#" id="killvip">Reset Virtual IP</a></li>
+							<li><a href="#" id="sandbox">Run Command(s)</a></li>
+							<li><a href="#" id="hb">Heartbeat</a></li>
+							<li><a href="#" id="prune">Clean Docker</a></li>
+							<li><a href="#" id="terminal">Terminal</a></li>
+							<li><a href="#" id="kibana">Kibana</a></li>
+						</ul>
+					</li>
+					<li><a href="#!">Logs</a>
+						<ul class="dropdown">
+							<li><a href="#" id="log">PiCluster Logs</a></li>
+							<li><a href="#" id="syslog">Syslog Analytics</a></li>
+							<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
+						</ul>
+					</li>
+			</ul>
+		</nav>
+		</td>
+	</div>
 
-  <div id="content">
-    <div class="left">
-    </div>
+	<script>
+		var modal = document.getElementById('login');
+		var span = document.getElementsByClassName("close")[0];
+		var btn = document.getElementById("myBtn");
 
-    <div style="clear: both;"> </div>
-  </div>
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
 
-  <script>
-    $("html").click(function() {
-      $(".dropdown").hide();
-    });
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
 
-    $("nav ul li a:not(:only-child)").click(function(e) {
-      $(this).siblings(".dropdown").toggle();
 
-      $(".dropdown").not($(this).siblings()).hide();
-      e.stopPropagation();
-    });
-  </script>
-  <p align=center>
-    <IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
+		btn.onclick = function() {
+			modal.style.display = "none";
+			login();
+		}
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+		modal.style.display = "block";
+	</script>
+
+	<div id="content">
+		<div class="left">
+		</div>
+
+		<div style="clear: both;"> </div>
+	</div>
+
+	<script>
+		$("html").click(function() {
+			$(".dropdown").hide();
+		});
+
+		$("nav ul li a:not(:only-child)").click(function(e) {
+			$(this).siblings(".dropdown").toggle();
+
+			$(".dropdown").not($(this).siblings()).hide();
+			e.stopPropagation();
+		});
+	</script>
+	<p align=center>
+		<IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
   </body>
+
   </html>

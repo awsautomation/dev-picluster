@@ -147,14 +147,25 @@
         <label for="image">Image: </label>
         <input id="image">
 			</fieldset>
+			<fieldset name="nodesList" id="nodesList">
+				<legend>Nodes:</legend>
+				<label for="nodeslist">All</label><input type="checkbox" name="nodeslist" onClick="checkAll(this);" checked="checked" />
+			</fieldset>
 			<p align=center>
 				<button onclick="exec()"> Submit</button>
 			</p>
 			<script>
-        function clearAuth() {
-          document.getElementById('imageauth-user').value = "";
-          document.getElementById('imageauth-password').value = "";
-        }
+				function clearAuth() {
+					document.getElementById('imageauth-user').value = "";
+					document.getElementById('imageauth-password').value = "";
+				}
+				function checkAll(checkbox) {
+					var checked = checkbox.checked;
+					var checkboxes = document.getElementsByName('nodeslist');
+					checkboxes.forEach(function(e) {
+						e.checked = checked;
+					});
+				}
 				$("#container").dialog({
 					height: 'auto',
 					width: 'auto'
@@ -182,9 +193,9 @@
 						var parse_data = data.split(',');
             var option = '';
 						for (var i = 0; i < parse_data.length; i++) {
-							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							option += '<label for="nodeslist">' + parse_data[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" />';
 						}
-						$('#nodelist').append(option);
+						$('#nodesList').append(option);
             $( "#image" ).autocomplete({
               source: function (request, response) {
                 $.get('/remoteimages', {

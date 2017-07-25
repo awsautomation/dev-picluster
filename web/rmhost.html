@@ -1,32 +1,136 @@
 <html>
+
 <head>
 	<script src="/assets/jquery-1.10.2.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
 	<style>
-	body {
-		display: block;
-		color: rgba(255, 255, 255, .9);
-		text-decoration: none;
-		padding: 1rem;
-		font-size: 0.5 rem;
-		border-top: 2px solid transparent;
-		border-bottom: 2px solid transparent;
-	}
+		body {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 0.5 rem;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
+		#nodelist {
+			font-size: 18px;
+		}
+		#windowfont {
+			font-size: 18px;
+		}
+		#host {
+			font-size: 18px;
+		}
+		button {
+			background-color: #4D95CB;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 50%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+		textarea {
+			 font-size: 18px;
+		}
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 60%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #4D95CB;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
+		}
 	</style>
 	<script>
 		function exec() {
 			var e = document.getElementById("nodelist");
 			var host = e.options[e.selectedIndex].value;
 			var path = '/rmhost';
-
-			hideshow('output');
-			$("#command").dialog('close');
-			$("#output").dialog({
-				height: 'auto',
-				width: 'auto'
-			});
 
 			$.post(path, {
 				token: parent.token,
@@ -37,71 +141,103 @@
 			});
 		}
 	</script>
-	<script>
-		function hideshow(id) {
-			var e = document.getElementById(id);
-			if (e.style.display == 'block')
-				e.style.display = 'none';
-			else
-				e.style.display = 'block';
-		}
-		$(function() {
-			hideshow('output');
-		});
-	</script>
 </head>
 
 <body>
-	<div id="output" title="Command Output">
-		<p align=center>
-			<table style="width:10%">
-				<tr>
-					<td>
-						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-					</td>
-				</tr>
-			</table>
-			<script>
-				$(function() {
-					hideshow('output');
-				});
-			</script>
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Remove a host from PiCluster</h2>
+			</div>
+			<div class="modal-body">
+				<p align=left>
+					<label id="windowfont">This will remove a host from the PiCluster configuration file. Please stop any running containers</label>
+					<label id="windowfont">on the host before removing it.</label>
+					<br><br>
+					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
+					<select name="nodelist" id="nodelist">
+						</select>
+					<br><br>
+					<p align=center>
+						<button id="myBtn">Submit</button>
+					</p>
+					<script>
+						var option = '';
+						$.post('/listnodes', {
+							token: parent.token
+						}, function(data) {
+							data = data.replace(/\[/gi, '');
+							data = data.replace(/\]/gi, '');
+							data = data.replace(/\"/gi, '');
+							var parse_data = data.split(',');
+							for (var i = 0; i < parse_data.length; i++) {
+								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							}
+							$('#nodelist').append(option);
+						});
+					</script>
+
+				</p>
+			</div>
+		</div>
 	</div>
 
-	<div id="container" title="Remove a new Host">
-		<p align=left>
-			This will remove a new host from the PiCluster configuration file.
-			<br><br> Please stop any running containers on the host before removing it.
-			<br><br>
-			<label for="nodelist"><b>Select a Node</b></label>
-			<select name="nodelist" id="nodelist">
-				</select>
-			<br><br>
-			<p align=center>
-				<button onclick="exec()"> Submit</button>
-			</p>
-			<script>
-				$("#container").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-				var option = '';
-				$.post('/listnodes', {
-					token: parent.token
-				}, function(data) {
-					data = data.replace(/\[/gi, '');
-					data = data.replace(/\]/gi, '');
-					data = data.replace(/\"/gi, '');
-					var parse_data = data.split(',');
-					for (var i = 0; i < parse_data.length; i++) {
-						option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-					}
-					$('#nodelist').append(option);
-				});
-			</script>
+	<div id="output" class="modal">
+		<div class="modal-content2">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div class="modal-body">
+				<p align=center>
+					<table style="width:10%">
+						<tr>
+							<td>
+								<textarea rows="10" cols="75" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+							</td>
+						</tr>
+					</table>
+			</div>
+		</div>
 	</div>
-	<div class="widget">
-	</div>
+	<script>
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[0];
+		var btn = document.getElementById("myBtn");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+		}
+
+		output_span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		btn.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				modal.style.display = "none";
+			}
+			if (event.target == output_modal) {
+				output_modal.style.display = "none";
+			}
+		}
+		modal.style.display = "block";
+	</script>
+
 	</p>
 
 </html>
