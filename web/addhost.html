@@ -14,7 +14,12 @@
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
 		}
-
+		#windowfont {
+			font-size: 18px;
+		}
+		#host {
+			font-size: 18px;
+		}
 		button {
 			background-color: #4D95CB;
 			border: none;
@@ -144,9 +149,9 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					This will add a new host to the PiCluster configuration file.
-					<br><br>
-					<b>Host Name or IP:</b>
+					<label id="windowfont">This will add a new host to the PiCluster configuration file.</label>
+					<br><br><br>
+					<label id="windowfont"><b>Host Name or IP:</b></label>
 					<input type="text" size="30" id="host" name="host" value=""></font>
 					<br><br>
 					<p align=center>

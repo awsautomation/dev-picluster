@@ -15,7 +15,15 @@
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
 		}
-
+		#nodelist {
+			font-size: 18px;
+		}
+		#windowfont {
+			font-size: 18px;
+		}
+		#host {
+			font-size: 18px;
+		}
 		button {
 			background-color: #4D95CB;
 			border: none;
@@ -144,10 +152,10 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					This will remove a host from the PiCluster configuration file. Please stop any running containers
-					<br><br>on the host before removing it.
+					<label id="windowfont">This will remove a host from the PiCluster configuration file. Please stop any running containers</label>
+					<label id="windowfont">on the host before removing it.</label>
 					<br><br>
-					<label for="nodelist"><b>Select a Node</b></label>
+					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
 					<select name="nodelist" id="nodelist">
 						</select>
 					<br><br>
