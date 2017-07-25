@@ -93,6 +93,9 @@
 			color: #111;
 		}
 
+		ul.dropdown li {
+			z-index: 1;
+		}
 
 		.dropdown {
 			display: none;
@@ -451,21 +454,9 @@
 			modal.style.display = "none";
 		}
 
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
-		}
-
-
 		btn.onclick = function() {
 			modal.style.display = "none";
 			login();
-		}
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
 		}
 		modal.style.display = "block";
 	</script>
