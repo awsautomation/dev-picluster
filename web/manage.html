@@ -208,7 +208,7 @@
 						newhost: node
 					}, function(data) {
 						var div = document.getElementById('modal-body2');
-						div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
+						div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 					});
 				}
 			} else {
