@@ -240,9 +240,6 @@
 			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal?token=' + token);
 			});
-			$('#images').click(function() {
-				$('#iframe_a').attr('src', '/images.html');
-			});
 			$('#image-layout').click(function() {
 				$('#iframe_a').attr('src', '/image-layout.html');
 			});
@@ -257,9 +254,6 @@
 			});
 			$('#nodes').click(function() {
 				$('#iframe_a').attr('src', '/nodes.html');
-			});
-			$('#running').click(function() {
-				$('#iframe_a').attr('src', '/running.html');
 			});
 			$('#layout').click(function() {
 				$('#iframe_a').attr('src', '/container-layout.html');
@@ -410,7 +404,6 @@
 					<li><a href="#!">Containers</a>
 						<ul class="dropdown">
 							<li><a href="#" id="layout">Running</a></li>
-							<li><a href="#" id="running">Stats</a></li>
 							<li><a href="#" id="manage">Manage</a></li>
 							<li><a href="#" id="addcontainer">Add</a></li>
 						</ul>
@@ -420,7 +413,6 @@
 							<li><a href="#" id="pull">Pull</a></li>
 							<li><a href="#" id="build">Build</a></li>
 							<li><a href="#" id="image-layout">List</a></li>
-							<li><a href="#" id="images">Details</a></li>
 						</ul>
 					</li>
 					<li><a href="#!">Operations</a>

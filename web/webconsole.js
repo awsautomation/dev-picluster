@@ -944,10 +944,6 @@ app.get('/nodes.html', function(req, res) {
   res.sendFile(__dirname + '/nodes.html');
 });
 
-app.get('/running.html', function(req, res) {
-  res.sendFile(__dirname + '/running.html');
-});
-
 app.get('/container-layout.html', function(req, res) {
   res.sendFile(__dirname + '/container-layout.html');
 });
@@ -974,10 +970,6 @@ app.get('/build.html', function(req, res) {
 
 app.get('/logo.png', function(req, res) {
   res.sendFile(__dirname + '/logo.png');
-});
-
-app.get('/images.html', function(req, res) {
-  res.sendFile(__dirname + '/images.html');
 });
 
 app.get('/image-layout.html', function(req, res) {
