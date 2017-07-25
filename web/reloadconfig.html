@@ -98,7 +98,6 @@
 		function exec() {
 			$.get("/reloadconfig?token=" + parent.token, function(data) {
 				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-				$("#command_output").val(data);
 				var div = document.getElementById('modal-body2');
 				div.innerHTML = data;
 			});
