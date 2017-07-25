@@ -1,0 +1,3 @@
+[submodule "web/assets/font-linux"]
+	path = web/assets/font-linux
+	url = https://github.com/Lukas-W/font-linux.git
