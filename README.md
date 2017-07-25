@@ -35,6 +35,12 @@
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/picluster/picluster/tree/1.0)
 
+## Cloning this Repository
+To clone this repository properly with all the modules:
+```
+git clone --recursive https://github.com/picluster/picluster.git`
+```
+
 ## Try PiCluster in Docker
 
 We included a compose file to evaluate PiCluster easily on your laptop. Simply Install Docker on your laptop and do the following:
