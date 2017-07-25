@@ -81,6 +81,9 @@ You can run the server and agent on the same node since they are listening on di
   "docker":"/root/docker",
   "server_port":"3000",
   "agent_port": "3001",
+  "dockerRegistries": [
+    "registry.fedoraproject.org"
+  ],
   "layout": [
     {"node":"192.168.0.100", "mysql":"-p 3306:3306","nginx":"-p 80:80"},
     {"node":"192.168.0.102", "openvpn":"-p 1194:1194"}],
@@ -124,6 +127,8 @@ You can run the server and agent on the same node since they are listening on di
 - token - A string you define a random string that will be used for authentication with the agents.
 
 - agent_port - Defines the port that the agent will listen on.
+
+- dockerRegistries - Defines additional third-party docker registries to pull images from
 
 - docker - Defines where your Dockerfile's are. The format for the Docker folder should be like this: dockerfiles/imagename/Dockerfile
 

@@ -144,6 +144,104 @@ app.post('/exec', function(req, res) {
   }
 });
 
+app.get('/listregistries', function(req, res) {
+  const check_token = req.query.token;
+  if (!check_token || check_token !== token) {
+    return res.status(401).end('\nError: Invalid Credentials');
+  }
+
+  var registries = [{name: 'hub.docker.com'}];
+
+  if (config.dockerRegistries && config.dockerRegistries.length > 0) {
+    config.dockerRegistries.forEach(function(registry) {
+      registries.push({name: registry});
+    });
+  }
+
+  res.json(registries);
+});
+
+app.get('/remoteimagetags', function(req, res) {
+  const check_token = req.query.token;
+  if (!check_token || check_token !== token) {
+    return res.status(401).end('\nError: Invalid Credentials');
+  }
+
+  const registry = req.query.registry;
+  const image = req.query.image;
+  const page = req.query.page || 1;
+
+  const username = req.query.username || '';
+  const password = req.query.password || '';
+
+  if (!registry || !image) {
+    return res.status(400).end('\nError: Invalid Credentials');
+  }
+
+  var endpoint;
+  switch (registry) {
+    case 'hub.docker.com':
+      endpoint = 'https://hub.docker.com/v2/repositories/library/' + image + '/tags/?page=' + page + '&page_size=500';
+      break;
+    default:
+      // Custom registries
+      endpoint = ((registry.startsWith('http://') || registry.startsWith('https://')) ? registry : 'https://' + registry) + '/v2/' + image + '/tags/list';
+      break;
+  }
+
+  const options = {
+    url: endpoint,
+    headers: ((username && password)) ? {
+      'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    } : {}
+  }
+
+  request(options, function(error, response, body) {
+    if(!error && response.statusCode !== 200) { error = body; }
+    res.end((error) ? JSON.stringify({error: error.toString()}) : body);
+  });
+});
+
+app.get('/remoteimages', function(req, res) {
+  const check_token = req.query.token;
+  if (!check_token || check_token !== token) {
+    return res.status(401).end('\nError: Invalid Credentials');
+  }
+
+  const registry = req.query.registry;
+  const image = req.query.image;
+  const page = req.query.page || 1;
+
+  const username = req.query.username || '';
+  const password = req.query.password || '';
+
+  if (!registry || !image) {
+    return res.status(400).end('\nError: Bad Request');
+  }
+
+  var endpoint;
+  switch (registry) {
+    case 'hub.docker.com':
+      endpoint = 'https://hub.docker.com/v2/search/repositories/?page=' + page + '&query=' + image;
+      break;
+    default:
+      // Custom registries
+      endpoint = ((registry.startsWith('http://') || registry.startsWith('https://')) ? registry : 'https://' + registry) + '/v2/_catalog';
+      break;
+  }
+
+  const options = {
+    url: endpoint,
+    headers: ((username && password)) ? {
+      'Authorization': 'Basic ' + new Buffer(`${username}:${password}`).toString('base64')
+    } : {}
+  }
+
+  request(options, function(error, response, body) {
+    if(!error && response.statusCode !== 200) { error = body; }
+    res.end((error) ? JSON.stringify({error: error.toString()}) : body);
+  });
+});
 
 app.post('/listcontainers', function(req, res) {
   var check_token = req.body.token;
@@ -864,6 +962,10 @@ app.get('/background', function(req, res) {
 
 app.get('/reloadconfig.html', function(req, res) {
   res.sendFile(__dirname + '/reloadconfig.html');
+});
+
+app.get('/pullimages.html', function(req, res) {
+  res.sendFile(__dirname + '/pullimages.html');
 });
 
 app.get('/build.html', function(req, res) {
