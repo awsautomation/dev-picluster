@@ -38,7 +38,7 @@ If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://
 ## Cloning this Repository
 To clone this repository properly with all the modules:
 ```
-git clone --recursive https://github.com/picluster/picluster.git`
+git clone --recursive https://github.com/picluster/picluster.git
 ```
 
 ## Try PiCluster in Docker
