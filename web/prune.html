@@ -103,7 +103,7 @@
 		function exec() {
 			$.get("/prune?token=" + parent.token, function(data) {
 				var div = document.getElementById('modal-body2');
-				div.innerHTML = div.innerHTML + data;
+				div.innerHTML = div.innerHTML + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 			});
 		}
 	</script>
