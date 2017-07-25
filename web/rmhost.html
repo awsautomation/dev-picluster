@@ -15,15 +15,19 @@
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
 		}
+
 		#nodelist {
 			font-size: 18px;
 		}
+
 		#windowfont {
 			font-size: 18px;
 		}
+
 		#host {
 			font-size: 18px;
 		}
+
 		button {
 			background-color: #4D95CB;
 			border: none;
@@ -62,16 +66,14 @@
 			animation-name: animatetop;
 			animation-duration: 0.4s
 		}
-		textarea {
-			 font-size: 18px;
-		}
+
 		.modal-content2 {
 			position: relative;
 			background-color: #fefefe;
 			margin: auto;
 			padding: 0;
 			border: 1px solid #888;
-			width: 60%;
+			width: 50%;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -136,8 +138,8 @@
 				token: parent.token,
 				host: host
 			}, function(data) {
-				$("#command").val(data);
-				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+				var div = document.getElementById('modal-body2');
+				div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
 			});
 		}
 	</script>
@@ -189,15 +191,8 @@
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-			<div class="modal-body">
+			<div id="modal-body2" class="modal-body">
 				<p align=center>
-					<table style="width:10%">
-						<tr>
-							<td>
-								<textarea rows="10" cols="75" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-							</td>
-						</tr>
-					</table>
 			</div>
 		</div>
 	</div>
