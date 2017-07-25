@@ -150,7 +150,15 @@ app.get('/listregistries', function(req, res) {
     return res.status(401).end('\nError: Invalid Credentials');
   }
 
-  res.json([{name: 'hub.docker.com'}, {name: 'registry.fedoraproject.org'}]);
+  var registries = [{name: 'hub.docker.com'}];
+
+  if (config.dockerRegistries && config.dockerRegistries.length > 0) {
+    config.dockerRegistries.forEach(function(registry) {
+      registries.push({name: registry});
+    });
+  }
+
+  res.json(registries);
 });
 
 app.get('/remoteimagetags', function(req, res) {
