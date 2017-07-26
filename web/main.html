@@ -33,7 +33,7 @@
 			margin: 0 auto;
 			max-width: 100%;
 			max-height: 100%;
-			background: #4D95CB;
+			background: #565051;
 		}
 
 		nav::after {
@@ -47,7 +47,12 @@
 			margin: 0;
 			list-style: none;
 		}
-
+		label {
+			font-size: 18px;
+		}
+		input {
+			font-size: 18px;
+		}
 		nav ul li {
 			float: left;
 			position: relative;
@@ -65,7 +70,7 @@
 
 		nav ul li a:hover,
 		nav ul li a:focus {
-			background: #4D95CB;
+			background: #565051;
 		}
 
 		nav ul li a:focus {
@@ -102,7 +107,7 @@
 			position: absolute;
 			margin-top: 6px;
 			background: linear-gradient(to bottom right, white, #F8F8F8) !important;
-			box-shadow: 0 4px 10px #4D95CB;
+			box-shadow: 0 4px 10px #565051;
 		}
 
 		.dropdown::after {
@@ -122,7 +127,7 @@
 		}
 
 		button {
-			background-color: #4D95CB;
+			background-color: #565051;
 			border: none;
 			color: white;
 			padding: 15px 32px;
@@ -198,7 +203,7 @@
 
 		.modal-header {
 			padding: 2px 16px;
-			background-color: #4D95CB;
+			background-color: #565051;
 			color: white;
 		}
 
@@ -371,13 +376,13 @@
 			</div>
 			<div class="modal-body">
 				<p align=center>
-					<img src="/logo.png" height="165" width="150">
-					<br> Please login to continue
+					<img src="/logo.png" height="200" width="300">
+					<br><label>Please login to continue<label>
 					<br>
 					<p align=center>
-						<input type="text" id="user" name="username">
+						<input type="text" style="width: 250px;" id="user" name="username">
 						<br>
-						<input type="password" id="password" name="password">
+						<input type="password" style="width: 250px;" size="18" id="password" name="password">
 						<br>
             <br>
 						<button id="myBtn">Connect</button>
@@ -391,7 +396,7 @@
 	<div id="menu">
 		<nav>
 			<ul>
-				<li><a href='https://github.com/rusher81572/picluster'> <img src="/assets/images/logo2.png" height="60" width="100"></a>
+				<li><a href='https://github.com/rusher81572/picluster'> <img src="/assets/images/logo2.png" height="55" width="170"></a>
 					<li><a href="#!">System</a>
 						<ul class="dropdown">
 							<li><a href="#" id="nodes">Nodes</a></li>
