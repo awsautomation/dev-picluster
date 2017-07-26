@@ -2,7 +2,7 @@
 
 
 
-![](http://i.imgur.com/x2Zfokp.png)
+![](http://i.imgur.com/eg6r9Wf.png)
 
  PiCluster is a simple way to manage Docker containers on multiple hosts. I created this because I found Docker Swarm not that good and Kubernetes was too difficult to install currently on ARM. PiCluster will only build and run images from Dockerfile's on the host specified in the config file. This software will work on regular x86 hardware also and is not tied to ARM.
 
@@ -10,7 +10,7 @@
 
 [![Build Status](https://travis-ci.org/picluster/picluster.svg?branch=master)](https://travis-ci.org/picluster/picluster) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-![Pic](http://i.imgur.com/qHU41rw.png)
+![Pic](http://i.imgur.com/FTpCB8r.png)
 
 ## Features
 
