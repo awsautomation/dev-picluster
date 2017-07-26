@@ -30,6 +30,10 @@
 			font-size: 18px;
 		}
 
+		#windowfont {
+			font-size: 18px;
+		}
+
 		.modal {
 			display: none;
 			position: fixed;
@@ -163,27 +167,28 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					This will add a new container to the PiCluster configuration file.
-					<br><br> Please ensure that the Dockerfile's are already on the node in the correct location.
+					<label id="windowfont">This will add a new container to the PiCluster configuration file.
+					<br><br> Please ensure that the Dockerfile's are already on the node in the correct location.</label>
 					<br><br>
-					<label for="nodelist"><b>Select a Node</b></label>
+					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
 					<select name="nodelist" id="nodelist">
 						</select>
 					<br><br>
-					<b>Container Name:</b>
+					<b><label id="windowfont">Container Name:</b></label>
 					<input type="text" size="15" id="container_name" name="container_name" value=""></font>
 					<br><br>
-					<b>Container Arguments:</b>
+					<b><label id="windowfont">Container Arguments:</label></b>
 					<input type="text" size="25" id="container_args" name="container_args" value=""></font>
 					<br><br>
-					<br><b>Heartbeat and Host Failover: (Optional)</b>
+					<br><b><label id="windowfont">Heartbeat and Host Failover: (Optional)</label></b>
 					<fieldset>
-						<b>Heartbeat Port:</b>
+						<b><label id="windowfont">Heartbeat Port:</label></b>
 						<input type="text" size="5" id="heartbeat_args" name="heartbeat_args" value=""></font>
 						<br><br>
-						<b>Host Failover Constraints (Optional):</b>
+						<b><label id="windowfont">Host Failover Constraints (Optional):</label></b>
+
 						<input type="text" size="25" id="failover_constraints" name="failover_constraints" value=""></font>
-						<br><br> This tells PiCluster which hosts that the container may failover to. Enter each host separted by a comma.
+						<br><br><label id="windowfont"> This tells PiCluster which hosts that the container may failover to. Enter each host separted by a comma.</label>
 						<br><br>
 						<br>
 					</fieldset>
