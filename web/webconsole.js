@@ -198,7 +198,7 @@ app.get('/remoteimagetags', function(req, res) {
 
   request(options, function(error, response, body) {
     if(!error && response.statusCode !== 200) { error = body; }
-    res.end((error) ? JSON.stringify({error: error.toString()}) : body);
+    res.status(response.statusCode).end((error) ? JSON.stringify({error: error.toString()}) : body);
   });
 });
 
@@ -239,7 +239,7 @@ app.get('/remoteimages', function(req, res) {
 
   request(options, function(error, response, body) {
     if(!error && response.statusCode !== 200) { error = body; }
-    res.end((error) ? JSON.stringify({error: error.toString()}) : body);
+    res.status(response.statusCode).end((error) ? JSON.stringify({error: error.toString()}) : body);
   });
 });
 
