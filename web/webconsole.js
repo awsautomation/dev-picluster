@@ -181,7 +181,7 @@ app.get('/remoteimagetags', function(req, res) {
   var endpoint;
   switch (registry) {
     case 'hub.docker.com':
-      endpoint = 'https://hub.docker.com/v2/repositories/library/' + image + '/tags/?page=' + page + '&page_size=500';
+      endpoint = 'https://hub.docker.com/v2/repositories/' + ((image.indexOf('/') === -1) ? ('library/' + image) : image) + '/tags/?page=' + page + '&page_size=500';
       break;
     default:
       // Custom registries
