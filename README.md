@@ -27,7 +27,8 @@
 - Built-in web terminal to easily run commands on nodes
 - Integrate the Kibana dashboard into PiCluster
 - Integrates with Elasticsearch to store the PiCluster logs.
-- Automatic container failover to different nodes.
+- Automatic container failover to different nodes
+- Pull container images from a registry
 
 ## Prerequisites
 
