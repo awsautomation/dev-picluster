@@ -6,7 +6,25 @@
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
 	<style>
-		label {
+		body {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 0.5 rem;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
+
+		#windowfont {
+			font-size: 18px;
+		}
+
+		#host {
+			font-size: 18px;
+		}
+
+		button {
 			background-color: #565051;
 			border: none;
 			color: white;
@@ -14,42 +32,163 @@
 			text-align: center;
 			text-decoration: none;
 			display: inline-block;
-			font-size: 24px;
+			font-size: 16px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 75%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: auto;
+			height: auto;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #565051;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
 		}
 	</style>
 	<script>
 		function exec() {
-			document.write('<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><label>Searching for containers</label>');
+			var div = document.getElementById('modal-body2');
+			if (div) {
+				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for containers</label></font>';
+			}
 			$.get("/status?token=" + parent.token, function(data) {
 				var get_data = data.split('Node:');
 				var dists = data.split('\n');
 				dists = getDists(dists);
+				if (div) {
+					div.innerHTML = '';
+				}
 				for (i = 0, dist = 0; i != get_data.length; i++) {
 					if (get_data[i].length > 2) {
 						var hostname = get_data[i].split('CONTAINER');
 						var containers = hostname[1].split('NAMES');
 						var show_containers = containers[1].split('\n');
-						document.write('<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>');
+						if (div) {
+							div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>';
+						}
 
 						for (j = 0; j != show_containers.length; j++) {
 							var parse_output = show_containers[j].split('  ');
 							if (parse_output.length > 1) {
-								document.write('<font size=+2><li class="ui-state-default">' + parse_output[parse_output.length - 1] + '</li>');
+								if (div) {
+									div.innerHTML = div.innerHTML + '<font size=+2><li>' + parse_output[parse_output.length - 1] + '</li>';
+								}
+
 							}
 						}
-						document.write('</ol>');
+						if (div) {
+							div.innerHTML = div.innerHTML + '</ol>';
+						}
 					}
 				}
-				addFontLinux();
+				//addFontLinux();
 			});
 		}
 	</script>
 </head>
 
 <body>
-	<script>
-		exec();
-	</script>
+	<div id="output" class="modal">
+		<div class="modal-content2">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Containers</h2>
+			</div>
+			<div id="modal-body2" class="modal-body">
+				<p align=center>
+			</div>
+		</div>
+	</div>
 	</p>
+	<script>
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[0];
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+		output_modal.style.display = "block";
+		exec()
+	</script>
 
 </html>
