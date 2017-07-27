@@ -109,7 +109,7 @@
 		function exec() {
 			$.get("/hb?token=" + parent.token, function(data) {
 				var div = document.getElementById('modal-body2');
-				div.innerHTML = div.innerHTML + '\nSent request to do a manual heartbeat. Check the logs for the latest information.' + data;
+				div.innerHTML = '\nSent request to do a manual heartbeat. Check the logs for the latest information.' + data;
 			});
 		}
 	</script>
@@ -124,6 +124,7 @@
 			</div>
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
+					Please wait......
 			</div>
 		</div>
 	</div>

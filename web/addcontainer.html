@@ -34,6 +34,10 @@
 			font-size: 18px;
 		}
 
+		#modal-body2 {
+			font-size: 18px;
+		}
+
 		.modal {
 			display: none;
 			position: fixed;
@@ -163,7 +167,7 @@
 				failover_constraints: container + ',' + failover_constraints
 			}, function(data) {
 				var div = document.getElementById('modal-body2');
-				div.innerHTML = div.innerHTML + '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
+				div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 			});
 		}
 	</script>
@@ -237,6 +241,7 @@
 			</div>
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
+					Please wait......
 			</div>
 		</div>
 	</div>

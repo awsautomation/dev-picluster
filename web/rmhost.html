@@ -23,7 +23,7 @@
 		#modal-body2 {
 			font-size: 18px;
 		}
-		
+
 		#windowfont {
 			font-size: 18px;
 		}
@@ -145,7 +145,7 @@
 				host: host
 			}, function(data) {
 				var div = document.getElementById('modal-body2');
-				div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
+				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
 			});
 		}
 	</script>
@@ -199,6 +199,7 @@
 			</div>
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
+					Please wait......
 			</div>
 		</div>
 	</div>

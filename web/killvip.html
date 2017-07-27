@@ -19,9 +19,11 @@
 			background-color: rgb(0, 0, 0);
 			background-color: rgba(0, 0, 0, 0.4);
 		}
+
 		#modal-body2 {
 			font-size: 18px;
 		}
+
 		.modal-content {
 			position: relative;
 			background-color: #fefefe;
@@ -107,7 +109,7 @@
 		function exec() {
 			$.get("/killvip?token=" + parent.token, function(data) {
 				var div = document.getElementById('modal-body2');
-				div.innerHTML = div.innerHTML + 'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data;
+				div.innerHTML = 'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data;
 			});
 		}
 	</script>
@@ -122,6 +124,7 @@
 			</div>
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
+					Please wait......
 			</div>
 		</div>
 	</div>
