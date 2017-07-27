@@ -18,7 +18,9 @@
 			#containerlist {
 				font-size: 18px;
 			}
-
+			#container {
+				font-size: 16px;
+			}
 			#nodelist {
 				font-size: 18px;
 			}
@@ -208,14 +210,14 @@
 							<label for="containerlist">Select Registry</label>
 							<select name="containerlist" id="containerlist" onchange="clearAuth()">
 							</select>
-							<fieldset name="imageauth" id="imageauth">
 								<legend>Authentication (optional)</legend>
+								<br>
 								<label for="imageauth-user">Username</label>
 								<input type="text" name="imageauth-user" id="imageauth-user" />
 								<label for="imageauth-password">Password</label>
 								<input type="password" name="imageauth-password" id="imageauth-password" />
-							</fieldset>
 						</fieldset>
+						<br>
 						<fieldset name="options" id="options">
 							<legend>Images</legend>
 							<p id="imageDescription" style="visibility: hidden;margin: 0;padding: 0;"></p>
