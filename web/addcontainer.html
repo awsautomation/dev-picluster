@@ -132,16 +132,27 @@
 	<script>
 		function exec() {
 			var e = document.getElementById("nodelist");
+			var nodes = document.getElementsByName('hostlist');
 			var path = '/addcontainer';
 			var host = e.options[e.selectedIndex].value;
 			var container = $("#container_name").val();
 			var container_args = $("#container_args").val();
 			var heartbeat_args = $("#heartbeat_args").val();
-			var failover_constraints = $("#failover_constraints").val();
+			var failover_constraints = '';
+
+			nodes.forEach(function(node, i) {
+				if (nodes[i].checked) {
+					if (failover_constraints) {
+						failover_constraints += ',' + node.value;
+					} else {
+						failover_constraints += node.value;
+					}
+				}
+			});
+
 			if (!failover_constraints) {
 				failover_constraints = 'none';
 			}
-
 
 			$.post(path, {
 				token: parent.token,
@@ -152,7 +163,7 @@
 				failover_constraints: container + ',' + failover_constraints
 			}, function(data) {
 				var div = document.getElementById('modal-body2');
-				div.innerHTML = div.innerHTML + 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
+				div.innerHTML = div.innerHTML + '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 			});
 		}
 	</script>
@@ -181,16 +192,12 @@
 					<input type="text" size="25" id="container_args" name="container_args" value=""></font>
 					<br><br>
 					<br><b><label id="windowfont">Heartbeat and Host Failover: (Optional)</label></b>
-					<fieldset>
+					<fieldset name="hostList" id="hostList">
 						<b><label id="windowfont">Heartbeat Port:</label></b>
 						<input type="text" size="5" id="heartbeat_args" name="heartbeat_args" value=""></font>
 						<br><br>
 						<b><label id="windowfont">Host Failover Constraints (Optional):</label></b>
-
-						<input type="text" size="25" id="failover_constraints" name="failover_constraints" value=""></font>
-						<br><br><label id="windowfont"> This tells PiCluster which hosts that the container may failover to. Enter each host separted by a comma.</label>
 						<br><br>
-						<br>
 					</fieldset>
 					<p align=center>
 						<button id="myBtn">Submit</button>
@@ -198,6 +205,7 @@
 					<script>
 						$(function() {
 							var option = '';
+							var checkbox = '';
 							$.post('/listnodes', {
 								token: parent.token
 							}, function(data) {
@@ -208,7 +216,11 @@
 								for (var i = 0; i < parse_data.length; i++) {
 									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
 								}
+								for (var i = 0; i < parse_data.length; i++) {
+									checkbox += '<label id="windowfont" for="hostlist">' + parse_data[i] + '</label><input type="checkbox" name="hostlist" value="' + parse_data[i] + '" />';
+								}
 								$('#nodelist').append(option);
+								$('#hostList').append(checkbox);
 							});
 						});
 					</script>
