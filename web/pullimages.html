@@ -176,37 +176,25 @@
 				command = ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command;
 			}
 
-			// Pull image on all nodes
-			if (nodes[0].checked) {
-				$.post(path, {
-					token: parent.token,
-					command: command,
-					node: '*'
-				}, function(data) {
-					$("#command").val(data);
-					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
-				});
-			} else {
-				var check_counter = 0;
-				nodes.forEach(function(node, i) {
-					if (nodes[i].checked) {
-						nodes.forEach(function(node, i) {
-							if (nodes[i].checked) {
-								check_counter++;
-								$.post(path, {
-									token: parent.token,
-									command: command,
-									node: node.value
-								}, function(data) {
-									div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />')
-								});
-							}
-						});
-					}
-				});
-				if (check_counter == 0) {
-					div.innerHTML = 'Error, no hosts were selected.';
+			var check_counter = 0;
+			nodes.forEach(function(node, i) {
+				if (nodes[i].checked) {
+					nodes.forEach(function(node, i) {
+						if (nodes[i].checked) {
+							check_counter++;
+							$.post(path, {
+								token: parent.token,
+								command: command,
+								node: node.value
+							}, function(data) {
+								div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />')
+							});
+						}
+					});
 				}
+			});
+			if (check_counter == 0) {
+				div.innerHTML = 'Error, no hosts were selected.';
 			}
 
 			return true;
