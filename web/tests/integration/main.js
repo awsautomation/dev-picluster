@@ -1,8 +1,9 @@
-casper.test.begin('main.html', 5, function(test) {
+casper.test.begin('main.html', 6, function(test) {
   const URL = casper.cli.get('url');
   const username = casper.cli.get('username');
   const password = casper.cli.get('password');
   const expected_token = casper.cli.get('token');
+  const expected_jquery = require('../../package.json').dependencies.jquery;
 
   casper.start(URL);
 
@@ -19,6 +20,12 @@ casper.test.begin('main.html', 5, function(test) {
       test.assertEquals(iframe.url, URL + '/blank', "Its source should equal " + URL + "/blank");
 
       this.wait(2000, function() {
+        var jquery = this.evaluate(function() {
+          return $.fn.jquery;
+        });
+
+        test.assert(expected_jquery.indexOf(jquery) > -1, "jQuery should be " + expected_jquery);
+
         this.evaluate(function(username, password) {
           document.getElementById('user').value = username;
           document.getElementById('password').value = password;
