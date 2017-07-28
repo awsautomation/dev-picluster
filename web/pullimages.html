@@ -188,15 +188,15 @@
 								token: parent.token,
 								command: command,
 								node: node.value
-							}, function(data) {
-								div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.';
-							});
+							}, function(data) {});
 						}
 					});
 				}
 			});
 			if (check_counter == 0) {
 				div.innerHTML = 'Error, no hosts were selected.';
+			} else {
+				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.';
 			}
 
 			return true;
