@@ -1,5 +1,4 @@
 # PiCluster
-<p align=center>
 
 ![Pic](http://i.imgur.com/WBnXC2R.png)
 
