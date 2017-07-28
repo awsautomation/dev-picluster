@@ -209,6 +209,15 @@ npm install
 node webconsole.js
 ```
 
+## Upgrading
+
+1. Backup config.json
+2. Delete the picluster directory
+3. Clone the PiCluster repository
+4. Copy your existing config.json to the picluster directory
+5. Run "npm install" in the web,server,agent directories.
+
+
 ## Configuring and using the client "pictl"
 
 Pictl is a bash client to easily control the cluster. It will make all the HTTP requests using curl.
