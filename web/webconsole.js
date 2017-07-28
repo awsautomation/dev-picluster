@@ -24,6 +24,7 @@ var syslog = "";
 var request_timeout = 5000;
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')))
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')))
 
 if (config.syslog) {
   syslog = config.syslog;
