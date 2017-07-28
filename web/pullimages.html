@@ -167,7 +167,7 @@
 
 			var command = ["docker", "pull", image].join(' ');
 			var nodes = document.getElementsByName('nodeslist');
-
+			var div = document.getElementById('modal-body2');
 			var username = document.getElementsByName('imageauth-user')[0].value || '';
 			var password = document.getElementsByName('imageauth-password')[0].value || '';
 
@@ -187,22 +187,26 @@
 					$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
 				});
 			} else {
+				var check_counter = 0;
 				nodes.forEach(function(node, i) {
 					if (nodes[i].checked) {
 						nodes.forEach(function(node, i) {
 							if (nodes[i].checked) {
+								check_counter++;
 								$.post(path, {
 									token: parent.token,
 									command: command,
 									node: node.value
 								}, function(data) {
-									var div = document.getElementById('modal-body2');
 									div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />')
 								});
 							}
 						});
 					}
 				});
+				if (check_counter == 0) {
+					div.innerHTML = 'Error, no hosts were selected.';
+				}
 			}
 
 			return true;
