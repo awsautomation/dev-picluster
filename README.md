@@ -8,7 +8,7 @@
 
 [![Build Status](https://travis-ci.org/picluster/picluster.svg?branch=master)](https://travis-ci.org/picluster/picluster) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-![Pic](http://i.imgur.com/FTpCB8r.png)
+![Pic](http://i.imgur.com/N7KBk6z.pngg)
 ![Pic](http://i.imgur.com/vRgDGJp.png)
 
 ## Features
@@ -418,7 +418,7 @@ Based on the sample above, PiCluster will check if Minio is running every 30 sec
 
 Project created by Phillip Tribble. [LinkedIn](https://www.linkedin.com/in/philliptribble) , [Twitter](https://twitter.com/rusher81572)
 
-PiCluster Logos by chzbacon. 
+PiCluster Logos by chzbacon.
 
 ## Images
 
