@@ -64,7 +64,9 @@
 			padding: 0;
 			font-size: 12px;
 			border: 1px solid #888;
-			width: 75%;
+			width: 80%;
+			height: 80%;
+			overflow: auto;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -188,7 +190,7 @@
 								command: command,
 								node: node.value
 							}, function(data) {
-								div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.';
+								div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 							});
 						}
 					});
