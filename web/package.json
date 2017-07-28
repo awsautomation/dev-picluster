@@ -6,7 +6,6 @@
     "exec": "",
     "express": "^4.15.3",
     "font-linux": "git+https://github.com/Lukas-W/font-linux.git",
-    "fs": "",
     "jquery": "^3.2.1",
     "jquery.terminal": "^1.5.0",
     "line-reader": "^0.4.0",
