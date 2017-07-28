@@ -11,7 +11,7 @@ script:
 - cd server;npm install; node server.js&
 - cd ../agent;npm install; node agent.js&
 - cd ../web;npm install; node webconsole.js&
-- sleep 2 && PATH="$PATH:$PWD/node_modules/.bin" ./node_modules/.bin/casperjs test tests/integration --verbose --engine=phantomjs --username=admin --password=admin --token=1234567890ABCDEFGHJKLMNOP --url=http://$IP:3003
+- sleep 2 && PATH="$PATH:$PWD/node_modules/.bin" ./node_modules/.bin/casperjs test tests/integration --verbose --fail-fast --engine=phantomjs --username=admin --password=admin --token=1234567890ABCDEFGHJKLMNOP --url=http://$IP:3003
 - cd ..
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
