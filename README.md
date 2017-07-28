@@ -418,7 +418,7 @@ Based on the sample above, PiCluster will check if Minio is running every 30 sec
 
 Project created by Phillip Tribble. [LinkedIn](https://www.linkedin.com/in/philliptribble) , [Twitter](https://twitter.com/rusher81572)
 
-Picluster Logos by chzbacon. 
+PiCluster Logos by chzbacon. 
 
 ## Images
 
