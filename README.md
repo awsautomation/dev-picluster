@@ -215,7 +215,7 @@ node webconsole.js
 2. Delete the picluster directory
 3. Clone the PiCluster repository
 4. Copy your existing config.json to the picluster directory
-5. Run "npm install" in the web,server,agent directories.
+5. Run "npm install" in the web, server, and agent directories.
 
 
 ## Configuring and using the client "pictl"
