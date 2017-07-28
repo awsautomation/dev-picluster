@@ -236,7 +236,8 @@
 					</fieldset>
 					<fieldset name="nodesList" id="nodesList">
 						<legend>Nodes:</legend>
-						<label for="nodeslist">All</label><input type="checkbox" name="nodeslist" onClick="checkAll(this);" checked="checked" />
+						<label for="nodeslist">All</label><input type="checkbox" name="nodeslist" onClick="checkAll(this);" checked="checked"/>
+						&nbsp;&nbsp;&nbsp;&nbsp;
 					</fieldset>
 					<p align=center>
 						<button onclick="exec()" id="myBtn"> Submit</button>
@@ -277,7 +278,7 @@
 								var parse_data = data.split(',');
 								var option = '';
 								for (var i = 0; i < parse_data.length; i++) {
-									option += '<label for="nodeslist">' + parse_data[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + parse_data[i] + '" />';
+									option += '<label for="nodeslist">' + parse_data[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + parse_data[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 								}
 								$('#nodesList').append(option);
 								var selectImage = function(event, ui) {
