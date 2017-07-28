@@ -29,7 +29,7 @@
     }
   ],
   "automatic_heartbeat": "enabled",
-  "heartbeat_interval": "300000",
+  "heartbeat_interval": "10000",
   "syslog": "dmesg",
   "web_username": "admin",
   "web_password": "admin",
