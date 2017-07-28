@@ -8,7 +8,7 @@ script:
 - sed -i "s/127.0.0.1/$IP/" config.json
 - sed -i "s/192.168.0.116/$IP/" pictl
 - npm install -g node-gyp
-- cd ../server;npm install; node server.js&
+- cd server;npm install; node server.js&
 - cd ../agent;npm install; node agent.js&
 - cd web;npm install; node webconsole.js&
 - PATH="$PATH:$PWD/node_modules/.bin" ./node_modules/.bin/casperjs test tests/integration --verbose --engine=phantomjs --username=admin --password=admin --token=1234567890ABCDEFGHJKLMNOP --url=http://$IP:3003
