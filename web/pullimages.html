@@ -165,7 +165,7 @@
 				}
 			}
 
-			var command = ["docker", "pull", image].join(' ');
+			var command = ["docker", "image", "pull", image].join(' ');
 			var nodes = document.getElementsByName('nodeslist');
 			var div = document.getElementById('modal-body2');
 			var username = document.getElementsByName('imageauth-user')[0].value || '';
