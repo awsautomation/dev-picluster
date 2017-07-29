@@ -15,6 +15,10 @@ script:
 - sed -i "s/127.0.0.1/$IP/" config.json
 - sed -i "s/192.168.0.116/$IP/" pictl
 - npm install -g node-gyp
+- sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
+- sudo docker image build ./docker/minio -t minio -f ./docker/minio/Dockerfile
+- sudo docker container run -d --name nginx -p 80:80 nginx
+- sudo docker container run -d --name minio -p 9000:9000 minio
 - cd server;npm install; sudo node server.js&
 - cd ../agent;npm install; sudo node agent.js&
 - cd ../web;npm install; sudo node webconsole.js&
