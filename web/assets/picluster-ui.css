@@ -1,0 +1,10 @@
+body {
+  background: #FFFFFF;
+  background-image: url("/background");
+  background-size: 100%;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 18px;
+  color: #333333;
+  ;
+}

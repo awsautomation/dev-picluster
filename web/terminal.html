@@ -1,125 +1,277 @@
 <html>
-<title>PiCluster</title>
 
 <head>
-	<script src="/assets/jquery-1.10.2.js">
-	</script>
+	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<script src="/node_modules/jquery.terminal/js/jquery.terminal.min.js"></script>
+	<script src="/node_modules/jquery.terminal/js/unix_formatting.js"></script>
+	<link href="/node_modules/jquery.terminal/css/jquery.terminal.min.css" rel="stylesheet"/>
+	<style>
+		body {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 0.5 rem;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
+		label {
+			font-size: 18px;
+		}
+
+		#windowfont {
+			font-size: 18px;
+		}
+
+		#host {
+			font-size: 18px;
+		}
+		#terminal {
+			font-size: 18px;
+		}
+
+		button {
+			background-color: #565051;
+			border: none;
+			color: white;
+			padding: 5px 10px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			font-size: 12px;
+			width: 25%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		textarea {
+			font-size: 18px;
+			resize: none;
+		}
+
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			font-size: 12px;
+			width: 90%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		#nodelist {
+			font-size: 18px;
+		}
+
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #565051;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
+		}
+
+		#terminal .prompt {
+			color: #D75F00;
+		}
+	</style>
 	<script>
-		function exec() {
+		var node;
+		function exec(cmd, cb) {
+			if (!cb) { cb = function() {}; }
+			$.post('/exec', {
+				token: parent.token,
+				command: cmd,
+				node: node
+			}, cb);
+		}
+
+		function init() {
 			var e = document.getElementById("nodelist");
 			var c = document.getElementById("commandlist");
-			var path = '/exec';
-			var node = e.options[e.selectedIndex].value;
-			var command = $("#terminal").val();
-			if (command.length == 0) {
-				$("#command_output").val('\nConnecting to terminal on node ' + node + '. There will be a short delay when returning each command output.');
-				command = 'uptime';
-			} else {
-				$("#terminal").val('');
-				$('#command_output').val($('#command_output').val() + '\n$ ' + command);
-			}
+			node = e.options[e.selectedIndex].value;
+			    var term = $('#terminal').terminal(function(command) {
+			        if (command !== '') {
+								var _this = this;
+								exec(command, function(output) {
+									_this.echo(output);
+								});
+			        } else {
+			           this.echo('');
+			        }
+			    }, {
+							greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
+			        name: 'terminal',
+			        height: 300,
+			        prompt: 'λ '
+			    });
+					exec('uptime', function(output) {
+						term.echo(output);
+					});
 
-			hideshow('output');
-			$("#command").dialog('close');
-			$("#output").dialog({
-				height: 'auto',
-				width: 'auto'
-			});
-
-			$.post(path, {
-				token: parent.token,
-				command: command,
-				node: node
-			}, function(data) {
-				$("#command").val(data);
-				//$("#command_output").val($('#command_output').val() + '\n' + data + '\n\n$');
-				$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
-			});
 		}
-	</script>
-	<script>
-		function hideshow(id) {
-			var e = document.getElementById(id);
-			if (e.style.display == 'block')
-				e.style.display = 'none';
-			else
-				e.style.display = 'block';
-		}
-		$(function() {
-			hideshow('output');
-		});
-		$(document).keyup(function(e) {
-			if ($("#command") && (e.keyCode === 13)) {
-				exec();
-			}
-		});
 	</script>
 </head>
 
 <body>
-	<div id="output" title="PiCluster Terminal">
 
-		<table style="width:10%">
-			<tr>
-				<td>
-					<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-				</td>
-			</tr>
-		</table>
-		<p align=left>
-			<table style="width:10%">
-				<tr>
-					<td>
-						<input size="93" id="terminal" type="text" name="terminal">
-					</td>
-					<td>
-						<button onclick="exec()">Execute</button>
-					</td>
-
-			</table>
-			<br>
-			<script>
-				$(function() {
-					hideshow('output');
-				});
-			</script>
-	</div>
-
-	<div id="container" title="PiCluster Terminal">
-		<p align=left>
-			<label for="nodelist"><b>Select a Node</b></label>
-			<select name="nodelist" id="nodelist">
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Terminal</h2>
+			</div>
+			<div class="modal-body">
+				<p align=left>
+					<label for="nodelist"><b>Select a Node</b></label>
+					<select name="nodelist" id="nodelist">
 		    </select>
-			<br><br>
-			<p align=center>
-				<button onclick="exec()"> Submit</button>
-			</p>
-			<script>
-				$("#container").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-				$(function() {
-					var option = '';
-					$.post('/listnodes', {
-						token: parent.token
-					}, function(data) {
-						data = data.replace(/\[/gi, '');
-						data = data.replace(/\]/gi, '');
-						data = data.replace(/\"/gi, '');
-						var parse_data = data.split(',');
-						for (var i = 0; i < parse_data.length; i++) {
-							option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-						}
-						$('#nodelist').append(option);
-					});
-				});
-			</script>
+					<br><br>
+					<p align=center>
+						<button id="myBtn">Submit</button>
+					</p>
+					<script>
+						$(function() {
+							var option = '';
+							$.post('/listnodes', {
+								token: parent.token
+							}, function(data) {
+								data = data.replace(/\[/gi, '');
+								data = data.replace(/\]/gi, '');
+								data = data.replace(/\"/gi, '');
+								var parse_data = data.split(',');
+								for (var i = 0; i < parse_data.length; i++) {
+									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+								}
+								$('#nodelist').append(option);
+							});
+						});
+					</script>
+
+				</p>
+			</div>
+		</div>
 	</div>
-	<div class="widget">
+
+	<div id="output" class="modal">
+		<div class="modal-content2" style="background-color: #000;">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Terminal</h2>
+			</div>
+			<div class="modal-body">
+				<table style="width:100%;">
+					<tr>
+						<td>
+							<div id="terminal_container" style="max-width: 100%;">
+								<div id="terminal" style="width: 100%;position: relative;left: -1.04em;top: -0.3em;"></div>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<p align=left>
+				<br>
+			</div>
+		</div>
 	</div>
 	</p>
+
+	<script>
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var btn = document.getElementById("myBtn");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		btn.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			init();
+		}
+
+		modal.style.display = "block";
+	</script>
 
 </html>

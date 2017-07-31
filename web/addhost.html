@@ -1,83 +1,211 @@
 <html>
-<title>PiCluster</title>
 
 <head>
-	<script src="/assets/jquery-1.10.2.js">
-	</script>
+	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
+	<style>
+		body {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 0.5 rem;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
+
+		#modal-body2 {
+			font-size: 18px;
+		}
+
+		#windowfont {
+			font-size: 18px;
+		}
+
+		#host {
+			font-size: 18px;
+		}
+
+		button {
+			background-color: #565051;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 50%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			border: 1px solid #888;
+			width: 50%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #565051;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
+		}
+
+		#modal-body2 {
+			font-size: 18px;
+		}
+	</style>
 	<script>
 		function exec() {
 			var e = document.getElementById("nodelist");
 			var path = '/addhost';
 			var host = $("#host").val();
 
-			hideshow('output');
-			$("#command").dialog('close');
-			$("#output").dialog({
-				height: 'auto',
-				width: 'auto'
-			});
-
 			$.post(path, {
 				token: parent.token,
 				host: host
 			}, function(data) {
-				$("#command").val(data);
-				$("#command_output").val('Sent request to the server. Please check the logs and running containers for updated information.\n' + data);
+				var div = document.getElementById('modal-body2');
+				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
 			});
 		}
-	</script>
-	<script>
-		function hideshow(id) {
-			var e = document.getElementById(id);
-			if (e.style.display == 'block')
-				e.style.display = 'none';
-			else
-				e.style.display = 'block';
-		}
-		$(function() {
-			hideshow('output');
-		});
 	</script>
 </head>
 
 <body>
-	<div id="output" title="Command Output">
-		<p align=center>
-			<table style="width:10%">
-				<tr>
-					<td>
-						<textarea rows="30" cols="100" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-					</td>
-				</tr>
-			</table>
-			<script>
-				$(function() {
-					hideshow('output');
-				});
-			</script>
+
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Add a host to PiCluster</h2>
+			</div>
+			<div class="modal-body">
+				<p align=left>
+					<label id="windowfont">This will add a new host to the PiCluster configuration file.</label>
+					<br><br><br>
+					<label id="windowfont"><b>Host Name or IP:</b></label>
+					<input type="text" size="30" id="host" name="host" value=""></font>
+					<br><br>
+					<p align=center>
+						<button id="myBtn">Submit</button>
+					</p>
+			</div>
+		</div>
 	</div>
 
-	<div id="container" title="Add a Host">
-		<p align=left>
-			This will add a new host to the PiCluster configuration file.
-			<br><br>
-			<b>Host Name or IP:</b>
-			<input type="text" size="30" id="host" name="host" value=""></font>
-			<br><br>
-			<p align=center>
-				<button onclick="exec()"> Submit</button>
-			</p>
-			<script>
-				$("#container").dialog({
-					height: 'auto',
-					width: 'auto'
-				});
-			</script>
-	</div>
-	<div class="widget">
+	<div id="output" class="modal">
+		<div class="modal-content2">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div id="modal-body2" class="modal-body">
+				<p align=center>
+					Please wait......
+			</div>
+		</div>
 	</div>
 	</p>
+
+	<script>
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var btn = document.getElementById("myBtn");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		btn.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+
+		modal.style.display = "block";
+	</script>
 
 </html>

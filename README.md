@@ -1,47 +1,70 @@
 # PiCluster
-<p align="center">
-<img src="http://i.imgur.com/x2Zfokp.png">
-</p>
-PiCluster is a simple way to manage Docker containers on multiple hosts. I created this
-because I found Docker Swarm not that good and Kubernetes was too difficult to install currently on ARM.
-PiCluster will only build and run images from Dockerfile's on the host specified in the config file. This software will work
-on regular x86 hardware also and is not tied to ARM.
 
-[![Build Status](https://travis-ci.org/rusher81572/picluster.svg?branch=master)](https://travis-ci.org/rusher81572/picluster)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+![Pic](http://i.imgur.com/WBnXC2R.png)
 
-![Pic](http://i.imgur.com/G7KH00c.png)
+ PiCluster is a simple way to manage Docker containers on multiple hosts. I created this because I found Docker Swarm not that good and Kubernetes was too difficult to install currently on ARM. PiCluster will only build and run images from Dockerfile's on the host specified in the config file. This software will work on regular x86 hardware also and is not tied to ARM.
+
+
+
+[![Build Status](https://travis-ci.org/picluster/picluster.svg?branch=master)](https://travis-ci.org/picluster/picluster) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+
+![Pic](http://i.imgur.com/N7KBk6z.pngg)
+![Pic](http://i.imgur.com/h63NLRI.png)
 
 ## Features
-* Move containers to different hosts in the cluster
-* Run commands in parallel across Nodes
-* Heartbeat for services
-* Easily build and orchestrate Docker images across nodes
-* Command-line interface
-* Web interface
-* HTTP interface
-* Virtual IP Manager
-* Rsyslog Analytics
-* Built-in web terminal to easily run commands on nodes
-* Integrate the Kibana dashboard into PiCluster
-* Integrates with Elasticsearch to store the PiCluster logs.
-* Automatic container failover to different nodes.
+
+- Move containers to different hosts in the cluster
+- Run commands in parallel across Nodes
+- Heartbeat for services
+- Easily build and orchestrate Docker images across nodes
+- Command-line interface
+- Web interface
+- HTTP interface
+- Virtual IP Manager
+- Rsyslog Analytics
+- Built-in web terminal to easily run commands on nodes
+- Integrate the Kibana dashboard into PiCluster
+- Integrates with Elasticsearch to store the PiCluster logs.
+- Automatic container failover to different nodes
+- Pull container images from a registry
 
 ## Prerequisites
 
-* Docker
-* Node.js
+- Docker
+- Node.js
 
-If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/rusher81572/picluster/tree/1.0)
+If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/picluster/picluster/tree/1.0)
+
+## Cloning this Repository
+
+```
+git clone https://github.com/picluster/picluster.git picluster
+```
+
+To clone the developer branch (not recommended unless you know what you're doing):
+
+```
+git clone -b dev https://github.com/picluster/picluster.git picluster
+```
+
+## Try PiCluster in Docker
+
+We included a compose file to evaluate PiCluster easily on your laptop. Simply Install Docker on your laptop and do the following:
+
+```
+cd picluster
+docker-compose up -d
+```
+
+Finally, in your web browser go to <http://127.0.0.1:3003>
 
 ## Server Installation
 
-##### 1. Modify config.json with your desired layout.
+### 1\. Copy config-example.json to config.json and modify with your desired layout.
 
 This is the core config file for the web console, agent, and server.
 
 You can run the server and agent on the same node since they are listening on different ports.
-
 
 ```
 {
@@ -49,6 +72,9 @@ You can run the server and agent on the same node since they are listening on di
   "docker":"/root/docker",
   "server_port":"3000",
   "agent_port": "3001",
+  "dockerRegistries": [
+    "registry.fedoraproject.org"
+  ],
   "layout": [
     {"node":"192.168.0.100", "mysql":"-p 3306:3306","nginx":"-p 80:80"},
     {"node":"192.168.0.102", "openvpn":"-p 1194:1194"}],
@@ -83,60 +109,65 @@ You can run the server and agent on the same node since they are listening on di
   "elasticsearch": "http://127.0.0.1:9200",
   "elasticsearch_index": "picluster"
 }
-
 ```
-* layout - Each row contains an IP address of the node to run the container on, the name for the container image as it corresponds in the Docker folder, and the Docker run arguments.
 
-* heartbeat -  lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
+- layout - Each row contains an IP address of the node to run the container on, the name for the container image as it corresponds in the Docker folder, and the Docker run arguments.
 
-* token - A string you define a random string that will be used for authentication with the agents.
+- heartbeat - lists the node, container name, and the port to monitor. If the port can not be connected to, PiCluster will restart the failed image.
 
-* agent_port -  Defines the port that the agent will listen on.
+- token - A string you define a random string that will be used for authentication with the agents.
 
-* docker - Defines where your Dockerfile's are. The format for the Docker folder should be like this: dockerfiles/imagename/Dockerfile
+- agent_port - Defines the port that the agent will listen on.
 
-* web_username and web_password - Define's the username and password for the web interface.
+- dockerRegistries - Defines additional third-party docker registries to pull images from
 
-* web_connect - IP address of a node running the server.
+- docker - Defines where your Dockerfile's are. The format for the Docker folder should be like this: dockerfiles/imagename/Dockerfile
 
-* web_port - Port that the web console listens on.
+- web_username and web_password - Define's the username and password for the web interface.
 
-* automatic_heartbeat - Have the server do a heartbeat check on the services in the hb section of config.json. Valid values are: enabled or disabled.
+- web_connect - IP address of a node running the server.
 
-* heartbeat_interval - How often to do the heartbeat check. Requires automatic_heartbeat to be enabled.
+- web_port - Port that the web console listens on.
 
-* syslog - The command used to read the logs on each host.
+- automatic_heartbeat - Have the server do a heartbeat check on the services in the hb section of config.json. Valid values are: enabled or disabled.
 
-* vip - This section contains the agent nodes that the VIP can run on, the ethernet device on each node, and the slave node to run checks against.
+- heartbeat_interval - How often to do the heartbeat check. Requires automatic_heartbeat to be enabled.
 
-* vip_ping_time - Time in ms to ping each slave. Each host should have different times.
+- syslog - The command used to read the logs on each host.
 
-* vip_ip - The Virtual IP address to use in the cluster
+- vip - This section contains the agent nodes that the VIP can run on, the ethernet device on each node, and the slave node to run checks against.
 
-* autostart_containers - If set, the agent will connect to the server specififed in web_connect to start all of the containers.
+- vip_ping_time - Time in ms to ping each slave. Each host should have different times.
 
-* rsyslog_logfile - Location of the log file on the Rsyslog server
+- vip_ip - The Virtual IP address to use in the cluster
 
-* rsyslog_host - The host running the PiCluster Agent with a Rsyslog server running or has access to the log drain file.
+- autostart_containers - If set, the agent will connect to the server specififed in web_connect to start all of the containers.
 
-* commandlist - A list of commands to run on the nodes on demand from the web console under Operations -> Run Command.
+- rsyslog_logfile - Location of the log file on the Rsyslog server
 
-* kibana - The is for the URL to Kibana to integrate the console inside PiCluster.
+- rsyslog_host - The host running the PiCluster Agent with a Rsyslog server running or has access to the log drain file.
 
-* elasticsearch - The URL for your Elasticsearch server.
+- commandlist - A list of commands to run on the nodes on demand from the web console under Operations -> Run Command.
 
-* elasticsearch_index - The Elasticsearch index to use for PiCluster.
+- kibana - The is for the URL to Kibana to integrate the console inside PiCluster.
 
-* container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container.
+- elasticsearch - The URL for your Elasticsearch server.
 
-###### An example on the Docker folder layout:
+- elasticsearch_index - The Elasticsearch index to use for PiCluster.
+
+- container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container.
+
+#### An example on the Docker folder layout:
+
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
+
 ```
 "layout": [
   {"node":"192.168.0.100", "mysql":"-p 3306:3306","nginx":"-p 80:80"}
 ```
 
 The Docker folder will need to be setup like this to match the container names:
+
 ```
 /root/docker/mysql/Dockerfile
 /root/docker/nginx/Dockerfile
@@ -144,7 +175,7 @@ The Docker folder will need to be setup like this to match the container names:
 
 When it is time to build the containers, PiCluster will use the "docker" variable from config.json plus the container name to locate and build the images.
 
-##### 2. Running the Application
+### 2\. Running the Application
 
 This section will cover how to install and run each component of PiCluster.
 
@@ -178,115 +209,136 @@ npm install
 node webconsole.js
 ```
 
+## Upgrading
+
+1. Read the release notes on Github
+2. Pull the latest changes from master `git pull`
+2. Run "npm install" in the web, server, and agent directories.
+3. Compare the contents of config.json with config-example.json to see if anything has changed
+
+
 ## Configuring and using the client "pictl"
 
 Pictl is a bash client to easily control the cluster. It will make all the HTTP requests using curl.
 
-#### 1. The following variables need to be set in the file:
+### 1\. The following variables need to be set in the file:
 
-* server - IP address of the server
-* port - PORT that the server uses
-* token - The token used in the Server and Agent configs.
+- server - IP address of the server
+- port - PORT that the server uses
+- token - The token used in the Server and Agent configs.
 
-#### 2. Using the client
+### 2\. Using the client
 
-If a command has arguments ([image] or [container]), the commands will
-run cluster-wide. For example if you run "pictl delete" without
-specifying a container, all of the containers will be deleted.
+If a command has arguments ([image] or [container]), the commands will run cluster-wide. For example if you run "pictl delete" without specifying a container, all of the containers will be deleted.
 
 To get a list of accepted arguments:
+
 ```
 pictl
 ```
 
 To get a list of all the nodes in PiCluster:
+
 ```
 pictl nodes
 ```
 
 To build a Docker image from the config:
+
 ```
 pictl build [image]
 ```
 
 To create and start a container from the config:
+
 ```
 pictl create [container]
 ```
 
 To stop a container from the config:
+
 ```
 pictl stop [container]
 ```
 
 To delete a container from the config:
+
 ```
 pictl delete [container]
 ```
 
 To restart a container from the config:
+
 ```
 pictl restart [container]
 ```
 
 To execute a command on all of the hosts
+
 ```
 pictl exec "command"
 ```
 
 Display all of the Docker images on each host
+
 ```
 pictl images
 ```
 
 To view the current log
+
 ```
 pictl log
 ```
 
-## Using Systemd for Server and Agent Processes
+## Using pm2 to init PiCluster on systemd
 
-The systemd folder containers the service files and scripts to make PiCluster start at boot time.
+### 0\. Login as root to install pm2
 
-#### 1. Modify the .service files in the systemd folder
-
-For each .service file, change ExecStart and ExecStop to reflect the location of the PiCluster folder.
 ```
-ExecStart=/bin/bash /root/picluster/systemd/start-agent.sh
-ExecStop=/bin/bash /root/picluster/systemd/stop-agent.sh
-```
-#### 2. Modify the start scripts in the systemd folder
-
-For each file that begins with "start", modify the PICLUSTER_ variables for your installation.
-
-Example for start-agent.sh.
-```
-export PICLUSTER_AGENT_PATH="/root/picluster/agent"
+sudo -i
 ```
 
-#### 3. Copy the systemd files to the systemd directory
+### 1\. Install pm2
+
 ```
-cp systemd/*.service /lib/systemd/system/
+npm install -g pm2
 ```
 
-#### 4. Enable the services
+### 2\. Install the pm2 systemd unit file
 
-To enable the server service.
 ```
-systemctl enable picluster-server.service
-```
-
-To enable the agent service.
-```
-systemctl enable picluster-agent.service
+pm2 startup systemd
 ```
 
-To enable the web console service.
+### 3\. Export the PiCluster config path (change the path accordingly)
+
 ```
-systemctl enable picluster-web.service
+export PICLUSTER_CONFIG='/opt/picluster/config.json'
 ```
 
-#### 5. Reboot for the services to be started properly
+### 4\. Start the server, agent, and webconsole scripts (change the path accordingly)
+
+```
+pm2 start /opt/picluster/server/server.js
+pm2 start /opt/picluster/agent/agent.js
+pm2 start /opt/picluster/web/webconsole.js
+```
+
+### 5\. Save the pm2 session to restart at boot
+
+```
+pm2 save
+```
+
+### 6\. Enable pm2 at boot:
+
+```
+systemctl enable pm2-root
+```
+
+### 7\. Reboot for the services to be started properly
+
 ```
 Reboot
 ```
@@ -295,29 +347,34 @@ Reboot
 
 This feature will automatically migrate a container to another host after three failed heartbeat attempts. It is recommended to use a Git repository for your Dockerfile's to easily build and move containers across nodes. For applications require data persistence using Docker volumes, it is best to use a distributed filesytem like GlusterFS or NFS so the container will have access to it's data on any host.
 
-### Overview of the process.
+## Overview of the process.
 
 When container_host_constraints is enabled in config.json, each failed heartbeat attempt to a container is logged. When three failed heartbeat attempts occur, the following action is taken:
 
-* A new host is chosen randomly from the container map that you designated in container_host_constraints.
-* The container is deleted on it's current host.
-* The configuration file is updated with the new host layout.
-* The container image is built and run on the new host.
+- A new host is chosen randomly from the container map that you designated in container_host_constraints.
+- The container is deleted on it's current host.
+- The configuration file is updated with the new host layout.
+- The container image is built and run on the new host.
 
-### Prerequisites
+## Prerequisites
 
 1. Heartbeat configured in config.json (automatic_heartbeat,heartbeat_interval, and container added to heartbeat section)
 2. container_host_constraints enabled in config.json
-```
-"container_host_constraints": [],
-```
-### How to assign container_host_constraints to a container and hosts?
 
-1. Manually in config.json
-2. Once container_host_constraints is enabled in config.json, you can add the hosts when you choose "Add Container" in the web console.
+  ```
+  "container_host_constraints": [],
+  ```
 
-### Sample configuration and Testing
-The following config.json is a minimal configuration needed to try this out on your laptop. It consists of two nodes (localhost and 127.0.0.1) that will run Minio in a container. Currently, Minio is only on the node called localhost.  
+  ### How to assign container_host_constraints to a container and hosts?
+
+3. Manually in config.json
+
+4. Once container_host_constraints is enabled in config.json, you can add the hosts when you choose "Add Container" in the web console.
+
+## Sample configuration and Testing
+
+The following config.json is a minimal configuration needed to try this out on your laptop. It consists of two nodes (localhost and 127.0.0.1) that will run Minio in a container. Currently, Minio is only on the node called localhost.
+
 ```
 {
   "token": "1234567890ABCDEFGHJKLMNOP",
@@ -360,6 +417,8 @@ Based on the sample above, PiCluster will check if Minio is running every 30 sec
 
 Project created by Phillip Tribble. [LinkedIn](https://www.linkedin.com/in/philliptribble) , [Twitter](https://twitter.com/rusher81572)
 
-#### Images
+PiCluster Logos by chzbacon.
+
+## Images
 
 This work, "Raspy Whale", is a derivative of "raspberry" by Chanut is Industries from the Noun Project used under CC BY, "Sperm Whale" by Oksana Latysheva from the Noun Project used under CC BY, and "Sperm Whale" by Oksana Latysheva from the Noun Project used under CC BY. "Raspy Whale" is licensed under CC BY by Jordan Sinn.

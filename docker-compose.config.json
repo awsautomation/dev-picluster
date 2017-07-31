@@ -3,29 +3,21 @@
   "docker": "../docker",
   "server_port": "3000",
   "agent_port": "3001",
-  "layout": [{
-      "node": "localhost",
-      "minio": "-p 9000:9000"
-    },
+  "layout": [
     {
-      "node": "127.0.0.1",
+      "node": "agent",
       "nginx": "-p 80:80"
     }
   ],
-  "hb": [{
-      "node": "localhost",
-      "minio": "9000"
-    },
+  "hb": [
     {
-      "node": "127.0.0.1",
+      "node": "agent",
       "nginx": "80"
     }
   ],
-  "container_host_constraints": [{
-      "container": "nginx,localhost,127.0.0.1"
-    },
+  "container_host_constraints": [
     {
-      "container": "minio,localhost,127.0.0.1"
+      "container": "nginx,agent"
     }
   ],
   "automatic_heartbeat": "enabled",
@@ -33,6 +25,6 @@
   "syslog": "dmesg",
   "web_username": "admin",
   "web_password": "admin",
-  "web_connect": "127.0.0.1",
+  "web_connect": "server",
   "web_port": "3003"
 }
