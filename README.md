@@ -60,7 +60,7 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 ## Server Installation
 
-### 1\. Modify config.json with your desired layout.
+### 1\. Copy config-example.json to config.json and modify with your desired layout.
 
 This is the core config file for the web console, agent, and server.
 
@@ -211,11 +211,10 @@ node webconsole.js
 
 ## Upgrading
 
-1. Backup config.json
-2. Delete the picluster directory
-3. Clone the PiCluster repository
-4. Copy your existing config.json to the picluster directory
-5. Run "npm install" in the web, server, and agent directories.
+1. Read the release notes on Github
+2. Pull the latest changes from master `git pull`
+2. Run "npm install" in the web, server, and agent directories.
+3. Compare the contents of config.json with config-example.json to see if anything has changed
 
 
 ## Configuring and using the client "pictl"
