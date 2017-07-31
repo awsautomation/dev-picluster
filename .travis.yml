@@ -19,6 +19,7 @@ script:
 - sudo docker image build ./docker/minio -t minio -f ./docker/minio/Dockerfile
 - sudo docker container run -d --name nginx -p 80:80 nginx
 - sudo docker container run -d --name minio -p 9000:9000 minio
+- cp config-example.json config.json
 - cd server;npm install; sudo node server.js&
 - cd ../agent;npm install; sudo node agent.js&
 - cd ../web;npm install; sudo node webconsole.js&
