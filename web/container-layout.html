@@ -115,6 +115,11 @@
 		}
 	</style>
 	<script>
+		function linkFunction(container) {
+			parent.manage_container = container;
+			return false;
+		};
+
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			if (div) {
@@ -140,9 +145,8 @@
 							var parse_output = show_containers[j].split('  ');
 							if (parse_output.length > 1) {
 								if (div) {
-									div.innerHTML = div.innerHTML + '<font size=+1><li>' + parse_output[parse_output.length - 1] + '</li>';
+									div.innerHTML = div.innerHTML + '<font size=+1><li><a href="/manage.html" onClick="linkFunction("' + parse_output[parse_output.length - 1] + '");">' + parse_output[parse_output.length - 1] + '</a></li>';
 								}
-
 							}
 						}
 						if (div) {

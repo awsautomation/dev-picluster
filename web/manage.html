@@ -288,19 +288,27 @@
 					<script>
 						$(function() {
 							var option = '';
-							$.post('/listcontainers', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
+							alert(parent.manage_container);
+							if (parent.manage_container) {
+								option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
 								$('#containerlist').append(option);
-							});
+								parent.manage_container = '';
+							} else {
+								$.post('/listcontainers', {
+									token: parent.token
+								}, function(data) {
+									data = data.replace(/\[/gi, '');
+									data = data.replace(/\]/gi, '');
+									data = data.replace(/\"/gi, '');
+									var parse_data = data.split(',');
+									for (var i = 0; i < parse_data.length; i++) {
+										option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+									}
+									option += '<option value="' + '*' + '">' + '*' + '</option>';
+									$('#containerlist').append(option);
+								});
+							}
+
 						});
 						$(function() {
 							var option = '';
