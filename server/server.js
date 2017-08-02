@@ -877,7 +877,14 @@ app.get('/addcontainer', function(req, res) {
         if (error) {
           res.end(error);
         } else {
-          res.end('\nAdded ' + container + ' to the configuration.');
+          //res.end('\nAdded ' + container + ' to the configuration.');
+          request('http://127.0.0.1' + ':' + port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + host, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+              res.end('\nAdded ' + container + ' to the configuration.');
+            } else {
+              res.end('\nError connecting with server.');
+            }
+          });
         }
       });
     };
