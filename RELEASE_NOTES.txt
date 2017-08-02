@@ -1,0 +1,12 @@
+Version 2.1
+
+New Features:
+Can now build fresh Docker images without using the cache.
+Ability to delete images from the Web Console.
+
+Enhancements:
+Container Display: Can click on a running container to manage it.
+Image Display: Can click on a image to manage it.
+
+Bug Fixes:
+None.
