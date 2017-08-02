@@ -113,6 +113,10 @@
 		}
 	</style>
 	<script>
+	function linkFunction(container) {
+		parent.manage_image = container;
+	};
+
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			if (div) {
@@ -136,7 +140,8 @@
 						for (j = 0; j != show_containers.length; j++) {
 							var parse_output = show_containers[j].split('  ');
 							if (parse_output.length > 1 && parse_output[0].indexOf('<none>') < 0) {
-								div.innerHTML = div.innerHTML + '<font size=+1><li>' + parse_output[0] + '</li>';
+								//div.innerHTML = div.innerHTML + '<font size=+1><li>' + parse_output[0] + '</li>';
+								div.innerHTML = div.innerHTML + '<font size=+1><li><a href="/manage-images.html" style="text-decoration:none" onclick="linkFunction(\'' +parse_output[0].replace(' ', '') + '\')"> ' + parse_output[0] + ' </a></li>';
 							}
 						}
 						if (div) {

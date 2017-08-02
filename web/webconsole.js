@@ -1016,8 +1016,8 @@ app.get('/pullimages.html', function(req, res) {
   res.sendFile(__dirname + '/pullimages.html');
 });
 
-app.get('/build.html', function(req, res) {
-  res.sendFile(__dirname + '/build.html');
+app.get('/manage-images.html', function(req, res) {
+  res.sendFile(__dirname + '/manage-images.html');
 });
 
 app.get('/logo.png', function(req, res) {
