@@ -163,7 +163,7 @@
 					command: command,
 					node: node
 				}, function(data) {
-						$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
+					$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
 				});
 			}
 		}
@@ -242,14 +242,17 @@
 			</div>
 			<div class="modal-body">
 				<p align=center>
-				<table style="width:10%">
-					<tr>
-						<td>
-							<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-					</tr>
-				</table>
-				<p align=left>
-					<br>
+					<table style="width:10%">
+						<tr>
+							<td>
+								<p align=center>
+									<button id="myBtn2">Run Again</button>
+									<br><br>
+									<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+						</tr>
+					</table>
+					<p align=left>
+						<br>
 			</div>
 		</div>
 	</div>
@@ -260,6 +263,7 @@
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
 		var btn = document.getElementById("myBtn");
+		var btn2 = document.getElementById("myBtn2");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -271,6 +275,10 @@
 		btn.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
+			exec();
+		}
+		btn2.onclick = function() {
+			$('#command_output').val('');
 			exec();
 		}
 		modal.style.display = "block";
