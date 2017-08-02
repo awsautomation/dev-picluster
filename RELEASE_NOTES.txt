@@ -7,6 +7,7 @@ Ability to delete images from the Web Console.
 Enhancements:
 Container Display: Can click on a running container to manage it.
 Image Display: Can click on a image to manage it.
+"Run Again" button has been added back to the PiCluster Run command window.
 
 Bug Fixes:
 None.
