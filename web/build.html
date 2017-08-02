@@ -137,17 +137,35 @@
 	<script>
 		function exec() {
 			var e = document.getElementById("imagelist");
+			var d = document.getElementById("delete");
+			var c = document.getElementById("cache");
+			var no_cache = '';
 			var image = e.options[e.selectedIndex].value;
+
+			if (c.checked) {
+				no_cache = "true";
+			}
 
 			if (image) {
 
-				$.post('/build', {
-					token: parent.token,
-					image: image
-				}, function(data) {
-					var div = document.getElementById('modal-body2');
-					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
-				});
+				if (d.checked) {
+					$.post('/delete-image', {
+						token: parent.token,
+						image: image
+					}, function(data) {
+						var div = document.getElementById('modal-body2');
+						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
+					});
+				} else {
+					$.post('/build', {
+						token: parent.token,
+						image: image,
+						no_cache: no_cache
+					}, function(data) {
+						var div = document.getElementById('modal-body2');
+						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
+					});
+				}
 			} else {
 				alert('Error, you did not select an image.')
 			}
@@ -161,7 +179,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Build a Container Image</h2>
+				<h2>Manage Images</h2>
 			</div>
 			<div class="modal-body">
 				<p align=left>
@@ -169,6 +187,10 @@
 						<label for="imagelist">Select a Container</label>
 						<select name="imagelist" id="imagelist">
 			    </select>
+						<br><br>
+						<input type="checkbox" id="cache"><label for="imagelist">No Cache</label>
+						<br><br>
+						<input type="checkbox" id="delete"><label for="imagelist">Delete</label>
 						<br> <br>
 						<p align=center>
 							<button id="myBtn">Submit</button>

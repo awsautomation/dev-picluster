@@ -522,7 +522,7 @@ app.get('/killvip', function(req, res) {
   }
 });
 
-app.post('/build', function(req, res) {
+app.post('/delete-image', function(req, res) {
   var check_token = req.body.token;
   var image = req.body.image;
 
@@ -536,7 +536,7 @@ app.post('/build', function(req, res) {
     var responseString = '';
     if (image.length > 1) {
 
-      request('http://' + server + ':' + server_port + '/build?' + 'token=' + token + '&image=' + image, function(error, response, body) {
+      request('http://' + server + ':' + server_port + '/delete-image?' + 'token=' + token + '&image=' + image, function(error, response, body) {
         if (!error && response.statusCode == 200) {
           display_log(function(data) {
             res.end(data);
@@ -547,7 +547,46 @@ app.post('/build', function(req, res) {
       });
     } else {
 
-      request('http://' + server + ':' + server_port + '/build?' + 'token=' + token, function(error, response, body) {
+      request('http://' + server + ':' + server_port + '/delete-image?' + 'token=' + token, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          display_log(function(data) {
+            res.end(data);
+          });
+        } else {
+          res.end('\nError connecting with server.');
+        }
+      });
+    }
+  }
+});
+
+app.post('/build', function(req, res) {
+  var check_token = req.body.token;
+  var image = req.body.image;
+  var no_cache = req.body.no_cache;
+
+  if (image.indexOf('Everthing') > -1) {
+    image = '';
+  }
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    if (image.length > 1) {
+
+      request('http://' + server + ':' + server_port + '/build?' + 'token=' + token + '&image=' + image + '&no_cache=' + no_cache, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          display_log(function(data) {
+            res.end(data);
+          });
+        } else {
+          res.end('\nError connecting with server.');
+        }
+      });
+    } else {
+
+      request('http://' + server + ':' + server_port + '/build?' + 'token=' + token + '&no_cache=' + no_cache, function(error, response, body) {
         if (!error && response.statusCode == 200) {
           display_log(function(data) {
             res.end(data);

@@ -232,6 +232,67 @@ function addLog(data) {
 
 app.get('/build', function(req, res) {
   var check_token = req.query['token'];
+  var no_cache = req.query['no_cache'];
+  var image = '';
+  if (req.query['image']) {
+    image = req.query['image'];
+  }
+
+  if (image.indexOf("*") > -1) {
+    image = '*';
+  }
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var responseString = '';
+    Object.keys(config.layout).forEach(function(get_node, i) {
+      Object.keys(config.layout[i]).forEach(function(key) {
+        const node = config.layout[i].node;
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
+        }
+        if (no_cache.indexOf('true') > -1) {
+          var command = JSON.stringify({
+            "command": 'docker image build --no-cache ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
+            "token": token
+          });
+        } else {
+          var command = JSON.stringify({
+            "command": 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
+            "token": token
+          });
+        }
+
+
+        var options = {
+          url: 'http://' + node + ':' + agentPort + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        }
+
+        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+          request(options, function(error, response, body) {
+            if (error) {
+              res.end("An error has occurred.");
+            } else {
+              var results = JSON.parse(response.body);
+              addLog('\n' + results.output);
+            }
+          });
+        }
+      });
+    });
+    res.end('');
+  }
+});
+
+app.get('/delete-image', function(req, res) {
+  var check_token = req.query['token'];
   var image = '';
   if (req.query['image']) {
     image = req.query['image'];
@@ -252,7 +313,7 @@ app.get('/build', function(req, res) {
           return;
         }
         var command = JSON.stringify({
-          "command": 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
+          "command": 'docker image rm ' + key,
           "token": token
         });
 
