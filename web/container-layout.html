@@ -144,7 +144,7 @@
 							var parse_output = show_containers[j].split('  ');
 							if (parse_output.length > 1) {
 								if (div) {
-									div.innerHTML = div.innerHTML + '<font size=+1><li><a href="/manage.html" style="text-decoration:none" onclick="linkFunction(\'' + parse_output[parse_output.length - 1] + '\')"> ' + parse_output[parse_output.length - 1] + ' </a></li>';
+									div.innerHTML = div.innerHTML + '<font size=+1><li><a href="/manage.html" style="text-decoration:none" onclick="linkFunction(\'' + parse_output[parse_output.length - 1].replace(' ', '') + '\')"> ' + parse_output[parse_output.length - 1] + ' </a></li>';
 								}
 							}
 						}
