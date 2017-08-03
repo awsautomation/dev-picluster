@@ -11,4 +11,4 @@ Image Display: Can click on a image to manage it.
 "Run Again" button has been added back to the PiCluster Run command window.
 
 Bug Fixes:
-None.
+Scrolling fixed in manage containers.
