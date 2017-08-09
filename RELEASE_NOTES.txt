@@ -4,6 +4,9 @@ New Features:
 Can now build fresh Docker images without using the cache.
 Ability to delete images from the Web Console.
 When a container is added, it will be automatically built and started.
+Can now upload a zip containing the Dockerfile and required files for a container.
+The zip archive will be copied to each machine and extracted.
+
 
 Enhancements:
 Container Display: Can click on a running container to manage it.
