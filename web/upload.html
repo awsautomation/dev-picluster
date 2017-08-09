@@ -149,12 +149,9 @@
 				<h2>Upload Dockerfile</h2>
 			</div>
 			<div class="modal-body">
-				<p align=left>
+				<p align=center>
 					<label id="windowfont">Upload your Dockerfile.
 						<br><br>
-					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
-					<select name="nodelist" id="nodelist">
-						</select>
 					<br><br>
 					<form id="upload-widget" method="post" action="/upload" class="dropzone">
 					<input type="hidden" name="token" id="token">
@@ -163,26 +160,6 @@
 					</fieldset>
 					<script>
 					 document.getElementById("token").value = parent.token;
-						$(function() {
-							var option = '';
-							var checkbox = '';
-							$.post('/listnodes', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-								}
-								for (var i = 0; i < parse_data.length; i++) {
-									checkbox += '<label id="windowfont" for="hostlist">' + parse_data[i] + '</label><input type="checkbox" name="hostlist" value="' + parse_data[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
-								}
-								$('#nodelist').append(option);
-								$('#hostList').append(checkbox);
-							});
-						});
 					</script>
 			</div>
 		</div>

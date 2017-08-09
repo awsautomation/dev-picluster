@@ -23,6 +23,10 @@ var log = '';
 var token = config.token;
 var dockerFolder = config.docker;
 var container_faillog = [];
+var multer = require('multer');
+var upload = multer({
+  dest: '../'
+});
 
 if (config.elasticsearch && config.elasticsearch_index) {
   var mapping = {
@@ -1232,6 +1236,7 @@ app.post('/listcontainers', function(req, res) {
 });
 
 
+
 app.post('/listnodes', function(req, res) {
   var command = req.body.command;
   var check_token = req.body.token;
@@ -1254,6 +1259,22 @@ app.post('/listnodes', function(req, res) {
     res.send(output);
   }
 });
+
+app.post('/receive-file', upload.single('file'), function(req, res, next) {
+  var check_token = req.body.token;
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    fs.readFile(req.file.path, function(err, data) {
+      var newPath = "../" + req.file.originalname;
+      fs.writeFile(newPath, data, function(err) {
+      });
+    });
+    res.end('Done');
+  }
+});
+
+
 
 app.post('/listcommands', function(req, res) {
   var command = req.body.command;

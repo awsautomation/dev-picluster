@@ -763,6 +763,26 @@ app.post('/addcontainer', function(req, res) {
   }
 });
 
+function sendFile(file, name) {
+
+  var formData = {
+    name: 'file',
+    token: token,
+    file: fs.createReadStream(file)
+  };
+
+  request.post({
+    url: 'http://' + server + ':' + server_port + '/receive-file',
+    formData: formData
+  }, function(err, httpResponse, body) {
+    if (err) {
+      console.error('upload failed:', err);
+    } else {
+      console.log('Upload successful!  Server responded with:', body);
+    }
+  });
+}
+
 app.post('/upload', upload.single('file'), function(req, res, next) {
   var check_token = req.body.token;
   var host = req.body.host;
@@ -774,6 +794,7 @@ app.post('/upload', upload.single('file'), function(req, res, next) {
     fs.readFile(req.file.path, function(err, data) {
       var newPath = "../" + req.file.originalname;
       fs.writeFile(newPath, data, function(err) {
+        sendFile(newPath, req.file.originalname);
         res.end("");
       });
     });
