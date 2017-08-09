@@ -14,6 +14,7 @@
     "os": "",
     "request": "",
     "request-debug": "",
-    "sys": ""
+    "sys": "",
+    "unzip": "^0.1.11"
   }
 }
