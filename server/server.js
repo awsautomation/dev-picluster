@@ -1278,10 +1278,7 @@ function copyToAgents(file) {
         url: 'http://' + node + ':' + agentPort + '/receive-file',
         formData: formData
       }, function(err, httpResponse, body) {
-        if (err) {
-          console.error('\nError: Did not copy ' + file + ' to ' + node, err);
-          addLog('\nError: Did not copy ' + file + ' to ' + node);
-        } else {
+        if (!err) {
           addLog('\nCopied ' + file + ' to ' + node);
           console.log('\nCopied ' + file + ' to ' + node);
         }
