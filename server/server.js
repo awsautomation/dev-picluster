@@ -1260,6 +1260,36 @@ app.post('/listnodes', function(req, res) {
   }
 });
 
+function copyToAgents(file) {
+  Object.keys(config.layout).forEach(function(get_node, i) {
+    Object.keys(config.layout[i]).forEach(function(key) {
+      const node = config.layout[i].node;
+      if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+        return;
+      }
+
+      var formData = {
+        name: 'file',
+        token: token,
+        file: fs.createReadStream(file)
+      };
+
+      request.post({
+        url: 'http://' + node + ':' + agentPort + '/receive-file',
+        formData: formData
+      }, function(err, httpResponse, body) {
+        if (err) {
+          console.error('\nError: Did not copy ' + file + ' to ' + node, err);
+          addLog('\nError: Did not copy ' + file + ' to ' + node);
+        } else {
+          addLog('\nCopied ' + file + ' to ' + node);
+          console.log('\nCopied ' + file + ' to ' + node);
+        }
+      });
+    });
+  });
+}
+
 app.post('/receive-file', upload.single('file'), function(req, res, next) {
   var check_token = req.body.token;
   if ((check_token != token) || (!check_token)) {
@@ -1268,9 +1298,10 @@ app.post('/receive-file', upload.single('file'), function(req, res, next) {
     fs.readFile(req.file.path, function(err, data) {
       var newPath = "../" + req.file.originalname;
       fs.writeFile(newPath, data, function(err) {
+        copyToAgents(newPath);
       });
     });
-    res.end('Done');
+    res.end('');
   }
 });
 

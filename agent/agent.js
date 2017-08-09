@@ -17,7 +17,7 @@ const node = os.hostname();
 const async = require('async');
 const Promisify = require('util').promisify;
 const exec = require('child-process-promise').exec;
-const noop = function () {};
+const noop = function() {};
 var vip = ''
 var vip_slave = '';
 var vip_device = '';
@@ -25,6 +25,10 @@ var ip_add_command = '';
 var ip_delete_command = '';
 var vip_ping_time = '';
 var token = config.token;
+var multer = require('multer');
+var upload = multer({
+  dest: '../'
+});
 
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
@@ -42,23 +46,27 @@ if (config.autostart_containers) {
 if (config.vip_ip && config.vip) {
   var vip = config.vip_ip;
   Object.keys(config.vip).forEach(function(i) {
-   const _node = config.vip[i].node;
-   Object.keys(config.vip[i]).forEach(function(key) {
-     if (!config.vip[i].hasOwnProperty(key)) { return; }
-     const interfaces = require('os').networkInterfaces();
-     Object.keys(interfaces).forEach(function(devName) {
-       const iface = interfaces[devName];
-       iface.forEach(function(alias) {
-         if (alias.address !== _node) { return; }
-         vip_slave = config.vip[i].slave;
-         vip_eth_device = config.vip[i].vip_eth_device;
-         ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
-         const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
-         vip_ping_time = config.vip[i].vip_ping_time;
-         exec(cmd).then(send_ping).catch(send_ping);
-       });
-     })
-   })
+    const _node = config.vip[i].node;
+    Object.keys(config.vip[i]).forEach(function(key) {
+      if (!config.vip[i].hasOwnProperty(key)) {
+        return;
+      }
+      const interfaces = require('os').networkInterfaces();
+      Object.keys(interfaces).forEach(function(devName) {
+        const iface = interfaces[devName];
+        iface.forEach(function(alias) {
+          if (alias.address !== _node) {
+            return;
+          }
+          vip_slave = config.vip[i].slave;
+          vip_eth_device = config.vip[i].vip_eth_device;
+          ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
+          const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
+          vip_ping_time = config.vip[i].vip_ping_time;
+          exec(cmd).then(send_ping).catch(send_ping);
+        });
+      })
+    })
   });
 }
 
@@ -135,9 +143,9 @@ app.post('/killvip', function(req, res) {
   if (config.vip_ip) {
     var cmd = ip_delete_command;
     exec(cmd).then(function(stdout, stderr) {
-        res.end('\nCompleted.');
+      res.end('\nCompleted.');
     }).catch(function(error) {
-        console.log(error);
+      console.log(error);
     });
   }
 });
@@ -165,6 +173,20 @@ app.post('/pong', function(req, res) {
     "vip_detected": vip_status
   };
   res.send(body);
+});
+
+app.post('/receive-file', upload.single('file'), function(req, res, next) {
+  var check_token = req.body.token;
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    fs.readFile(req.file.path, function(err, data) {
+      var newPath = "../" + req.file.originalname;
+      fs.writeFile(newPath, data, function(err) {
+      });
+    });
+    res.end('Done');
+  }
 });
 
 app.post('/run', function(req, res) {
@@ -195,10 +217,16 @@ app.post('/run', function(req, res) {
   }
 
   async.eachSeries(commands, function(command, cb) {
-    if (typeof command === "string") { command = [command]; }
-    if(!(command instanceof Array)) { return; }
+    if (typeof command === "string") {
+      command = [command];
+    }
+    if (!(command instanceof Array)) {
+      return;
+    }
     //console.log('command', command);
-    exec(command.join(' '), {cwd: __dirname}).then(function(log) {
+    exec(command.join(' '), {
+      cwd: __dirname
+    }).then(function(log) {
       //console.log('output', log);
       output.output.push(`${log.stdout||''}${log.stderr||''}`);
       return cb();
@@ -208,7 +236,9 @@ app.post('/run', function(req, res) {
       return cb(e);
     });
   }, function(e) {
-    if (e) { console.error('error:', e); }
+    if (e) {
+      console.error('error:', e);
+    }
     //console.log('output', output);
     res.json(output);
   });

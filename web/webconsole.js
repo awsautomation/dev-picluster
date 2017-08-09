@@ -778,7 +778,7 @@ function sendFile(file, name) {
     if (err) {
       console.error('upload failed:', err);
     } else {
-      console.log('Upload successful!  Server responded with:', body);
+      console.log('Upload successful!');
     }
   });
 }
