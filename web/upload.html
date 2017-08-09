@@ -157,10 +157,12 @@
 						</select>
 					<br><br>
 					<form id="upload-widget" method="post" action="/upload" class="dropzone">
+					<input type="hidden" name="token" id="token">
 					</form>
 					<br><br>
 					</fieldset>
 					<script>
+					 document.getElementById("token").value = parent.token;
 						$(function() {
 							var option = '';
 							var checkbox = '';
