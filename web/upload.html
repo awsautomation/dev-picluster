@@ -33,6 +33,13 @@
 
 		form {
 			font-size: 18px;
+			background-color: #565051;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
 		}
 
 		#windowfont {
@@ -64,7 +71,7 @@
 			font-size: 12px;
 			padding: 0;
 			border: 1px solid #888;
-			width: 75%;
+			width: 45%;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -149,10 +156,11 @@
 				<h2>Upload Dockerfile</h2>
 			</div>
 			<div class="modal-body">
-				<p align=center>
-					<label id="windowfont">Upload a .zip archive of a containers Dockerfile and required files to be copied on each node.
+				<p align=left>
+					<label id="windowfont">This will upload a .zip archive of a containers Dockerfile and required files.
+				  <br><br>
+					The .zip archive will be copied to each node and extracted.
 						<br><br>
-					<br><br>
 					<form id="upload-widget" method="post" action="/upload" class="dropzone">
 					<input type="hidden" name="token" id="token">
 					</form>
