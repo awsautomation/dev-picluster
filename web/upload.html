@@ -1,0 +1,267 @@
+<html>
+
+<head>
+	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<style>
+		body {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 1rem;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
+
+
+		button {
+			background-color: #565051;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+		}
+
+		#nodelist {
+			font-size: 18px;
+		}
+
+		input {
+				font-size: 18px;
+		}
+		#windowfont {
+			font-size: 18px;
+		}
+
+		#modal-body2 {
+			font-size: 18px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			font-size: 12px;
+			padding: 0;
+			border: 1px solid #888;
+			width: 75%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #565051;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
+		}
+
+		textarea {
+			font-size: 18px;
+		}
+
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			font-size: 12px;
+			padding: 0;
+			border: 1px solid #888;
+			width: 60%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+	</style>
+	<script>
+		function exec() {
+			var e = document.getElementById("nodelist");
+			var nodes = document.getElementsByName('hostlist');
+			var path = '/addcontainer';
+			var host = e.options[e.selectedIndex].value;
+			var container = $("#container_name").val();
+			var container_args = $("#container_args").val();
+			var heartbeat_args = $("#heartbeat_args").val();
+			var failover_constraints = '';
+
+			nodes.forEach(function(node, i) {
+				if (nodes[i].checked) {
+					if (failover_constraints) {
+						failover_constraints += ',' + node.value;
+					} else {
+						failover_constraints += node.value;
+					}
+				}
+			});
+
+			if (!failover_constraints) {
+				failover_constraints = 'none';
+			}
+
+			$.post(path, {
+				token: parent.token,
+				container: container,
+				host: host,
+				container_args: container_args,
+				heartbeat_args: heartbeat_args,
+				failover_constraints: container + ',' + failover_constraints
+			}, function(data) {
+				var div = document.getElementById('modal-body2');
+				div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Upload Dockerfile</h2>
+			</div>
+			<div class="modal-body">
+				<p align=left>
+					<label id="windowfont">Upload your Dockerfile.
+						<br><br>
+					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
+					<select name="nodelist" id="nodelist">
+						</select>
+						<br><br>
+					<form action="/upload">
+						<input type="file" name="pic" accept="*.zip">
+					</form>
+					<br><br>
+					</fieldset>
+					<p align=center>
+						<button id="myBtn">Submit</button>
+					</p>
+					<script>
+						$(function() {
+							var option = '';
+							var checkbox = '';
+							$.post('/listnodes', {
+								token: parent.token
+							}, function(data) {
+								data = data.replace(/\[/gi, '');
+								data = data.replace(/\]/gi, '');
+								data = data.replace(/\"/gi, '');
+								var parse_data = data.split(',');
+								for (var i = 0; i < parse_data.length; i++) {
+									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+								}
+								for (var i = 0; i < parse_data.length; i++) {
+									checkbox += '<label id="windowfont" for="hostlist">' + parse_data[i] + '</label><input type="checkbox" name="hostlist" value="' + parse_data[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+								}
+								$('#nodelist').append(option);
+								$('#hostList').append(checkbox);
+							});
+						});
+					</script>
+			</div>
+		</div>
+	</div>
+
+
+	<div id="output" class="modal">
+		<div class="modal-content2">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div id="modal-body2" class="modal-body">
+				<p align=center>
+					Please wait......
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var btn = document.getElementById("myBtn");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		btn.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+		modal.style.display = "block";
+	</script>
+	</p>
+
+</html>
