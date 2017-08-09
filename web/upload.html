@@ -32,8 +32,9 @@
 		}
 
 		input {
-				font-size: 18px;
+			font-size: 18px;
 		}
+
 		#windowfont {
 			font-size: 18px;
 		}
@@ -137,44 +138,7 @@
 			animation-duration: 0.4s
 		}
 	</style>
-	<script>
-		function exec() {
-			var e = document.getElementById("nodelist");
-			var nodes = document.getElementsByName('hostlist');
-			var path = '/addcontainer';
-			var host = e.options[e.selectedIndex].value;
-			var container = $("#container_name").val();
-			var container_args = $("#container_args").val();
-			var heartbeat_args = $("#heartbeat_args").val();
-			var failover_constraints = '';
-
-			nodes.forEach(function(node, i) {
-				if (nodes[i].checked) {
-					if (failover_constraints) {
-						failover_constraints += ',' + node.value;
-					} else {
-						failover_constraints += node.value;
-					}
-				}
-			});
-
-			if (!failover_constraints) {
-				failover_constraints = 'none';
-			}
-
-			$.post(path, {
-				token: parent.token,
-				container: container,
-				host: host,
-				container_args: container_args,
-				heartbeat_args: heartbeat_args,
-				failover_constraints: container + ',' + failover_constraints
-			}, function(data) {
-				var div = document.getElementById('modal-body2');
-				div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
-			});
-		}
-	</script>
+	<script src="/assets/dropzone.js"></script>
 </head>
 
 <body>
@@ -191,15 +155,11 @@
 					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
 					<select name="nodelist" id="nodelist">
 						</select>
-						<br><br>
-					<form action="/upload">
-						<input id="file" type="file" name="pic" accept="*.zip">
+					<br><br>
+					<form id="upload-widget" method="post" action="/upload" class="dropzone">
 					</form>
 					<br><br>
 					</fieldset>
-					<p align=center>
-						<button id="myBtn">Submit</button>
-					</p>
 					<script>
 						$(function() {
 							var option = '';
@@ -255,11 +215,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
-			modal.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
+
 		modal.style.display = "block";
 	</script>
 	</p>

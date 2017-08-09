@@ -1,5 +1,7 @@
 var http = require('http');
 var fs = require('fs');
+var multer = require('multer');
+var upload = multer( { dest: '../' } );
 if (process.env.PICLUSTER_CONFIG) {
   var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 } else {
@@ -758,6 +760,22 @@ app.post('/addcontainer', function(req, res) {
 
   }
 });
+
+app.post('/upload', upload.single( 'file' ), function( req, res, next ) {
+  var check_token = req.body.token;
+  console.log(check_token);
+  var host = req.body.host;
+  var file = req.body.file;
+  console.log(req);
+  fs.readFile(req.file.path, function (err, data) {
+  // ...
+  var newPath = "../uploadedFileName";
+  fs.writeFile(newPath, data, function (err) {
+    res.redirect("back");
+  });
+});
+});
+
 
 app.post('/removecontainerconfig', function(req, res) {
   var check_token = req.body.token;
