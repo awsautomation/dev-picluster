@@ -765,10 +765,8 @@ app.post('/addcontainer', function(req, res) {
 
 app.post('/upload', upload.single('file'), function(req, res, next) {
   var check_token = req.body.token;
-  console.log(check_token);
   var host = req.body.host;
   var file = req.body.file;
-  console.log(req);
   fs.readFile(req.file.path, function(err, data) {
     var newPath = "../" + req.file.originalname;
     fs.writeFile(newPath, data, function(err) {
