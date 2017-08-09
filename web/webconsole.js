@@ -1070,6 +1070,9 @@ app.get('/server.jpeg', function(req, res) {
 app.get('/favicon.ico', function(req, res) {
   res.sendFile(__dirname + '/favicon.ico');
 });
+app.get('/upload.html', function(req, res) {
+  res.sendFile(__dirname + '/upload.html');
+});
 app.get('/searching.jpeg', function(req, res) {
   res.sendFile(__dirname + '/searching.jpeg');
 });
