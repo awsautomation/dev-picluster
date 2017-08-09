@@ -767,12 +767,17 @@ app.post('/upload', upload.single('file'), function(req, res, next) {
   var check_token = req.body.token;
   var host = req.body.host;
   var file = req.body.file;
-  fs.readFile(req.file.path, function(err, data) {
-    var newPath = "../" + req.file.originalname;
-    fs.writeFile(newPath, data, function(err) {
-      res.end("");
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+
+    fs.readFile(req.file.path, function(err, data) {
+      var newPath = "../" + req.file.originalname;
+      fs.writeFile(newPath, data, function(err) {
+        res.end("");
+      });
     });
-  });
+  }
 });
 
 
