@@ -2,6 +2,7 @@ var http = require('http');
 var express = require('express');
 var request = require('request');
 var fs = require('fs');
+var unzip = require('unzip');
 if (process.env.PICLUSTER_CONFIG) {
   var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 } else {
@@ -175,6 +176,12 @@ app.post('/pong', function(req, res) {
   res.send(body);
 });
 
+function unzipFile(file) {
+  fs.createReadStream(file).pipe(unzip.Extract({
+    path: config.docker
+  }));
+
+}
 app.post('/receive-file', upload.single('file'), function(req, res, next) {
   var check_token = req.body.token;
   if ((check_token != token) || (!check_token)) {
@@ -183,6 +190,7 @@ app.post('/receive-file', upload.single('file'), function(req, res, next) {
     fs.readFile(req.file.path, function(err, data) {
       var newPath = "../" + req.file.originalname;
       fs.writeFile(newPath, data, function(err) {
+        unzipFile(newPath);
       });
     });
     res.end('Done');
