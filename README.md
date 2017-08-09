@@ -27,6 +27,7 @@
 - Integrates with Elasticsearch to store the PiCluster logs.
 - Automatic container failover to different nodes
 - Pull container images from a registry
+- Upload Dockerfile archives to the entire cluster
 
 ## Prerequisites
 
