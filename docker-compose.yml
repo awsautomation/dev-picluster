@@ -20,7 +20,7 @@ services:
     ports:
       - "3001:3001"
     working_dir: /picluster/agent
-    command: ["sh", "-c", "apk update;apk upgrade;apk add docker;npm install --production;node agent.js"]
+    command: ["sh", "-c", "apk update;apk upgrade;apk add git docker;npm install --production;node agent.js"]
   webconsole:
     image: "node:alpine"
     volumes:
