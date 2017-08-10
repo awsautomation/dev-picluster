@@ -109,7 +109,7 @@ app.get('/status', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;docker container ps;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
+      "command": 'hostname;docker container ps;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -158,7 +158,7 @@ app.get('/nodes', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
+      "command": 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
@@ -197,7 +197,7 @@ app.get('/images', function(req, res) {
     res.end('\nError: Invalid Credentials')
   } else {
     var command = JSON.stringify({
-      "command": 'hostname;docker image list;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
+      "command": 'hostname;docker image list;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
       "token": token
     });
     for (var i = 0; i < config.layout.length; i++) {
