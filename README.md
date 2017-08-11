@@ -11,6 +11,9 @@
 ![Pic](http://i.imgur.com/N7KBk6z.pngg)
 ![Pic](http://i.imgur.com/h63NLRI.png)
 
+## Community Chat
+ [![Slack](http://i.imgur.com/PXLxay0.png)](https://join.slack.com/t/piclusterteam/shared_invite/MjI1NzU0NDE2MDM3LTE1MDI0Nzg2ODktYmNmZDk2NzZhMA)
+
 ## Features
 
 - Move containers to different hosts in the cluster
