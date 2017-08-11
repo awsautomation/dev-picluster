@@ -6,10 +6,13 @@
 
 
 
-[![Build Status](https://travis-ci.org/picluster/picluster.svg?branch=master)](https://travis-ci.org/picluster/picluster) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) [![Slack](https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png)](https://join.slack.com/t/piclusterteam/shared_invite/MjI1NzU0NDE2MDM3LTE1MDI0Nzg2ODktYmNmZDk2NzZhMA)
+[![Build Status](https://travis-ci.org/picluster/picluster.svg?branch=master)](https://travis-ci.org/picluster/picluster) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 ![Pic](http://i.imgur.com/N7KBk6z.pngg)
 ![Pic](http://i.imgur.com/h63NLRI.png)
+
+## Community Chat
+ [![Slack](https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png)](https://join.slack.com/t/piclusterteam/shared_invite/MjI1NzU0NDE2MDM3LTE1MDI0Nzg2ODktYmNmZDk2NzZhMA)
 
 ## Features
 
