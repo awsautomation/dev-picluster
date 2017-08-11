@@ -12,7 +12,7 @@
 ![Pic](http://i.imgur.com/h63NLRI.png)
 
 ## Community Chat
- [![Slack](https://brandfolder.com/slack/logo/slack-primary-logo.png)](https://join.slack.com/t/piclusterteam/shared_invite/MjI1NzU0NDE2MDM3LTE1MDI0Nzg2ODktYmNmZDk2NzZhMA)
+ [![Slack](http://i.imgur.com/PXLxay0.png)](https://join.slack.com/t/piclusterteam/shared_invite/MjI1NzU0NDE2MDM3LTE1MDI0Nzg2ODktYmNmZDk2NzZhMA)
 
 ## Features
 
