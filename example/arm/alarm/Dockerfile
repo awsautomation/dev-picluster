@@ -1,7 +1,7 @@
 # Arch Linux ARM (Raspberry Pi 2)
 
 ARG VERSION=latest
-FROM scratch AS armv7/armhf-archlinux
+FROM scratch AS armhf-archlinux
 
 MAINTAINER TokinRing <support@gnetsolutions.net>
 LABEL Description="Arch Linux ARM (Raspberry Pi 2)"
