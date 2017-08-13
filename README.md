@@ -161,6 +161,20 @@ You can run the server and agent on the same node since they are listening on di
 
 - container_host_constraints - This section enables automatic container failover. Requires automatic_heartbeat,heartbeat_interval, and hb set for the container.
 
+### 2\. Copy the example Dockerfile layout depending on architecture
+
+**Arch Linux ARM**
+```
+cd /opt/picluster
+cp -r example/arm/archlinux/* docker/
+```
+
+**x86_64 Ubuntu x86_64**
+```
+cd /opt/picluster
+cp -r example/x86_64/ubuntu/* docker/
+```
+
 #### An example on the Docker folder layout:
 
 Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
