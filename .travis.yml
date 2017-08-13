@@ -14,6 +14,7 @@ script:
 - cp config-example.json config.json
 - sed -i "s/127.0.0.1/$IP/" config.json
 - sed -i "s/192.168.0.116/$IP/" pictl
+- cp -r ./example/x86_64/ubuntu/* ./docker/
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build ./docker/minio -t minio -f ./docker/minio/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
