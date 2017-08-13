@@ -3,6 +3,7 @@ var dateTime = require('node-datetime');
 var request = require('request');
 var app = express();
 var http = require('http');
+var https = require('https');
 var net = require('net');
 var fs = require('fs');
 if (process.env.PICLUSTER_CONFIG) {
@@ -18,7 +19,17 @@ var bodyParser = require('body-parser');
 app.use(bodyParser());
 //require('request-debug')(request);
 var exec = require('child_process').exec;
-var server = require("http").createServer(app);
+if ( config.ssl_cert && config.ssl_key ) {
+    var ssl_options = {
+        cert: fs.readFileSync(config.ssl_cert),
+        key: fs.readFileSync(config.ssl_key)
+    }
+    var server = https.createServer(ssl_options, app);
+    console.log("SSL API enabled");
+} else {
+    var server = http.createServer(app);
+    console.log("Non-SSL API enabled");
+}
 var log = '';
 var token = config.token;
 var dockerFolder = config.docker;

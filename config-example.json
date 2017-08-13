@@ -3,6 +3,8 @@
   "docker": "../docker",
   "server_port": "3000",
   "agent_port": "3001",
+  "ssl_cert": "",
+  "ssl_key": "",
   "layout": [{
       "node": "localhost",
       "minio": "-p 9000:9000"
