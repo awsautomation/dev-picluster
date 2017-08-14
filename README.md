@@ -65,7 +65,7 @@ docker-compose up -d
 
 Finally, in your web browser go to <http://127.0.0.1:3003>
 
-## Server Installation
+## Installation
 [See Wiki](https://github.com/picluster/picluster/wiki/Installation)
 
 ## Upgrading
