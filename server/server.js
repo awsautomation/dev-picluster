@@ -156,6 +156,7 @@ function containerDetails() {
         }
       });
     });
+    containerDetails();
   }, 15000);
 
 }

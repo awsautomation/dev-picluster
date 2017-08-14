@@ -82,6 +82,8 @@
 			var running = output.running_containers;
 			var calc = Math.floor((running / total * 100));
 			var percent = Math.round(calc);
+			alert(data);
+			
 			document.getElementById("running_containers").textContent = percent;
 			document.getElementById("running-class").className = "c100 p" + percent + " small";
 
