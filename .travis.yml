@@ -1,14 +1,14 @@
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get remove -y docker docker-engine docker.io
-  - sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get -qq update
-  - sudo apt-get install -y docker-ce
-  - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-  - sudo apt-get install -y nodejs
-
+- sudo apt-get -qq update
+- sudo apt-get remove -y docker docker-engine docker.io
+- sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu
+  $(lsb_release -cs) stable"
+- sudo apt-get -qq update
+- sudo apt-get install -y docker-ce
+- curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+- sudo apt-get install -y nodejs
 script:
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - cp config-example.json config.json
@@ -24,8 +24,12 @@ script:
 - cd ../agent;npm install --production; sudo node agent.js&
 - cd ../web;npm install --production; sudo node webconsole.js&
 - cd ..
-- sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003 -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
+- sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
+  -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
-- ./pictl nodes
-- ./pictl reloadconfig
+- "./pictl nodes"
+- "./pictl reloadconfig"
+notifications:
+  slack:
+    secure: cYlopFAlFeNzjKTK7XyN/P4fsFXejs459f6c1B+IRv2v9hgIOEhTvR1iFFJmaiWdCje/ws47MnVMj6NJiBmaiC1L34BsWRtQhNN6j/bINpCAHF7nfSzS1amiB5OgskTEQ+BHAmjNvSj+EmtLiWfixJpEFkH3P4VXqZXRTas1wYCWQVnBN08BRL5Jz3rNJhNVwhGBpWZByeAD03xcUnuYQ976/ZLX8DRwCbRtCgmHxBRnvYOY+5fgtNPffDZtb4zyFNhZz1Huqqpm9g4K438lx/zOONch8+1q8Y/rvSYKNu61LrZrZ2EhIwkLbCLthosm2ZpsbqlVBrRsZB6sXlcedmNkp7ZrX4VVEIbTYk7rp2JXRddo1P1Q5jDxVc1cIMIDwaTaY7mOZQ5sUr0GWo/Npk53/EHZMKyv/bBX0S5q2aCV8uCaU/ben5pzY7rHr6JhACDciFgvM+rYTI39EOemIHgJFRbbrYHaUVQF2FsVAVFiGyjh9AoLpW/3nWas/kv1Wz26/Qk8EvHklq3BzniUYInByfYcqk5KYQ/VXr/f2kYgIYi6BM3W/Wx0o1+ouGxhbULuNSF9T4yV/G+Ta4BGcGayjqiYGjYKD2+oKbOp05gsgaw+SRrHvqhCDsZRc2kRzFzCm5KmfHi/jbMR1N90on6pHy0s3kGjtuAOLAjG1do=
