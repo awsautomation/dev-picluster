@@ -53,7 +53,12 @@
 						var total = output.total_containers;
 						var running = output.running_containers;
 						var calc = Math.floor((running / total * 100));
-						var percent = Math.ceil((calc + 1) / 10) * 10;
+						var percent = 0;
+						if (!calc == 100) {
+							percent = percent = Math.ceil((calc + 1) / 100) * 10;
+						} else {
+							percent = calc;
+						}
 						document.getElementById("running_containers").textContent = percent;
 						document.getElementById("running-class").className = "c100 p" + percent + " small";
 						getContainerStatus();
