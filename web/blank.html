@@ -80,7 +80,7 @@
 			var output = JSON.parse(data);
 			var total = output.total_containers;
 			var running = output.running_containers;
-			var calc = Math.floor((running / total * 100));
+			var calc = Math.floor((running / total * 100) /10);
 			var percent = Math.round(calc);
 			document.getElementById("running_containers").textContent = percent;
 			document.getElementById("running-class").className = "c100 p" + percent + " small";
