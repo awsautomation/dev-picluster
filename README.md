@@ -66,96 +66,14 @@ docker-compose up -d
 Finally, in your web browser go to <http://127.0.0.1:3003>
 
 ## Server Installation
-
-### 1\. Copy config-example.json to config.json and modify with your desired layout.
-
-This is the core config file for the web console, agent, and server.
-
-You can run the server and agent on the same node since they are listening on different ports.
-
-
-### 2\. Copy the example Dockerfile layout depending on architecture
-
-**Arch Linux ARM**
-```
-cd /opt/picluster
-cp -r example/arm/archlinux/* docker/
-```
-
-**x86_64 Ubuntu x86_64**
-```
-cd /opt/picluster
-cp -r example/x86_64/ubuntu/* docker/
-```
-
-#### An example on the Docker folder layout:
-
-Based on the config snippet below, I have two container images that will be called "mysql" and "nginx" that will run on host 192.168.0.100.
-
-```
-"layout": [
-  {"node":"192.168.0.100", "mysql":"-p 3306:3306","nginx":"-p 80:80"}
-```
-
-The Docker folder will need to be setup like this to match the container names:
-
-```
-/root/docker/mysql/Dockerfile
-/root/docker/nginx/Dockerfile
-```
-
-When it is time to build the containers, PiCluster will use the "docker" variable from config.json plus the container name to locate and build the images.
-
-### 2\. Running the Application
-
-This section will cover how to install and run each component of PiCluster.
-
-## Server Installation
-
-The server is the brain of PiCluster and the agents and web console connect to it.
-
-```
-cd server
-npm install
-node server.js
-```
-
-## Agent Installation
-
-The server will send commands to be executed on the agents nodes. The agent should be installed on each host in the cluster.
-
-```
-cd agent
-npm install
-node agent.js
-```
-
-## Web Console Installation
-
-The web console will send commands to the server that will run commands or gather information from the agent nodes.
-
-```
-cd web
-npm install
-node webconsole.js
-```
+[See Wiki](https://github.com/picluster/picluster/wiki/Installation)
 
 ## Upgrading
 
 [See Wiki Page](https://github.com/picluster/picluster/wiki/Upgrading)
 
 
-## Configuring and using the client "pictl"
-
-Pictl is a bash client to easily control the cluster. It will make all the HTTP requests using curl.
-
-### 1\. The following variables need to be set in the file:
-
-- server - IP address of the server
-- port - PORT that the server uses
-- token - The token used in the Server and Agent configs.
-
-### 2\. Using the Command-line client
+## Configuring and using the command-line client "pictl"
 
 [See Wiki Page](https://github.com/picluster/picluster/wiki/Pictl)
 
