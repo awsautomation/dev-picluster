@@ -23,6 +23,8 @@ var log = '';
 var token = config.token;
 var dockerFolder = config.docker;
 var container_faillog = [];
+var running_containers = 0;
+var total_containers = 0;
 var multer = require('multer');
 var upload = multer({
   dest: '../'
@@ -102,6 +104,77 @@ function automatic_heartbeat() {
     console.log('\nAutomatic Heartbeat Disabled.');
   }
 }
+
+function containerDetails() {
+
+  setTimeout(function() {
+    total_containers = 0;
+    running_containers = 0;
+    Object.keys(config.layout).forEach(function(get_node, i) {
+      Object.keys(config.layout[i]).forEach(function(key) {
+        const node = config.layout[i].node;
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
+        }
+        total_containers++;
+      });
+    });
+
+    Object.keys(config.layout).forEach(function(get_node, i) {
+      Object.keys(config.layout[i]).forEach(function(key) {
+        const node = config.layout[i].node;
+        if (!config.layout[i].hasOwnProperty(key)) {
+          return;
+        }
+
+        if (key.indexOf('node') > -1) {
+          var command = JSON.stringify({
+            "command": 'docker ps -q | wc -l',
+            "token": token
+          });
+
+
+          var options = {
+            url: 'http://' + node + ':' + agentPort + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          }
+
+          request(options, function(error, response, body) {
+            if (error) {
+              console.log("An error has occurred.");
+            } else {
+              var check_value = JSON.parse(body).output.toString();
+              var found = check_value.replace(/ /g, '');
+              running_containers = running_containers + parseInt(found);
+            }
+          });
+        }
+      });
+    });
+  }, 15000);
+
+}
+
+
+app.get('/status-count', function(req, res) {
+  var check_token = req.query['token'];
+  var data = JSON.stringify({
+    "total_containers": total_containers,
+    "running_containers": running_containers
+  });
+
+  //  if ((check_token != token) || (!check_token)) {
+  //    res.end('\nError: Invalid Credentials')
+  //  } else {
+  res.end(data);
+  //  }
+
+});
 
 app.get('/status', function(req, res) {
   var check_token = req.query['token'];
@@ -1651,6 +1724,7 @@ app.post('/updateconfig', function(req, res) {
 
 });
 
+containerDetails();
 
 server.listen(port, function() {
   console.log('Listening on port %d', port);
