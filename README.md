@@ -52,7 +52,7 @@ git clone -b dev https://github.com/picluster/picluster.git picluster
 ```
 
 ## Config file reference
-[See Wiki Page](https://github.com/picluster/picluster/wiki/Config-Reference)
+[See Wiki](https://github.com/picluster/picluster/wiki/Config-Reference)
 
 ## Try PiCluster in Docker
 
@@ -70,20 +70,20 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 ## Upgrading
 
-[See Wiki Page](https://github.com/picluster/picluster/wiki/Upgrading)
+[See Wiki](https://github.com/picluster/picluster/wiki/Upgrading)
 
 
 ## Configuring and using the command-line client "pictl"
 
-[See Wiki Page](https://github.com/picluster/picluster/wiki/Pictl)
+[See Wiki](https://github.com/picluster/picluster/wiki/Pictl)
 
 ## Using pm2 to init PiCluster on systemd
 
-[See Wiki Page](https://github.com/picluster/picluster/wiki/PM2)
+[See Wiki](https://github.com/picluster/picluster/wiki/PM2)
 
 # Automatic Container failover to other hosts
 
-[See Wiki Page](https://github.com/picluster/picluster/wiki/Automatic-Container-failover-to-other-hosts)
+[See Wiki](https://github.com/picluster/picluster/wiki/Automatic-Container-failover-to-other-hosts)
 
 # Authors and Contributions
 
