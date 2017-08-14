@@ -46,15 +46,20 @@
 	<link rel="stylesheet" href="/assets/circle.css">
 	<script>
 		function getContainerStatus() {
-			$.get("/status-count?token=" + parent.token, function(data) {
-				var output = JSON.parse(data);
-				var total = output.total_containers;
-				var running = output.running_containers;
-				var calc = Math.floor((running / total * 100));
-				var percent = Math.ceil((calc + 1) / 10) * 10;
-				document.getElementById("running_containers").textContent = percent;
-				document.getElementById("running-class").className = "c100 p" + percent + " small";
-			});
+			setTimeout(function() {
+				if (parent.token) {
+					$.get("/status-count?token=" + parent.token, function(data) {
+						var output = JSON.parse(data);
+						var total = output.total_containers;
+						var running = output.running_containers;
+						var calc = Math.floor((running / total * 100));
+						var percent = Math.ceil((calc + 1) / 10) * 10;
+						document.getElementById("running_containers").textContent = percent;
+						document.getElementById("running-class").className = "c100 p" + percent + " small";
+						getContainerStatus();
+					});
+				}
+			}, 5000)
 		}
 	</script>
 </head>
@@ -89,11 +94,7 @@
 			</tr>
 		</table>
 		<script>
-			setTimeout(function(){
-					if(parent.token) {
 			getContainerStatus();
-		}
-			}, 5000)
 		</script>
 
 </body>
