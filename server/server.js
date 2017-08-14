@@ -168,11 +168,11 @@ app.get('/status-count', function(req, res) {
     "running_containers": running_containers
   });
 
-  //  if ((check_token != token) || (!check_token)) {
-  //    res.end('\nError: Invalid Credentials')
-  //  } else {
-  res.end(data);
-  //  }
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    res.end(data);
+  }
 
 });
 
