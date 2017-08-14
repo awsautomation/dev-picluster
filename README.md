@@ -81,7 +81,7 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 [See Wiki](https://github.com/picluster/picluster/wiki/PM2)
 
-# Automatic Container failover to other hosts
+## Automatic Container failover to other hosts
 
 [See Wiki](https://github.com/picluster/picluster/wiki/Automatic-Container-failover-to-other-hosts)
 
