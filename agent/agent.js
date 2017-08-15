@@ -1,61 +1,65 @@
-var http = require('http');
-var express = require('express');
-var request = require('request');
-var fs = require('fs');
-var unzip = require('unzip');
+const http = require('http');
+const express = require('express');
+const request = require('request');
+const fs = require('fs');
+const unzip = require('unzip');
+
 if (process.env.PICLUSTER_CONFIG) {
   var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 } else {
   var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
-var port = config.agent_port;
-var app = express();
-var bodyParser = require('body-parser');
+const port = config.agent_port;
+const app = express();
+const bodyParser = require('body-parser');
+
 app.use(bodyParser());
-var server = require("http").createServer(app);
-var os = require('os');
+const server = require('http').createServer(app);
+const os = require('os');
+
 const node = os.hostname();
 const async = require('async');
 const Promisify = require('util').promisify;
 const exec = require('child-process-promise').exec;
-const noop = function() {};
-var vip = ''
-var vip_slave = '';
-var vip_device = '';
-var ip_add_command = '';
-var ip_delete_command = '';
-var vip_ping_time = '';
-var token = config.token;
-var multer = require('multer');
-var upload = multer({
+
+const noop = function () {};
+var vip = '';
+let vip_slave = '';
+const vip_device = '';
+let ip_add_command = '';
+let ip_delete_command = '';
+let vip_ping_time = '';
+const token = config.token;
+const multer = require('multer');
+
+const upload = multer({
   dest: '../'
 });
 
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
-  var options = {
+  const options = {
     host: config.web_connect,
     path: '/start?token=' + token + '&container=*',
     port: config.server_port
   };
-  var autostart_request = http.get(options, function(response) {}).on('error', function(e) {
+  const autostart_request = http.get(options, response => {}).on('error', e => {
     console.error(e);
   });
-
 }
 
 if (config.vip_ip && config.vip) {
   var vip = config.vip_ip;
-  Object.keys(config.vip).forEach(function(i) {
+  Object.keys(config.vip).forEach(i => {
     const _node = config.vip[i].node;
-    Object.keys(config.vip[i]).forEach(function(key) {
+    Object.keys(config.vip[i]).forEach(key => {
       if (!config.vip[i].hasOwnProperty(key)) {
         return;
       }
       const interfaces = require('os').networkInterfaces();
-      Object.keys(interfaces).forEach(function(devName) {
+      Object.keys(interfaces).forEach(devName => {
         const iface = interfaces[devName];
-        iface.forEach(function(alias) {
+        iface.forEach(alias => {
           if (alias.address !== _node) {
             return;
           }
@@ -66,18 +70,18 @@ if (config.vip_ip && config.vip) {
           vip_ping_time = config.vip[i].vip_ping_time;
           exec(cmd).then(send_ping).catch(send_ping);
         });
-      })
-    })
+      });
+    });
   });
 }
 
 function send_ping() {
-  setTimeout(function() {
-    var responseString = "";
-    var token_body = JSON.stringify({
-      "token": token
+  setTimeout(() => {
+    const responseString = '';
+    const token_body = JSON.stringify({
+      token
     });
-    var options = {
+    const options = {
       url: 'http://' + vip_slave + ':' + port + '/pong',
       method: 'POST',
       headers: {
@@ -87,36 +91,36 @@ function send_ping() {
       body: token_body
     };
 
-    request(options, function(error, response, body) {
-      var found_vip = false;
+    request(options, (error, response, body) => {
+      let found_vip = false;
 
-      if ((error || response.statusCode != "200")) {
+      if ((error || response.statusCode != '200')) {
         var cmd = ip_add_command;
-        //console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+        // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
         exec(cmd).then(noop).catch(noop);
       } else {
         const interfaces = require('os').networkInterfaces();
-        Object.keys(interfaces).forEach(function(devName) {
-          var iface = interfaces[devName];
-          iface.forEach(function(alias) {
+        Object.keys(interfaces).forEach(devName => {
+          const iface = interfaces[devName];
+          iface.forEach(alias => {
             if (alias.address == vip) {
               found_vip = true;
             }
           });
         });
-        var json_object = JSON.parse(body);
+        const json_object = JSON.parse(body);
 
-        if (json_object.vip_detected == "false" && found_vip == false) {
-          console.log("\nVIP not detected on either machine. Bringing up the VIP on this host.");
+        if (json_object.vip_detected == 'false' && found_vip == false) {
+          console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
           var cmd = ip_add_command;
-          exec(cmd).catch(function(error) {
+          exec(cmd).catch(error => {
             console.log(error);
           });
         }
-        if ((json_object.vip_detected == "true" && found_vip == true)) {
-          console.log("\nVIP detected on boths hosts! Stopping the VIP on this host.");
+        if ((json_object.vip_detected == 'true' && found_vip == true)) {
+          console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
           var cmd = ip_delete_command;
-          exec(cmd).catch(function(error) {
+          exec(cmd).catch(error => {
             console.log(error);
           });
         }
@@ -124,54 +128,54 @@ function send_ping() {
     });
     send_ping();
   }, vip_ping_time);
-};
+}
 
-app.get('/rsyslog', function(req, res) {
-  var check_token = req.query['token'];
+app.get('/rsyslog', (req, res) => {
+  const check_token = req.query.token;
   if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+    res.end('\nError: Invalid Credentials');
   } else {
     res.sendFile(config.rsyslog_logfile);
   }
 });
 
-app.post('/killvip', function(req, res) {
+app.post('/killvip', (req, res) => {
   const check_token = req.body.token;
   if (check_token !== token) {
     return res.status(401).end('\nError: Invalid Credentials');
   }
 
   if (config.vip_ip) {
-    var cmd = ip_delete_command;
-    exec(cmd).then(function(stdout, stderr) {
+    const cmd = ip_delete_command;
+    exec(cmd).then((stdout, stderr) => {
       res.end('\nCompleted.');
-    }).catch(function(error) {
+    }).catch(error => {
       console.log(error);
     });
   }
 });
 
-app.post('/pong', function(req, res) {
+app.post('/pong', (req, res) => {
   const check_token = req.body.token;
   if (check_token !== token) {
-    return res.status(500).send('Something broke!')
+    return res.status(500).send('Something broke!');
   }
 
-  var responseString = "";
-  var vip_status = "false";
+  const responseString = '';
+  let vip_status = 'false';
   const interfaces = require('os').networkInterfaces();
 
-  Object.keys(interfaces).forEach(function(devName) {
+  Object.keys(interfaces).forEach(devName => {
     const iface = interfaces[devName];
-    iface.forEach(function(alias) {
+    iface.forEach(alias => {
       if (alias.address == vip) {
-        vip_status = "true";
+        vip_status = 'true';
       }
     });
   });
 
-  var body = {
-    "vip_detected": vip_status
+  const body = {
+    vip_detected: vip_status
   };
   res.send(body);
 });
@@ -180,16 +184,15 @@ function unzipFile(file) {
   fs.createReadStream(file).pipe(unzip.Extract({
     path: config.docker
   }));
-
 }
-app.post('/receive-file', upload.single('file'), function(req, res, next) {
-  var check_token = req.body.token;
+app.post('/receive-file', upload.single('file'), (req, res, next) => {
+  const check_token = req.body.token;
   if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+    res.end('\nError: Invalid Credentials');
   } else {
-    fs.readFile(req.file.path, function(err, data) {
-      var newPath = "../" + req.file.originalname;
-      fs.writeFile(newPath, data, function(err) {
+    fs.readFile(req.file.path, (err, data) => {
+      const newPath = '../' + req.file.originalname;
+      fs.writeFile(newPath, data, err => {
         unzipFile(newPath);
       });
     });
@@ -197,17 +200,17 @@ app.post('/receive-file', upload.single('file'), function(req, res, next) {
   }
 });
 
-app.post('/run', function(req, res) {
-  var output = {
-    "output": [],
-    "node": node
+app.post('/run', (req, res) => {
+  const output = {
+    output: [],
+    node
   };
 
   const check_token = req.body.token;
 
   if (check_token !== token) {
     return res.status(401).json({
-      output: "Not Authorized to connect to this agent!"
+      output: 'Not Authorized to connect to this agent!'
     });
   }
 
@@ -218,40 +221,40 @@ app.post('/run', function(req, res) {
 
   const commands = (typeof req.body.commands === 'string') ? [req.body.commands] : req.body.commands;
 
-  if (!(commands instanceof Array)) {
+  if (!(Array.isArray(commands))) {
     return res.status(400).json({
-      output: "Bad Request"
+      output: 'Bad Request'
     });
   }
 
-  async.eachSeries(commands, function(command, cb) {
-    if (typeof command === "string") {
+  async.eachSeries(commands, (command, cb) => {
+    if (typeof command === 'string') {
       command = [command];
     }
-    if (!(command instanceof Array)) {
+    if (!(Array.isArray(command))) {
       return;
     }
-    //console.log('command', command);
+    // Console.log('command', command);
     exec(command.join(' '), {
       cwd: __dirname
-    }).then(function(log) {
-      //console.log('output', log);
-      output.output.push(`${log.stdout||''}${log.stderr||''}`);
+    }).then(log => {
+      // Console.log('output', log);
+      output.output.push(`${log.stdout || ''}${log.stderr || ''}`);
       return cb();
-    }).catch(function(e) {
-      //console.log('error', e);
-      output.output.push(`${e.stdout||''}${e.stderr||''}`);
+    }).catch(e => {
+      // Console.log('error', e);
+      output.output.push(`${e.stdout || ''}${e.stderr || ''}`);
       return cb(e);
     });
-  }, function(e) {
+  }, e => {
     if (e) {
       console.error('error:', e);
     }
-    //console.log('output', output);
+    // Console.log('output', output);
     res.json(output);
   });
 });
 
-server.listen(port, function() {
+server.listen(port, () => {
   console.log('Listening on port %d', port);
 });

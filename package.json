@@ -1,0 +1,36 @@
+{
+    "name": "picluster",
+    "scripts": {
+        "test": "xo"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/picluster/picluster.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "GPL-3.0",
+    "bugs": {
+        "url": "https://github.com/picluster/picluster/issues"
+    },
+    "homepage": "https://github.com/picluster/picluster",
+    "xo": {
+        "space": 2,
+        "envs": [
+            "node",
+            "es6"
+        ],
+        "ignores": [
+            "web/assets/**"
+        ],
+        "rules": {
+            "camelcase": "off",
+            "no-prototype-builtins": "off",
+            "radix": "off",
+            "max-nested-callbacks": "warn"
+        }
+    },
+    "devDependencies": {
+        "xo": "^0.18.2"
+    }
+}

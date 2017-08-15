@@ -10,6 +10,8 @@ before_install:
 - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 - sudo apt-get install -y nodejs
 script:
+- npm install
+- npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - cp config-example.json config.json
 - sed -i "s/127.0.0.1/$IP/" config.json
