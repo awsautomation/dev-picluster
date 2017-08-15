@@ -27,7 +27,8 @@
             "camelcase": "off",
             "no-prototype-builtins": "off",
             "radix": "off",
-            "max-nested-callbacks": "warn"
+            "max-nested-callbacks": "warn",
+            "no-path-concat": "warn"
         }
     },
     "devDependencies": {

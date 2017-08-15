@@ -1,14 +1,18 @@
 const http = require('http');
 const fs = require('fs');
+const path = require('path');
+
 const multer = require('multer');
 
 const upload = multer({
   dest: '../'
 });
+
+let config;
 if (process.env.PICLUSTER_CONFIG) {
-  var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+  config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 } else {
-  var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
 const express = require('express');
 const request = require('request');
@@ -18,11 +22,9 @@ const bodyParser = require('body-parser');
 
 app.use(bodyParser());
 // Require('request-debug')(request);
-const path = require('path');
 
 const port = config.web_port;
-const lineReader = require('line-reader');
-const webconsole = require('http').createServer(app);
+const webconsole = http.createServer(app);
 
 let token = config.token;
 let user = config.web_username;
@@ -41,7 +43,7 @@ if (config.syslog) {
 
 app.get('/sandbox', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     res.sendFile(__dirname + '/exec.html');
@@ -50,7 +52,7 @@ app.get('/sandbox', (req, res) => {
 
 app.get('/editconfig', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     res.sendFile(__dirname + '/editconfig.html');
@@ -59,7 +61,7 @@ app.get('/editconfig', (req, res) => {
 
 app.get('/kibana', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token) || (!config.kibana)) {
+  if ((check_token !== token) || (!check_token) || (!config.kibana)) {
     res.end('\nError: Invalid Credentials or invalid configuration.');
   } else {
     res.redirect(config.kibana);
@@ -69,10 +71,9 @@ app.get('/kibana', (req, res) => {
 app.post('/sendconfig', (req, res) => {
   const check_token = req.body.token;
   const payload = req.body.payload;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
     const command = JSON.stringify({
       payload,
       token
@@ -103,8 +104,8 @@ app.post('/', (req, res) => {
   const get_user = req.body.username;
   const get_pass = req.body.password;
 
-  if (get_user == user) {
-    if (get_pass == password) {
+  if (get_user === user) {
+    if (get_pass === password) {
       const auth_data = {
         token,
         syslog
@@ -122,10 +123,9 @@ app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   const node = req.body.node;
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
     const command = JSON.stringify({
       command: req.body.command,
       token,
@@ -142,7 +142,7 @@ app.post('/exec', (req, res) => {
       body: command
     };
 
-    request(options, (error, response, body) => {
+    request(options, error => {
       if (error) {
         res.end(error);
       } else {
@@ -267,11 +267,9 @@ app.get('/remoteimages', (req, res) => {
 
 app.post('/listcontainers', (req, res) => {
   const check_token = req.body.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    const node = req.body.node;
     const token_body = JSON.stringify({
       token
     });
@@ -298,11 +296,9 @@ app.post('/listcontainers', (req, res) => {
 
 app.post('/listcommands', (req, res) => {
   const check_token = req.body.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    const node = req.body.node;
     const token_body = JSON.stringify({
       token
     });
@@ -329,11 +325,9 @@ app.post('/listcommands', (req, res) => {
 
 app.post('/listnodes', (req, res) => {
   const check_token = req.body.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    const node = req.body.node;
     const token_body = JSON.stringify({
       token
     });
@@ -359,12 +353,10 @@ app.post('/listnodes', (req, res) => {
 });
 
 function display_log(callback) {
-  const responseString = '';
-  clear_log(data => {
+  clear_log(() => {
     setTimeout(() => {
-      const responseString = '';
-      request('http://' + server + ':' + server_port + '/log?' + 'token=' + token, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/log?token=' + token, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
           callback(body);
         } else {
           callback('\nError connecting with server.');
@@ -375,9 +367,8 @@ function display_log(callback) {
 }
 
 function clear_log(callback) {
-  const responseString = '';
-  request('http://' + server + ':' + server_port + '/clearlog?' + 'token=' + token, (error, response, body) => {
-    if (!error && response.statusCode == 200) {
+  request('http://' + server + ':' + server_port + '/clearlog?token=' + token, (error, response) => {
+    if (!error && response.statusCode === 200) {
       callback('');
     } else {
       console.log('\nError clearing log: ' + error);
@@ -393,12 +384,11 @@ app.post('/containerlog', (req, res) => {
     container = req.body.container;
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/containerlog?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/containerlog?token=' + token + '&container=' + container, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end('\n' + data);
         });
@@ -417,13 +407,12 @@ app.post('/create', (req, res) => {
     container = req.body.container;
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/create?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
-        display_log(data => {
+    request('http://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(() => {
           res.end('\nSent request to create the containers.');
         });
       } else {
@@ -435,12 +424,11 @@ app.post('/create', (req, res) => {
 
 app.get('/status-count', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/status-count?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/status-count?token=' + token, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
         res.end(body);
       } else {
         res.end('\nError connecting with server.');
@@ -451,12 +439,11 @@ app.get('/status-count', (req, res) => {
 
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/rsyslog?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/rsyslog?token=' + token, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
         res.end(body);
       } else {
         res.end('\nError connecting with server.');
@@ -467,12 +454,11 @@ app.get('/rsyslog', (req, res) => {
 
 app.get('/status', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/status?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/status?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -485,12 +471,11 @@ app.get('/status', (req, res) => {
 
 app.get('/reloadconfig', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/reloadconfig?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/reloadconfig?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         if (process.env.PICLUSTER_CONFIG) {
           config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
         } else {
@@ -511,12 +496,11 @@ app.get('/reloadconfig', (req, res) => {
 
 app.get('/images', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/images?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/images?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -529,12 +513,11 @@ app.get('/images', (req, res) => {
 
 app.get('/killvip', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/killvip?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/killvip?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -553,13 +536,13 @@ app.post('/delete-image', (req, res) => {
     image = '';
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (image.length > 1) {
-      request('http://' + server + ':' + server_port + '/delete-image?' + 'token=' + token + '&image=' + image, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: This isn't a massive issue but should still probably be fixed at some point.
+    if (image.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -568,8 +551,8 @@ app.post('/delete-image', (req, res) => {
         }
       });
     } else {
-      request('http://' + server + ':' + server_port + '/delete-image?' + 'token=' + token, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/delete-image?token=' + token, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -590,13 +573,13 @@ app.post('/build', (req, res) => {
     image = '';
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (image.length > 1) {
-      request('http://' + server + ':' + server_port + '/build?' + 'token=' + token + '&image=' + image + '&no_cache=' + no_cache, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
+    if (image.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -605,8 +588,8 @@ app.post('/build', (req, res) => {
         }
       });
     } else {
-      request('http://' + server + ':' + server_port + '/build?' + 'token=' + token + '&no_cache=' + no_cache, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -629,13 +612,13 @@ app.post('/delete', (req, res) => {
     }
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (container.length > 1) {
-      request('http://' + server + ':' + server_port + '/delete?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: Fix this!
+    if (container.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -644,8 +627,8 @@ app.post('/delete', (req, res) => {
         }
       });
     } else {
-      request('http://' + server + ':' + server_port + '/delete?' + 'token=' + token, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/delete?token=' + token, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -659,12 +642,11 @@ app.post('/delete', (req, res) => {
 
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/prune?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/prune?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -686,13 +668,13 @@ app.post('/stop', (req, res) => {
     }
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (container.length > 1) {
-      request('http://' + server + ':' + server_port + '/stop?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: Fix this!
+    if (container.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -701,8 +683,8 @@ app.post('/stop', (req, res) => {
         }
       });
     } else {
-      request('http://' + server + ':' + server_port + '/stop?' + 'token=' + token, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/stop?token=' + token, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -717,7 +699,7 @@ app.post('/stop', (req, res) => {
 app.post('/changehost', (req, res) => {
   const check_token = req.body.token;
   const newhost = req.body.newhost;
-
+  let container;
   if (req.body.container) {
     container = req.body.container;
     if (container.indexOf('Everything') > -1) {
@@ -725,13 +707,13 @@ app.post('/changehost', (req, res) => {
     }
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (container.length > 1) {
-      request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: Fix this!
+    if (container.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -757,11 +739,11 @@ app.post('/addcontainer', (req, res) => {
     }
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if ((container) && (container_args) && (host)) {
-    request('http://' + server + ':' + server_port + '/addcontainer?' + 'token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/addcontainer?token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -774,7 +756,7 @@ app.post('/addcontainer', (req, res) => {
   }
 });
 
-function sendFile(file, name) {
+function sendFile(file) {
   const formData = {
     name: 'file',
     token,
@@ -784,7 +766,7 @@ function sendFile(file, name) {
   request.post({
     url: 'http://' + server + ':' + server_port + '/receive-file',
     formData
-  }, (err, httpResponse, body) => {
+  }, err => {
     if (err) {
       console.error('upload failed:', err);
     } else {
@@ -793,16 +775,15 @@ function sendFile(file, name) {
   });
 }
 
-app.post('/upload', upload.single('file'), (req, res, next) => {
+app.post('/upload', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const file = req.body.file;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    fs.readFile(req.file.path, (err, data) => {
+    // FixMe: Handle the error...
+    fs.readFile(req.file.path, (err, data) => { // eslint-disable-line handle-callback-err
       const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => {
+      fs.writeFile(newPath, data, () => {
         sendFile(newPath, req.file.originalname);
         res.end('');
       });
@@ -814,11 +795,11 @@ app.post('/removecontainerconfig', (req, res) => {
   const check_token = req.body.token;
   const container = req.body.container;
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (container) {
-    request('http://' + server + ':' + server_port + '/removecontainerconfig?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + container, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -835,11 +816,11 @@ app.post('/addhost', (req, res) => {
   const check_token = req.body.token;
   const host = req.body.host;
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
-    request('http://' + server + ':' + server_port + '/addhost?' + 'token=' + token + '&host=' + host, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/addhost?token=' + token + '&host=' + host, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -856,11 +837,11 @@ app.post('/rmhost', (req, res) => {
   const check_token = req.body.token;
   const host = req.body.host;
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
-    request('http://' + server + ':' + server_port + '/rmhost?' + 'token=' + token + '&host=' + host, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/rmhost?token=' + token + '&host=' + host, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -875,7 +856,7 @@ app.post('/rmhost', (req, res) => {
 
 app.post('/start', (req, res) => {
   const check_token = req.body.token;
-
+  let container;
   if (req.body.container) {
     container = req.body.container;
     if (container.indexOf('Everything') > -1) {
@@ -883,13 +864,13 @@ app.post('/start', (req, res) => {
     }
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (container.length > 1) {
-      request('http://' + server + ':' + server_port + '/start?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: Fix this!
+    if (container.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -898,8 +879,8 @@ app.post('/start', (req, res) => {
         }
       });
     } else {
-      request('http://' + server + ':' + server_port + '/start?' + 'token=' + token, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/start?token=' + token, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -913,6 +894,7 @@ app.post('/start', (req, res) => {
 
 app.post('/restart', (req, res) => {
   const check_token = req.body.token;
+  let container;
 
   if (req.body.container) {
     container = req.body.container;
@@ -921,13 +903,13 @@ app.post('/restart', (req, res) => {
     }
   }
 
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    if (container.length > 1) {
-      request('http://' + server + ':' + server_port + '/restart?' + 'token=' + token + '&container=' + container, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+    // FixMe: Fix this!
+    if (container.length > 1) { // eslint-disable-line no-lonely-if
+      request('http://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -936,8 +918,8 @@ app.post('/restart', (req, res) => {
         }
       });
     } else {
-      request('http://' + server + ':' + server_port + '/restart?' + 'token=' + token, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
+      request('http://' + server + ':' + server_port + '/restart?token=' + token, (error, response) => {
+        if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
           });
@@ -951,12 +933,11 @@ app.post('/restart', (req, res) => {
 
 app.get('/hb', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/hb?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/hb?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -969,12 +950,11 @@ app.get('/hb', (req, res) => {
 
 app.get('/log', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/log?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/log?token=' + token, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
         res.end(body);
       } else {
         res.end('\nError connecting with server.');
@@ -985,12 +965,11 @@ app.get('/log', (req, res) => {
 
 app.get('/nodes', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/nodes?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
         display_log(data => {
           res.end(data);
         });
@@ -1003,12 +982,11 @@ app.get('/nodes', (req, res) => {
 
 app.get('/getconfig', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const responseString = '';
-    request('http://' + server + ':' + server_port + '/getconfig?' + 'token=' + token, (error, response, body) => {
-      if (!error && response.statusCode == 200) {
+    request('http://' + server + ':' + server_port + '/getconfig?token=' + token, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
         res.end(body);
       } else {
         res.end('Error connecting with server. ' + error);
@@ -1018,7 +996,6 @@ app.get('/getconfig', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  const responseString = '';
   res.sendFile(__dirname + '/main.html');
 });
 
