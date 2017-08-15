@@ -11,6 +11,7 @@ before_install:
 - sudo apt-get install -y nodejs
 script:
 - npm install
+- find . -maxdepth 2 -name "package.json" -not -wholename "./package.json" -execdir npm install --production \;
 - npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - cp config-example.json config.json
@@ -22,9 +23,9 @@ script:
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
 - sudo docker container run -d --name minio -p 9000:9000 minio
-- cd server;npm install --production; sudo node server.js&
-- cd ../agent;npm install --production; sudo node agent.js&
-- cd ../web;npm install --production; sudo node webconsole.js&
+- cd server;sudo node server.js&
+- cd ../agent;sudo node agent.js&
+- cd ../web;sudo node webconsole.js&
 - cd ..
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
   -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
