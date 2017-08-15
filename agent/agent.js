@@ -1,31 +1,31 @@
+/* eslint "no-warning-comments": [1, { "terms": ["todo","fixme"] }] */
 const http = require('http');
+const fs = require('fs');
+const os = require('os');
+const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
-const fs = require('fs');
-const unzip = require('unzip');
 
+let config;
 if (process.env.PICLUSTER_CONFIG) {
-  var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+  config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
 } else {
-  var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
 const port = config.agent_port;
 const app = express();
 const bodyParser = require('body-parser');
 
 app.use(bodyParser());
-const server = require('http').createServer(app);
-const os = require('os');
+const server = http.createServer(app);
 
 const node = os.hostname();
 const async = require('async');
-const Promisify = require('util').promisify;
 const exec = require('child-process-promise').exec;
 
 const noop = function () {};
-var vip = '';
+let vip = '';
 let vip_slave = '';
-const vip_device = '';
 let ip_add_command = '';
 let ip_delete_command = '';
 let vip_ping_time = '';
@@ -43,13 +43,13 @@ if (config.autostart_containers) {
     path: '/start?token=' + token + '&container=*',
     port: config.server_port
   };
-  const autostart_request = http.get(options, response => {}).on('error', e => {
+  http.get(options).on('error', e => {
     console.error(e);
   });
 }
 
 if (config.vip_ip && config.vip) {
-  var vip = config.vip_ip;
+  vip = config.vip_ip;
   Object.keys(config.vip).forEach(i => {
     const _node = config.vip[i].node;
     Object.keys(config.vip[i]).forEach(key => {
@@ -64,11 +64,11 @@ if (config.vip_ip && config.vip) {
             return;
           }
           vip_slave = config.vip[i].slave;
-          vip_eth_device = config.vip[i].vip_eth_device;
+          const vip_eth_device = config.vip[i].vip_eth_device;
           ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
-          const cmd = ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
+          ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
           vip_ping_time = config.vip[i].vip_ping_time;
-          exec(cmd).then(send_ping).catch(send_ping);
+          exec(ip_delete_command).then(send_ping).catch(send_ping);
         });
       });
     });
@@ -77,7 +77,6 @@ if (config.vip_ip && config.vip) {
 
 function send_ping() {
   setTimeout(() => {
-    const responseString = '';
     const token_body = JSON.stringify({
       token
     });
@@ -94,8 +93,8 @@ function send_ping() {
     request(options, (error, response, body) => {
       let found_vip = false;
 
-      if ((error || response.statusCode != '200')) {
-        var cmd = ip_add_command;
+      if ((error || response.statusCode !== '200')) {
+        const cmd = ip_add_command;
         // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
         exec(cmd).then(noop).catch(noop);
       } else {
@@ -103,25 +102,25 @@ function send_ping() {
         Object.keys(interfaces).forEach(devName => {
           const iface = interfaces[devName];
           iface.forEach(alias => {
-            if (alias.address == vip) {
+            if (alias.address === vip) {
               found_vip = true;
             }
           });
         });
         const json_object = JSON.parse(body);
 
-        if (json_object.vip_detected == 'false' && found_vip == false) {
+        if (json_object.vip_detected === 'false' && found_vip === false) {
           console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
-          var cmd = ip_add_command;
-          exec(cmd).catch(error => {
-            console.log(error);
+          const cmd = ip_add_command;
+          exec(cmd).catch(err => {
+            console.log(err);
           });
         }
-        if ((json_object.vip_detected == 'true' && found_vip == true)) {
+        if ((json_object.vip_detected === 'true' && found_vip === true)) {
           console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
-          var cmd = ip_delete_command;
-          exec(cmd).catch(error => {
-            console.log(error);
+          const cmd = ip_delete_command;
+          exec(cmd).catch(err => {
+            console.log(err);
           });
         }
       }
@@ -132,7 +131,7 @@ function send_ping() {
 
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     res.sendFile(config.rsyslog_logfile);
@@ -147,10 +146,10 @@ app.post('/killvip', (req, res) => {
 
   if (config.vip_ip) {
     const cmd = ip_delete_command;
-    exec(cmd).then((stdout, stderr) => {
+    exec(cmd).then(() => {
       res.end('\nCompleted.');
-    }).catch(error => {
-      console.log(error);
+    }).catch(err => {
+      console.log(err);
     });
   }
 });
@@ -161,14 +160,13 @@ app.post('/pong', (req, res) => {
     return res.status(500).send('Something broke!');
   }
 
-  const responseString = '';
   let vip_status = 'false';
   const interfaces = require('os').networkInterfaces();
 
   Object.keys(interfaces).forEach(devName => {
     const iface = interfaces[devName];
     iface.forEach(alias => {
-      if (alias.address == vip) {
+      if (alias.address === vip) {
         vip_status = 'true';
       }
     });
@@ -181,21 +179,25 @@ app.post('/pong', (req, res) => {
 });
 
 function unzipFile(file) {
-  fs.createReadStream(file).pipe(unzip.Extract({
+  fs.createReadStream(file).pipe(new unzip.Extract({
     path: config.docker
   }));
 }
-app.post('/receive-file', upload.single('file'), (req, res, next) => {
+app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
-  if ((check_token != token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    fs.readFile(req.file.path, (err, data) => {
+    /* eslint-disable no-unused-vars */
+    /* eslint-disable handle-callback-err */
+    fs.readFile(req.file.path, (err, data) => { // FixMe: What's this code supposed to be doing?
       const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => {
+      fs.writeFile(newPath => {
         unzipFile(newPath);
       });
     });
+    /* eslint-enable no-unused-vars */
+    /* eslint-enable handle-callback-err */
     res.end('Done');
   }
 });
@@ -241,14 +243,14 @@ app.post('/run', (req, res) => {
       // Console.log('output', log);
       output.output.push(`${log.stdout || ''}${log.stderr || ''}`);
       return cb();
-    }).catch(e => {
-      // Console.log('error', e);
-      output.output.push(`${e.stdout || ''}${e.stderr || ''}`);
-      return cb(e);
+    }).catch(err => {
+      // Console.log('error', err);
+      output.output.push(`${err.stdout || ''}${err.stderr || ''}`);
+      return cb(err);
     });
-  }, e => {
-    if (e) {
-      console.error('error:', e);
+  }, err => {
+    if (err) {
+      console.error('error:', err);
     }
     // Console.log('output', output);
     res.json(output);
