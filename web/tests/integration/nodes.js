@@ -1,3 +1,6 @@
+/* eslint-env phantomjs,browser */
+/* eslint-disable func-names */
+/* global casper */
 casper.options.waitTimeout = 20000;
 
 casper.test.begin('nodes.html', 2, test => {

@@ -1,3 +1,5 @@
+/* eslint-env phantomjs,browser */
+/* global slimer */
 module.exports = function (_this) {
   return {
     doLogin(username, password) {
@@ -9,9 +11,9 @@ module.exports = function (_this) {
     },
     getCasperEngine() {
       try {
-        slimer;
+        slimer; // eslint-disable-line no-unused-expressions
         return 'slimerjs';
-      } catch (e) {
+      } catch (err) {
         return 'phantomjs';
       }
     }
