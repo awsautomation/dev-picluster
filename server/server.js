@@ -480,7 +480,6 @@ app.get('/create', (req, res) => {
             console.error(e);
           });
           request.write(command);
-          req.end();
         }
       });
     });

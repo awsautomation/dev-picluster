@@ -26,7 +26,7 @@ const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
 
-const noop = function () {};
+const noop = function() {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -46,6 +46,11 @@ const upload = multer({
 });
 
 function monitoring() {
+
+  exec('docker container ps -q', (err, stdout, stderr) => {
+    running_containers = stdout.split('\n').length -1;
+  });
+
   setTimeout(() => {
     getos((e, os) => {
       const dist = (e) ? '' : os.dist || os.os;
@@ -184,8 +189,10 @@ app.get('/node-status', (req, res) => {
       cpu_percent,
       hostname: node,
       os_type: os.platform,
-      disk_percentage
+      disk_percentage,
+      running_containers: running_containers
     });
+    console.log(json_output);
     res.send(json_output);
   }
 });
