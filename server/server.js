@@ -184,7 +184,7 @@ app.get('/nodes', (req, res) => {
   }
 
   function getData() {
-    node_metrics['total_containers'] = total_containers;
+    node_metrics.total_containers = total_containers;
     return node_metrics;
   }
 
@@ -252,7 +252,7 @@ app.get('/images', (req, res) => {
         }
       });
     }
-    res.end(getData());
+    res.end(log);
   }
 });
 
