@@ -48,10 +48,13 @@
 		function getContainerStatus() {
 			setTimeout(function() {
 				if (parent.token) {
-					$.get("/status-count?token=" + parent.token, function(data) {
-						var output = JSON.parse(data);
-						var total = output.total_containers;
-						var running = output.running_containers;
+					$.get("/nodes?token=" + parent.token, function(data) {
+						var check_data = data;
+						var total = check_data.total_containers;
+						var running = 0;
+						for (var i in check_data.data) {
+							running = running + check_data.data[i].running_containers;
+						}
 						var calc = Math.floor((running / total * 100));
 						var percent = 0;
 						if (!calc == 100) {
