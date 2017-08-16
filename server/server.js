@@ -155,7 +155,6 @@ app.get('/status', (req, res) => {
           res.end('An error has occurred.');
         } else {
           const results = JSON.parse(response.body);
-          console.log(response.body);
           addLog('\nNode: ' + results.output);
         }
       });
