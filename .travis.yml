@@ -1,4 +1,4 @@
-language: general
+language: generic
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get remove -y docker docker-engine docker.io
@@ -25,7 +25,7 @@ script:
 - sudo docker container run -d --name nginx -p 80:80 nginx
 - sudo docker container run -d --name minio -p 9000:9000 minio
 - cd server;sudo node server.js&
-- cd ../agent;npm rebuild;sudo node agent.js&
+- cd ../agent;npm install;npm rebuild;sudo node agent.js&
 - cd ../web;sudo node webconsole.js&
 - cd ..
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
