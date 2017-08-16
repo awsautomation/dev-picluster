@@ -37,7 +37,6 @@ const multer = require('multer');
 const getos = require('picluster-getos');
 
 let cpu_percent = 0;
-const disk_usage = 0;
 let os_type = '';
 let disk_percentage = 0;
 
@@ -48,8 +47,7 @@ const upload = multer({
 function monitoring() {
   setTimeout(() => {
     getos((e, os) => {
-      const dist = (e) ? '' : os.dist || os.os;
-      os_type = 'Dist: ' + dist;
+      os_type = (e) ? '' : os.dist || os.os;
     });
 
     disk.check(path, (err, info) => {
@@ -183,7 +181,7 @@ app.get('/node-status', (req, res) => {
     const json_output = JSON.stringify({
       cpu_percent,
       hostname: node,
-      os_type: os.platform,
+      os_type: (os_type === '') ? os.platform() : os_type,
       disk_percentage
     });
     res.send(json_output);
