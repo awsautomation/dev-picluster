@@ -192,7 +192,6 @@ app.get('/node-status', (req, res) => {
       disk_percentage,
       running_containers: running_containers
     });
-    console.log(json_output);
     res.send(json_output);
   }
 });
