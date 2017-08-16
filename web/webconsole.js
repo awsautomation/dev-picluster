@@ -971,7 +971,16 @@ app.get('/nodes', (req, res) => {
     request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
       if (!error && response.statusCode === 200) {
         console.log(response.body);
-      res.json(response.body);
+        let json;
+        let statusCode = 200;
+        try {
+          json = JSON.parse(response.body);
+        } catch (err) {
+          statusCode = 500;
+          console.error(err);
+          json = {status: statusCode, error: 'Internal Server Error'};
+        }
+        res.status(statusCode).json(json);
       } else {
         res.end('\nError connecting with server. ' + error);
       }
