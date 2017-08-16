@@ -162,7 +162,7 @@
 								var analyze_percent = test[i + 4].split('%');
 								var analyze_percent2 = analyze_percent[0].split(' ');
 								var percent = analyze_percent2[analyze_percent2.length - 1];
-								var cpu_percent = Math.round(test[test.length - 2]);
+								var cpu_percent = Math.round(test[i + 6]);
 								div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + test[i] + '</b><br>' + '<br>' + test[i + 2] + "</font>";
 								var div0 = document.createElement('div0');
 								div0.className = "page";
