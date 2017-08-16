@@ -970,9 +970,8 @@ app.get('/nodes', (req, res) => {
   } else {
     request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
       if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
+        console.log(response.body);
+      res.json(response.body);
       } else {
         res.end('\nError connecting with server. ' + error);
       }

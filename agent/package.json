@@ -6,6 +6,7 @@
     "body-parser": "latest",
     "child-process-promise": "",
     "cpu-stats": "^1.0.0",
+    "diskusage": "^0.2.2",
     "express": "^4.15.3",
     "fs": "",
     "line-reader": "",

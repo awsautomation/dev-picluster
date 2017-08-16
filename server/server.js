@@ -38,6 +38,10 @@ const upload = multer({
   dest: '../'
 });
 
+var node_metrics = {
+  data: []
+}
+
 if (config.elasticsearch && config.elasticsearch_index) {
   const mapping = {
     settings: {
@@ -207,6 +211,7 @@ app.get('/status', (req, res) => {
           res.end('An error has occurred.');
         } else {
           const results = JSON.parse(response.body);
+          console.log(response.body);
           addLog('\nNode: ' + results.output);
         }
       });
@@ -226,38 +231,54 @@ app.get('/clearlog', (req, res) => {
 });
 
 app.get('/nodes', (req, res) => {
+  var node_metrics = {
+    data: []
+  }
+
+  function addData(data) {
+    var foo = JSON.stringify(data);
+    node_metrics.data.push(data);
+  }
+
+  function getData() {
+    return node_metrics;
+  }
+
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const command = JSON.stringify({
-      command: 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';node -e \'require("cpu-stats")(1000, (error, result) => { let usage = 0; result.forEach(e => { usage += e.cpu; });console.log(usage); });\'',
-      token
-    });
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
 
-      // Runs a command on each node
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      request(options, (error, response) => {
-        if (error) {
-          res.end(error);
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('Node: ' + results.output);
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
+        if (!config.layout[i].hasOwnProperty(key)) {
+          return;
         }
+        const node = config.layout[i].node;
+        if (config.layout[i].node) {
+          const options = {
+            url: 'http://' + node + ':' + agentPort + '/node-status?token=' + token,
+            method: 'GET',
+          };
+
+          request(options, (error, response) => {
+            if (error) {
+              res.end(error);
+            } else {
+              var check = JSON.parse(response.body);
+              if (check.cpu_percent > 0) {
+                addData(check);
+              }
+            }
+          });
+        }
+
       });
-    }
-    res.end('');
+    });
+    setTimeout(function() {
+      res.json(getData());
+    }, 3000);
+
   }
 });
 
@@ -293,7 +314,7 @@ app.get('/images', (req, res) => {
         }
       });
     }
-    res.end('');
+    res.end(getData());
   }
 });
 

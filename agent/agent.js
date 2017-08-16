@@ -5,6 +5,9 @@ const os = require('os');
 const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
+const disk = require('diskusage');
+
+let path = os.platform() === 'win32' ? 'c:' : '/';
 
 let config;
 if (process.env.PICLUSTER_CONFIG) {
@@ -23,7 +26,7 @@ const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
 
-const noop = function () {};
+const noop = function() {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -31,10 +34,44 @@ let ip_delete_command = '';
 let vip_ping_time = '';
 const token = config.token;
 const multer = require('multer');
+const getos = require("picluster-getos");
+var cpu_percent = 0;
+var disk_usage = 0;
+var os_type = '';
+var disk_percentage = 0;
 
 const upload = multer({
   dest: '../'
 });
+
+function monitoring() {
+  setTimeout(function() {
+
+    getos(function(e, os) {
+      var dist = (e) ? "" : os.dist || os.os;
+      os_type = "Dist: " + dist;
+    });
+
+    disk.check(path, function(err, info) {
+      if (err) {
+        console.log(err);
+      } else {
+        disk_percentage = info.free / info.total * 100;
+      }
+    });
+
+    require("cpu-stats")(1000, (error, result) => {
+      let usage = 0;
+      result.forEach(e => {
+        usage += e.cpu;
+      });
+      cpu_percent = usage;
+    });
+    monitoring();
+  }, 3000);
+}
+
+monitoring();
 
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
@@ -137,6 +174,22 @@ app.get('/rsyslog', (req, res) => {
     res.sendFile(config.rsyslog_logfile);
   }
 });
+
+app.get('/node-status', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    var json_output = JSON.stringify({
+      "cpu_percent": cpu_percent,
+      "hostname": node,
+      "os_type": os.platform,
+      "disk_percentage": disk_percentage
+    })
+    res.send(json_output);
+  }
+});
+
 
 app.post('/killvip', (req, res) => {
   const check_token = req.body.token;

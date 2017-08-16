@@ -150,75 +150,69 @@
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for nodes</label></font>';
 			}
 			$.get("/nodes?token=" + parent.token, function(data) {
-				var test = data.split('\n');
-				var dists = getDists(test);
+				var check_data = JSON.parse(data);
+
 				if (div) {
 					div.innerHTML = '';
 				}
-				for (i = 0, dist = 0; i != test.length; i++) {
-					if (test[i].length > 2) {
-						if (test[i].indexOf('Node:') > -1) {
-							if (div) {
-								var analyze_percent = test[i + 4].split('%');
-								var analyze_percent2 = analyze_percent[0].split(' ');
-								var percent = analyze_percent2[analyze_percent2.length - 1];
-								var cpu_percent = Math.round(test[i + 6]);
-								div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + test[i] + '</b><br>' + '<br>' + test[i + 2] + "</font>";
-								var div0 = document.createElement('div0');
-								div0.className = "page";
-								var div1 = document.createElement('div1');
-								div1.className = 'clearfix';
-								div1.id = 'div1';
-								var div2 = document.createElement('div2');
-								div2.className = 'c100 p' + percent + ' small';
-								div2.id = 'running-class';
-								div2.innerHTML = '<span id="' + test[i] + '">' + percent + '%</span>';
-								var div3 = document.createElement('div3');
-								div3.className = "slice";
-								var div4 = document.createElement('div4');
-								div4.className = "bar";
-								var div5 = document.createElement('div5');
-								div5.className = "fill";
+				for (var i in check_data.data) {
+					if (div) {
+						var percent = Math.round(data.disk_percentage);
+						var cpu_percent = Math.round(data.cpu_percent);
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						var div0 = document.createElement('div0');
+						div0.className = "page";
+						var div1 = document.createElement('div1');
+						div1.className = 'clearfix';
+						div1.id = 'div1';
+						var div2 = document.createElement('div2');
+						div2.className = 'c100 p' + percent + ' small';
+						div2.id = 'running-class';
+						div2.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
+						var div3 = document.createElement('div3');
+						div3.className = "slice";
+						var div4 = document.createElement('div4');
+						div4.className = "bar";
+						var div5 = document.createElement('div5');
+						div5.className = "fill";
 
-								var div6 = document.createElement('div6');
-								div6.className = "page";
-								var div7 = document.createElement('div7');
-								div7.className = 'clearfix';
-								div7.id = 'div7';
-								var div8 = document.createElement('div8');
-								div8.className = 'c100 p' + cpu_percent + ' small';
-								div8.id = 'running-class';
-								div8.innerHTML = '<span id="' + i + '">' + cpu_percent + '%</span>';
-								var div9 = document.createElement('div9');
-								div9.className = "slice";
-								var div10 = document.createElement('div10');
-								div10.className = "bar";
-								var div11 = document.createElement('div11');
-								div11.className = "fill";
+						var div6 = document.createElement('div6');
+						div6.className = "page";
+						var div7 = document.createElement('div7');
+						div7.className = 'clearfix';
+						div7.id = 'div7';
+						var div8 = document.createElement('div8');
+						div8.className = 'c100 p' + cpu_percent + ' small';
+						div8.id = 'running-class';
+						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent) + '%</span>';
+						var div9 = document.createElement('div9');
+						div9.className = "slice";
+						var div10 = document.createElement('div10');
+						div10.className = "bar";
+						var div11 = document.createElement('div11');
+						div11.className = "fill";
 
-								div0.appendChild(div1);
-								div1.appendChild(div2);
-								div2.appendChild(div3);
-								div3.appendChild(div4);
-								div4.appendChild(div5);
+						div0.appendChild(div1);
+						div1.appendChild(div2);
+						div2.appendChild(div3);
+						div3.appendChild(div4);
+						div4.appendChild(div5);
 
-								div6.appendChild(div7);
-								div7.appendChild(div8);
-								div8.appendChild(div9);
-								div9.appendChild(div10);
-								div10.appendChild(div11);
+						div6.appendChild(div7);
+						div7.appendChild(div8);
+						div8.appendChild(div9);
+						div9.appendChild(div10);
+						div10.appendChild(div11);
 
-								var table = document.createElement("TABLE");
-								var row = table.insertRow(0);
-								var cell1 = row.insertCell(0);
-								var cell2 = row.insertCell(1);
-								cell1.innerHTML += '<font size="+0" color="black"><b>Disk Usage</b>';
-								cell2.innerHTML += '<font size="+0" color="black"><b>CPU Usage</b>';
-								cell1.appendChild(div0);
-								cell2.appendChild(div6);
-								div.appendChild(table);
-							}
-						}
+						var table = document.createElement("TABLE");
+						var row = table.insertRow(0);
+						var cell1 = row.insertCell(0);
+						var cell2 = row.insertCell(1);
+						cell1.innerHTML += '<font size="+0" color="black"><b>Disk Usage</b>';
+						cell2.innerHTML += '<font size="+0" color="black"><b>CPU Usage</b>';
+						cell1.appendChild(div0);
+						cell2.appendChild(div6);
+						div.appendChild(table);
 					}
 				}
 				addFontLinux();
