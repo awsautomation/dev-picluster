@@ -38,9 +38,9 @@ const upload = multer({
   dest: '../'
 });
 
-var node_metrics = {
+const node_metrics = {
   data: []
-}
+};
 
 if (config.elasticsearch && config.elasticsearch_index) {
   const mapping = {
@@ -231,12 +231,12 @@ app.get('/clearlog', (req, res) => {
 });
 
 app.get('/nodes', (req, res) => {
-  var node_metrics = {
+  const node_metrics = {
     data: []
-  }
+  };
 
   function addData(data) {
-    var foo = JSON.stringify(data);
+    const foo = JSON.stringify(data);
     node_metrics.data.push(data);
   }
 
@@ -248,7 +248,6 @@ app.get('/nodes', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         if (!config.layout[i].hasOwnProperty(key)) {
@@ -258,27 +257,25 @@ app.get('/nodes', (req, res) => {
         if (config.layout[i].node) {
           const options = {
             url: 'http://' + node + ':' + agentPort + '/node-status?token=' + token,
-            method: 'GET',
+            method: 'GET'
           };
 
           request(options, (error, response) => {
             if (error) {
-              res.end(error);
+              console.error(error);
             } else {
-              var check = JSON.parse(response.body);
+              const check = JSON.parse(response.body);
               if (check.cpu_percent > 0) {
                 addData(check);
               }
             }
           });
         }
-
       });
     });
-    setTimeout(function() {
+    setTimeout(() => {
       res.json(getData());
     }, 3000);
-
   }
 });
 
