@@ -159,7 +159,9 @@
 					if (div) {
 						var percent = Math.round(data.disk_percentage);
 						var cpu_percent = Math.round(data.cpu_percent);
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						var dist = data.os_type || '';
+						dist = dist.toLowerCase();
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
 						var div0 = document.createElement('div0');
 						div0.className = "page";
 						var div1 = document.createElement('div1');
