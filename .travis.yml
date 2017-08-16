@@ -1,3 +1,4 @@
+language: general
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get remove -y docker docker-engine docker.io
