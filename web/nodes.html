@@ -113,6 +113,7 @@
 			padding: 2px 16px;
 			color: black
 		}
+
 		.page {
 			margin: 10px;
 		}
@@ -158,12 +159,11 @@
 					if (test[i].length > 2) {
 						if (test[i].indexOf('Node:') > -1) {
 							if (div) {
-							var analyze_percent = test[i+4].split('%');
-							var analyze_percent2 = analyze_percent[0].split(' ');
-							var percent = analyze_percent2[analyze_percent2.length - 1];
-							var cpu_percent = Math.round(test[test.length - 2]);
+								var analyze_percent = test[i + 4].split('%');
+								var analyze_percent2 = analyze_percent[0].split(' ');
+								var percent = analyze_percent2[analyze_percent2.length - 1];
+								var cpu_percent = Math.round(test[test.length - 2]);
 								div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+2 style="white-space: pre-wrap;">' + test[i] + '<br>' + '<br>' + test[i + 2] + "</font>";
-								div.innerHTML = div.innerHTML += '<font size="+1"><br><b>Disk Usage</font></b><br><br>';
 								var div0 = document.createElement('div0');
 								div0.className = "page";
 								var div1 = document.createElement('div1');
@@ -172,7 +172,7 @@
 								var div2 = document.createElement('div2');
 								div2.className = 'c100 p' + percent + ' small';
 								div2.id = 'running-class';
-								div2.innerHTML = '<span id="' +  test[i] + '">' + percent + '%</span>';
+								div2.innerHTML = '<span id="' + test[i] + '">' + percent + '%</span>';
 								var div3 = document.createElement('div3');
 								div3.className = "slice";
 								var div4 = document.createElement('div4');
@@ -188,7 +188,7 @@
 								var div8 = document.createElement('div8');
 								div8.className = 'c100 p' + cpu_percent + ' small';
 								div8.id = 'running-class';
-								div8.innerHTML = '<span id="' +  test[i] + '">' + cpu_percent + '%</span>';
+								div8.innerHTML = '<span id="' + test[i] + '">' + cpu_percent + '%</span>';
 								var div9 = document.createElement('div9');
 								div9.className = "slice";
 								var div10 = document.createElement('div10');
@@ -208,9 +208,15 @@
 								div9.appendChild(div10);
 								div10.appendChild(div11);
 
-								div.appendChild(div0);
-								div.innerHTML = div.innerHTML += '<font size="+1"><br><b>CPU Usage</font></b><br><br>';
-								div.appendChild(div6);
+								var table = document.createElement("TABLE");
+								var row = table.insertRow(0);
+								var cell1 = row.insertCell(0);
+								var cell2 = row.insertCell(1);
+								cell1.innerHTML += '<font size="+1" color="black">Disk Usage';
+								cell2.innerHTML += '<font size="+1" color="black">CPU Usage';
+								cell1.appendChild(div0);
+								cell2.appendChild(div6);
+								div.appendChild(table);
 							}
 						}
 					}
