@@ -256,7 +256,7 @@ app.get('/images', (req, res) => {
         }
       });
     }
-    res.end(getData());
+    res.end(log);
   }
 });
 
