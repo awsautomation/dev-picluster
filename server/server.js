@@ -37,6 +37,10 @@ const upload = multer({
   dest: '../'
 });
 
+const node_metrics = {
+  data: []
+};
+
 if (config.elasticsearch && config.elasticsearch_index) {
   const mapping = {
     settings: {
@@ -175,20 +179,12 @@ app.get('/clearlog', (req, res) => {
 });
 
 app.get('/nodes', (req, res) => {
-  const node_metrics = {
-    data: [],
-    running: []
-  };
-
   function addData(data) {
     node_metrics.data.push(data);
   }
 
   function getData() {
-    const ad = JSON.stringify({
-      total_containers
-    });
-    node_metrics.running.push(ad);
+    node_metrics['total_containers'] = total_containers;
     return node_metrics;
   }
 
@@ -256,7 +252,7 @@ app.get('/images', (req, res) => {
         }
       });
     }
-    res.end(log);
+    res.end(getData());
   }
 });
 
