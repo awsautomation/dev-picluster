@@ -37,10 +37,6 @@ const upload = multer({
   dest: '../'
 });
 
-const node_metrics = {
-  data: []
-};
-
 if (config.elasticsearch && config.elasticsearch_index) {
   const mapping = {
     settings: {
@@ -179,6 +175,10 @@ app.get('/clearlog', (req, res) => {
 });
 
 app.get('/nodes', (req, res) => {
+  const node_metrics = {
+    data: []
+  };
+
   function addData(data) {
     node_metrics.data.push(data);
   }
