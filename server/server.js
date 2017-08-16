@@ -129,59 +129,9 @@ function containerDetails() {
         total_containers++;
       });
     });
-
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-        if (!config.layout[i].hasOwnProperty(key)) {
-          return;
-        }
-
-        if (key.indexOf('node') > -1) {
-          const command = JSON.stringify({
-            command: 'docker ps -q | wc -l',
-            token
-          });
-
-          const options = {
-            url: 'http://' + node + ':' + agentPort + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-
-          request(options, (error, response, body) => {
-            if (error) {
-              console.log('An error has occurred.');
-            } else {
-              const check_value = JSON.parse(body).output.toString();
-              const found = check_value.replace(/ /g, '');
-              running_containers += parseInt(found);
-            }
-          });
-        }
-      });
-    });
     containerDetails();
   }, 15000);
 }
-
-app.get('/status-count', (req, res) => {
-  const check_token = req.query.token;
-  const data = JSON.stringify({
-    total_containers,
-    running_containers
-  });
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    res.end(data);
-  }
-});
 
 app.get('/status', (req, res) => {
   const check_token = req.query.token;
@@ -232,7 +182,8 @@ app.get('/clearlog', (req, res) => {
 
 app.get('/nodes', (req, res) => {
   const node_metrics = {
-    data: []
+    data: [],
+    running: []
   };
 
   function addData(data) {
@@ -240,6 +191,10 @@ app.get('/nodes', (req, res) => {
   }
 
   function getData() {
+    var ad = JSON.stringify({
+      "total_containers": total_containers
+    });
+    node_metrics.running.push(ad);
     return node_metrics;
   }
 

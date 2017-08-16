@@ -422,21 +422,6 @@ app.post('/create', (req, res) => {
   }
 });
 
-app.get('/status-count', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    request('http://' + server + ':' + server_port + '/status-count?token=' + token, (error, response, body) => {
-      if (!error && response.statusCode === 200) {
-        res.end(body);
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
