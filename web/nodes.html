@@ -150,7 +150,7 @@
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for nodes</label></font>';
 			}
 			$.get("/nodes?token=" + parent.token, function(data) {
-				var check_data = JSON.parse(data);
+				var check_data = data;
 
 				if (div) {
 					div.innerHTML = '';
