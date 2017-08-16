@@ -185,7 +185,7 @@ app.get('/status', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const command = JSON.stringify({
-      command: 'hostname;docker container ps;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
+      command: 'hostname;docker container ps;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
       token
     });
     for (let i = 0; i < config.layout.length; i++) {
@@ -231,7 +231,7 @@ app.get('/nodes', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const command = JSON.stringify({
-      command: 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
+      command: 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';node -e \'require("cpu-stats")(1000, (error, result) => { let usage = 0; result.forEach(e => { usage += e.cpu; });console.log(usage); });\'',
       token
     });
     for (let i = 0; i < config.layout.length; i++) {
