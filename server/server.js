@@ -30,7 +30,6 @@ let log = '';
 let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
-let running_containers = 0;
 let total_containers = 0;
 const multer = require('multer');
 
@@ -39,7 +38,8 @@ const upload = multer({
 });
 
 const node_metrics = {
-  data: []
+  data: [],
+  running: []
 };
 
 if (config.elasticsearch && config.elasticsearch_index) {
@@ -120,7 +120,6 @@ function automatic_heartbeat() {
 function containerDetails() {
   setTimeout(() => {
     total_containers = 0;
-    running_containers = 0;
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
@@ -181,18 +180,13 @@ app.get('/clearlog', (req, res) => {
 });
 
 app.get('/nodes', (req, res) => {
-  const node_metrics = {
-    data: [],
-    running: []
-  };
-
   function addData(data) {
     node_metrics.data.push(data);
   }
 
   function getData() {
-    var ad = JSON.stringify({
-      "total_containers": total_containers
+    const ad = JSON.stringify({
+      total_containers
     });
     node_metrics.running.push(ad);
     return node_metrics;
