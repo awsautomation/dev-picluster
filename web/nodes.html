@@ -157,8 +157,6 @@
 				}
 				for (var i in check_data.data) {
 					if (div) {
-						var percent = Math.round(data.disk_percentage);
-						var cpu_percent = Math.round(data.cpu_percent);
 						var dist = check_data.data[i].os_type || '';
 						dist = dist.toLowerCase();
 						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
@@ -168,7 +166,7 @@
 						div1.className = 'clearfix';
 						div1.id = 'div1';
 						var div2 = document.createElement('div2');
-						div2.className = 'c100 p' + percent + ' small';
+						div2.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
 						div2.id = 'running-class';
 						div2.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
 						var div3 = document.createElement('div3');
@@ -184,7 +182,7 @@
 						div7.className = 'clearfix';
 						div7.id = 'div7';
 						var div8 = document.createElement('div8');
-						div8.className = 'c100 p' + cpu_percent + ' small';
+						div8.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent) + ' small';
 						div8.id = 'running-class';
 						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent) + '%</span>';
 						var div9 = document.createElement('div9');
