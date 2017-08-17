@@ -24,7 +24,7 @@ const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
 
-const noop = function () {};
+const noop = function() {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -37,7 +37,8 @@ const getos = require('picluster-getos');
 let cpu_percent = 0;
 let os_type = '';
 let disk_percentage = 0;
-let running_containers = 0;
+let total_running_containers = 0;
+let running_containers = '';
 let cpu_cores = 0;
 
 let memory_free = 0;
@@ -52,14 +53,22 @@ function monitoring() {
 
   memory_free = os.freemem();
   memory_total = os.totalmem();
-  memory_percentage =  Math.round((memory_total - memory_free) / memory_total * 100);
+  memory_percentage = Math.round((memory_total - memory_free) / memory_total * 100);
 
   exec('docker container ps -q', (err, stdout) => {
     if (err) {
       console.error(err);
     }
-    running_containers = stdout.split('\n').length - 1;
+    total_running_containers = stdout.split('\n').length - 1;
   });
+
+  exec('docker ps --format "{{.Names}}"', (err, stdout) => {
+    if (err) {
+      console.error(err);
+    }
+    running_containers = stdout.split('\n');
+  });
+
 
   setTimeout(() => {
     getos((e, os) => {
@@ -197,10 +206,12 @@ app.get('/node-status', (req, res) => {
       hostname: node,
       os_type: (os_type === '') ? os.platform() : os_type,
       disk_percentage,
+      total_running_containers,
       running_containers,
       cpu_cores,
       memory_percentage
     });
+    console.log(json_output);
     res.send(json_output);
   }
 });
