@@ -132,7 +132,7 @@ logs
 }
 
 
-if [  -z "$1" ]; then
+if [  -z "$1" ] ||  [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "help" ]; then
 echo "Error, no args specified!"
 echo
 arguments="build nodes reloadconfig images start create status exec start stop clean "
