@@ -23,11 +23,13 @@ script:
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
-- sudo find . -name "node_modules" -exec rm -rf {} \;
+- sudo find . -name "node_modules" -exec rm -rf {} \; || true
 - docker-compose up -d --force-recreate
 - docker-compose ps
+- sleep 10
+- docker-compose ps
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
-  -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
+  -e FONTLINUX=fl-alpine local/testing:alpine
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
 - "./pictl nodes"
