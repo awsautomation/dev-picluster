@@ -23,9 +23,7 @@ script:
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
-- sudo docker-compose up server &
-- sudo docker-compose up agent &
-- sudo docker-compose up webconsole &
+- sudo docker-compose up -d
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
   -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
 - chmod +x ./pictl
