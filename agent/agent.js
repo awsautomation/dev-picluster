@@ -5,7 +5,7 @@ const os = require('os');
 const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
-const disk = require('diskusage');
+var diskspace = require('diskspace');
 
 const path = os.platform() === 'win32' ? 'c:' : '/';
 
@@ -26,7 +26,7 @@ const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
 
-const noop = function () {};
+const noop = function() {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -58,14 +58,12 @@ function monitoring() {
       os_type = (e) ? '' : os.dist || os.os;
     });
 
-    disk.check(path, (err, info) => {
-      if (err) {
-        console.log(err);
-      } else {
-        disk_percentage = info.available / info.total * 100;
-      }
+    diskspace.check('/', function (err, result)
+    {
+        disk_percentage = Math.round(result.used  / result.total * 100);
     });
-
+    console.log(disk_percentage);
+  
     require('cpu-stats')(1000, (error, result) => {
       let usage = 0;
       result.forEach(e => {
