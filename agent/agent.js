@@ -62,7 +62,7 @@ function monitoring() {
       if (err) {
         console.log(err);
       } else {
-        disk_percentage = info.free / info.total * 100;
+        disk_percentage = Math.round(info.free / info.total * 100);
       }
     });
 
