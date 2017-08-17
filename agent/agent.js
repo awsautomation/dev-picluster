@@ -62,8 +62,7 @@ function monitoring() {
     {
         disk_percentage = Math.round(result.used  / result.total * 100);
     });
-    console.log(disk_percentage);
-  
+
     require('cpu-stats')(1000, (error, result) => {
       let usage = 0;
       result.forEach(e => {
