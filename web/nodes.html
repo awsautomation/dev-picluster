@@ -182,9 +182,9 @@
 						div7.className = 'clearfix';
 						div7.id = 'div7';
 						var div8 = document.createElement('div8');
-						div8.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent) + ' small';
+						div8.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent /check_data.data[i].cpu_cores) + ' small';
 						div8.id = 'running-class';
-						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent) + '%</span>';
+						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent /check_data.data[i].cpu_cores) + '%</span>';
 						var div9 = document.createElement('div9');
 						div9.className = "slice";
 						var div10 = document.createElement('div10');

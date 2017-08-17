@@ -40,6 +40,7 @@ let cpu_percent = 0;
 let os_type = '';
 let disk_percentage = 0;
 let running_containers = 0;
+let cpu_cores = 0;
 
 const upload = multer({
   dest: '../'
@@ -64,9 +65,11 @@ function monitoring() {
     });
 
     require('cpu-stats')(1000, (error, result) => {
+      cpu_cores = 0;
       let usage = 0;
       result.forEach(e => {
         usage += e.cpu;
+        cpu_cores++;
       });
       cpu_percent = usage;
     });
@@ -188,7 +191,8 @@ app.get('/node-status', (req, res) => {
       hostname: node,
       os_type: (os_type === '') ? os.platform() : os_type,
       disk_percentage,
-      running_containers
+      running_containers,
+      cpu_cores,
     });
     res.send(json_output);
   }
