@@ -4,6 +4,12 @@ server='127.0.0.1'
 port='3000'
 token='1234567890ABCDEFGHJKLMNOP'
 
+if jq --version &> /dev/null 2>&1; then
+  JSON_TOOL=jq
+else
+  JSON_TOOL=python
+fi
+
 hb(){
 clear
 echo "Heartbeat is now checking....."
@@ -14,7 +20,13 @@ logs
 nodes(){
 clear
 echo "Active Nodes:"
-curl -s $server:$port/nodes?token=$token
+cmd="curl -s -L $server:$port/nodes?token=$token"
+if [[ "$JSON_TOOL" == "jq" ]]
+then
+  $cmd | jq '.data'
+else
+  $cmd | python -m json.tool
+fi
 logs
 }
 
