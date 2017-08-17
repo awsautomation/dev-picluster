@@ -40,11 +40,20 @@ let disk_percentage = 0;
 let running_containers = 0;
 let cpu_cores = 0;
 
+let memory_free = 0;
+let memory_total = 0;
+let memory_percentage = 0;
+
 const upload = multer({
   dest: '../'
 });
 
 function monitoring() {
+
+  memory_free = os.freemem();
+  memory_total = os.totalmem();
+  memory_percentage =  Math.round((memory_total - memory_free) / memory_total * 100);
+
   exec('docker container ps -q', (err, stdout) => {
     if (err) {
       console.error(err);
@@ -189,7 +198,8 @@ app.get('/node-status', (req, res) => {
       os_type: (os_type === '') ? os.platform() : os_type,
       disk_percentage,
       running_containers,
-      cpu_cores
+      cpu_cores,
+      memory_percentage
     });
     res.send(json_output);
   }
