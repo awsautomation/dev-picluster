@@ -7,6 +7,7 @@ When a container is added, it will be automatically built and started.
 Can now upload a zip containing the Dockerfile and required files for a container.
 The zip archive will be copied to each machine and extracted.
 A percentage of running containers is displayed on the main screen.
+Node status page shows disk, cpu, and memory utilization.
 
 Enhancements:
 Container Display: Can click on a running container to manage it.
