@@ -23,6 +23,7 @@ script:
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
+- sudo find . -name "node_modules" -exec rm -rf {} \;
 - docker-compose up -d --force-recreate
 - docker-compose ps
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
