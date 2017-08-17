@@ -6,6 +6,7 @@ const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
 const diskspace = require('diskspace');
+var free = require('freem');
 
 let config;
 if (process.env.PICLUSTER_CONFIG) {
@@ -23,7 +24,7 @@ const server = http.createServer(app);
 const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
-
+const si = require('systeminformation');
 const noop = function() {};
 let vip = '';
 let vip_slave = '';
@@ -52,9 +53,12 @@ const upload = multer({
 
 function monitoring() {
 
-  memory_free = os.freemem();
-  memory_total = os.totalmem();
-  memory_percentage = Math.round((memory_total - memory_free) / memory_total * 100);
+    si.mem(function(data) {
+      memory_free = data.free;
+      memory_total = data.total;
+      memory_buffers = data.buffcache;
+      memory_percentage = Math.round((memory_free + memory_buffers) / memory_total * 100);
+  })
 
   exec('docker container ps -q', (err, stdout) => {
     if (err) {
