@@ -141,11 +141,11 @@
 					if (div) {
 						var dist = check_data.data[i].os_type || '';
 						dist = dist.toLowerCase();
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br';
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br>' + '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br><br>';
 						var array = check_data.data[i].images;
 						for (var j in array) {
 							if (array[j]) {
-								div.innerHTML = div.innerHTML + '<font size=+0><a href="/manage-images.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
+								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage-images.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
 							}
 						}
 					}

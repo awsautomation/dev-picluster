@@ -142,7 +142,7 @@
 					if (div) {
 						var dist = check_data.data[i].os_type || '';
 						dist = dist.toLowerCase();
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br';
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br>'+ '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br><br>';
 						var array = check_data.data[i].running_containers;
 						for (var j in array) {
 							if (array[j]) {
