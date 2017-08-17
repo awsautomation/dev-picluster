@@ -38,6 +38,18 @@
 
 - Docker
 - Node.js
+- pq
+- git
+
+### Ubuntu
+```
+apt-get install git node docker pq
+```
+
+### Arch Linux
+```
+pacman -S git node docker pq
+```
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/picluster/picluster/tree/1.0)
 
