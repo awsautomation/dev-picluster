@@ -8,7 +8,6 @@ services:
     ports:
       - "3000:3000"
     working_dir: /picluster/server
-    network_mode: host
     command: ["sh", "-c", "set -e;printf '127.0.0.1\tagent\n' | tee -a /etc/hosts;printf '127.0.0.1\tserver\n' | tee -a /etc/hosts;npm install --production;node server.js;"]
   agent:
     image: "node:alpine"
@@ -19,7 +18,6 @@ services:
     ports:
       - "3001:3001"
     working_dir: /picluster/agent
-    network_mode: host
     command: ["sh", "-c", "set -e;printf '127.0.0.1\tagent\n' | tee -a /etc/hosts;printf '127.0.0.1\tserver\n' | tee -a /etc/hosts;apk update;apk upgrade;apk add git python make g++ docker procps;export PATH=/bin:$PATH;npm install --production;node agent.js"]
   webconsole:
     image: "node:alpine"
@@ -29,5 +27,4 @@ services:
     ports:
       - "3003:3003"
     working_dir: /picluster/web
-    network_mode: host
     command: ["sh", "-c", "set -e;printf '127.0.0.1\tagent\n' | tee -a /etc/hosts;printf '127.0.0.1\tserver\n' | tee -a /etc/hosts;apk update;apk upgrade;apk add git;npm install --production;node webconsole.js;"]
