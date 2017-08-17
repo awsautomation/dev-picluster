@@ -23,13 +23,15 @@ script:
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
-- sudo docker-compose up -d
+- docker-compose up -d --force-recreate
+- docker-compose ps
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
   -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
 - "./pictl nodes"
 - "./pictl reloadconfig"
+- for container in $(docker-compose ps | grep -v Up | tail -n +3 | awk '{print $1}') ; do echo "$container" | sed -e 's/^\(\([^_]\|_[^0-9]\)*\).*/\1/g' | sed 's/^picluster_//g' | xargs sudo docker-compose logs ; done
 - sudo docker-compose down
 notifications:
   slack:
