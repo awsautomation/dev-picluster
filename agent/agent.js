@@ -1,4 +1,5 @@
 var http = require('http');
+var https = require("https");
 var express = require('express');
 var request = require('request');
 var fs = require('fs');
@@ -8,11 +9,21 @@ if (process.env.PICLUSTER_CONFIG) {
 } else {
   var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
-var port = config.agent_port;
+var agent_port = config.agent_port;
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser());
-var server = require("http").createServer(app);
+if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+    var ssl_options = {
+        cert: fs.readFileSync(config.ssl_cert),
+        key: fs.readFileSync(config.ssl_key)
+    }
+    var server = https.createServer(ssl_options, app);
+    console.log("SSL Agent API enabled");
+} else {
+    var server = http.createServer(app);
+    console.log("Non-SSL Agent API enabled");
+}
 var os = require('os');
 const node = os.hostname();
 const async = require('async');
@@ -34,11 +45,15 @@ var upload = multer({
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
   var options = {
-    host: config.web_connect,
+    if ( config.ssl ){
+      host: "https://" + config.web_connect
+    } else {
+      host: "http://" + config.web_connect
+    },
     path: '/start?token=' + token + '&container=*',
     port: config.server_port
   };
-  var autostart_request = http.get(options, function(response) {}).on('error', function(e) {
+  var autostart_request = app.get(options, function(response) {}).on('error', function(e) {
     console.error(e);
   });
 
@@ -78,7 +93,11 @@ function send_ping() {
       "token": token
     });
     var options = {
-      url: 'http://' + vip_slave + ':' + port + '/pong',
+      if ( config.ssl ){
+        url: "https://" + vip_slave + ':' + agent_port + '/pong'
+      } else {
+        url: "http://" + vip_slave + ':' + agent_port + '/pong'
+      },
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -252,6 +271,6 @@ app.post('/run', function(req, res) {
   });
 });
 
-server.listen(port, function() {
-  console.log('Listening on port %d', port);
+server.listen(agent_port, function() {
+  console.log('Listening on port %d', agent_port);
 });

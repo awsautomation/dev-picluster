@@ -36,6 +36,7 @@
 
 - Docker
 - Node.js
+- OpenSSL
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/picluster/picluster/tree/1.0)
 
@@ -359,6 +360,21 @@ systemctl enable pm2-root
 
 ```
 Reboot
+```
+
+## SSL/TLS
+
+Generate self-signed SSL key/cert in the ssl/ folder:
+```
+cd /opt/picluster
+openssl req -sha512 -newkey rsa:4096 -keyout ssl/picluster.key -x509 -days 365 -nodes -out ssl/picluster.crt
+```
+
+Edit the config.json file and enable SSL and specify the cert and key path:
+```
+"ssl": "true",
+"ssl_cert": "/opt/picluster/ssl/picluster.crt",
+"ssl_key": "/opt/picluster/ssl/picluster.key",
 ```
 
 # Automatic Container failover to other hosts
