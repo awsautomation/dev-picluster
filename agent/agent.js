@@ -6,7 +6,6 @@ const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
 const diskspace = require('diskspace');
-var free = require('freem');
 
 let config;
 if (process.env.PICLUSTER_CONFIG) {
