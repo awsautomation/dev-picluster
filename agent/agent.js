@@ -5,9 +5,7 @@ const os = require('os');
 const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
-var diskspace = require('diskspace');
-
-const path = os.platform() === 'win32' ? 'c:' : '/';
+const diskspace = require('diskspace');
 
 let config;
 if (process.env.PICLUSTER_CONFIG) {
@@ -26,7 +24,7 @@ const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
 
-const noop = function() {};
+const noop = function () {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -59,9 +57,8 @@ function monitoring() {
       os_type = (e) ? '' : os.dist || os.os;
     });
 
-    diskspace.check('/', function (err, result)
-    {
-        disk_percentage = Math.round(result.used  / result.total * 100);
+    diskspace.check('/', (err, result) => {
+      disk_percentage = Math.round(result.used / result.total * 100);
     });
 
     require('cpu-stats')(1000, (error, result) => {
@@ -192,7 +189,7 @@ app.get('/node-status', (req, res) => {
       os_type: (os_type === '') ? os.platform() : os_type,
       disk_percentage,
       running_containers,
-      cpu_cores,
+      cpu_cores
     });
     res.send(json_output);
   }

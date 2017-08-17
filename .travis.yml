@@ -26,8 +26,7 @@ script:
 - sudo find . -name "node_modules" -exec rm -rf {} \; || true
 - docker-compose up -d --force-recreate
 - docker-compose ps
-- sleep 10
-- docker-compose ps
+- echo "Waiting for PiCluster...";until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do     printf '.';     sleep 5; done
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
   -e FONTLINUX=fl-alpine local/testing:alpine
 - chmod +x ./pictl
