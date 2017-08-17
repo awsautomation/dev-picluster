@@ -27,7 +27,7 @@ script:
 - sudo find . -name "node_modules" -exec rm -rf {} \; || true
 - docker-compose up -d --force-recreate
 - docker-compose ps
-- echo "Waiting for PiCluster...";let i=1;until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do i=$((i+1)); printf '.'; sleep 5; [ "$i" -eq 60 ] && exit 1; done
+- echo "Waiting for PiCluster...";let i=1;until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do i=$((i+1)); printf '.'; sleep 5; if [ "$i" -eq 60 ] ; then exit 1; fi; done
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
   -e FONTLINUX=fl-alpine local/testing:alpine
 - shellcheck pictl
