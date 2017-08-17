@@ -13,7 +13,7 @@ before_install:
 - sudo chmod +x /usr/local/bin/docker-compose
 - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 - sudo apt-get install -y nodejs
-- cd /tmp;curl -O http://mirrors.kernel.org/ubuntu/pool/universe/s/shellcheck/shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb && dpkg -i shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb;
+- cd /tmp;curl -O http://mirrors.kernel.org/ubuntu/pool/universe/s/shellcheck/shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb && sudo dpkg -i shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb;
 script:
 - npm install
 - find . -maxdepth 2 -name "package.json" -not -wholename "./package.json" -execdir npm install --production \;
