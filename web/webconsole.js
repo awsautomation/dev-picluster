@@ -32,6 +32,8 @@ let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
 let syslog = '';
+let nodedata = '';
+
 const request_timeout = 5000;
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -40,6 +42,27 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 if (config.syslog) {
   syslog = config.syslog;
 }
+
+function getData() {
+  setTimeout(function() {
+    request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        let json;
+        let statusCode = 200;
+        try {
+          nodedata = JSON.parse(response.body);
+        } catch (err) {
+          statusCode = 500;
+          console.error(err);
+        }
+      } else {
+        console.log('\nError connecting with server. ' + error);
+      }
+    });
+  }, 5000)
+
+}
+getData();
 
 app.get('/sandbox', (req, res) => {
   const check_token = req.query.token;
@@ -895,22 +918,7 @@ app.get('/nodes', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        let json;
-        let statusCode = 200;
-        try {
-          json = JSON.parse(response.body);
-        } catch (err) {
-          statusCode = 500;
-          console.error(err);
-          json = {status: statusCode, error: 'Internal Server Error'};
-        }
-        res.status(statusCode).json(json);
-      } else {
-        res.end('\nError connecting with server. ' + error);
-      }
-    });
+    res.json(nodedata);
   }
 });
 
