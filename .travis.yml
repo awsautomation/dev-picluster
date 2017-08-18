@@ -20,6 +20,7 @@ script:
 - npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - sed -i "s/192.168.0.116/$IP/" pictl
+- sed -i 's/restart: "always"/restart: "no"/g' docker-compose.yml
 - cp -r ./example/x86_64/ubuntu/* ./docker/
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
