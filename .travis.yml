@@ -35,7 +35,7 @@ script:
 - ./pictl exec "uname -a"
 - "./pictl nodes"
 - "./pictl reloadconfig"
-- for container in $(docker-compose ps | grep -v Up | tail -n +3 | awk '{print $1}') ; do echo "$container" | sed -e 's/^\(\([^_]\|_[^0-9]\)*\).*/\1/g' | sed 's/^picluster_//g' | xargs sudo docker-compose logs ; done
+- for container in $(sudo docker-compose ps -q) ; do json=$(sudo docker inspect $container); if [ "$(jq '.[0].State.Running' <<< $json)" != "true" ] ; then sudo docker-compose logs "$(jq -r '.[0].Config.Labels."com.docker.compose.service"' <<< $json)"; fi; done
 - sudo docker-compose down
 notifications:
   slack:
