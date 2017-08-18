@@ -1,10 +1,11 @@
 <html>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
+	<link rel="stylesheet" href="/assets/circle.css">
 	<style>
 		body {
 			display: block;
@@ -48,6 +49,7 @@
 			background-color: rgb(0, 0, 0);
 			background-color: rgba(0, 0, 0, 0.4);
 		}
+
 		.modal-content2 {
 			position: relative;
 			background-color: #fefefe;
@@ -111,6 +113,35 @@
 			padding: 2px 16px;
 			color: black
 		}
+
+		.page {
+			margin: 10px;
+		}
+
+		h1 {
+			margin: 40px 0 60px 0;
+		}
+
+		.dark-area {
+			background-color: #666;
+			padding: 40px;
+			margin: 0 -40px 20px -40px;
+			clear: both;
+		}
+
+		.clearfix:before,
+		.clearfix:after {
+			content: " ";
+			display: table;
+		}
+
+		.clearfix:after {
+			clear: both;
+		}
+
+		.clearfix {
+			*zoom: 1;
+		}
 	</style>
 	<script>
 		function exec() {
@@ -119,18 +150,69 @@
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for nodes</label></font>';
 			}
 			$.get("/nodes?token=" + parent.token, function(data) {
-				var test = data.split('\n');
-				var dists = getDists(test);
+				var check_data = data;
+
 				if (div) {
 					div.innerHTML = '';
 				}
-				for (i = 0, dist = 0; i != test.length; i++) {
-					if (test[i].length > 2) {
-						if (test[i].indexOf('Node:') > -1) {
-							if (div) {
-								div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+2 style="white-space: pre-wrap;">' + test[i] + '<br>' + test[i + 1] + '<br>' + test[i + 2] + '<br><br>' + test[i + 3] + '<br><br>' + test[i + 4] + "</font>";
-							}
-						}
+				for (var i in check_data.data) {
+					if (div) {
+						var dist = check_data.data[i].os_type || '';
+						dist = dist.toLowerCase();
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						var div0 = document.createElement('div0');
+						div0.className = "page";
+						var div1 = document.createElement('div1');
+						div1.className = 'clearfix';
+						div1.id = 'div1';
+						var div2 = document.createElement('div2');
+						div2.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
+						div2.id = 'running-class';
+						div2.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
+						var div3 = document.createElement('div3');
+						div3.className = "slice";
+						var div4 = document.createElement('div4');
+						div4.className = "bar";
+						var div5 = document.createElement('div5');
+						div5.className = "fill";
+
+						var div6 = document.createElement('div6');
+						div6.className = "page";
+						var div7 = document.createElement('div7');
+						div7.className = 'clearfix';
+						div7.id = 'div7';
+						var div8 = document.createElement('div8');
+						div8.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent /check_data.data[i].cpu_cores) + ' small';
+						div8.id = 'running-class';
+						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent /check_data.data[i].cpu_cores) + '%</span>';
+						var div9 = document.createElement('div9');
+						div9.className = "slice";
+						var div10 = document.createElement('div10');
+						div10.className = "bar";
+						var div11 = document.createElement('div11');
+						div11.className = "fill";
+
+						div0.appendChild(div1);
+						div1.appendChild(div2);
+						div2.appendChild(div3);
+						div3.appendChild(div4);
+						div4.appendChild(div5);
+
+						div6.appendChild(div7);
+						div7.appendChild(div8);
+						div8.appendChild(div9);
+						div9.appendChild(div10);
+						div10.appendChild(div11);
+
+						var table = document.createElement("TABLE");
+						var row = table.insertRow(0);
+						var cell1 = row.insertCell(0);
+						var cell2 = row.insertCell(1);
+						cell1.innerHTML += '<font size="+0" color="black"><b>Disk Usage</b>';
+						cell2.innerHTML += '<font size="+0" color="black"><b>CPU Usage</b>';
+						cell1.appendChild(div0);
+						cell2.appendChild(div6);
+						div.appendChild(table);
 					}
 				}
 				addFontLinux();

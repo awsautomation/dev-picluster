@@ -1,31 +1,40 @@
+language: generic
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get remove -y docker docker-engine docker.io
-  - sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get -qq update
-  - sudo apt-get install -y docker-ce
-  - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-  - sudo apt-get install -y nodejs
-
+- sudo apt-get -qq update
+- sudo apt-get remove -y docker docker-engine docker.io
+- sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu
+  $(lsb_release -cs) stable"
+- sudo apt-get -qq update
+- sudo apt-get install -y docker-ce
+- sudo curl -L https://github.com/docker/compose/releases/download/1.15.0/docker-compose-`uname -s`-`uname -m` > /tmp/docker-compose
+- sudo mv /tmp/docker-compose /usr/local/bin/docker-compose
+- sudo chmod +x /usr/local/bin/docker-compose
+- curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+- sudo apt-get install -y nodejs
 script:
+- npm install
+- find . -maxdepth 2 -name "package.json" -not -wholename "./package.json" -execdir npm install --production \;
+- npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
-- cp config-example.json config.json
-- sed -i "s/127.0.0.1/$IP/" config.json
 - sed -i "s/192.168.0.116/$IP/" pictl
 - cp -r ./example/x86_64/ubuntu/* ./docker/
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
-- sudo docker image build ./docker/minio -t minio -f ./docker/minio/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
-- sudo docker container run -d --name minio -p 9000:9000 minio
-- cd server;npm install --production; sudo node server.js&
-- cd ../agent;npm install --production; sudo node agent.js&
-- cd ../web;npm install --production; sudo node webconsole.js&
-- cd ..
-- sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003 -e FONTLINUX=fl-ubuntu-inverse local/testing:alpine
+- sudo find . -name "node_modules" -exec rm -rf {} \; || true
+- docker-compose up -d --force-recreate
+- docker-compose ps
+- echo "Waiting for PiCluster...";until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do     printf '.';     sleep 5; done
+- sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
+  -e FONTLINUX=fl-alpine local/testing:alpine
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
-- ./pictl nodes
-- ./pictl reloadconfig
+- "./pictl nodes"
+- "./pictl reloadconfig"
+- for container in $(docker-compose ps | grep -v Up | tail -n +3 | awk '{print $1}') ; do echo "$container" | sed -e 's/^\(\([^_]\|_[^0-9]\)*\).*/\1/g' | sed 's/^picluster_//g' | xargs sudo docker-compose logs ; done
+- sudo docker-compose down
+notifications:
+  slack:
+    secure: cYlopFAlFeNzjKTK7XyN/P4fsFXejs459f6c1B+IRv2v9hgIOEhTvR1iFFJmaiWdCje/ws47MnVMj6NJiBmaiC1L34BsWRtQhNN6j/bINpCAHF7nfSzS1amiB5OgskTEQ+BHAmjNvSj+EmtLiWfixJpEFkH3P4VXqZXRTas1wYCWQVnBN08BRL5Jz3rNJhNVwhGBpWZByeAD03xcUnuYQ976/ZLX8DRwCbRtCgmHxBRnvYOY+5fgtNPffDZtb4zyFNhZz1Huqqpm9g4K438lx/zOONch8+1q8Y/rvSYKNu61LrZrZ2EhIwkLbCLthosm2ZpsbqlVBrRsZB6sXlcedmNkp7ZrX4VVEIbTYk7rp2JXRddo1P1Q5jDxVc1cIMIDwaTaY7mOZQ5sUr0GWo/Npk53/EHZMKyv/bBX0S5q2aCV8uCaU/ben5pzY7rHr6JhACDciFgvM+rYTI39EOemIHgJFRbbrYHaUVQF2FsVAVFiGyjh9AoLpW/3nWas/kv1Wz26/Qk8EvHklq3BzniUYInByfYcqk5KYQ/VXr/f2kYgIYi6BM3W/Wx0o1+ouGxhbULuNSF9T4yV/G+Ta4BGcGayjqiYGjYKD2+oKbOp05gsgaw+SRrHvqhCDsZRc2kRzFzCm5KmfHi/jbMR1N90on6pHy0s3kGjtuAOLAjG1do=
