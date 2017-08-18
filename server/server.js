@@ -183,7 +183,28 @@ app.get('/nodes', (req, res) => {
   }
 
   function getData() {
+    var total_node_count = 0;
+    var node_list = new Array();
+    var container_list = new Array();
+
+    for (let i = 0; i < config.layout.length; i++) {
+      for (const key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          node = config.layout[i].node;
+          const node_info = config.layout[i][key];
+          if (node_info === node) {
+            total_node_count++;
+            node_list.push(node);
+          } else {
+            container_list.push(key);
+          }
+        }
+      }
+    }
     node_metrics.total_containers = total_containers;
+    node_metrics.total_nodes = total_node_count;
+    node_metrics.container_list = container_list;
+    node_metrics.nodes = node_list;
     return node_metrics;
   }
 

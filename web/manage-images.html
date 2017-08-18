@@ -212,15 +212,9 @@
 								parent.manage_image = '';
 							} else {
 								$(function() {
-									$.post('/listcontainers', {
-										token: parent.token
-									}, function(data) {
-										data = data.replace(/\[/gi, '');
-										data = data.replace(/\]/gi, '');
-										data = data.replace(/\"/gi, '');
-										var parse_data = data.split(',');
-										for (var i = 0; i < parse_data.length; i++) {
-											option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+									$.get("/nodes?token=" + parent.token, function(data) {
+										for (var i in data.container_list) {
+											option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
 										}
 										option += '<option value="' + '*' + '">' + '*' + '</option>';
 										$('#imagelist').append(option);
@@ -230,23 +224,6 @@
 						</script>
 						<p align=center>
 						</p>
-						<script>
-							$(function() {
-								var option = '';
-								$.post('/listnodes', {
-									token: parent.token
-								}, function(data) {
-									data = data.replace(/\[/gi, '');
-									data = data.replace(/\]/gi, '');
-									data = data.replace(/\"/gi, '');
-									var parse_data = data.split(',');
-									for (var i = 0; i < parse_data.length; i++) {
-										option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-									}
-									$('#nodelist').append(option);
-								});
-							});
-						</script>
 			</div>
 		</div>
 	</div>
