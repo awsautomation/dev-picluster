@@ -42,7 +42,6 @@ let total_running_containers = 0;
 let running_containers = '';
 let cpu_cores = 0;
 
-let memory_free = 0;
 let memory_buffers = 0;
 let memory_total = 0;
 let memory_percentage = 0;
@@ -54,7 +53,6 @@ const upload = multer({
 
 function monitoring() {
   si.mem(data => {
-    memory_free = data.free;
     memory_used = data.used;
     memory_total = data.total;
     memory_buffers = data.buffcache;
