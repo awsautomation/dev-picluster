@@ -84,6 +84,10 @@ function monitoring() {
         images[i] = '';
       }
     }
+    images = images.filter((e, pos) => {
+      return e.length > 0 && images.indexOf(e) === pos;
+    });
+    images = images.sort();
   });
 
   setTimeout(() => {
