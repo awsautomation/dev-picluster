@@ -269,18 +269,19 @@
 							});
 						});
 						$(function() {
-							$.post('/listnodes', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
+							$.get("/nodes?token=" + parent.token, function(data) {
+								for (var i in data.nodes) {
+									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+								}
+								option += '<option value="' + '*' + '">' + '*' + '</option>';
+								$('#nodelist').append(option);
+
 								var option = '';
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<label for="nodeslist">' + parse_data[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + parse_data[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+								for (var i = 0; i < data.nodes.length; i++) {
+									option += '<label for="nodeslist">' + data.nodes[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 								}
 								$('#nodesList').append(option);
+
 								var selectImage = function(event, ui) {
 									var image = event.target.value;
 									var imageTags = document.getElementById('imageTags');
