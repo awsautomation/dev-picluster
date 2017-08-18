@@ -43,6 +43,7 @@ let running_containers = '';
 let cpu_cores = 0;
 
 let memory_buffers = 0;
+let memory_swap = 0;
 let memory_total = 0;
 let memory_percentage = 0;
 let images = '';
@@ -53,10 +54,10 @@ const upload = multer({
 
 function monitoring() {
   si.mem(data => {
-    memory_used = data.used;
     memory_total = data.total;
     memory_buffers = data.buffcache;
-    memory_percentage = Math.round(memory_total / (memory_used + memory_buffers) * 100);
+    memory_swap = data.swapused;
+    memory_percentage = Math.round((memory_swap + memory_buffers) / memory_total * 100);
   });
 
   exec('docker container ps -q', (err, stdout) => {
