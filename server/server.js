@@ -1,5 +1,6 @@
 /* eslint "no-warning-comments": [1, { "terms": ["todo","fixme"] }] */
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const net = require('net');
 const bodyParser = require('body-parser');
@@ -19,12 +20,23 @@ if (process.env.PICLUSTER_CONFIG) {
   config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
   config_file = '../config.json';
 }
-const port = config.server_port;
-const agentPort = config.agent_port;
+const server_port = config.server_port;
+const agent_port = config.agent_port;
 
 app.use(bodyParser());
 // Require('request-debug')(request);
-const server = http.createServer(app);
+
+if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+    const ssl_options = {
+        cert: fs.readFileSync(config.ssl_cert),
+        key: fs.readFileSync(config.ssl_key)
+    }
+    const server = https.createServer(ssl_options, app);
+    console.log("SSL Server API enabled");
+} else {
+    const server = http.createServer(app);
+    console.log("Non-SSL Server API enabled");
+}
 
 let log = '';
 let token = config.token;
@@ -62,7 +74,11 @@ if (config.elasticsearch && config.elasticsearch_index) {
   };
 
   const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index,
+    if ( config.ssl ){
+      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index
+    } else {
+      url: "http://" + config.elasticsearch + '/' + config.elasticsearch_index
+    },
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -99,7 +115,7 @@ function automatic_heartbeat() {
       const options = {
         host: '127.0.0.1',
         path: '/hb?token=' + token,
-        port
+        port: server_port
       };
       http.get(options).on('error', e => {
         console.error(e);
@@ -169,7 +185,11 @@ app.get('/nodes', (req, res) => {
         return;
       }
       const options = {
-        url: 'http://' + node + ':' + agentPort + '/node-status?token=' + token,
+        if (config.ssl) {
+          url: 'http://' + node + ':' + agent_port + '/node-status?token=' + token
+        } else {
+          url: 'http://' + node + ':' + agent_port + '/node-status?token=' + token
+        }
         method: 'GET'
       };
 
@@ -229,7 +249,11 @@ app.get('/build', (req, res) => {
         }
 
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -280,7 +304,11 @@ app.get('/delete-image', (req, res) => {
         });
 
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -333,8 +361,13 @@ app.get('/create', (req, res) => {
         });
 
         const options = {
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           hostname: node,
-          port: agentPort,
+          port: agent_port,
           path: '/run',
           method: 'POST',
           headers: {
@@ -344,21 +377,39 @@ app.get('/create', (req, res) => {
         };
 
         if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          const request = http.request(options, response => {
-            response.on('data', data => {
-              responseString += data;
+          if (config.ssl) {
+            const request = https.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
             });
-            response.on('end', () => {
-              if (responseString.body) {
-                const body = responseString.body;
-                const results = JSON.parse(body.toString('utf8'));
-                addLog(results.output);
-              }
+            request.write(command);
+          } else {
+            const request = http.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
             });
-          }).on('error', e => {
-            console.error(e);
-          });
-          request.write(command);
+            request.write(command);
+          }
         }
       });
     });
@@ -390,7 +441,11 @@ app.get('/start', (req, res) => {
           token
         });
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -427,7 +482,11 @@ function migrate(container, original_host, new_host, original_container_data) {
     token
   });
   const options = {
-    url: 'http://' + original_host + ':' + agentPort + '/run',
+    if ( config.ssl ){
+      url: "https://" + original_host + ':' + agent_port + '/run'
+    } else {
+      url: "http://" + original_host + ':' + agent_port + '/run'
+    },
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -446,7 +505,11 @@ function migrate(container, original_host, new_host, original_container_data) {
       });
 
       const options = {
-        url: 'http://' + new_host + ':' + agentPort + '/run',
+        if ( config.ssl ){
+          url: "https://" + new_host + ':' + agent_port + '/run'
+        } else {
+          url: "http://" + new_host + ':' + agent_port + '/run'
+        },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -465,7 +528,11 @@ function migrate(container, original_host, new_host, original_container_data) {
           });
 
           const options = {
-            url: 'http://' + new_host + ':' + agentPort + '/run',
+            if ( config.ssl ){
+              url: "https://" + new_host + ':' + agent_port + '/run'
+            } else {
+              url: "http://" + new_host + ':' + agent_port + '/run'
+            },
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -526,9 +593,13 @@ app.get('/addhost', (req, res) => {
         token
       });
 
-      // Save Configuration
+      //Save Configuration
       const options = {
-        url: `http://127.0.0.1:${port}/updateconfig`,
+        if ( config.ssl ){
+          url: "https://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+        } else {
+          url: "http://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+        },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -559,7 +630,11 @@ function elasticsearch(data) {
   });
 
   const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+    if ( config.ssl ){
+      url: "https://" config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index
+    } else {
+      url: "http://" config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index
+    },
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -589,6 +664,11 @@ app.get('/clear-elasticsearch', (req, res) => {
     };
 
     const options = {
+      if ( config.ssl ){
+        url: "https://" config.elasticsearch + '/' + config.elasticsearch_index
+      } else {
+        url: "http://" config.elasticsearch + '/' + config.elasticsearch_index
+      },
       url: config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'DELETE',
       headers: {
@@ -651,9 +731,13 @@ app.get('/rmhost', (req, res) => {
     token
   });
 
-  // Save Configuration
+  //Save Configuration
   const options = {
-    url: `http://127.0.0.1:${port}/updateconfig`,
+    if ( config.ssl ){
+      url: "https://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+    } else {
+      url: "http://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+    },
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -732,9 +816,13 @@ app.get('/removecontainerconfig', (req, res) => {
       token
     });
 
-    // Save Configuration
+    //Save Configuration
     const options = {
-      url: `http://127.0.0.1:${port}/updateconfig`,
+      if ( config.ssl ){
+        url: "https://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+      } else {
+        url: "http://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+      },
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -818,9 +906,13 @@ app.get('/addcontainer', (req, res) => {
         token
       });
 
-      // Save Configuration
+      //Save Configuration
       const options = {
-        url: `http://127.0.0.1:${port}/updateconfig`,
+        if ( config.ssl ){
+          url: "https://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+        } else {
+          url: "http://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+        },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -833,14 +925,25 @@ app.get('/addcontainer', (req, res) => {
         if (error) {
           res.end(error);
         } else {
-          // Res.end('\nAdded ' + container + ' to the configuration.');
-          request(`http://127.0.0.1:${port}/changehost?token=${token}&container=${container}&newhost=${host}`, (error, response) => {
-            if (!error && response.statusCode === 200) {
-              res.end('\nAdded ' + container + ' to the configuration.');
-            } else {
-              res.end('\nError connecting with server.');
-            }
-          });
+          if (config.ssl) {
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(`https://127.0.0.1:${port}/changehost?token=${token}&container=${container}&newhost=${host}`, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          } else {
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(`http://127.0.0.1:${port}/changehost?token=${token}&container=${container}&newhost=${host}`, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
         }
       });
     }
@@ -939,9 +1042,13 @@ app.get('/changehost', (req, res) => {
         token
       });
 
-      // Save Configuration
+      //Save Configuration
       const options = {
-        url: `http://127.0.0.1:${port}/updateconfig`,
+        if ( config.ssl ){
+          url: "https://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+        } else {
+          url: "http://" + '127.0.0.1' + ':' + server_port + '/updateconfig'
+        },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -986,7 +1093,11 @@ app.get('/stop', (req, res) => {
           token
         });
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1036,7 +1147,11 @@ app.get('/delete', (req, res) => {
           token
         });
         const options = {
-          url: `http://${node}:${agentPort}/run`,
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1085,7 +1200,11 @@ app.get('/restart', (req, res) => {
           token
         });
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1134,7 +1253,11 @@ app.get('/containerlog', (req, res) => {
           token
         });
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          if ( config.ssl ){
+            url: "https://" + node + ':' + agent_port + '/run'
+          } else {
+            url: "http://" + node + ':' + agent_port + '/run'
+          },
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1219,9 +1342,13 @@ function copyToAgents(file) {
       };
 
       request.post({
-        url: 'http://' + node + ':' + agentPort + '/receive-file',
-        formData
-      }, err => {
+        if ( config.ssl ){
+          url: "https://" + node + ':' + agent_port + '/receive-file'
+        } else {
+          url: "http://" + node + ':' + agent_port + '/receive-file'
+        },
+        formData: formData
+      }, function(err, httpResponse, body) {
         if (!err) {
           addLog('\nCopied ' + file + ' to ' + node);
           console.log('\nCopied ' + file + ' to ' + node);
@@ -1286,7 +1413,11 @@ app.post('/exec', (req, res) => {
       const node = config.layout[i].node;
 
       const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
+        if ( config.ssl ){
+          url: "https://" + node + ':' + agent_port + '/run'
+        } else {
+          url: "http://" + node + ':' + agent_port + '/run'
+        },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1333,7 +1464,11 @@ app.get('/prune', (req, res) => {
       const node = config.layout[i].node;
 
       const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
+        if ( config.ssl ){
+          url: "https://" + node + ':' + agent_port + '/run'
+        } else {
+          url: "http://" + node + ':' + agent_port + '/run'
+        },
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1360,7 +1495,11 @@ function move_container(container, newhost) {
   console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
   addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
   const options = {
-    url: `http://127.0.0.1:3000/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+    if ( config.ssl ){
+      url: "https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}"
+    } else {
+      url: "http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}"
+    },
     method: 'GET'
   };
 
@@ -1433,9 +1572,16 @@ function hb_check(node, container_port, container) {
         port
       };
 
-      http.get(options).on('error', e => {
-        console.error(e);
-      });
+      if (config.ssl) {
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+      } else {
+        http.get(options).on('error', e => {
+          console.error(e);
+        });
+      }
+
       client.destroy();
     });
   }
@@ -1488,13 +1634,23 @@ app.get('/rsyslog', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    request(`http://${config.rsyslog_host}:${config.agent_port}/rsyslog?token=${token}`, (error, response, body) => {
-      if (!error && response.statusCode === 200) {
-        res.end(body);
-      } else {
-        res.end('Error connecting with server. ' + error);
-      }
-    });
+    if (config.ssl) {
+      request(`https://${config.rsyslog_host}:${config.agent_port}/rsyslog?token=${token}`, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    } else {
+      request(`http://${config.rsyslog_host}:${config.agent_port}/rsyslog?token=${token}`, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    }
   }
 });
 
@@ -1543,7 +1699,11 @@ app.get('/killvip', (req, res) => {
           });
 
           const options = {
-            url: 'http://' + node + ':' + agentPort + '/killvip',
+            if ( config.ssl ){
+              url: "https://" + node + ':' + agent_port + '/killvip'
+            } else {
+              url: "http://" + node + ':' + agent_port + '/killvip'
+            },
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -1587,6 +1747,8 @@ app.post('/updateconfig', (req, res) => {
   }
 });
 
-server.listen(port, () => {
-  console.log('Listening on port %d', port);
+containerDetails();
+
+server.listen(server_port, () => {
+  console.log('Listening on port %d', server_port);
 });

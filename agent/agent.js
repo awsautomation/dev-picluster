@@ -1,5 +1,6 @@
 /* eslint "no-warning-comments": [1, { "terms": ["todo","fixme"] }] */
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const os = require('os');
 const unzip = require('unzip');
@@ -13,13 +14,22 @@ if (process.env.PICLUSTER_CONFIG) {
 } else {
   config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
-const port = config.agent_port;
+const agent_port = config.agent_port;
 const app = express();
 const bodyParser = require('body-parser');
-
 app.use(bodyParser());
-const server = http.createServer(app);
-
+if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+    const ssl_options = {
+        cert: fs.readFileSync(config.ssl_cert),
+        key: fs.readFileSync(config.ssl_key)
+    }
+    const server = https.createServer(ssl_options, app);
+    console.log("SSL Agent API enabled");
+} else {
+    const server = http.createServer(app);
+    console.log("Non-SSL Agent API enabled");
+}
+var os = require('os');
 const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
@@ -121,9 +131,16 @@ if (config.autostart_containers) {
     path: '/start?token=' + token + '&container=*',
     port: config.server_port
   };
-  http.get(options).on('error', e => {
-    console.error(e);
-  });
+
+  if (config.ssl) {
+    https.get(options).on('error', e => {
+      console.error(e);
+    });
+  } else {
+    http.get(options).on('error', e => {
+      console.error(e);
+    });
+  }
 }
 
 if (config.vip_ip && config.vip) {
@@ -158,8 +175,12 @@ function send_ping() {
     const token_body = JSON.stringify({
       token
     });
-    const options = {
-      url: 'http://' + vip_slave + ':' + port + '/pong',
+    var options = {
+      if ( config.ssl ){
+        url: "https://" + vip_slave + ':' + agent_port + '/pong'
+      } else {
+        url: "http://" + vip_slave + ':' + agent_port + '/pong'
+      },
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -356,6 +377,6 @@ app.post('/run', (req, res) => {
   });
 });
 
-server.listen(port, () => {
-  console.log('Listening on port %d', port);
+server.listen(agent_port, () => {
+  console.log('Listening on port %d', agent_port);
 });

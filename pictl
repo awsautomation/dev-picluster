@@ -7,50 +7,61 @@ if `type jq &>/dev/null`; then
   config="config-example.json"
 
   # Set config parameters to assign to variables
-  config_token=`jq .token $config | sed -e 's/\"//g'`
-  config_docker=`jq .docker $config | sed -e 's/\"//g'`
-  config_server_port=`jq .server_port $config | sed -e 's/\"//g'`
-  config_agent_port=`jq .agent_port $config | sed -e 's/\"//g'`
-  config_ssl=`jq .ssl $config | sed -e 's/\"//g'`
-  config_ssl_cert=`jq .ssl_cert $config | sed -e 's/\"//g'`
-  config_ssl_key=`jq .ssl_key $config | sed -e 's/\"//g'`
-  config_web_username=`jq .web_username $config | sed -e 's/\"//g'`
-  config_web_password=`jq .web_password $config | sed -e 's/\"//g'`
-  config_web_connect=`jq .web_connect $config | sed -e 's/\"//g'`
-  config_web_port=`jq .web_port $config | sed -e 's/\"//g'`
+  config_token=$(jq .token $config | sed -e 's/\"//g')
+  config_docker=$(jq .docker $config | sed -e 's/\"//g')
+  config_server_port=$(jq .server_port $config | sed -e 's/\"//g')
+  config_agent_port=$(jq .agent_port $config | sed -e 's/\"//g')
+  config_ssl=$(jq .ssl $config | sed -e 's/\"//g')
+  config_ssl_cert=$(jq .ssl_cert $config | sed -e 's/\"//g')
+  config_ssl_key=$(jq .ssl_key $config | sed -e 's/\"//g')
+  config_web_username=$(jq .web_username $config | sed -e 's/\"//g')
+  config_web_password=$(jq .web_password $config | sed -e 's/\"//g')
+  config_web_connect=$(jq .web_connect $config | sed -e 's/\"//g')
+  config_web_port=$(jq .web_port $config | sed -e 's/\"//g')
 
   hb(){
     clear
     echo "Heartbeat is now checking....."
-    curl -s $config_web_connect:$config_server_port/hb?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s "https://$config_web_connect:$config_server_port/hb?token=$config_token"
+    else curl -s "http://$config_web_connect:$config_server_port/hb?token=$config_token"
+    fi
     logs
   }
 
   nodes(){
     clear
     echo "Active Nodes:"
-    curl -s $config_web_connect:$config_server_port/nodes?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s "https://$config_web_connect:$config_server_port/nodes?token=$config_token"
+    else curl -s "http://$config_web_connect:$config_server_port/nodes?token=$config_token"
+    fi
     logs
   }
 
   stop(){
     clear
     echo "Stopping the container(s)....."
-    curl -s -G -d "token=$config_token&container=$1" http://$config_web_connect:$config_server_port/stop
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&container=$1 https://$config_web_connect:$config_server_port/stop"
+    else curl -s -G -d "token=$config_token&container=$1 http://$config_web_connect:$config_server_port/stop"
+    fi
+
     logs
   }
 
   images(){
     clear
     echo "Gathering a list of images....."
-    curl -s  http://$config_web_connect:$config_server_port/images?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s  "https://$config_web_connect:$config_server_port/images?token=$config_token"
+    else curl -s  "http://$config_web_connect:$config_server_port/images?token=$config_token"
+    fi
     logs
   }
 
   reloadconfig(){
     clear
     echo "Reloading the configuration...."
-    curl -s http://$config_web_connect:$config_server_port/reloadconfig?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s "https://$config_web_connect:$config_server_port/reloadconfig?token=$config_token"
+    else curl -s "http://$config_web_connect:$config_server_port/reloadconfig?token=$config_token"
+    fi
     logs
   }
 
@@ -58,21 +69,27 @@ if `type jq &>/dev/null`; then
   shell(){
     clear
     echo "Running the command....."
-    curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"$config_token"'"}' http://$config_web_connect:$config_server_port/exec
+    if [ config_ssl == "true" ]; then curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"$config_token"'"}' "https://$config_web_connect:$config_server_port/exec"
+    else curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"$config_token"'"}' "http://$config_web_connect:$config_server_port/exec"
+    fi
     logs
   }
 
   clean(){
     clear
     echo "Cleaning stale Docker images and containers...."
-    curl -s http://$config_web_connect:$config_server_port/prune?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s "https://$config_web_connect:$config_server_port/prune?token=$config_token"
+    else curl -s "http://$config_web_connect:$config_server_port/prune?token=$config_token"
+    fi
     logs
   }
 
   build() {
     clear
     echo "Building the container(s) in the background. This may take a while. Continue to check the logs for progress."
-    curl -s -G -d "token=$config_token&image=$1" http://$config_web_connect:$config_server_port/build
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&image=$1 https://$config_web_connect:$config_server_port/build"
+    else curl -s -G -d "token=$config_token&image=$1 http://$config_web_connect:$config_server_port/build"
+    fi
     logs
   }
 
@@ -80,51 +97,65 @@ if `type jq &>/dev/null`; then
     sleep 5
     clear
     echo "Checking the logs....."
-    curl -s http://$config_web_connect:$config_server_port/log?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s "https://$config_web_connect:$config_server_port/log?token=$config_token"
+    else curl -s "http://$config_web_connect:$config_server_port/log?token=$config_token"
+    fi
   }
 
   create() {
     clear
     echo "Running the container(s)....."
-    curl -s -G -d "token=$config_token&container=$1" http://$config_web_connect:$config_server_port/create
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&container=$1 https://$config_web_connect:$config_server_port/create"
+    else curl -s -G -d "token=$config_token&container=$1 http://$config_web_connect:$config_server_port/create"
+    fi
     logs
   }
 
   start(){
     clear
     echo "Starting the container(s)....."
-    curl -s -G -d "token=$config_token&container=$1" http://$config_web_connect:$config_server_port/start
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&container=$1 https://$config_web_connect:$config_server_port/start"
+    else curl -s -G -d "token=$config_token&container=$1 http://$config_web_connect:$config_server_port/start"
+    fi
     logs
   }
 
   restart(){
     clear
     echo "Restarting the container(s)....."
-    curl -s -G -d "token=$config_token&container=$1" http://$config_web_connect:$config_server_port/restart
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&container=$1 https://$config_web_connect:$config_server_port/restart"
+    else curl -s -G -d "token=$config_token&container=$1 http://$config_web_connect:$config_server_port/restart"
+    fi
     logs
   }
 
   changehost(){
     clear
     echo "Changing the host....."
-    curl -s -G -d "token=$config_token&newhost=$2&container=$1" http://$config_web_connect:$config_server_port/changehost
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&newhost=$2&container=$1 https://$config_web_connect:$config_server_port/changehost"
+    else curl -s -G -d "token=$config_token&newhost=$2&container=$1 http://$config_web_connect:$config_server_port/changehost"
+    fi
     logs
   }
 
   delete(){
     clear
     echo "Deleting the container(s)....."
-    curl -s -G -d "token=$config_token&container=$1" http://$config_web_connect:$config_server_port/delete
+    if [ config_ssl == "true" ]; then curl -s -G -d "token=$config_token&container=$1 https://$config_web_connect:$config_server_port/delete"
+    else curl -s -G -d "token=$config_token&container=$1 http://$config_web_connect:$config_server_port/delete"
+    fi
+
     logs
   }
 
   status() {
     clear
     echo "Checking the status....."
-    curl -s http://$config_web_connect:$config_server_port/status?token=$config_token
+    if [ config_ssl == "true" ]; then curl -s "http://$config_web_connect:$config_server_port/status?token=$config_token"
+    else curl -s "http://$config_web_connect:$config_server_port/status?token=$config_token"
+    fi
     logs
   }
-
 
   if [  -z "$1" ]; then
     echo "Error, no args specified!"
