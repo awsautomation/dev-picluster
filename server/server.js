@@ -226,42 +226,6 @@ app.get('/nodes', (req, res) => {
   }
 });
 
-app.get('/images', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const command = JSON.stringify({
-      command: 'hostname;docker image list;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
-      token
-    });
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
-
-      // Runs a command on each node
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      request(options, (error, response) => {
-        if (error) {
-          res.end('An error has occurred.');
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output);
-        }
-      });
-    }
-    res.end(log);
-  }
-});
-
 function addLog(data) {
   log += data;
 }
