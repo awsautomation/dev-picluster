@@ -265,35 +265,6 @@ app.get('/remoteimages', (req, res) => {
   });
 });
 
-app.post('/listcontainers', (req, res) => {
-  const check_token = req.body.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const token_body = JSON.stringify({
-      token
-    });
-
-    const options = {
-      url: 'http://' + server + ':' + server_port + '/listcontainers',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': token_body.length
-      },
-      body: token_body
-    };
-
-    request(options, (error, response, body) => {
-      if (error) {
-        res.end(error);
-      } else {
-        res.end(body);
-      }
-    });
-  }
-});
-
 app.post('/listcommands', (req, res) => {
   const check_token = req.body.token;
   if ((check_token !== token) || (!check_token)) {
@@ -305,35 +276,6 @@ app.post('/listcommands', (req, res) => {
 
     const options = {
       url: 'http://' + server + ':' + server_port + '/listcommands',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': token_body.length
-      },
-      body: token_body
-    };
-
-    request(options, (error, response, body) => {
-      if (error) {
-        res.end(error);
-      } else {
-        res.end(body);
-      }
-    });
-  }
-});
-
-app.post('/listnodes', (req, res) => {
-  const check_token = req.body.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const token_body = JSON.stringify({
-      token
-    });
-
-    const options = {
-      url: 'http://' + server + ':' + server_port + '/listnodes',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
