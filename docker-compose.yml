@@ -3,6 +3,7 @@ services:
 
   server:
     image: "node:alpine"
+    restart: "always"
     volumes:
       - .:/picluster
       - ./docker-compose.config.json:/picluster/config.json
@@ -15,6 +16,7 @@ services:
     command: ["sh", "-c", "set -e;printf '127.0.0.1\tagent\n' | tee -a /etc/hosts;printf '127.0.0.1\tserver\n' | tee -a /etc/hosts;npm install --production;node server.js;"]
   agent:
     image: "node:alpine"
+    restart: "always"
     volumes:
       - .:/picluster
       - ./docker-compose.config.json:/picluster/config.json
@@ -29,6 +31,7 @@ services:
 
   webconsole:
     image: "node:alpine"
+    restart: "always"
     networks:
       picluster:
         ipv4_address: 10.10.10.3
