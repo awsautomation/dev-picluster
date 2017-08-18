@@ -8,8 +8,10 @@ Can now upload a zip containing the Dockerfile and required files for a containe
 The zip archive will be copied to each machine and extracted.
 A percentage of running containers is displayed on the main screen.
 Node status page shows disk, cpu, and memory utilization.
+New /nodes api that gathers host metrics and container info.
 
 Enhancements:
+Faster Webconsole: Data is now cached from the server and agent nodes using the new /nodes api.
 Container Display: Can click on a running container to manage it.
 Image Display: Can click on a image to manage it.
 "Run Again" button has been added back to the PiCluster Run command window.
