@@ -59,6 +59,7 @@ function getData() {
         console.log('\nError connecting with server. ' + error);
       }
     });
+    getData();
   }, 5000)
 
 }
