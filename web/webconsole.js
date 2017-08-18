@@ -403,23 +403,6 @@ app.get('/rsyslog', (req, res) => {
   }
 });
 
-app.get('/status', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    request('http://' + server + ':' + server_port + '/status?token=' + token, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.get('/reloadconfig', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
