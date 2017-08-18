@@ -55,9 +55,10 @@ const upload = multer({
 function monitoring() {
   si.mem(data => {
     memory_free = data.free;
+    memory_used = data.used;
     memory_total = data.total;
     memory_buffers = data.buffcache;
-    memory_percentage = Math.round((memory_free + memory_buffers) / memory_total * 100);
+    memory_percentage = Math.round(memory_total / (memory_used + memory_buffers) * 100);
   });
 
   exec('docker container ps -q', (err, stdout) => {
