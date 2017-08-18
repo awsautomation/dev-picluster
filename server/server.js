@@ -30,7 +30,6 @@ let log = '';
 let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
-let total_containers = 0;
 const multer = require('multer');
 
 const upload = multer({
@@ -112,57 +111,6 @@ function automatic_heartbeat() {
   }
 }
 
-function containerDetails() {
-  setTimeout(() => {
-    total_containers = 0;
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        total_containers++;
-      });
-    });
-    containerDetails();
-  }, 15000);
-}
-
-app.get('/status', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const command = JSON.stringify({
-      command: 'hostname;docker container ps;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
-      token
-    });
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
-
-      // Runs a command on each node
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      request(options, (error, response) => {
-        if (error) {
-          res.end('An error has occurred.');
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output);
-        }
-      });
-    }
-    res.end('');
-  }
-});
-
 app.get('/clearlog', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
@@ -183,7 +131,30 @@ app.get('/nodes', (req, res) => {
   }
 
   function getData() {
+    var total_node_count = 0;
+    var total_containers = 0;
+    var node_list = new Array();
+    var container_list = new Array();
+
+    for (let i = 0; i < config.layout.length; i++) {
+      for (const key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          node = config.layout[i].node;
+          const node_info = config.layout[i][key];
+          if (node_info === node) {
+            total_node_count++;
+            node_list.push(node);
+          } else {
+            total_containers++;
+            container_list.push(key);
+          }
+        }
+      }
+    }
     node_metrics.total_containers = total_containers;
+    node_metrics.total_nodes = total_node_count;
+    node_metrics.container_list = container_list;
+    node_metrics.nodes = node_list;
     return node_metrics;
   }
 
@@ -216,42 +187,6 @@ app.get('/nodes', (req, res) => {
     setTimeout(() => {
       res.json(getData());
     }, 3000);
-  }
-});
-
-app.get('/images', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const command = JSON.stringify({
-      command: 'hostname;docker image list;node -e \'const getos = require("picluster-getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
-      token
-    });
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
-
-      // Runs a command on each node
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      request(options, (error, response) => {
-        if (error) {
-          res.end('An error has occurred.');
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output);
-        }
-      });
-    }
-    res.end(log);
   }
 });
 
@@ -1651,8 +1586,6 @@ app.post('/updateconfig', (req, res) => {
     res.end('Error: Invalid JSON. Configuration not saved.');
   }
 });
-
-containerDetails();
 
 server.listen(port, () => {
   console.log('Listening on port %d', port);

@@ -32,6 +32,8 @@ let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
 let syslog = '';
+let nodedata = '';
+
 const request_timeout = 5000;
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -40,6 +42,28 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 if (config.syslog) {
   syslog = config.syslog;
 }
+
+function getData() {
+  setTimeout(function() {
+    request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        let json;
+        let statusCode = 200;
+        try {
+          nodedata = JSON.parse(response.body);
+        } catch (err) {
+          statusCode = 500;
+          console.error(err);
+        }
+      } else {
+        console.log('\nError connecting with server. ' + error);
+      }
+    });
+    getData();
+  }, 5000)
+
+}
+getData();
 
 app.get('/sandbox', (req, res) => {
   const check_token = req.query.token;
@@ -265,35 +289,6 @@ app.get('/remoteimages', (req, res) => {
   });
 });
 
-app.post('/listcontainers', (req, res) => {
-  const check_token = req.body.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const token_body = JSON.stringify({
-      token
-    });
-
-    const options = {
-      url: 'http://' + server + ':' + server_port + '/listcontainers',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': token_body.length
-      },
-      body: token_body
-    };
-
-    request(options, (error, response, body) => {
-      if (error) {
-        res.end(error);
-      } else {
-        res.end(body);
-      }
-    });
-  }
-});
-
 app.post('/listcommands', (req, res) => {
   const check_token = req.body.token;
   if ((check_token !== token) || (!check_token)) {
@@ -305,35 +300,6 @@ app.post('/listcommands', (req, res) => {
 
     const options = {
       url: 'http://' + server + ':' + server_port + '/listcommands',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': token_body.length
-      },
-      body: token_body
-    };
-
-    request(options, (error, response, body) => {
-      if (error) {
-        res.end(error);
-      } else {
-        res.end(body);
-      }
-    });
-  }
-});
-
-app.post('/listnodes', (req, res) => {
-  const check_token = req.body.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const token_body = JSON.stringify({
-      token
-    });
-
-    const options = {
-      url: 'http://' + server + ':' + server_port + '/listnodes',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -437,23 +403,6 @@ app.get('/rsyslog', (req, res) => {
   }
 });
 
-app.get('/status', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    request('http://' + server + ':' + server_port + '/status?token=' + token, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.get('/reloadconfig', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
@@ -474,23 +423,6 @@ app.get('/reloadconfig', (req, res) => {
         res.end('\nRequest to update configuration succeeded.');
       } else {
         res.end('\nError connecting with server.' + error);
-      }
-    });
-  }
-});
-
-app.get('/images', (req, res) => {
-  const check_token = req.query.token;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    request('http://' + server + ':' + server_port + '/images?token=' + token, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
       }
     });
   }
@@ -953,22 +885,7 @@ app.get('/nodes', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    request('http://' + server + ':' + server_port + '/nodes?token=' + token, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        let json;
-        let statusCode = 200;
-        try {
-          json = JSON.parse(response.body);
-        } catch (err) {
-          statusCode = 500;
-          console.error(err);
-          json = {status: statusCode, error: 'Internal Server Error'};
-        }
-        res.status(statusCode).json(json);
-      } else {
-        res.end('\nError connecting with server. ' + error);
-      }
-    });
+    res.json(nodedata);
   }
 });
 

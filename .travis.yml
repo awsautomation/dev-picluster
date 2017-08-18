@@ -2,7 +2,7 @@ language: generic
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get remove -y docker docker-engine docker.io
-- sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+- sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common libgmp10
 - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 - sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu
   $(lsb_release -cs) stable"
@@ -13,12 +13,14 @@ before_install:
 - sudo chmod +x /usr/local/bin/docker-compose
 - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 - sudo apt-get install -y nodejs
+- cd /tmp;curl -O http://mirrors.kernel.org/ubuntu/pool/universe/s/shellcheck/shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb && sudo dpkg -i shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb;cd $OLDPWD;
 script:
 - npm install
 - find . -maxdepth 2 -name "package.json" -not -wholename "./package.json" -execdir npm install --production \;
 - npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
 - sed -i "s/192.168.0.116/$IP/" pictl
+- "sed -i 's/restart: \"always\"/restart: \"no\"/g' docker-compose.yml"
 - cp -r ./example/x86_64/ubuntu/* ./docker/
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
@@ -26,14 +28,15 @@ script:
 - sudo find . -name "node_modules" -exec rm -rf {} \; || true
 - docker-compose up -d --force-recreate
 - docker-compose ps
-- echo "Waiting for PiCluster...";until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do     printf '.';     sleep 5; done
+- echo "Waiting for PiCluster...";let i=1;until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do i=$((i+1)); printf '.'; sleep 5; if [ "$i" -eq 60 ] ; then exit 1; fi; done
 - sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
   -e FONTLINUX=fl-alpine local/testing:alpine
+- shellcheck pictl
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
 - "./pictl nodes"
 - "./pictl reloadconfig"
-- for container in $(docker-compose ps | grep -v Up | tail -n +3 | awk '{print $1}') ; do echo "$container" | sed -e 's/^\(\([^_]\|_[^0-9]\)*\).*/\1/g' | sed 's/^picluster_//g' | xargs sudo docker-compose logs ; done
+- for container in $(sudo docker-compose ps -q) ; do json=$(sudo docker inspect $container); if [ "$(jq '.[0].State.Running' <<< $json)" != "true" ] ; then sudo docker-compose logs "$(jq -r '.[0].Config.Labels."com.docker.compose.service"' <<< $json)"; fi; done
 - sudo docker-compose down
 notifications:
   slack:

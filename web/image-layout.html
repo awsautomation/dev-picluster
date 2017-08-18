@@ -17,12 +17,13 @@
 		}
 
 		a:link {
-				color: black;
+			color: black;
 		}
 
 		a:visited {
-				color: black;
+			color: black;
 		}
+
 		#windowfont {
 			font-size: 18px;
 		}
@@ -55,6 +56,7 @@
 			background-color: rgb(0, 0, 0);
 			background-color: rgba(0, 0, 0, 0.4);
 		}
+
 		.modal-content2 {
 			position: relative;
 			background-color: #fefefe;
@@ -120,43 +122,39 @@
 		}
 	</style>
 	<script>
-	function linkFunction(container) {
-		parent.manage_image = container;
-	};
+		function linkFunction(image) {
+			parent.manage_image = image;
+		};
 
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			if (div) {
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for images</label></font>';
 			}
-			$.get("/images?token=" + parent.token, function(data) {
-				var get_data = data.split('Node:');
-				var dists = data.split('\n');
-				dists = getDists(dists);
+			$.get("/nodes?token=" + parent.token, function(data) {
+				var check_data = data;
+
 				if (div) {
 					div.innerHTML = '';
 				}
-				for (i = 0, dist = 0; i != get_data.length; i++) {
-					if (get_data[i].length > 2) {
-						var hostname = get_data[i].split('REPOSITORY');
-						var containers = hostname[1].split('SIZE');
-						var show_containers = containers[1].split('\n');
-						if (div) {
-							div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>';
-						}
-						for (j = 0; j != show_containers.length; j++) {
-							var parse_output = show_containers[j].split('  ');
-							if (parse_output.length > 1 && parse_output[0].indexOf('<none>') < 0) {
-								//div.innerHTML = div.innerHTML + '<font size=+1><li>' + parse_output[0] + '</li>';
-								div.innerHTML = div.innerHTML + '<font size=+1><li><a href="/manage-images.html" style="text-decoration:none" onclick="linkFunction(\'' +parse_output[0].replace(' ', '') + '\')"> ' + parse_output[0] + ' </a></li>';
+				for (var i in check_data.data) {
+					if (div) {
+						var dist = check_data.data[i].os_type || '';
+						dist = dist.toLowerCase();
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br>' + '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br><br>';
+						var array = check_data.data[i].images;
+						for (var j in array) {
+							if (array[j]) {
+								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage-images.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
 							}
 						}
-						if (div) {
-							div.innerHTML = div.innerHTML + '</ol>';
-						}
 					}
+					if (div) {
+						div.innerHTML = div.innerHTML + '</ol>';
+					}
+					addFontLinux();
+
 				}
-				addFontLinux();
 			});
 		}
 	</script>

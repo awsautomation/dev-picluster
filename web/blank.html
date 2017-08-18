@@ -53,7 +53,7 @@
 						var total = check_data.total_containers;
 						var running = 0;
 						for (var i in check_data.data) {
-							running = running + check_data.data[i].running_containers;
+							running = running + check_data.data[i].total_running_containers;
 						}
 						var calc = Math.floor((running / total * 100));
 						var percent = 0;

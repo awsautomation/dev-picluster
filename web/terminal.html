@@ -7,7 +7,7 @@
 	<script src="/assets/distLogo.js"></script>
 	<script src="/assets/jquery.terminal.min.js"></script>
 	<script src="/assets/unix_formatting.js"></script>
-	<link href="/assets/jquery.terminal.min.css" rel="stylesheet"/>
+	<link href="/assets/jquery.terminal.min.css" rel="stylesheet" />
 	<style>
 		body {
 			display: block;
@@ -18,6 +18,7 @@
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
 		}
+
 		label {
 			font-size: 18px;
 		}
@@ -29,6 +30,7 @@
 		#host {
 			font-size: 18px;
 		}
+
 		#terminal {
 			font-size: 18px;
 		}
@@ -151,8 +153,11 @@
 	</style>
 	<script>
 		var node;
+
 		function exec(cmd, cb) {
-			if (!cb) { cb = function() {}; }
+			if (!cb) {
+				cb = function() {};
+			}
 			$.post('/exec', {
 				token: parent.token,
 				command: cmd,
@@ -164,24 +169,24 @@
 			var e = document.getElementById("nodelist");
 			var c = document.getElementById("commandlist");
 			node = e.options[e.selectedIndex].value;
-			    var term = $('#terminal').terminal(function(command) {
-			        if (command !== '') {
-								var _this = this;
-								exec(command, function(output) {
-									_this.echo(output);
-								});
-			        } else {
-			           this.echo('');
-			        }
-			    }, {
-							greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
-			        name: 'terminal',
-			        height: 300,
-			        prompt: 'λ '
-			    });
-					exec('uptime', function(output) {
-						term.echo(output);
+			var term = $('#terminal').terminal(function(command) {
+				if (command !== '') {
+					var _this = this;
+					exec(command, function(output) {
+						_this.echo(output);
 					});
+				} else {
+					this.echo('');
+				}
+			}, {
+				greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
+				name: 'terminal',
+				height: 300,
+				prompt: 'λ '
+			});
+			exec('uptime', function(output) {
+				term.echo(output);
+			});
 
 		}
 	</script>
@@ -207,15 +212,9 @@
 					<script>
 						$(function() {
 							var option = '';
-							$.post('/listnodes', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							$.get("/nodes?token=" + parent.token, function(data) {
+								for (var i in data.nodes) {
+									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
 								$('#nodelist').append(option);
 							});
@@ -244,7 +243,7 @@
 					</tr>
 				</table>
 				<p align=left>
-				<br>
+					<br>
 			</div>
 		</div>
 	</div>
