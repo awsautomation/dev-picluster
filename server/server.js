@@ -30,7 +30,6 @@ let log = '';
 let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
-let total_containers = 0;
 const multer = require('multer');
 
 const upload = multer({
@@ -112,21 +111,6 @@ function automatic_heartbeat() {
   }
 }
 
-function containerDetails() {
-  setTimeout(() => {
-    total_containers = 0;
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        total_containers++;
-      });
-    });
-    containerDetails();
-  }, 15000);
-}
-
 app.get('/status', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
@@ -184,6 +168,7 @@ app.get('/nodes', (req, res) => {
 
   function getData() {
     var total_node_count = 0;
+    var total_containers = 0;
     var node_list = new Array();
     var container_list = new Array();
 
@@ -196,6 +181,7 @@ app.get('/nodes', (req, res) => {
             total_node_count++;
             node_list.push(node);
           } else {
+            total_containers++;
             container_list.push(key);
           }
         }
@@ -1672,8 +1658,6 @@ app.post('/updateconfig', (req, res) => {
     res.end('Error: Invalid JSON. Configuration not saved.');
   }
 });
-
-containerDetails();
 
 server.listen(port, () => {
   console.log('Listening on port %d', port);
