@@ -112,6 +112,7 @@ if (config.automatic_heartbeat) {
 function automatic_heartbeat() {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     setTimeout(() => {
+
       const options = {
         host: '127.0.0.1',
         path: '/hb?token=' + token,
@@ -1666,6 +1667,13 @@ app.get('/reloadconfig', (req, res) => {
     }
     token = config.token;
     dockerFolder = config.docker;
+
+    if (config.heartbeat_interval && config.automatic_heartbeat) {
+      if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+        console.log('\nEnabing Heartbeat.');
+        automatic_heartbeat();
+      }
+    }
     addLog('\nReloading Config.json\n');
     res.end('');
   }

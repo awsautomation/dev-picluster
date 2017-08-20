@@ -35,7 +35,7 @@ const async = require('async');
 const exec = require('child-process-promise').exec;
 const si = require('systeminformation');
 
-const noop = function () {};
+const noop = function() {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -52,9 +52,10 @@ let total_running_containers = 0;
 let running_containers = '';
 let cpu_cores = 0;
 
-let memory_free = 0;
 let memory_buffers = 0;
+let memory_swap = 0;
 let memory_total = 0;
+let memory_used = 0;
 let memory_percentage = 0;
 let images = '';
 
@@ -64,10 +65,17 @@ const upload = multer({
 
 function monitoring() {
   si.mem(data => {
-    memory_free = data.free;
     memory_total = data.total;
     memory_buffers = data.buffcache;
-    memory_percentage = Math.round((memory_free + memory_buffers) / memory_total * 100);
+    memory_used = data.used;
+    memory_swap = data.swapused;
+    var this_os = os.platform();
+
+    if (this_os.indexOf('linux') > -1) {
+      memory_percentage = Math.round((memory_used - memory_buffers) / memory_total * 100);
+    } else {
+      memory_percentage = Math.round((memory_swap + memory_buffers) / memory_total * 100);
+    }
   });
 
   exec('docker container ps -q', (err, stdout) => {
@@ -194,7 +202,7 @@ function send_ping() {
 
       if ((error || response.statusCode !== '200')) {
         const cmd = ip_add_command;
-          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+        // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
         exec(cmd).then(noop).catch(noop);
       } else {
         const interfaces = require('os').networkInterfaces();
@@ -308,16 +316,16 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-      /* eslint-disable no-unused-vars */
-      /* eslint-disable handle-callback-err */
+    /* eslint-disable no-unused-vars */
+    /* eslint-disable handle-callback-err */
     fs.readFile(req.file.path, (err, data) => { // FixMe: What's this code supposed to be doing?
       const newPath = '../' + req.file.originalname;
       fs.writeFile(newPath => {
         unzipFile(newPath);
       });
     });
-      /* eslint-enable no-unused-vars */
-      /* eslint-enable handle-callback-err */
+    /* eslint-enable no-unused-vars */
+    /* eslint-enable handle-callback-err */
     res.end('Done');
   }
 });
@@ -336,7 +344,7 @@ app.post('/run', (req, res) => {
     });
   }
 
-    // Backwards compatability...
+  // Backwards compatability...
   if (!('commands' in req.body) && 'command' in req.body) {
     req.body.commands = req.body.command;
   }
@@ -356,15 +364,15 @@ app.post('/run', (req, res) => {
     if (!(Array.isArray(command))) {
       return;
     }
-      // Console.log('command', command);
+    // Console.log('command', command);
     exec(command.join(' '), {
       cwd: __dirname
     }).then(log => {
-        // Console.log('output', log);
+      // Console.log('output', log);
       output.output.push(`${log.stdout || ''}${log.stderr || ''}`);
       return cb();
     }).catch(err => {
-        // Console.log('error', err);
+      // Console.log('error', err);
       output.output.push(`${err.stdout || ''}${err.stderr || ''}`);
       return cb(err);
     });
@@ -372,7 +380,7 @@ app.post('/run', (req, res) => {
     if (err) {
       console.error('error:', err);
     }
-      // Console.log('output', output);
+    // Console.log('output', output);
     res.json(output);
   });
 });
