@@ -1334,27 +1334,27 @@ app.post('/changehost', (req, res) => {
           }
         });
       }
-    }
-  } else {
-    // FixMe: Fix this!
-    if (container.length > 1) { // eslint-disable-line no-lonely-if
-      request('http://' + server + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
     } else {
-      request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
-          display_log(function(data) {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
+      // FixMe: Fix this!
+      if (container.length > 1) { // eslint-disable-line no-lonely-if
+        request('http://' + server + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          }
+        });
+      } else {
+        request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
+          if (!error && response.statusCode == 200) {
+            display_log(function(data) {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      }
     }
   }
 });
