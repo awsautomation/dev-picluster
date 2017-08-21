@@ -845,94 +845,95 @@ app.post('/delete-image', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-  if (config.ssl) {
-    // FixMe: This isn't a massive issue but should still probably be fixed at some point.
-    if (image.length > 1) { // eslint-disable-line no-lonely-if
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
+    if (config.ssl) {
+      // FixMe: This isn't a massive issue but should still probably be fixed at some point.
+      if (image.length > 1) { // eslint-disable-line no-lonely-if
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
         }
-      });
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      } else {
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token
+        }
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      }
+    } else if (config.ssl && config.ssl_self_signed) {
+      // FixMe: This isn't a massive issue but should still probably be fixed at some point.
+      if (image.length > 1) { // eslint-disable-line no-lonely-if
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image,
+          rejectUnauthorized: "false"
+        }
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      } else {
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token,
+          rejectUnauthorized: "false"
+        }
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      }
     } else {
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
+      // FixMe: This isn't a massive issue but should still probably be fixed at some point.
+      if (image.length > 1) { // eslint-disable-line no-lonely-if
+        const options = {
+          url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
         }
-      });
-    }
-  } else if (config.ssl && config.ssl_self_signed) {
-    // FixMe: This isn't a massive issue but should still probably be fixed at some point.
-    if (image.length > 1) { // eslint-disable-line no-lonely-if
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image,
-        rejectUnauthorized: "false"
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      } else {
+        const options = {
+          url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token
         }
-      });
-    } else {
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token,
-        rejectUnauthorized: "false"
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
       }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
-    }
-  } else {
-    // FixMe: This isn't a massive issue but should still probably be fixed at some point.
-    if (image.length > 1) { // eslint-disable-line no-lonely-if
-      const options = {
-        url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
-    } else {
-      const options = {
-        url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
   }
 });
