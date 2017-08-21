@@ -26,18 +26,6 @@ const agent_port = config.agent_port;
 app.use(bodyParser());
 // Require('request-debug')(request);
 
-if ( config.ssl && config.ssl_cert && config.ssl_key ) {
-    const ssl_options = {
-        cert: fs.readFileSync(config.ssl_cert),
-        key: fs.readFileSync(config.ssl_key)
-    }
-    const server = https.createServer(ssl_options, app);
-    console.log("SSL Server API enabled");
-} else {
-    const server = http.createServer(app);
-    console.log("Non-SSL Server API enabled");
-}
-
 let log = '';
 let token = config.token;
 let dockerFolder = config.docker;
@@ -2771,6 +2759,24 @@ app.post('/updateconfig', (req, res) => {
   }
 });
 
-server.listen(server_port, () => {
-  console.log('Listening on port %d', server_port);
-});
+if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+  const ssl_options = {
+    cert: fs.readFileSync(config.ssl_cert),
+    key: fs.readFileSync(config.ssl_key)
+  };
+  const server = https.createServer(ssl_options, app);
+
+  server.listen(server_port, () => {
+    console.log('Listening on port %d', server_port);
+  });
+
+  console.log("SSL Server API enabled");
+} else {
+  const server = http.createServer(app);
+
+  server.listen(server_port, () => {
+    console.log('Listening on port %d', server_port);
+  });
+
+  console.log("Non-SSL Server API enabled");
+}
