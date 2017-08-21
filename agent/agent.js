@@ -18,18 +18,6 @@ const agent_port = config.agent_port;
 const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser());
-if ( config.ssl && config.ssl_cert && config.ssl_key ) {
-    const ssl_options = {
-        cert: fs.readFileSync(config.ssl_cert),
-        key: fs.readFileSync(config.ssl_key)
-    }
-    const server = https.createServer(ssl_options, app);
-    console.log("SSL Agent API enabled");
-} else {
-    const server = http.createServer(app);
-    console.log("Non-SSL Agent API enabled");
-}
-var os = require('os');
 const node = os.hostname();
 const async = require('async');
 const exec = require('child-process-promise').exec;
@@ -183,55 +171,148 @@ function send_ping() {
     const token_body = JSON.stringify({
       token
     });
-    var options = {
-      if ( config.ssl ){
-        url: "https://" + vip_slave + ':' + agent_port + '/pong'
-      } else {
-        url: "http://" + vip_slave + ':' + agent_port + '/pong'
-      },
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': token_body.length
-      },
-      body: token_body
-    };
 
-    request(options, (error, response, body) => {
-      let found_vip = false;
+    if (config.ssl) {
+      var options = {
+        url: "https://" + vip_slave + ':' + agent_port + '/pong',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': token_body.length
+        },
+        body: token_body
+      };
 
-      if ((error || response.statusCode !== '200')) {
-        const cmd = ip_add_command;
-        // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
-        exec(cmd).then(noop).catch(noop);
-      } else {
-        const interfaces = require('os').networkInterfaces();
-        Object.keys(interfaces).forEach(devName => {
-          const iface = interfaces[devName];
-          iface.forEach(alias => {
-            if (alias.address === vip) {
-              found_vip = true;
-            }
-          });
-        });
-        const json_object = JSON.parse(body);
+      request(options, (error, response, body) => {
+        let found_vip = false;
 
-        if (json_object.vip_detected === 'false' && found_vip === false) {
-          console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
+        if ((error || response.statusCode !== '200')) {
           const cmd = ip_add_command;
-          exec(cmd).catch(err => {
-            console.log(err);
+          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+          exec(cmd).then(noop).catch(noop);
+        } else {
+          const interfaces = require('os').networkInterfaces();
+          Object.keys(interfaces).forEach(devName => {
+            const iface = interfaces[devName];
+            iface.forEach(alias => {
+              if (alias.address === vip) {
+                found_vip = true;
+              }
+            });
           });
+          const json_object = JSON.parse(body);
+
+          if (json_object.vip_detected === 'false' && found_vip === false) {
+            console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
+            const cmd = ip_add_command;
+            exec(cmd).catch(err => {
+              console.log(err);
+            });
+          }
+          if ((json_object.vip_detected === 'true' && found_vip === true)) {
+            console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
+            const cmd = ip_delete_command;
+            exec(cmd).catch(err => {
+              console.log(err);
+            });
+          }
         }
-        if ((json_object.vip_detected === 'true' && found_vip === true)) {
-          console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
-          const cmd = ip_delete_command;
-          exec(cmd).catch(err => {
-            console.log(err);
+      });
+    } else if (config.ssl && config.ssl_self_signed) {
+      var options = {
+        url: "https://" + vip_slave + ':' + agent_port + '/pong',
+        method: 'POST',
+        rejectUnauthorized: "false",
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': token_body.length
+        },
+        body: token_body
+      };
+
+      request(options, (error, response, body) => {
+        let found_vip = false;
+
+        if ((error || response.statusCode !== '200')) {
+          const cmd = ip_add_command;
+          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+          exec(cmd).then(noop).catch(noop);
+        } else {
+          const interfaces = require('os').networkInterfaces();
+          Object.keys(interfaces).forEach(devName => {
+            const iface = interfaces[devName];
+            iface.forEach(alias => {
+              if (alias.address === vip) {
+                found_vip = true;
+              }
+            });
           });
+          const json_object = JSON.parse(body);
+
+          if (json_object.vip_detected === 'false' && found_vip === false) {
+            console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
+            const cmd = ip_add_command;
+            exec(cmd).catch(err => {
+              console.log(err);
+            });
+          }
+          if ((json_object.vip_detected === 'true' && found_vip === true)) {
+            console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
+            const cmd = ip_delete_command;
+            exec(cmd).catch(err => {
+              console.log(err);
+            });
+          }
         }
-      }
-    });
+      });
+    } else {
+      var options = {
+        url: "http://" + vip_slave + ':' + agent_port + '/pong',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': token_body.length
+        },
+        body: token_body
+      };
+
+      request(options, (error, response, body) => {
+        let found_vip = false;
+
+        if ((error || response.statusCode !== '200')) {
+          const cmd = ip_add_command;
+          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+          exec(cmd).then(noop).catch(noop);
+        } else {
+          const interfaces = require('os').networkInterfaces();
+          Object.keys(interfaces).forEach(devName => {
+            const iface = interfaces[devName];
+            iface.forEach(alias => {
+              if (alias.address === vip) {
+                found_vip = true;
+              }
+            });
+          });
+          const json_object = JSON.parse(body);
+
+          if (json_object.vip_detected === 'false' && found_vip === false) {
+            console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
+            const cmd = ip_add_command;
+            exec(cmd).catch(err => {
+              console.log(err);
+            });
+          }
+          if ((json_object.vip_detected === 'true' && found_vip === true)) {
+            console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
+            const cmd = ip_delete_command;
+            exec(cmd).catch(err => {
+              console.log(err);
+            });
+          }
+        }
+      });
+    }
+
     send_ping();
   }, vip_ping_time);
 }
@@ -385,6 +466,24 @@ app.post('/run', (req, res) => {
   });
 });
 
-server.listen(agent_port, () => {
-  console.log('Listening on port %d', agent_port);
-});
+if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+  const ssl_options = {
+    cert: fs.readFileSync(config.ssl_cert),
+    key: fs.readFileSync(config.ssl_key)
+  }
+  const server = https.createServer(ssl_options, app);
+
+  server.listen(agent_port, () => {
+    console.log('Listening on port %d', agent_port);
+  });
+
+  console.log("SSL Agent API enabled");
+} else {
+  const server = http.createServer(app);
+
+  server.listen(agent_port, () => {
+    console.log('Listening on port %d', agent_port);
+  });
+
+  console.log("Non-SSL Agent API enabled");
+}
