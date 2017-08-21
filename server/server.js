@@ -75,7 +75,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
 
   if (config.ssl){
     const options = {
-      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index
+      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
     });
   } else if (config.ssl && config.ssl_self_signed) {
     const options = {
-      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index
+      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
   }
   else {
     const options = {
-      url: "http://" + config.elasticsearch + '/' + config.elasticsearch_index
+      url: "http://" + config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
