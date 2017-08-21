@@ -1037,7 +1037,7 @@ function elasticsearch(data) {
 
   if (config.ssl) {
     const options = {
-      url: "https://" config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1053,7 +1053,7 @@ function elasticsearch(data) {
     });
   } else if (config.ssl && config.ssl_self_signed) {
     const options = {
-      url: "https://" config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+      url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
       method: 'POST',
       rejectUnauthorized: "false",
       headers: {
@@ -1070,7 +1070,7 @@ function elasticsearch(data) {
     });
   } else {
     const options = {
-      url: "http://" config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+      url: "http://" + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1102,7 +1102,7 @@ app.get('/clear-elasticsearch', (req, res) => {
 
     if (config.ssl) {
       const options = {
-        url: "https://" config.elasticsearch + '/' + config.elasticsearch_index,
+        url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index,
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -1122,7 +1122,7 @@ app.get('/clear-elasticsearch', (req, res) => {
       });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
-        url: "https://" config.elasticsearch + '/' + config.elasticsearch_index,
+        url: "https://" + config.elasticsearch + '/' + config.elasticsearch_index,
         rejectUnauthorized: "false",
         method: 'DELETE',
         headers: {
@@ -1143,7 +1143,7 @@ app.get('/clear-elasticsearch', (req, res) => {
       });
     } else {
       const options = {
-        url: "http://" config.elasticsearch + '/' + config.elasticsearch_index,
+        url: "http://" + config.elasticsearch + '/' + config.elasticsearch_index,
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
