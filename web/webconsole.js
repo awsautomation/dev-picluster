@@ -1127,7 +1127,7 @@ app.post('/delete', (req, res) => {
           }
         });
       } else {
-        const = {
+        const options = {
           url: 'http://' + server + ':' + server_port + '/delete?token=' + token
         }
         request(options, (error, response) => {
@@ -1177,7 +1177,7 @@ app.get('/prune', (req, res) => {
         }
       });
     } else {
-      const = {
+      const options = {
         url: 'http://' + server + ':' + server_port + '/prune?token=' + token
       }
       request(options, (error, response) => {
@@ -1694,7 +1694,7 @@ app.post('/restart', (req, res) => {
           }
         })
       } else {
-        const = {
+        const options = {
           url: 'https://' + server + ':' + server_port + '/restart?token=' + token
         }
         request(options, (error, response) => {
@@ -1724,7 +1724,7 @@ app.post('/restart', (req, res) => {
           }
         })
       } else {
-        const = {
+        const options = {
           url: 'https://' + server + ':' + server_port + '/restart?token=' + token,
           rejectUnauthorized: "false"
         }
