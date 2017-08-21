@@ -873,6 +873,7 @@ app.post('/delete-image', (req, res) => {
           res.end('\nError connecting with server.');
         }
       });
+    }
   } else if (config.ssl && config.ssl_self_signed) {
     // FixMe: This isn't a massive issue but should still probably be fixed at some point.
     if (image.length > 1) { // eslint-disable-line no-lonely-if
@@ -903,6 +904,7 @@ app.post('/delete-image', (req, res) => {
           res.end('\nError connecting with server.');
         }
       });
+    }
   } else {
     // FixMe: This isn't a massive issue but should still probably be fixed at some point.
     if (image.length > 1) { // eslint-disable-line no-lonely-if
@@ -931,7 +933,6 @@ app.post('/delete-image', (req, res) => {
           res.end('\nError connecting with server.');
         }
       });
-  }
     }
   }
 });
