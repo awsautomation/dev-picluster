@@ -583,7 +583,7 @@ app.post('/containerlog', (req, res) => {
       });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
-        url: 'https://' + server + ':' + server_port + '/containerlog?token=' + token + '&container=' + container
+        url: 'https://' + server + ':' + server_port + '/containerlog?token=' + token + '&container=' + container,
         rejectUnauthorized: "false"
       }
       request(options, (error, response) => {
@@ -638,7 +638,7 @@ app.post('/create', (req, res) => {
       });
   } else if (config.ssl && config.ssl_self_signed) {
     const options = {
-      url: 'https://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container
+      url: 'https://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container,
       rejectUnauthorized: "false"
     }
     request(options, (error, response) => {
