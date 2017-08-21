@@ -950,88 +950,89 @@ app.post('/build', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-  if (config.ssl) {
-    // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
-    if (image.length > 1) { // eslint-disable-line no-lonely-if
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
+    if (config.ssl) {
+      // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
+      if (image.length > 1) { // eslint-disable-line no-lonely-if
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
         }
-      });
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      } else {
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
+        }
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          }
+        });
+      }
+    } else if (config.ssl && config.ssl_self_signed) {
+      // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
+      if (image.length > 1) { // eslint-disable-line no-lonely-if
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache,
+          rejectUnauthorized: "false"
+        }
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      } else {
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache,
+          rejectUnauthorized: "false"
+        }
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          }
+        });
+      }
     } else {
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
+      // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
+      if (image.length > 1) { // eslint-disable-line no-lonely-if
+        const options = {
+          url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
         }
-      });
-    }
-  } else if (config.ssl && config.ssl_self_signed) {
-    // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
-    if (image.length > 1) { // eslint-disable-line no-lonely-if
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache,
-        rejectUnauthorized: "false"
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          } else {
+            res.end('\nError connecting with server.');
+          }
+        });
+      } else {
+        const options = {
+          url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
         }
-      });
-    } else {
-      const options = {
-        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache,
-        rejectUnauthorized: "false"
+        request(options, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log(data => {
+              res.end(data);
+            });
+          }
+        });
       }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
-    }
-  } else {
-    // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
-    if (image.length > 1) { // eslint-disable-line no-lonely-if
-      const options = {
-        url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
-    } else {
-      const options = {
-        url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
-      }
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
     }
   }
 });
