@@ -1321,16 +1321,17 @@ app.post('/changehost', (req, res) => {
             display_log(data => {
               res.end(data);
             });
-        } else {
-          request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-              display_log(function(data) {
-                res.end(data);
-              });
-            } else {
-              res.end('\nError connecting with server.');
-            }
-          });
+          } else {
+            request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
+              if (!error && response.statusCode == 200) {
+                display_log(function(data) {
+                  res.end(data);
+                });
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
         }
       }
     }
@@ -1355,7 +1356,6 @@ app.post('/changehost', (req, res) => {
         });
       }
     }
-  }
   }
 });
 
