@@ -514,7 +514,7 @@ function display_log(callback) {
         }, request_timeout);
       }
     });
-  }
+  }};
 }
 
 function clear_log(callback) {
