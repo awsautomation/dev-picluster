@@ -20,6 +20,11 @@ if (process.env.PICLUSTER_CONFIG) {
   config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
   config_file = '../config.json';
 }
+
+if (config.ssl_self_signed){
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+}
+
 const server_port = config.server_port;
 const agent_port = config.agent_port;
 

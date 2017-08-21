@@ -12,6 +12,11 @@ if (process.env.PICLUSTER_CONFIG) {
 } else {
   config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
+
+if (config.ssl_self_signed){
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+}
+
 const express = require('express');
 const request = require('request');
 
