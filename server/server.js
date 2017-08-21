@@ -2710,7 +2710,7 @@ app.get('/killvip', (req, res) => {
           } else if (config.ssl && config.ssl_self_signed) {
             const options = {
               url: "https://" + node + ':' + agent_port + '/killvip',
-              rejectUnauthorized: "false"
+              rejectUnauthorized: "false",
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
