@@ -454,7 +454,7 @@ app.get('/delete-image', (req, res) => {
         } else if (config.ssl && config.ssl_self_signed) {
           const options = {
             url: "https://" + node + ':' + agent_port + '/run',
-            rejectUnauthorized:
+            rejectUnauthorized: "false",
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
