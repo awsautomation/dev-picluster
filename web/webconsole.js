@@ -1409,21 +1409,41 @@ function sendFile(file) {
     file: fs.createReadStream(file)
   };
 
-  request.post({
-    if (config.ssl) {
-      url: 'https://' + server + ':' + server_port + '/receive-file'
-    } else {
-      url: 'http://' + server + ':' + server_port + '/receive-file'
-    }
-    url: 'http://' + server + ':' + server_port + '/receive-file'
-    formData
-  }, err => {
-    if (err) {
-      console.error('upload failed:', err);
-    } else {
-      console.log('Upload successful!');
-    }
-  });
+  if (config.ssl){
+    request.post({
+      url: 'https://' + server + ':' + server_port + '/receive-file',
+      formData
+    }, err => {
+      if (err) {
+        console.error('upload failed:', err);
+      } else {
+        console.log('Upload successful!');
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    request.post({
+      url: 'https://' + server + ':' + server_port + '/receive-file',
+      rejectUnauthorized: "false",
+      formData
+    }, err => {
+      if (err) {
+        console.error('upload failed:', err);
+      } else {
+        console.log('Upload successful!');
+      }
+    });
+  } else {
+    request.post({
+      url: 'http://' + server + ':' + server_port + '/receive-file',
+      formData
+    }, err => {
+      if (err) {
+        console.error('upload failed:', err);
+      } else {
+        console.log('Upload successful!');
+      }
+    });
+  }
 }
 
 app.post('/upload', upload.single('file'), (req, res) => {
