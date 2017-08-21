@@ -1843,7 +1843,7 @@ app.get('/hb', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/hb?token=' + token
       }
-      request(, (error, response) => {
+      request(options, (error, response) => {
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
@@ -1857,7 +1857,7 @@ app.get('/hb', (req, res) => {
         url: 'https://' + server + ':' + server_port + '/hb?token=' + token,
         rejectUnauthorized: "false"
       }
-      request(, (error, response) => {
+      request(options, (error, response) => {
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
