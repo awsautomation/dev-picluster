@@ -2078,7 +2078,7 @@ if ( config.ssl && config.ssl_cert && config.ssl_key ) {
     }
     const webconsole = https.createServer(ssl_options, app);
 
-    webconsole.listen(port, () => {
+    webconsole.listen(web_port, () => {
       console.log('Listening on port %d', webconsole.address().web_port);
     });
 
@@ -2086,7 +2086,7 @@ if ( config.ssl && config.ssl_cert && config.ssl_key ) {
 } else {
     const webconsole = http.createServer(app);
 
-    webconsole.listen(port, () => {
+    webconsole.listen(web_port, () => {
       console.log('Listening on port %d', webconsole.address().web_port);
     });
 
