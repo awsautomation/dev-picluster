@@ -10,14 +10,10 @@ services:
     networks:
       picluster:
         ipv4_address: 10.10.10.1
-    extra_hosts:
-      server: 10.10.10.1
-      agent: 10.10.10.2
-      docker0: 172.17.0.1
     ports:
       - "3000:3000"
     working_dir: /picluster/server
-    command: ["sh", "-c", "set -e;apk add --no-cache sudo;sudo -u node npm install --production;sudo -u node node server.js;"]
+    command: ["sh", "-c", "set -e;apk add --no-cache ; npm install --production; node server.js;"]
   agent:
     image: "node:alpine"
     restart: "always"
@@ -28,14 +24,10 @@ services:
     networks:
       picluster:
         ipv4_address: 10.10.10.2
-    extra_hosts:
-      server: 10.10.10.1
-      agent: 10.10.10.2
-      docker0: 172.17.0.1
     ports:
       - "3001:3001"
     working_dir: /picluster/agent
-    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add sudo git python make g++ docker procps;export PATH=/bin:$PATH;sudo -u node npm install --production;node agent.js"]
+    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add  git python make g++ docker procps;export PATH=/bin:$PATH; npm install --production;node agent.js"]
 
   webconsole:
     image: "node:alpine"
@@ -43,17 +35,13 @@ services:
     networks:
       picluster:
         ipv4_address: 10.10.10.3
-    extra_hosts:
-      server: 10.10.10.1
-      agent: 10.10.10.2
-      docker0: 172.17.0.1
     volumes:
       - .:/picluster
       - ./docker-compose.config.json:/picluster/config.json
     ports:
       - "3003:3003"
     working_dir: /picluster/web
-    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add git sudo;sudo -u node npm install --production;sudo -u node node webconsole.js;"]
+    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add git ; npm install --production; node webconsole.js;"]
 
 networks:
   picluster:
