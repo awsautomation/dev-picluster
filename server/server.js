@@ -512,16 +512,15 @@ app.get('/create', (req, res) => {
     let responseString = '';
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        const command = JSON.stringify({
-          command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-          token
-        });
-
         if (config.ssl){
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
           const options = {
             url: "https://" + node + ':' + agent_port + '/run',
             hostname: node,
@@ -552,6 +551,14 @@ app.get('/create', (req, res) => {
             request.write(command);
           }
         } else if (config.ssl && config.ssl_self_signed) {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
           const options = {
             url: "https://" + node + ':' + agent_port + '/run',
             hostname: node,
@@ -583,6 +590,14 @@ app.get('/create', (req, res) => {
             request.write(command);
           }
         } else {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
           const options = {
             url: "http://" + node + ':' + agent_port + '/run',
             hostname: node,

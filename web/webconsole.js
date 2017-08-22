@@ -641,33 +641,33 @@ app.post('/create', (req, res) => {
           res.end('\nError connecting with server.');
         }
       });
-  } else if (config.ssl && config.ssl_self_signed) {
-    const options = {
-      url: 'https://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container,
-      rejectUnauthorized: "false"
-    }
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(() => {
-          res.end('\nSent request to create the containers.');
-        });
-      } else {
-        res.end('\nError connecting with server.');
+    } else if (config.ssl && config.ssl_self_signed) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container,
+        rejectUnauthorized: "false"
       }
-    });
-  } else {
-    const options = {
-      url: 'http://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container
-    }
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(() => {
-          res.end('\nSent request to create the containers.');
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      request(options, (error, response) => {
+        if (!error && response.statusCode === 200) {
+          display_log(() => {
+            res.end('\nSent request to create the containers.');
+          });
+        } else {
+          res.end('\nError connecting with server.');
+        }
+      });
+    } else {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container
       }
-    });
+      request(options, (error, response) => {
+        if (!error && response.statusCode === 200) {
+          display_log(() => {
+            res.end('\nSent request to create the containers.');
+          });
+        } else {
+          res.end('\nError connecting with server.');
+        }
+      });
     }
   }
 });
