@@ -22,8 +22,8 @@
 - Run commands in parallel across Nodes
 - Heartbeat for services
 - Easily build and orchestrate Docker images across nodes
-- Command-line interface
 - Web interface
+- Monitor host metrics (Disk, CPU, Memory)
 - HTTP interface
 - Virtual IP Manager
 - Rsyslog Analytics
