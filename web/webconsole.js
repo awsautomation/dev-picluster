@@ -32,6 +32,7 @@ let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
+let agent_port = config.agent_port;
 let server_port = config.server_port;
 let syslog = '';
 let nodedata = '';
@@ -1926,7 +1927,7 @@ app.get('/log', (req, res) => {
         } else {
           res.end('\nError connecting with server.');
         }
-      });s
+      });
     }
   }
 });
