@@ -4,12 +4,10 @@ const https = require('https');
 const fs = require('fs');
 const net = require('net');
 const bodyParser = require('body-parser');
-
+const multer = require('multer');
 const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
-
-const app = express();
 
 let config;
 let config_file;
@@ -25,17 +23,18 @@ if (config.ssl_self_signed) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
+const app = express();
+
 const server_port = config.server_port;
 const agent_port = config.agent_port;
 
 app.use(bodyParser());
-// Require('request-debug')(request);
+// require('request-debug')(request);
 
 let log = '';
 let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
-const multer = require('multer');
 
 const upload = multer({
   dest: '../'
@@ -2152,8 +2151,8 @@ function copyToAgents(file) {
       if (config.ssl) {
         request.post({
           url: 'https://' + node + ':' + agent_port + '/receive-file',
-          formData: formData
-        }, (err, httpResponse, body) => {
+          formData
+        }, (err, httpResponse) => {
           if (!err) {
             addLog('\nCopied ' + file + ' to ' + node);
             console.log('\nCopied ' + file + ' to ' + node);
@@ -2163,8 +2162,8 @@ function copyToAgents(file) {
         request.post({
           url: 'https://' + node + ':' + agent_port + '/receive-file',
           rejectUnauthorized: 'false',
-          formData: formData
-        }, (err, httpResponse, body) => {
+          formData
+        }, (err, httpResponse) => {
           if (!err) {
             addLog('\nCopied ' + file + ' to ' + node);
             console.log('\nCopied ' + file + ' to ' + node);
@@ -2173,8 +2172,8 @@ function copyToAgents(file) {
       } else {
         request.post({
           url: 'http://' + node + ':' + agent_port + '/receive-file',
-          formData: formData
-        }, (err, httpResponse, body) => {
+          formData
+        }, (err, httpResponse) => {
           if (!err) {
             addLog('\nCopied ' + file + ' to ' + node);
             console.log('\nCopied ' + file + ' to ' + node);
@@ -2601,6 +2600,7 @@ app.get('/log', (req, res) => {
   }
 });
 
+/*eslint-disable no-lonely-if */
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
@@ -2646,6 +2646,7 @@ app.get('/rsyslog', (req, res) => {
     }
   }
 });
+/*eslint-enable no-lonely-if */
 
 app.get('/reloadconfig', (req, res) => {
   const check_token = req.query.token;
