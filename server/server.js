@@ -1233,7 +1233,7 @@ app.get('/rmhost', (req, res) => {
       }
     });
   } else if (config.ssl && config.ssl_self_signed) {
-    //Save Configuration
+    // Save Configuration
     const options = {
       url: `https://127.0.0.1:${server_port}/updateconfig`,
       rejectUnauthorized: 'false',
@@ -1253,7 +1253,7 @@ app.get('/rmhost', (req, res) => {
       }
     });
   } else {
-    //Save Configuration
+    // Save Configuration
     const options = {
       url: `http://127.0.0.1:${server_port}/updateconfig`,
       method: 'POST',
@@ -1336,7 +1336,7 @@ app.get('/removecontainerconfig', (req, res) => {
     });
 
     if (config.ssl) {
-      //Save Configuration
+      // Save Configuration
       const options = {
         url: `https://127.0.0.1:${server_port}/updateconfig`,
         method: 'POST',
@@ -1355,7 +1355,7 @@ app.get('/removecontainerconfig', (req, res) => {
         }
       });
     } else if (config.ssl && config.ssl_self_signed) {
-      //Save Configuration
+      // Save Configuration
       const options = {
         url: `https://127.0.0.1:${server_port}/updateconfig`,
         method: 'POST',
@@ -1375,7 +1375,7 @@ app.get('/removecontainerconfig', (req, res) => {
         }
       });
     } else {
-      //Save Configuration
+      // Save Configuration
       const options = {
         url: `http://127.0.0.1:${server_port}/updateconfig`,
         method: 'POST',
@@ -1463,7 +1463,7 @@ app.get('/addcontainer', (req, res) => {
       });
 
       if (config.ssl) {
-        //Save Configuration
+        // Save Configuration
         const options = {
           url: `https://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
@@ -1493,7 +1493,7 @@ app.get('/addcontainer', (req, res) => {
           }
         });
       } else if (config.ssl && config.ssl_self_signed) {
-        //Save Configuration
+        // Save Configuration
         const options = {
           url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
@@ -1508,7 +1508,7 @@ app.get('/addcontainer', (req, res) => {
           if (error) {
             res.end(error);
           } else {
-            const container_options ={
+            const container_options = {
               url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
               rejectUnauthorized: 'false'
             };
@@ -1523,7 +1523,7 @@ app.get('/addcontainer', (req, res) => {
           }
         });
       } else {
-        //Save Configuration
+        // Save Configuration
         const options = {
           url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
@@ -1538,8 +1538,8 @@ app.get('/addcontainer', (req, res) => {
           if (error) {
             res.end(error);
           } else {
-            const container_options ={
-              url: 'http://' + '127.0.0.1' + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + host,
+            const container_options = {
+              url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
               rejectUnauthorized: 'false'
             };
             // Res.end('\nAdded ' + container + ' to the configuration.');
@@ -1650,7 +1650,7 @@ app.get('/changehost', (req, res) => {
       });
 
       if (config.ssl) {
-        //Save Configuration
+        // Save Configuration
         const options = {
           url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
@@ -1670,7 +1670,7 @@ app.get('/changehost', (req, res) => {
           }
         });
       } else if (config.ssl && config.ssl_self_signed) {
-        //Save Configuration
+        // Save Configuration
         const options = {
           url: `https://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
@@ -1691,7 +1691,7 @@ app.get('/changehost', (req, res) => {
           }
         });
       } else {
-        //Save Configuration
+        // Save Configuration
         const options = {
           url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
@@ -2153,7 +2153,7 @@ function copyToAgents(file) {
         request.post({
           url: 'https://' + node + ':' + agent_port + '/receive-file',
           formData: formData
-        }, function(err, httpResponse, body) {
+        }, (err, httpResponse, body) => {
           if (!err) {
             addLog('\nCopied ' + file + ' to ' + node);
             console.log('\nCopied ' + file + ' to ' + node);
@@ -2164,7 +2164,7 @@ function copyToAgents(file) {
           url: 'https://' + node + ':' + agent_port + '/receive-file',
           rejectUnauthorized: 'false',
           formData: formData
-        }, function(err, httpResponse, body) {
+        }, (err, httpResponse, body) => {
           if (!err) {
             addLog('\nCopied ' + file + ' to ' + node);
             console.log('\nCopied ' + file + ' to ' + node);
@@ -2174,7 +2174,7 @@ function copyToAgents(file) {
         request.post({
           url: 'http://' + node + ':' + agent_port + '/receive-file',
           formData: formData
-        }, function(err, httpResponse, body) {
+        }, (err, httpResponse, body) => {
           if (!err) {
             addLog('\nCopied ' + file + ' to ' + node);
             console.log('\nCopied ' + file + ' to ' + node);
@@ -2607,9 +2607,9 @@ app.get('/rsyslog', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     if (config.ssl) {
-      const options ={
+      const options = {
         url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
-      }
+      };
 
       request(options, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -2619,10 +2619,10 @@ app.get('/rsyslog', (req, res) => {
         }
       });
     } else if (config.ssl && config.ssl_self_signed) {
-      const options ={
+      const options = {
         url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token,
-        rejectUnauthorized: 'false',
-      }
+        rejectUnauthorized: 'false'
+      };
 
       request(options, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -2632,9 +2632,9 @@ app.get('/rsyslog', (req, res) => {
         }
       });
     } else {
-      const options ={
+      const options = {
         url: 'http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
-      }
+      };
 
       request(options, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -2778,7 +2778,7 @@ app.post('/updateconfig', (req, res) => {
   }
 });
 
-if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+if (config.ssl && config.ssl_cert && config.ssl_key) {
   const ssl_options = {
     cert: fs.readFileSync(config.ssl_cert),
     key: fs.readFileSync(config.ssl_key)
