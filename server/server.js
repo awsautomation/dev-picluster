@@ -101,8 +101,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
         console.log(error);
       }
     });
-  }
-  else {
+  } else {
     const options = {
       url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'PUT',
@@ -120,8 +119,8 @@ if (config.elasticsearch && config.elasticsearch_index) {
       }
     });
   }
-
 }
+
 if (config.automatic_heartbeat) {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     if (config.heartbeat_interval) {
@@ -200,13 +199,13 @@ app.get('/nodes', (req, res) => {
   function getData() {
     let total_node_count = 0;
     let total_containers = 0;
-    let node_list = [];
-    let container_list = [];
+    const node_list = [];
+    const container_list = [];
 
     for (let i = 0; i < config.layout.length; i++) {
       for (const key in config.layout[i]) {
         if (config.layout[i].hasOwnProperty(key)) {
-          node = config.layout[i].node;
+          const node = config.layout[i].node;
           const node_info = config.layout[i][key];
           if (node_info === node) {
             total_node_count++;
@@ -971,9 +970,9 @@ app.get('/addhost', (req, res) => {
       });
 
       if (config.ssl) {
-        //Save Configuration
+        // Save Configuration
         const options = {
-          url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -990,9 +989,9 @@ app.get('/addhost', (req, res) => {
           }
         });
       } else if (config.ssl && config.ssl_self_signed) {
-        //Save Configuration
+        // Save Configuration
         const options = {
-          url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
           rejectUnauthorized: 'false',
           method: 'POST',
           headers: {
@@ -1010,9 +1009,9 @@ app.get('/addhost', (req, res) => {
           }
         });
       } else {
-        //Save Configuration
+        // Save Configuration
         const options = {
-          url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1215,9 +1214,9 @@ app.get('/rmhost', (req, res) => {
   });
 
   if (config.ssl) {
-    //Save Configuration
+    // Save Configuration
     const options = {
-      url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+      url: `https://127.0.0.1:${server_port}/updateconfig`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1236,7 +1235,7 @@ app.get('/rmhost', (req, res) => {
   } else if (config.ssl && config.ssl_self_signed) {
     //Save Configuration
     const options = {
-      url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+      url: `https://127.0.0.1:${server_port}/updateconfig`,
       rejectUnauthorized: 'false',
       method: 'POST',
       headers: {
@@ -1256,7 +1255,7 @@ app.get('/rmhost', (req, res) => {
   } else {
     //Save Configuration
     const options = {
-      url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+      url: `http://127.0.0.1:${server_port}/updateconfig`,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1339,7 +1338,7 @@ app.get('/removecontainerconfig', (req, res) => {
     if (config.ssl) {
       //Save Configuration
       const options = {
-        url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+        url: `https://127.0.0.1:${server_port}/updateconfig`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1358,7 +1357,7 @@ app.get('/removecontainerconfig', (req, res) => {
     } else if (config.ssl && config.ssl_self_signed) {
       //Save Configuration
       const options = {
-        url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+        url: `https://127.0.0.1:${server_port}/updateconfig`,
         method: 'POST',
         rejectUnauthorized: 'false',
         headers: {
@@ -1378,7 +1377,7 @@ app.get('/removecontainerconfig', (req, res) => {
     } else {
       //Save Configuration
       const options = {
-        url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+        url: `http://127.0.0.1:${server_port}/updateconfig`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1466,7 +1465,7 @@ app.get('/addcontainer', (req, res) => {
       if (config.ssl) {
         //Save Configuration
         const options = {
-          url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1480,9 +1479,9 @@ app.get('/addcontainer', (req, res) => {
             res.end(error);
           } else {
             const container_options = {
-              url: 'https://' + '127.0.0.1' + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + host,
+              url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
               rejectUnauthorized: 'false'
-            }
+            };
             // Res.end('\nAdded ' + container + ' to the configuration.');
             request(container_options, (error, response) => {
               if (!error && response.statusCode === 200) {
@@ -1496,7 +1495,7 @@ app.get('/addcontainer', (req, res) => {
       } else if (config.ssl && config.ssl_self_signed) {
         //Save Configuration
         const options = {
-          url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1510,9 +1509,9 @@ app.get('/addcontainer', (req, res) => {
             res.end(error);
           } else {
             const container_options ={
-              url: 'https://' + '127.0.0.1' + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + host,
+              url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
               rejectUnauthorized: 'false'
-            }
+            };
             // Res.end('\nAdded ' + container + ' to the configuration.');
             request(container_options, (error, response) => {
               if (!error && response.statusCode === 200) {
@@ -1526,7 +1525,7 @@ app.get('/addcontainer', (req, res) => {
       } else {
         //Save Configuration
         const options = {
-          url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1542,7 +1541,7 @@ app.get('/addcontainer', (req, res) => {
             const container_options ={
               url: 'http://' + '127.0.0.1' + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + host,
               rejectUnauthorized: 'false'
-            }
+            };
             // Res.end('\nAdded ' + container + ' to the configuration.');
             request(container_options, (error, response) => {
               if (!error && response.statusCode === 200) {
@@ -1653,7 +1652,7 @@ app.get('/changehost', (req, res) => {
       if (config.ssl) {
         //Save Configuration
         const options = {
-          url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1673,7 +1672,7 @@ app.get('/changehost', (req, res) => {
       } else if (config.ssl && config.ssl_self_signed) {
         //Save Configuration
         const options = {
-          url: 'https://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           rejectUnauthorized: 'false',
           headers: {
@@ -1694,7 +1693,7 @@ app.get('/changehost', (req, res) => {
       } else {
         //Save Configuration
         const options = {
-          url: 'http://' + '127.0.0.1' + ':' + server_port + '/updateconfig',
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -29,7 +29,7 @@ const async = require('async');
 const exec = require('child-process-promise').exec;
 const si = require('systeminformation');
 
-const noop = function() {};
+const noop = () => {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
@@ -63,7 +63,7 @@ function monitoring() {
     memory_buffers = data.buffcache;
     memory_used = data.used;
     memory_swap = data.swapused;
-    var this_os = os.platform();
+    const this_os = os.platform();
 
     if (this_os.indexOf('linux') > -1) {
       memory_percentage = Math.round((memory_used - memory_buffers) / memory_total * 100);
@@ -476,7 +476,7 @@ if (config.ssl && config.ssl_cert && config.ssl_key) {
   const ssl_options = {
     cert: fs.readFileSync(config.ssl_cert),
     key: fs.readFileSync(config.ssl_key)
-  }
+  };
   const server = https.createServer(ssl_options, app);
 
   server.listen(agent_port, () => {
