@@ -7,6 +7,15 @@ const unzip = require('unzip');
 const express = require('express');
 const request = require('request');
 const diskspace = require('diskspace');
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const getos = require('picluster-getos');
+const async = require('async');
+const exec = require('child-process-promise').exec;
+const si = require('systeminformation');
+/* eslint-disable capitalized-comments */
+// require('request-debug')(request);
+/* eslint-enable capitalized-comments */
 
 let config;
 if (process.env.PICLUSTER_CONFIG) {
@@ -19,43 +28,34 @@ if (config.ssl_self_signed) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
-const agent_port = config.agent_port;
 const app = express();
-const bodyParser = require('body-parser');
 
 app.use(bodyParser());
-const node = os.hostname();
-const async = require('async');
-const exec = require('child-process-promise').exec;
-const si = require('systeminformation');
 
+const upload = multer({
+  dest: '../'
+});
+const agent_port = config.agent_port;
+const node = os.hostname();
+const token = config.token;
 const noop = () => {};
 let vip = '';
 let vip_slave = '';
 let ip_add_command = '';
 let ip_delete_command = '';
 let vip_ping_time = '';
-const token = config.token;
-const multer = require('multer');
-const getos = require('picluster-getos');
-
 let cpu_percent = 0;
 let os_type = '';
 let disk_percentage = 0;
 let total_running_containers = 0;
 let running_containers = '';
 let cpu_cores = 0;
-
 let memory_buffers = 0;
 let memory_swap = 0;
 let memory_total = 0;
 let memory_used = 0;
 let memory_percentage = 0;
 let images = '';
-
-const upload = multer({
-  dest: '../'
-});
 
 function monitoring() {
   si.mem(data => {
@@ -473,23 +473,19 @@ app.post('/run', (req, res) => {
 });
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {
+  console.log('SSL Agent API enabled');
   const ssl_options = {
     cert: fs.readFileSync(config.ssl_cert),
     key: fs.readFileSync(config.ssl_key)
   };
-  const server = https.createServer(ssl_options, app);
-
-  server.listen(agent_port, () => {
+  const agent = https.createServer(ssl_options, app);
+  agent.listen(agent_port, () => {
     console.log('Listening on port %d', agent_port);
   });
-
-  console.log('SSL Agent API enabled');
 } else {
-  const server = http.createServer(app);
-
-  server.listen(agent_port, () => {
+  console.log('Non-SSL Agent API enabled');
+  const agent = http.createServer(app);
+  agent.listen(agent_port, () => {
     console.log('Listening on port %d', agent_port);
   });
-
-  console.log('Non-SSL Agent API enabled');
 }
