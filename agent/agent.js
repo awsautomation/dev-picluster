@@ -15,13 +15,14 @@ if (process.env.PICLUSTER_CONFIG) {
   config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 }
 
-if (config.ssl_self_signed){
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+if (config.ssl_self_signed) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
 
 const agent_port = config.agent_port;
 const app = express();
 const bodyParser = require('body-parser');
+
 app.use(bodyParser());
 const node = os.hostname();
 const async = require('async');
@@ -178,8 +179,8 @@ function send_ping() {
     });
 
     if (config.ssl) {
-      var options = {
-        url: "https://" + vip_slave + ':' + agent_port + '/pong',
+      const options = {
+        url: 'https://' + vip_slave + ':' + agent_port + '/pong',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,10 +225,10 @@ function send_ping() {
         }
       });
     } else if (config.ssl && config.ssl_self_signed) {
-      var options = {
-        url: "https://" + vip_slave + ':' + agent_port + '/pong',
+      const options = {
+        url: 'https://' + vip_slave + ':' + agent_port + '/pong',
         method: 'POST',
-        rejectUnauthorized: "false",
+        rejectUnauthorized: 'false',
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': token_body.length
@@ -271,8 +272,8 @@ function send_ping() {
         }
       });
     } else {
-      var options = {
-        url: "http://" + vip_slave + ':' + agent_port + '/pong',
+      const options = {
+        url: 'http://' + vip_slave + ':' + agent_port + '/pong',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -471,7 +472,7 @@ app.post('/run', (req, res) => {
   });
 });
 
-if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+if (config.ssl && config.ssl_cert && config.ssl_key) {
   const ssl_options = {
     cert: fs.readFileSync(config.ssl_cert),
     key: fs.readFileSync(config.ssl_key)
@@ -482,7 +483,7 @@ if ( config.ssl && config.ssl_cert && config.ssl_key ) {
     console.log('Listening on port %d', agent_port);
   });
 
-  console.log("SSL Agent API enabled");
+  console.log('SSL Agent API enabled');
 } else {
   const server = http.createServer(app);
 
@@ -490,5 +491,5 @@ if ( config.ssl && config.ssl_cert && config.ssl_key ) {
     console.log('Listening on port %d', agent_port);
   });
 
-  console.log("Non-SSL Agent API enabled");
+  console.log('Non-SSL Agent API enabled');
 }
