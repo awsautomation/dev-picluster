@@ -1347,9 +1347,9 @@ app.post('/changehost', (req, res) => {
               res.end(data);
             });
           } else {
-            request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
+            request(`http://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`, (error, response) => {
               if (!error && response.statusCode === 200) {
-                display_log(function(data) {
+                display_log(data => {
                   res.end(data);
                 });
               } else {
@@ -1370,9 +1370,9 @@ app.post('/changehost', (req, res) => {
           }
         });
       } else {
-        request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
+        request(`http://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`, (error, response) => {
           if (!error && response.statusCode === 200) {
-            display_log((data) => {
+            display_log(data => {
               res.end(data);
             });
           } else {
