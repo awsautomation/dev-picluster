@@ -6,7 +6,6 @@ const multer = require('multer');
 const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
-const lineReader = require('line-reader');
 /* eslint-disable capitalized-comments */
 // require('request-debug')(request);
 /* eslint-enable capitalized-comments */
@@ -112,7 +111,6 @@ function getData() {
     }
     getData();
   }, 5000);
-
 }
 getData();
 
@@ -489,7 +487,6 @@ app.post('/listcommands', (req, res) => {
 });
 
 function display_log(callback) {
-  var responseString = '';
   clear_log(() => {
     setTimeout(() => {
       if (config.ssl) {
@@ -569,6 +566,7 @@ function clear_log(callback) {
   }
 }
 
+/* eslint-disable no-lonely-if */
 app.post('/containerlog', (req, res) => {
   const check_token = req.body.token;
   let container = '';
@@ -621,6 +619,7 @@ app.post('/containerlog', (req, res) => {
     }
   }
 });
+/* eslint-enable no-lonely-if */
 
 /* eslint-disable no-lonely-if */
 app.post('/create', (req, res) => {
@@ -1231,7 +1230,7 @@ app.post('/stop', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl){
+    if (config.ssl) {
       // FixMe: Fix this!
       if (container.length > 1) { // eslint-disable-line no-lonely-if
         const options = {
@@ -1348,8 +1347,8 @@ app.post('/changehost', (req, res) => {
               res.end(data);
             });
           } else {
-            request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
-              if (!error && response.statusCode == 200) {
+            request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
+              if (!error && response.statusCode === 200) {
                 display_log(function(data) {
                   res.end(data);
                 });
@@ -1371,9 +1370,9 @@ app.post('/changehost', (req, res) => {
           }
         });
       } else {
-        request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, function(error, response, body) {
-          if (!error && response.statusCode == 200) {
-            display_log(function(data) {
+        request('http://' + server + ':' + server_port + '/changehost?' + 'token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
+          if (!error && response.statusCode === 200) {
+            display_log((data) => {
               res.end(data);
             });
           } else {
@@ -1438,7 +1437,7 @@ function sendFile(file) {
     file: fs.createReadStream(file)
   };
 
-  if (config.ssl){
+  if (config.ssl) {
     request.post({
       url: 'https://' + server + ':' + server_port + '/receive-file',
       formData
@@ -1854,7 +1853,7 @@ app.post('/restart', (req, res) => {
           }
         });
       } else {
-        const option = {
+        const options = {
           url: 'http://' + server + ':' + server_port + '/restart?token=' + token
         };
         request(options, (error, response) => {
@@ -2117,9 +2116,9 @@ app.get('/searching.jpeg', (req, res) => {
   res.sendFile(__dirname + '/searching.jpeg');
 });
 
-if ( config.ssl && config.ssl_cert && config.ssl_key ) {
+if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Web Console enabled');
-  var ssl_options = {
+  const ssl_options = {
     cert: fs.readFileSync(config.ssl_cert),
     key: fs.readFileSync(config.ssl_key)
   };
