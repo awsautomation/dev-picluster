@@ -491,7 +491,7 @@ function display_log(callback) {
     setTimeout(() => {
       if (config.ssl) {
         const options = {
-          url: 'https://' + server + ':' + server_port + '/log?token=' + token
+          url: `https://${server}:${server_port}/log?token=${token}`
         };
         request(options, (error, response, body) => {
           if (!error && response.statusCode === 200) {
@@ -502,7 +502,7 @@ function display_log(callback) {
         }, request_timeout);
       } else if (config.ssl && config.ssl_self_signed) {
         const options = {
-          url: 'https://' + server + ':' + server_port + '/log?token=' + token,
+          url: `https://${server}:${server_port}/log?token=${token}`,
           rejectUnauthorized: 'false'
         };
         request(options, (error, response, body) => {
@@ -514,7 +514,7 @@ function display_log(callback) {
         }, request_timeout);
       } else {
         const options = {
-          url: 'http://' + server + ':' + server_port + '/log?token=' + token
+          url: `http://${server}:${server_port}/log?token=${token}`
         };
         request(options, (error, response, body) => {
           if (!error && response.statusCode === 200) {
