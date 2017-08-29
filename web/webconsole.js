@@ -533,7 +533,7 @@ function clear_log(callback) {
     const options = {
       url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token
     };
-    request(options, (error, response) => {
+    request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         callback('');
       } else {
@@ -545,7 +545,7 @@ function clear_log(callback) {
       url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token,
       rejectUnauthorized: 'false'
     };
-    request(options, (error, response) => {
+    request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         callback('');
       } else {
@@ -556,7 +556,7 @@ function clear_log(callback) {
     const options = {
       url: 'http://' + server + ':' + server_port + '/clearlog?token=' + token
     };
-    request(options, (error, response) => {
+    request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
         callback('');
       } else {
