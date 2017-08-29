@@ -487,8 +487,8 @@ app.post('/listcommands', (req, res) => {
 });
 
 function display_log(callback) {
-  clear_log(() => {
-    setTimeout(() => {
+  clear_log(function(data) {
+    setTimeout(function() {
       if (config.ssl) {
         const options = {
           url: `https://${server}:${server_port}/log?token=${token}`
