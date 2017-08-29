@@ -1174,7 +1174,7 @@ app.get('/prune', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/prune?token=' + token
       };
-      request(options, (error, response) => {
+      request(options, (error, response, body) => {
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
@@ -1188,7 +1188,7 @@ app.get('/prune', (req, res) => {
         url: 'https://' + server + ':' + server_port + '/prune?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
+      request(options, (error, response, body) => {
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
@@ -1201,7 +1201,7 @@ app.get('/prune', (req, res) => {
       const options = {
         url: 'http://' + server + ':' + server_port + '/prune?token=' + token
       };
-      request(options, (error, response) => {
+      request(options, (error, response, body) => {
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);

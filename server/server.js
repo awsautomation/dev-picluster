@@ -2351,7 +2351,6 @@ app.get('/prune', (req, res) => {
     });
     for (let i = 0; i < config.layout.length; i++) {
       const node = config.layout[i].node;
-
       if (config.ssl) {
         const options = {
           url: 'https://' + node + ':' + agent_port + '/run',
