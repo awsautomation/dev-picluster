@@ -2239,7 +2239,7 @@ app.post('/exec', (req, res) => {
       for (let i = 0; i < config.layout.length; i++) {
         const node = config.layout[i].node;
         const options = {
-          url: 'https://' + node + ':' + agentPort + '/run',
+          url: 'https://' + node + ':' + agent_port + '/run',
           method: 'POST',
           headers: {
            'Content-Type': 'application/json',
@@ -2279,7 +2279,7 @@ app.post('/exec', (req, res) => {
       for (let i = 0; i < config.layout.length; i++) {
         const node = config.layout[i].node;
         const options = {
-          url: 'https://' + node + ':' + agentPort + '/run',
+          url: 'https://' + node + ':' + agent_port + '/run',
           rejectUnauthorized: "false",
           method: 'POST',
           headers: {
@@ -2320,7 +2320,7 @@ app.post('/exec', (req, res) => {
       for (let i = 0; i < config.layout.length; i++) {
         const node = config.layout[i].node;
         const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
+          url: 'http://' + node + ':' + agent_port + '/run',
           method: 'POST',
           headers: {
            'Content-Type': 'application/json',
