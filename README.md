@@ -103,8 +103,8 @@ openssl req -sha512 -newkey rsa:4096 -keyout ssl/picluster.key -x509 -days 365 -
 
 Edit the config.json file and enable SSL and specify the cert and key path, also in since this instance uses a self-signed SSL key/cert the ssl_self_signed has been set to true:
 ```
-"ssl": "true",
-"ssl_self_signed": "true",
+"ssl": true,
+"ssl_self_signed": true,
 "ssl_cert": "/opt/picluster/ssl/picluster.crt",
 "ssl_key": "/opt/picluster/ssl/picluster.key",
 ```

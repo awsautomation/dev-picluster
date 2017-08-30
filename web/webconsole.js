@@ -487,11 +487,11 @@ app.post('/listcommands', (req, res) => {
 });
 
 function display_log(callback) {
-  clear_log(function(data) {
-    setTimeout(function() {
-      if (config.ssl) {
+  if (config.ssl) {
+    clear_log(() => {
+      setTimeout(() => {
         const options = {
-          url: `https://${server}:${server_port}/log?token=${token}`
+          url: 'https://' + server + ':' + server_port + '/log?token=' + token
         };
         request(options, (error, response, body) => {
           if (!error && response.statusCode === 200) {
@@ -499,41 +499,49 @@ function display_log(callback) {
           } else {
             callback('\nError connecting with server.');
           }
-        }, request_timeout);
-      } else if (config.ssl && config.ssl_self_signed) {
-        const options = {
-          url: `https://${server}:${server_port}/log?token=${token}`,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response, body) => {
-          if (!error && response.statusCode === 200) {
-            callback(body);
-          } else {
-            callback('\nError connecting with server.');
-          }
-        }, request_timeout);
-      } else {
-        const options = {
-          url: `http://${server}:${server_port}/log?token=${token}`
-        };
-        request(options, (error, response, body) => {
-          if (!error && response.statusCode === 200) {
-            callback(body);
-          } else {
-            callback('\nError connecting with server.');
-          }
-        }, request_timeout);
-      }
+        });
+      }, request_timeout);
     });
-  });
+  } else if (config.ssl && config.ssl_self_signed) {
+    clear_log(() => {
+      setTimeout(() => {
+        const options = {
+          url: 'https://' + server + ':' + server_port + '/log?token=' + token,
+          rejectUnauthorized: "false"
+        };
+        request(options, (error, response, body) => {
+          if (!error && response.statusCode === 200) {
+            callback(body);
+          } else {
+            callback('\nError connecting with server.');
+          }
+        });
+      }, request_timeout);
+    });
+  } else {
+    clear_log(() => {
+      setTimeout(() => {
+        const options = {
+          url: 'http://' + server + ':' + server_port + '/log?token=' + token
+        };
+        request(options, (error, response, body) => {
+          if (!error && response.statusCode === 200) {
+            callback(body);
+          } else {
+            callback('\nError connecting with server.');
+          }
+        });
+      }, request_timeout);
+    });
+  }
 }
 
 function clear_log(callback) {
   if (config.ssl) {
     const options = {
-      url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token
+      url:'https://' + server + ':' + server_port + '/clearlog?token=' + token
     };
-    request(options, (error, response, body) => {
+    request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
         callback('');
       } else {
@@ -542,10 +550,10 @@ function clear_log(callback) {
     });
   } else if (config.ssl && config.ssl_self_signed) {
     const options = {
-      url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token,
-      rejectUnauthorized: 'false'
+      url:'https://' + server + ':' + server_port + '/clearlog?token=' + token,
+      rejectUnauthorized: "false"
     };
-    request(options, (error, response, body) => {
+    request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
         callback('');
       } else {
@@ -554,9 +562,9 @@ function clear_log(callback) {
     });
   } else {
     const options = {
-      url: 'http://' + server + ':' + server_port + '/clearlog?token=' + token
+      url:'http://' + server + ':' + server_port + '/clearlog?token=' + token
     };
-    request(options, (error, response, body) => {
+    request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
         callback('');
       } else {

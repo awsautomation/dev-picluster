@@ -3,8 +3,8 @@
   "docker": "../docker",
   "server_port": "3000",
   "agent_port": "3001",
-  "ssl": "false",
-  "ssl_self_signed": "false",
+  "ssl": false,
+  "ssl_self_signed": false,
   "ssl_cert": "",
   "ssl_key": "",
   "layout": [{
