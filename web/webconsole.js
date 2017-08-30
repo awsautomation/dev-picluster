@@ -363,7 +363,6 @@ app.get('/remoteimagetags', (req, res) => {
   const registry = req.query.registry;
   const image = req.query.image;
   const page = req.query.page || 1;
-
   const username = req.query.username || '';
   const password = req.query.password || '';
 
@@ -408,7 +407,6 @@ app.get('/remoteimages', (req, res) => {
   const registry = req.query.registry;
   const image = req.query.image;
   const page = req.query.page || 1;
-
   const username = req.query.username || '';
   const password = req.query.password || '';
 

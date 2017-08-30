@@ -2216,6 +2216,7 @@ app.post('/listcommands', (req, res) => {
   }
 });
 
+/* eslint-disable no-lonely-if */
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   let selected_node = '';
@@ -2354,6 +2355,7 @@ app.post('/exec', (req, res) => {
     }
   }
 });
+/* eslint-enable no-lonely-if */
 
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
