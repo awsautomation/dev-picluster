@@ -295,16 +295,12 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    /* eslint-disable no-unused-vars */
-    /* eslint-disable handle-callback-err */
-    fs.readFile(req.file.path, (err, data) => { // FixMe: What's this code supposed to be doing?
+    fs.readFile(req.file.path, (err, data) => {
       const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath => {
+      fs.writeFile(newPath, data, err => {
         unzipFile(newPath);
       });
     });
-    /* eslint-enable no-unused-vars */
-    /* eslint-enable handle-callback-err */
     res.end('Done');
   }
 });
