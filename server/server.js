@@ -2230,21 +2230,20 @@ app.post('/exec', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const command = JSON.stringify({
-      command: req.body.command,
-      token
-    });
+    if (config.ssl) {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
 
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
-
-      if (config.ssl) {
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
         const options = {
-          url: 'https://' + node + ':' + agent_port + '/run',
+          url: 'https://' + node + ':' + agentPort + '/run',
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
+           'Content-Type': 'application/json',
+           'Content-Length': command.length
           },
           body: command
         };
@@ -2270,14 +2269,22 @@ app.post('/exec', (req, res) => {
           });
         }
         res.end('');
-      } else if (config.ssl && config.ssl_self_signed) {
+      }
+    } else if (config.ssl && config.ssl_self_signed) {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
+
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
         const options = {
-          url: 'https://' + node + ':' + agent_port + '/run',
-          rejectUnauthorized: 'false',
+          url: 'https://' + node + ':' + agentPort + '/run',
+          rejectUnauthorized: "false",
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
+           'Content-Type': 'application/json',
+           'Content-Length': command.length
           },
           body: command
         };
@@ -2303,13 +2310,21 @@ app.post('/exec', (req, res) => {
           });
         }
         res.end('');
-      } else {
+      }
+    } else {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
+
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
         const options = {
-          url: 'http://' + node + ':' + agent_port + '/run',
+          url: 'http://' + node + ':' + agentPort + '/run',
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
+           'Content-Type': 'application/json',
+           'Content-Length': command.length
           },
           body: command
         };

@@ -230,62 +230,88 @@ app.post('/', (req, res) => {
 });
 
 app.post('/exec', (req, res) => {
-  const check_token = req.body.token;
-  const node = req.body.node;
+  if (config.ssl) {
+    const check_token = req.body.token;
+    const node = req.body.node;
 
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const command = JSON.stringify({
-      command: req.body.command,
-      token,
-      node
-    });
-
-    if (config.ssl) {
-      const options = {
-        url: 'https://' + node + ':' + agent_port + '/exec',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
-    } else if (config.ssl && config.ssl_self_signed) {
-      const options = {
-        url: 'http://' + node + ':' + agent_port + '/exec',
-        rejectUnauthorized: 'false',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
+    if ((check_token !== token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials');
     } else {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token,
+        node
+      });
+
       const options = {
-        url: 'http://' + node + ':' + agent_port + '/exec',
+        url: 'https://' + server + ':' + server_port + '/exec',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          display_log(data => {
+            res.end(data);
+          });
+        }
+      });
+    }
+  } else if (config.ssl && config.ssl_self_signed) {
+    const check_token = req.body.token;
+    const node = req.body.node;
+
+    if ((check_token !== token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials');
+    } else {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token,
+        node
+      });
+
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/exec',
+        rejectUnauthorized: "false",
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          display_log(data => {
+            res.end(data);
+          });
+        }
+      });
+    }
+  } else {
+    const check_token = req.body.token;
+    const node = req.body.node;
+
+    if ((check_token !== token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials');
+    } else {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token,
+        node
+      });
+
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/exec',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
