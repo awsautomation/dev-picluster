@@ -31,7 +31,6 @@ const upload = multer({
   dest: '../'
 });
 const request_timeout = 5000;
-const agent_port = config.agent_port;
 const web_port = config.web_port;
 let token = config.token;
 let user = config.web_username;
@@ -278,7 +277,7 @@ app.post('/exec', (req, res) => {
 
       const options = {
         url: 'https://' + server + ':' + server_port + '/exec',
-        rejectUnauthorized: "false",
+        rejectUnauthorized: 'false',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -531,7 +530,7 @@ function display_log(callback) {
       setTimeout(() => {
         const options = {
           url: 'https://' + server + ':' + server_port + '/log?token=' + token,
-          rejectUnauthorized: "false"
+          rejectUnauthorized: 'false'
         };
         request(options, (error, response, body) => {
           if (!error && response.statusCode === 200) {
@@ -563,7 +562,7 @@ function display_log(callback) {
 function clear_log(callback) {
   if (config.ssl) {
     const options = {
-      url:'https://' + server + ':' + server_port + '/clearlog?token=' + token
+      url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token
     };
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -574,8 +573,8 @@ function clear_log(callback) {
     });
   } else if (config.ssl && config.ssl_self_signed) {
     const options = {
-      url:'https://' + server + ':' + server_port + '/clearlog?token=' + token,
-      rejectUnauthorized: "false"
+      url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token,
+      rejectUnauthorized: 'false'
     };
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -586,7 +585,7 @@ function clear_log(callback) {
     });
   } else {
     const options = {
-      url:'http://' + server + ':' + server_port + '/clearlog?token=' + token
+      url: 'http://' + server + ':' + server_port + '/clearlog?token=' + token
     };
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -1206,7 +1205,7 @@ app.get('/prune', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/prune?token=' + token
       };
-      request(options, (error, response, body) => {
+      request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
@@ -1220,7 +1219,7 @@ app.get('/prune', (req, res) => {
         url: 'https://' + server + ':' + server_port + '/prune?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response, body) => {
+      request(options, (error, response, body) => {  // eslint-disable-line no-unused-vars
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);
@@ -1233,7 +1232,7 @@ app.get('/prune', (req, res) => {
       const options = {
         url: 'http://' + server + ':' + server_port + '/prune?token=' + token
       };
-      request(options, (error, response, body) => {
+      request(options, (error, response, body) => {  // eslint-disable-line no-unused-vars
         if (!error && response.statusCode === 200) {
           display_log(data => {
             res.end(data);

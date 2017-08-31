@@ -2243,8 +2243,8 @@ app.post('/exec', (req, res) => {
           url: 'https://' + node + ':' + agent_port + '/run',
           method: 'POST',
           headers: {
-           'Content-Type': 'application/json',
-           'Content-Length': command.length
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
           },
           body: command
         };
@@ -2281,11 +2281,11 @@ app.post('/exec', (req, res) => {
         const node = config.layout[i].node;
         const options = {
           url: 'https://' + node + ':' + agent_port + '/run',
-          rejectUnauthorized: "false",
+          rejectUnauthorized: 'false',
           method: 'POST',
           headers: {
-           'Content-Type': 'application/json',
-           'Content-Length': command.length
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
           },
           body: command
         };
@@ -2324,8 +2324,8 @@ app.post('/exec', (req, res) => {
           url: 'http://' + node + ':' + agent_port + '/run',
           method: 'POST',
           headers: {
-           'Content-Type': 'application/json',
-           'Content-Length': command.length
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
           },
           body: command
         };
