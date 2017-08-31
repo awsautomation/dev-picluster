@@ -71,7 +71,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
     body: JSON.stringify(mapping)
   };
 
-   request(options, error => {
+  request(options, error => {
     console.log('\nCreating Elasticsearch Map......');
     if (error) {
       console.log(error);
@@ -901,9 +901,9 @@ app.get('/addhost', (req, res) => {
   } else {
     let proceed = 1;
     for (let i = 0; i < config.layout.length; i++) {
-        if (config.layout[i].node.indexOf(host) > -1) {
-          proceed = 0;
-        }
+      if (config.layout[i].node.indexOf(host) > -1) {
+        proceed = 0;
+      }
     }
 
     if (proceed) {
@@ -1057,21 +1057,21 @@ app.get('/rmhost', (req, res) => {
   } else {
     // Ensures that the host exists
     for (let i = 0; i < config.layout.length; i++) {
-        if (config.layout[i].node.indexOf(host) > -1) {
-          config.layout.splice(i, 1);
-          hb_proceed = 1;
-          break;
-        }
+      if (config.layout[i].node.indexOf(host) > -1) {
+        config.layout.splice(i, 1);
+        hb_proceed = 1;
+        break;
+      }
     }
   }
 
   if (hb_proceed) {
     if (config.hb) {
       for (let i = 0; i < config.hb.length; i++) {
-          if (config.hb[i].node.indexOf(host) > -1) {
-            config.hb.splice(i, 1);
-            break;
-          }
+        if (config.hb[i].node.indexOf(host) > -1) {
+          config.hb.splice(i, 1);
+          break;
+        }
       }
     }
   }
@@ -1278,10 +1278,8 @@ app.get('/addcontainer', (req, res) => {
     // Ensures that the host exists
     let proceed = 0;
     for (let i = 0; i < config.layout.length; i++) {
-      for (const key in config.layout[i]) {
-        if (config.layout[i].node.indexOf(host) > -1) {
-          proceed++;
-        }
+      if (config.layout[i].node.indexOf(host) > -1) {
+        proceed++;
       }
     }
 
@@ -1291,18 +1289,18 @@ app.get('/addcontainer', (req, res) => {
       // Add Data to New Host
 
       for (let i = 0; i < config.layout.length; i++) {
-          if (config.layout[i].node.indexOf(host) > -1) {
-            config.layout[i][container] = container_args;
-          }
+        if (config.layout[i].node.indexOf(host) > -1) {
+          config.layout[i][container] = container_args;
+        }
       }
 
       // Adds Heartbeat Data
       if (config.hb) {
         if (heartbeat_args) {
           for (let i = 0; i < config.hb.length; i++) {
-              if (config.hb[i].node.indexOf(host) > -1) {
-                config.hb[i][container] = heartbeat_args;
-              }
+            if (config.hb[i].node.indexOf(host) > -1) {
+              config.hb[i][container] = heartbeat_args;
+            }
           }
         }
       }
@@ -1477,10 +1475,8 @@ app.get('/changehost', (req, res) => {
       }
 
       for (let i = 0; i < config.layout.length; i++) {
-        for (const key in config.layout[i]) {
-          if (config.layout[i].node.indexOf(new_host) > -1) {
-            config.layout[i][container] = original_container_data;
-          }
+        if (config.layout[i].node.indexOf(new_host) > -1) {
+          config.layout[i][container] = original_container_data;
         }
       }
 
@@ -1488,10 +1484,8 @@ app.get('/changehost', (req, res) => {
       if (config.hb) {
         if (original_heartbeat_data) {
           for (let i = 0; i < config.hb.length; i++) {
-            for (const key in config.hb[i]) {
-              if (config.hb[i].node.indexOf(new_host) > -1) {
-                config.hb[i][container] = original_heartbeat_data;
-              }
+            if (config.hb[i].node.indexOf(new_host) > -1) {
+              config.hb[i][container] = original_heartbeat_data;
             }
           }
         }
