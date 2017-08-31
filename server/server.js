@@ -1291,22 +1291,18 @@ app.get('/addcontainer', (req, res) => {
       // Add Data to New Host
 
       for (let i = 0; i < config.layout.length; i++) {
-        for (const key in config.layout[i]) {
           if (config.layout[i].node.indexOf(host) > -1) {
             config.layout[i][container] = container_args;
           }
-        }
       }
 
       // Adds Heartbeat Data
       if (config.hb) {
         if (heartbeat_args) {
           for (let i = 0; i < config.hb.length; i++) {
-            for (const key in config.hb[i]) {
               if (config.hb[i].node.indexOf(host) > -1) {
                 config.hb[i][container] = heartbeat_args;
               }
-            }
           }
         }
       }
