@@ -2041,7 +2041,9 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
       if (data) {
         const newPath = '../' + req.file.originalname;
         fs.writeFile(newPath, data => {
-          copyToAgents(newPath);
+          if (data) {
+            copyToAgents(newPath);
+          }
         });
       }
     });
