@@ -38,23 +38,23 @@ const container_faillog = [];
 
 if (config.elasticsearch && config.elasticsearch_index) {
   const mapping = {
-    'settings': {
-      'index': {
-        'number_of_shards': 3,
-        'number_of_replicas': 2
+    settings: {
+      index: {
+        number_of_shards: 3,
+        number_of_replicas: 2
       }
     },
-    'mappings': {
-      'picluster': {
-        'properties': {
-          'date': {
-            'type': 'date',
-            'index': 'true',
-            'format': 'yyyy-MM-dd HH:mm:ss'
+    mappings: {
+      picluster: {
+        properties: {
+          date: {
+            type: 'date',
+            index: 'true',
+            format: 'yyyy-MM-dd HH:mm:ss'
           },
-          'data': {
-            "type": 'keyword',
-            'index': 'true'
+          data: {
+            type: 'keyword',
+            index: 'true'
           }
         }
       }
@@ -71,7 +71,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
     body: JSON.stringify(mapping)
   };
 
-  request(options, function(error, response) {
+  request(options, function(error) {
     console.log('\nCreating Elasticsearch Map......');
     if (error) {
       console.log(error);
@@ -994,8 +994,8 @@ function elasticsearch(data) {
   const dt = dateTime.create();
 
   const elasticsearch_data = JSON.stringify({
-    'data': data,
-    'date': dt.format('Y-m-d H:M:S')
+    data: data,
+    date: dt.format('Y-m-d H:M:S')
   });
 
   const options = {
@@ -1008,7 +1008,7 @@ function elasticsearch(data) {
     body: elasticsearch_data
   };
 
-  request(options, function (error, response, body) {
+  request(options, error => {
     if (error) {
       console.log(error);
     }
@@ -1017,17 +1017,14 @@ function elasticsearch(data) {
 
 app.get('/clear-elasticsearch', function(req, res) {
   const check_token = req.query.token;
-  const host = req.query.host;
-  const data = req.query.data;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     const message = {
-      'query': {
-        'match_all': {}
+      query: {
+        match_all: {}
       }
-
     };
 
     const options = {
@@ -1040,7 +1037,7 @@ app.get('/clear-elasticsearch', function(req, res) {
       body: JSON.stringify(message)
     };
 
-    request(options, function (error, response, body) {
+    request(options, function(error, response, body) {
       if (error) {
         res.end(error);
         console.log(error);
