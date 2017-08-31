@@ -41,83 +41,46 @@ let dockerFolder = config.docker;
 const container_faillog = [];
 
 if (config.elasticsearch && config.elasticsearch_index) {
-  const mapping = {
-    settings: {
-      index: {
-        number_of_shards: 3,
-        number_of_replicas: 2
+  var mapping = {
+    "settings": {
+      "index": {
+        "number_of_shards": 3,
+        "number_of_replicas": 2
       }
     },
-    mappings: {
-      picluster: {
-        properties: {
-          date: {
-            type: 'date',
-            index: 'true',
-            format: 'yyyy-MM-dd HH:mm:ss'
+    "mappings": {
+      "picluster": {
+        "properties": {
+          "date": {
+            "type": "date",
+            "index": "true",
+            "format": "yyyy-MM-dd HH:mm:ss"
           },
-          data: {
-            type: 'keyword',
-            index: 'true'
+          "data": {
+            "type": "keyword",
+            "index": "true"
           }
         }
       }
     }
-  };
-
-  if (config.ssl) {
-    const options = {
-      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': mapping.length
-      },
-      body: JSON.stringify(mapping)
-    };
-
-    request(options, error => {
-      console.log('\nCreating Elasticsearch Map......');
-      if (error) {
-        console.log(error);
-      }
-    });
-  } else if (config.ssl && config.ssl_self_signed) {
-    const options = {
-      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': mapping.length
-      },
-      rejectUnauthorized: false,
-      body: JSON.stringify(mapping)
-    };
-
-    request(options, error => {
-      console.log('\nCreating Elasticsearch Map......');
-      if (error) {
-        console.log(error);
-      }
-    });
-  } else {
-    const options = {
-      url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index,
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': mapping.length
-      },
-      body: JSON.stringify(mapping)
-    };
-
-    request(options, error => {
-      console.log('\nCreating Elasticsearch Map......');
-      if (error) {
-        console.log(error);
-      }
-    });
   }
+
+  var options = {
+    url: config.elasticsearch + '/' + config.elasticsearch_index,
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': mapping.length
+    },
+    body: JSON.stringify(mapping)
+  }
+
+  request(options, function(error, response, body) {
+    console.log('\nCreating Elasticsearch Map......')
+    if (error) {
+      console.log(error);
+    }
+  });
 }
 
 if (config.automatic_heartbeat) {
