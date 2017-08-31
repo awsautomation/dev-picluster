@@ -992,7 +992,7 @@ function elasticsearch(data) {
   const dt = dateTime.create();
 
   const elasticsearch_data = JSON.stringify({
-    data: data,
+    data,
     date: dt.format('Y-m-d H:M:S')
   });
 
