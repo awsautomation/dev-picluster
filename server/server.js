@@ -1034,141 +1034,65 @@ app.get('/addhost', (req, res) => {
 });
 
 function elasticsearch(data) {
-  const dt = dateTime.create();
+  var dt = dateTime.create();
 
-  const elasticsearch_data = JSON.stringify({
-    data,
-    date: dt.format('Y-m-d H:M:S')
+  var elasticsearch_data = JSON.stringify({
+    "data": data,
+    "date": dt.format('Y-m-d H:M:S')
   });
 
-  if (config.ssl) {
-    const options = {
-      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': elasticsearch_data.length
-      },
-      body: elasticsearch_data
-    };
-
-    request(options, error => {
-      if (error) {
-        console.log(error);
-      }
-    });
-  } else if (config.ssl && config.ssl_self_signed) {
-    const options = {
-      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
-      method: 'POST',
-      rejectUnauthorized: 'false',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': elasticsearch_data.length
-      },
-      body: elasticsearch_data
-    };
-
-    request(options, error => {
-      if (error) {
-        console.log(error);
-      }
-    });
-  } else {
-    const options = {
-      url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': elasticsearch_data.length
-      },
-      body: elasticsearch_data
-    };
-
-    request(options, error => {
-      if (error) {
-        console.log(error);
-      }
-    });
+  var options = {
+    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': elasticsearch_data.length
+    },
+    body: elasticsearch_data
   }
-}
 
-app.get('/clear-elasticsearch', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const message = {
-      query: {
-        match_all: {}
-      }
-
-    };
-
-    if (config.ssl) {
-      const options = {
-        url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': message.length
-        },
-        body: JSON.stringify(message)
-      };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-          console.log(error);
-        } else {
-          res.end('\nCleared Elasticsearch data');
-          console.log('\nCleared Elasticsearch data:' + body);
-        }
-      });
-    } else if (config.ssl && config.ssl_self_signed) {
-      const options = {
-        url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
-        rejectUnauthorized: 'false',
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': message.length
-        },
-        body: JSON.stringify(message)
-      };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-          console.log(error);
-        } else {
-          res.end('\nCleared Elasticsearch data');
-          console.log('\nCleared Elasticsearch data:' + body);
-        }
-      });
-    } else {
-      const options = {
-        url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index,
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': message.length
-        },
-        body: JSON.stringify(message)
-      };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-          console.log(error);
-        } else {
-          res.end('\nCleared Elasticsearch data');
-          console.log('\nCleared Elasticsearch data:' + body);
-        }
-      });
+  request(options, function(error, response, body) {
+    if (error) {
+      console.log(error);
     }
-  }
+  });
+};
+
+app.get('/clear-elasticsearch', function(req, res) {
+  var check_token = req.query['token'];
+  var host = req.query['host'];
+  var data = req.query['data'];
+
+  if ((check_token != token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials')
+  } else {
+    var message = {
+      "query": {
+        "match_all": {}
+      }
+
+    }
+
+    var options = {
+      url: config.elasticsearch + '/' + config.elasticsearch_index,
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': message.length
+      },
+      body: JSON.stringify(message)
+    }
+
+    request(options, function(error, response, body) {
+      if (error) {
+        res.end(error);
+        console.log(error);
+      } else {
+        res.end('\nCleared Elasticsearch data');
+        console.log('\nCleared Elasticsearch data:' + body);
+      }
+    });
+  };
 });
 
 app.get('/rmhost', (req, res) => {
