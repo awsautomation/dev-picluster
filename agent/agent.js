@@ -405,7 +405,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
   } else {
     fs.readFile(req.file.path, (err, data) => {
       const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => { //eslint-disable-line no-unused-vars
+      fs.writeFile(newPath, data, err => { // eslint-disable-line no-unused-vars
         unzipFile(newPath);
       });
     });
