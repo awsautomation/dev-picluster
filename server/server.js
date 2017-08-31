@@ -2038,10 +2038,12 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     fs.readFile(req.file.path, (err, data) => {
-      const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data => {
-        copyToAgents(newPath);
-      });
+      if (data) {
+        const newPath = '../' + req.file.originalname;
+        fs.writeFile(newPath, data => {
+          copyToAgents(newPath);
+        });
+      }
     });
     res.end('');
   }
