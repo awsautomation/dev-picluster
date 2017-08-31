@@ -1013,9 +1013,9 @@ function elasticsearch(data) {
       console.log(error);
     }
   });
-};
+}
 
-app.get('/clear-elasticsearch', function(req, res) {
+app.get('/clear-elasticsearch', (req, res) => {
   const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {
@@ -1037,7 +1037,7 @@ app.get('/clear-elasticsearch', function(req, res) {
       body: JSON.stringify(message)
     };
 
-    request(options, function(error, response, body) {
+    request(options, (error, response, body) => {
       if (error) {
         res.end(error);
         console.log(error);
