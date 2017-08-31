@@ -1,4 +1,3 @@
-/* eslint "no-warning-comments": [1, { "terms": ["todo","fixme"] }] */
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -8,9 +7,6 @@ const multer = require('multer');
 const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
-/* eslint-disable capitalized-comments */
-// require('request-debug')(request);
-/* eslint-enable capitalized-comments */
 
 let config;
 let config_file;
@@ -905,13 +901,11 @@ app.get('/addhost', (req, res) => {
   } else {
     let proceed = 1;
     for (let i = 0; i < config.layout.length; i++) {
-      /* eslint-disable no-unused-vars */
-      for (const key in config.layout[i]) { // FixMe: Why is 'key' unused?
+      for (const key in config.layout[i]) {
         if (config.layout[i].node.indexOf(host) > -1) {
           proceed = 0;
         }
       }
-      /* eslint-enable no-unused-vars */
     }
 
     if (proceed) {
@@ -1029,14 +1023,14 @@ app.get('/clear-elasticsearch', function(req, res) {
   if ((check_token != token) || (!check_token)) {
     res.end('\nError: Invalid Credentials')
   } else {
-    var message = {
+    const message = {
       "query": {
         "match_all": {}
       }
 
     }
 
-    var options = {
+    const options = {
       url: config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'DELETE',
       headers: {
@@ -1061,36 +1055,33 @@ app.get('/clear-elasticsearch', function(req, res) {
 app.get('/rmhost', (req, res) => {
   const check_token = req.query.token;
   const host = req.query.host;
-  let hb_proceed = 0; // FixMe: Should this be a boolean (true or false)?
+  let hb_proceed = 0;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     // Ensures that the host exists
     for (let i = 0; i < config.layout.length; i++) {
-      /* eslint-disable no-unused-vars */
-      for (const key in config.layout[i]) { // FixMe: Why is 'key' unused?
+
+      for (const key in config.layout[i]) {
         if (config.layout[i].node.indexOf(host) > -1) {
           config.layout.splice(i, 1);
           hb_proceed = 1;
           break;
         }
       }
-      /* eslint-enable no-unused-vars */
     }
   }
 
   if (hb_proceed) {
     if (config.hb) {
       for (let i = 0; i < config.hb.length; i++) {
-        /* eslint-disable no-unused-vars */
-        for (const key in config.hb[i]) { // FixMe: Why is 'key' unused?
+        for (const key in config.hb[i]) {
           if (config.hb[i].node.indexOf(host) > -1) {
             config.hb.splice(i, 1);
             break;
           }
         }
-        /* eslint-enable no-unused-vars */
       }
     }
   }
@@ -1297,13 +1288,11 @@ app.get('/addcontainer', (req, res) => {
     // Ensures that the host exists
     let proceed = 0;
     for (let i = 0; i < config.layout.length; i++) {
-      /* eslint-disable no-unused-vars */
-      for (const key in config.layout[i]) { // FixMe: Why isn't 'key' used?
+      for (const key in config.layout[i]) {
         if (config.layout[i].node.indexOf(host) > -1) {
           proceed++;
         }
       }
-      /* eslint-enable no-unused-vars */
     }
 
     if (proceed < 1) {
@@ -1312,26 +1301,22 @@ app.get('/addcontainer', (req, res) => {
       // Add Data to New Host
 
       for (let i = 0; i < config.layout.length; i++) {
-        /* eslint-disable no-unused-vars */
-        for (const key in config.layout[i]) { // FixMe: Why isn't 'key' used?
+        for (const key in config.layout[i]) {
           if (config.layout[i].node.indexOf(host) > -1) {
             config.layout[i][container] = container_args;
           }
         }
-        /* eslint-enable no-unused-vars */
       }
 
       // Adds Heartbeat Data
       if (config.hb) {
         if (heartbeat_args) {
           for (let i = 0; i < config.hb.length; i++) {
-            /* eslint-disable no-unused-vars */
-            for (const key in config.hb[i]) { // FixMe: Why isn't 'key' used?
+            for (const key in config.hb[i]) {
               if (config.hb[i].node.indexOf(host) > -1) {
                 config.hb[i][container] = heartbeat_args;
               }
             }
-            /* eslint-enable no-unused-vars */
           }
         }
       }
@@ -1506,26 +1491,22 @@ app.get('/changehost', (req, res) => {
       }
 
       for (let i = 0; i < config.layout.length; i++) {
-        /* eslint-disable no-unused-vars */
-        for (const key in config.layout[i]) { // FixMe: Why isn't 'key' used?
+        for (const key in config.layout[i]) {
           if (config.layout[i].node.indexOf(new_host) > -1) {
             config.layout[i][container] = original_container_data;
           }
         }
-        /* eslint-enable no-unused-vars */
       }
 
       // Adds Heartbeat Data
       if (config.hb) {
         if (original_heartbeat_data) {
           for (let i = 0; i < config.hb.length; i++) {
-            /* eslint-disable no-unused-vars */
-            for (const key in config.hb[i]) { // FixMe: Why isn't 'key' used?
+            for (const key in config.hb[i]) {
               if (config.hb[i].node.indexOf(new_host) > -1) {
                 config.hb[i][container] = original_heartbeat_data;
               }
             }
-            /* eslint-enable no-unused-vars */
           }
         }
       }
@@ -2076,18 +2057,12 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    /* eslint-disable handle-callback-err */
-    fs.readFile(req.file.path, (err, data) => { // FixMe: We should handle an error here...
+    fs.readFile(req.file.path, (err, data) => {
       const newPath = '../' + req.file.originalname;
-      /* eslint-disable no-unused-vars */
-      /* eslint-disable handle-callback-err */
-      fs.writeFile(newPath, data, err => { // FixMe: We should handle an error here...
+      fs.writeFile(newPath, data, err => {
         copyToAgents(newPath);
       });
-      /* eslint-enable no-unused-vars */
-      /* eslint-enable handle-callback-err */
     });
-    /* eslint-enable handle-callback-err */
     res.end('');
   }
 });
@@ -2485,11 +2460,10 @@ app.get('/hb', (req, res) => {
   }
 });
 
-/* eslint-disable no-unused-vars */
-function gatherLog(callback) { // FixMe: Why isn't this used anywhere?
+function gatherLog(callback) {
   callback(log);
 }
-/* eslint-enable no-unused-vars */
+
 
 app.get('/log', (req, res) => {
   const check_token = req.query.token;
