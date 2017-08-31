@@ -109,7 +109,7 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 * Project created by Phillip Tribble. [LinkedIn](https://www.linkedin.com/in/philliptribble) , [Twitter](https://twitter.com/rusher81572)
 
-* [TokinRing](https://github.com/TokinRin), core developer.
+* [TokinRing](https://github.com/TokinRing), core developer.
 
 * [AidanHarris](https://github.com/aidanharris), core developer.
 
