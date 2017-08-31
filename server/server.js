@@ -2040,10 +2040,8 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
     fs.readFile(req.file.path, (err, data) => {
       if (data) {
         const newPath = '../' + req.file.originalname;
-        fs.writeFile(newPath, data => {
-          if (data) {
+        fs.writeFile(newPath => {
             copyToAgents(newPath);
-          }
         });
       }
     });
