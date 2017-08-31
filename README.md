@@ -38,6 +38,20 @@
 
 - Docker
 - Node.js
+- OpenSSL
+- pq
+- git
+- curl
+
+### Ubuntu
+```
+apt-get install openssl git node docker pq curl
+```
+
+### Arch Linux
+```
+pacman -S openssl git node docker pq curl
+```
 
 If you are using Docker 1.12.x and earlier, please use [PiCluster v1.0](https://github.com/picluster/picluster/tree/1.0)
 
@@ -78,6 +92,22 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 ## Configuring and using the command-line client "pictl"
 
 [See Wiki](https://github.com/picluster/picluster/wiki/Pictl)
+
+## SSL/TLS
+
+Generate self-signed SSL key/cert in the ssl/ folder:
+```
+cd /opt/picluster
+openssl req -sha512 -newkey rsa:4096 -keyout ssl/picluster.key -x509 -days 365 -nodes -out ssl/picluster.crt
+```
+
+Edit the config.json file and enable SSL and specify the cert and key path, also in since this instance uses a self-signed SSL key/cert the ssl_self_signed has been set to true:
+```
+"ssl": true,
+"ssl_self_signed": true,
+"ssl_cert": "/opt/picluster/ssl/picluster.crt",
+"ssl_key": "/opt/picluster/ssl/picluster.key",
+```
 
 ## Using pm2 to init PiCluster on systemd
 

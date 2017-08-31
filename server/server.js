@@ -1,14 +1,16 @@
 /* eslint "no-warning-comments": [1, { "terms": ["todo","fixme"] }] */
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const net = require('net');
 const bodyParser = require('body-parser');
-
+const multer = require('multer');
 const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
-
-const app = express();
+/* eslint-disable capitalized-comments */
+// require('request-debug')(request);
+/* eslint-enable capitalized-comments */
 
 let config;
 let config_file;
@@ -19,22 +21,24 @@ if (process.env.PICLUSTER_CONFIG) {
   config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
   config_file = '../config.json';
 }
-const port = config.server_port;
-const agentPort = config.agent_port;
+
+if (config.ssl_self_signed) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
+const app = express();
 
 app.use(bodyParser());
-// Require('request-debug')(request);
-const server = http.createServer(app);
-
-let log = '';
-let token = config.token;
-let dockerFolder = config.docker;
-const container_faillog = [];
-const multer = require('multer');
 
 const upload = multer({
   dest: '../'
 });
+const server_port = config.server_port;
+const agent_port = config.agent_port;
+let log = '';
+let token = config.token;
+let dockerFolder = config.docker;
+const container_faillog = [];
 
 if (config.elasticsearch && config.elasticsearch_index) {
   const mapping = {
@@ -61,23 +65,61 @@ if (config.elasticsearch && config.elasticsearch_index) {
     }
   };
 
-  const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index,
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': mapping.length
-    },
-    body: JSON.stringify(mapping)
-  };
+  if (config.ssl) {
+    const options = {
+      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': mapping.length
+      },
+      body: JSON.stringify(mapping)
+    };
 
-  request(options, error => {
-    console.log('\nCreating Elasticsearch Map......');
-    if (error) {
-      console.log(error);
-    }
-  });
+    request(options, error => {
+      console.log('\nCreating Elasticsearch Map......');
+      if (error) {
+        console.log(error);
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': mapping.length
+      },
+      rejectUnauthorized: false,
+      body: JSON.stringify(mapping)
+    };
+
+    request(options, error => {
+      console.log('\nCreating Elasticsearch Map......');
+      if (error) {
+        console.log(error);
+      }
+    });
+  } else {
+    const options = {
+      url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index,
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': mapping.length
+      },
+      body: JSON.stringify(mapping)
+    };
+
+    request(options, error => {
+      console.log('\nCreating Elasticsearch Map......');
+      if (error) {
+        console.log(error);
+      }
+    });
+  }
 }
+
 if (config.automatic_heartbeat) {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     if (config.heartbeat_interval) {
@@ -96,16 +138,38 @@ if (config.automatic_heartbeat) {
 function automatic_heartbeat() {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     setTimeout(() => {
-
-      const options = {
-        host: '127.0.0.1',
-        path: '/hb?token=' + token,
-        port
-      };
-      http.get(options).on('error', e => {
-        console.error(e);
-      });
-      automatic_heartbeat();
+      if (config.ssl) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/hb?token=' + token,
+          port: server_port
+        };
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+        automatic_heartbeat();
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/hb?token=' + token,
+          port: server_port,
+          rejectUnauthorized: 'false'
+        };
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+        automatic_heartbeat();
+      } else {
+        const options = {
+          host: '127.0.0.1',
+          path: '/hb?token=' + token,
+          port: server_port
+        };
+        http.get(options).on('error', e => {
+          console.error(e);
+        });
+        automatic_heartbeat();
+      }
     }, config.heartbeat_interval);
   } else {
     console.log('\nAutomatic Heartbeat Disabled.');
@@ -132,15 +196,15 @@ app.get('/nodes', (req, res) => {
   }
 
   function getData() {
-    var total_node_count = 0;
-    var total_containers = 0;
-    var node_list = new Array();
-    var container_list = new Array();
+    let total_node_count = 0;
+    let total_containers = 0;
+    const node_list = [];
+    const container_list = [];
 
     for (let i = 0; i < config.layout.length; i++) {
       for (const key in config.layout[i]) {
         if (config.layout[i].hasOwnProperty(key)) {
-          node = config.layout[i].node;
+          const node = config.layout[i].node;
           const node_info = config.layout[i][key];
           if (node_info === node) {
             total_node_count++;
@@ -169,21 +233,56 @@ app.get('/nodes', (req, res) => {
         console.error('Invalid Config for node', get_node);
         return;
       }
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/node-status?token=' + token,
-        method: 'GET'
-      };
+      if (config.ssl) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/node-status?token=' + token,
+          method: 'GET'
+        };
 
-      request(options, (error, response) => {
-        if (error) {
-          console.error(error);
-        } else {
-          const check = JSON.parse(response.body);
-          if (check.cpu_percent > 0) {
-            addData(check);
+        request(options, (error, response) => {
+          if (error) {
+            console.error(error);
+          } else {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
           }
-        }
-      });
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/node-status?token=' + token,
+          method: 'GET',
+          rejectUnauthorized: 'false'
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            console.error(error);
+          } else {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
+          }
+        });
+      } else {
+        const options = {
+          url: 'http://' + node + ':' + agent_port + '/node-status?token=' + token,
+          method: 'GET'
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            console.error(error);
+          } else {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
+          }
+        });
+      }
     });
     setTimeout(() => {
       res.json(getData());
@@ -229,25 +328,67 @@ app.get('/build', (req, res) => {
           });
         }
 
-        const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            rejectUnauthorized: 'false',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -280,25 +421,70 @@ app.get('/delete-image', (req, res) => {
           token
         });
 
-        const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
 
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            rejectUnauthorized: 'false',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -324,42 +510,121 @@ app.get('/create', (req, res) => {
     let responseString = '';
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        const command = JSON.stringify({
-          command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-          token
-        });
-
-        const options = {
-          hostname: node,
-          port: agentPort,
-          path: '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
+        if (config.ssl) {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
           }
-        };
-
-        if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          const request = http.request(options, response => {
-            response.on('data', data => {
-              responseString += data;
-            });
-            response.on('end', () => {
-              if (responseString.body) {
-                const body = responseString.body;
-                const results = JSON.parse(body.toString('utf8'));
-                addLog(results.output);
-              }
-            });
-          }).on('error', e => {
-            console.error(e);
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
           });
-          request.write(command);
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            hostname: node,
+            port: agent_port,
+            path: '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            }
+          };
+
+          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+            const request = https.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
+            });
+            request.write(command);
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            hostname: node,
+            port: agent_port,
+            rejectUnauthorized: 'false',
+            path: '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            }
+          };
+
+          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+            const request = https.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
+            });
+            request.write(command);
+          }
+        } else {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            hostname: node,
+            port: agent_port,
+            path: '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            }
+          };
+
+          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+            const request = http.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
+            });
+            request.write(command);
+          }
         }
       });
     });
@@ -390,24 +655,67 @@ app.get('/start', (req, res) => {
           command: 'docker container start ' + key,
           token
         });
-        const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nStarting: ' + key + '\n' + results.output);
-            }
-          });
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -427,69 +735,202 @@ function migrate(container, original_host, new_host, original_container_data) {
     command: 'docker rm -f ' + container,
     token
   });
-  const options = {
-    url: 'http://' + original_host + ':' + agentPort + '/run',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': command.length
-    },
-    body: command
-  };
+  if (config.ssl) {
+    const options = {
+      url: 'https://' + original_host + ':' + agent_port + '/run',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
 
-  request(options, error => {
-    if (error) {
-      addLog('An error has occurred.');
-    } else {
-      const command = JSON.stringify({
-        command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-        token
-      });
+    request(options, error => {
+      if (error) {
+        addLog('An error has occurred.');
+      } else {
+        const command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
 
-      const options = {
-        url: 'http://' + new_host + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
+        const options = {
+          url: 'https://' + new_host + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      request(options, error => {
-        if (error) {
-          addLog('An error has occurred.');
-        } else {
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-            token
-          });
+        request(options, error => {
+          if (error) {
+            addLog('An error has occurred.');
+          } else {
+            const command = JSON.stringify({
+              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+              token
+            });
 
-          const options = {
-            url: 'http://' + new_host + ':' + agentPort + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-          request(options, error => {
-            if (error) {
-              addLog('An error has occurred.');
-            } else {
-              addLog('\nStarting ' + container);
-              if (config.automatic_heartbeat) {
-                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
+            const options = {
+              url: 'https://' + new_host + ':' + agent_port + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            };
+            request(options, error => {
+              if (error) {
+                addLog('An error has occurred.');
+              } else {
+                addLog('\nStarting ' + container);
+                if (config.automatic_heartbeat) {
+                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                  }
                 }
               }
-            }
-          });
-        }
-      });
-    }
-  });
+            });
+          }
+        });
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url: 'https://' + original_host + ':' + agent_port + '/run',
+      method: 'POST',
+      rejectUnauthorized: 'false',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, error => {
+      if (error) {
+        addLog('An error has occurred.');
+      } else {
+        const command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
+
+        const options = {
+          url: 'https://' + new_host + ':' + agent_port + '/run',
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, error => {
+          if (error) {
+            addLog('An error has occurred.');
+          } else {
+            const command = JSON.stringify({
+              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+              token
+            });
+
+            const options = {
+              url: 'https://' + new_host + ':' + agent_port + '/run',
+              rejectUnauthorized: 'false',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            };
+            request(options, error => {
+              if (error) {
+                addLog('An error has occurred.');
+              } else {
+                addLog('\nStarting ' + container);
+                if (config.automatic_heartbeat) {
+                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                  }
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  } else {
+    const options = {
+      url: 'http://' + original_host + ':' + agent_port + '/run',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, error => {
+      if (error) {
+        addLog('An error has occurred.');
+      } else {
+        const command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
+
+        const options = {
+          url: 'http://' + new_host + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, error => {
+          if (error) {
+            addLog('An error has occurred.');
+          } else {
+            const command = JSON.stringify({
+              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+              token
+            });
+
+            const options = {
+              url: 'http://' + new_host + ':' + agent_port + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            };
+            request(options, error => {
+              if (error) {
+                addLog('An error has occurred.');
+              } else {
+                addLog('\nStarting ' + container);
+                if (config.automatic_heartbeat) {
+                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                  }
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  }
 }
 
 app.get('/addhost', (req, res) => {
@@ -527,24 +968,65 @@ app.get('/addhost', (req, res) => {
         token
       });
 
-      // Save Configuration
-      const options = {
-        url: `http://127.0.0.1:${port}/updateconfig`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config
-      };
+      if (config.ssl) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
 
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end('\nAdded host ' + host + ' to the configuration.');
-        }
-      });
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+          }
+        });
+      } else {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+          }
+        });
+      }
     } else {
       res.end('\nError: Host already exists');
     }
@@ -559,21 +1041,56 @@ function elasticsearch(data) {
     date: dt.format('Y-m-d H:M:S')
   });
 
-  const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': elasticsearch_data.length
-    },
-    body: elasticsearch_data
-  };
+  if (config.ssl) {
+    const options = {
+      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': elasticsearch_data.length
+      },
+      body: elasticsearch_data
+    };
 
-  request(options, error => {
-    if (error) {
-      console.log(error);
-    }
-  });
+    request(options, error => {
+      if (error) {
+        console.log(error);
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+      method: 'POST',
+      rejectUnauthorized: 'false',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': elasticsearch_data.length
+      },
+      body: elasticsearch_data
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log(error);
+      }
+    });
+  } else {
+    const options = {
+      url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': elasticsearch_data.length
+      },
+      body: elasticsearch_data
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log(error);
+      }
+    });
+  }
 }
 
 app.get('/clear-elasticsearch', (req, res) => {
@@ -589,25 +1106,68 @@ app.get('/clear-elasticsearch', (req, res) => {
 
     };
 
-    const options = {
-      url: config.elasticsearch + '/' + config.elasticsearch_index,
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': message.length
-      },
-      body: JSON.stringify(message)
-    };
+    if (config.ssl) {
+      const options = {
+        url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': message.length
+        },
+        body: JSON.stringify(message)
+      };
 
-    request(options, (error, response, body) => {
-      if (error) {
-        res.end(error);
-        console.log(error);
-      } else {
-        res.end('\nCleared Elasticsearch data');
-        console.log('\nCleared Elasticsearch data:' + body);
-      }
-    });
+      request(options, (error, response, body) => {
+        if (error) {
+          res.end(error);
+          console.log(error);
+        } else {
+          res.end('\nCleared Elasticsearch data');
+          console.log('\nCleared Elasticsearch data:' + body);
+        }
+      });
+    } else if (config.ssl && config.ssl_self_signed) {
+      const options = {
+        url: 'https://' + config.elasticsearch + '/' + config.elasticsearch_index,
+        rejectUnauthorized: 'false',
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': message.length
+        },
+        body: JSON.stringify(message)
+      };
+
+      request(options, (error, response, body) => {
+        if (error) {
+          res.end(error);
+          console.log(error);
+        } else {
+          res.end('\nCleared Elasticsearch data');
+          console.log('\nCleared Elasticsearch data:' + body);
+        }
+      });
+    } else {
+      const options = {
+        url: 'http://' + config.elasticsearch + '/' + config.elasticsearch_index,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': message.length
+        },
+        body: JSON.stringify(message)
+      };
+
+      request(options, (error, response, body) => {
+        if (error) {
+          res.end(error);
+          console.log(error);
+        } else {
+          res.end('\nCleared Elasticsearch data');
+          console.log('\nCleared Elasticsearch data:' + body);
+        }
+      });
+    }
   }
 });
 
@@ -652,24 +1212,65 @@ app.get('/rmhost', (req, res) => {
     token
   });
 
-  // Save Configuration
-  const options = {
-    url: `http://127.0.0.1:${port}/updateconfig`,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': new_config.length
-    },
-    body: new_config
-  };
+  if (config.ssl) {
+    // Save Configuration
+    const options = {
+      url: `https://127.0.0.1:${server_port}/updateconfig`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
 
-  request(options, error => {
-    if (error) {
-      res.end(error);
-    } else {
-      res.end('\nAdded host ' + host + ' to the configuration.');
-    }
-  });
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nAdded host ' + host + ' to the configuration.');
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    // Save Configuration
+    const options = {
+      url: `https://127.0.0.1:${server_port}/updateconfig`,
+      rejectUnauthorized: 'false',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nAdded host ' + host + ' to the configuration.');
+      }
+    });
+  } else {
+    // Save Configuration
+    const options = {
+      url: `http://127.0.0.1:${server_port}/updateconfig`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nAdded host ' + host + ' to the configuration.');
+      }
+    });
+  }
 });
 
 app.get('/removecontainerconfig', (req, res) => {
@@ -733,24 +1334,65 @@ app.get('/removecontainerconfig', (req, res) => {
       token
     });
 
-    // Save Configuration
-    const options = {
-      url: `http://127.0.0.1:${port}/updateconfig`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': new_config.length
-      },
-      body: new_config
-    };
+    if (config.ssl) {
+      // Save Configuration
+      const options = {
+        url: `https://127.0.0.1:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
 
-    request(options, error => {
-      if (error) {
-        res.end(error);
-      } else {
-        res.end('\nRemoved Container ' + container + ' from the configuration.');
-      }
-    });
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nRemoved Container ' + container + ' from the configuration.');
+        }
+      });
+    } else if (config.ssl && config.ssl_self_signed) {
+      // Save Configuration
+      const options = {
+        url: `https://127.0.0.1:${server_port}/updateconfig`,
+        method: 'POST',
+        rejectUnauthorized: 'false',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nRemoved Container ' + container + ' from the configuration.');
+        }
+      });
+    } else {
+      // Save Configuration
+      const options = {
+        url: `http://127.0.0.1:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nRemoved Container ' + container + ' from the configuration.');
+        }
+      });
+    }
   }
 });
 
@@ -819,31 +1461,97 @@ app.get('/addcontainer', (req, res) => {
         token
       });
 
-      // Save Configuration
-      const options = {
-        url: `http://127.0.0.1:${port}/updateconfig`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config
-      };
+      if (config.ssl) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
 
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          // Res.end('\nAdded ' + container + ' to the configuration.');
-          request(`http://127.0.0.1:${port}/changehost?token=${token}&container=${container}&newhost=${host}`, (error, response) => {
-            if (!error && response.statusCode === 200) {
-              res.end('\nAdded ' + container + ' to the configuration.');
-            } else {
-              res.end('\nError connecting with server.');
-            }
-          });
-        }
-      });
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            const container_options = {
+              url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+              rejectUnauthorized: 'false'
+            };
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(container_options, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            const container_options = {
+              url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+              rejectUnauthorized: 'false'
+            };
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(container_options, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
+        });
+      } else {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            const container_options = {
+              url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+              rejectUnauthorized: 'false'
+            };
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(container_options, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
+        });
+      }
     }
   }
 });
@@ -940,25 +1648,68 @@ app.get('/changehost', (req, res) => {
         token
       });
 
-      // Save Configuration
-      const options = {
-        url: `http://127.0.0.1:${port}/updateconfig`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config
-      };
+      if (config.ssl) {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
 
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          migrate(container, original_host, new_host, original_container_data);
-          res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
-        }
-      });
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            migrate(container, original_host, new_host, original_container_data);
+            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          rejectUnauthorized: 'false',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            migrate(container, original_host, new_host, original_container_data);
+            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+          }
+        });
+      } else {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            migrate(container, original_host, new_host, original_container_data);
+            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+          }
+        });
+      }
     }
   }
 });
@@ -986,24 +1737,68 @@ app.get('/stop', (req, res) => {
           command: 'docker container stop ' + key,
           token
         });
-        const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
-            }
-          });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1036,25 +1831,71 @@ app.get('/delete', (req, res) => {
           command: 'docker container rm -f ' + key,
           token
         });
-        const options = {
-          url: `http://${node}:${agentPort}/run`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
 
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
-            }
-          });
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1085,24 +1926,68 @@ app.get('/restart', (req, res) => {
           command: 'docker container restart ' + key,
           token
         });
-        const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nRestarting: ' + key + '\n' + results.output);
-            }
-          });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nRestarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nRestarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nRestarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1134,24 +2019,68 @@ app.get('/containerlog', (req, res) => {
           command: 'docker container logs ' + key,
           token
         });
-        const options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nLogs for Container: ' + key + '\n' + results.output);
-            }
-          });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nLogs for Container: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nLogs for Container: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nLogs for Container: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1219,15 +2148,38 @@ function copyToAgents(file) {
         file: fs.createReadStream(file)
       };
 
-      request.post({
-        url: 'http://' + node + ':' + agentPort + '/receive-file',
-        formData
-      }, err => {
-        if (!err) {
-          addLog('\nCopied ' + file + ' to ' + node);
-          console.log('\nCopied ' + file + ' to ' + node);
-        }
-      });
+      if (config.ssl) {
+        request.post({
+          url: 'https://' + node + ':' + agent_port + '/receive-file',
+          formData
+        }, err => {
+          if (!err) {
+            addLog('\nCopied ' + file + ' to ' + node);
+            console.log('\nCopied ' + file + ' to ' + node);
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        request.post({
+          url: 'https://' + node + ':' + agent_port + '/receive-file',
+          rejectUnauthorized: 'false',
+          formData
+        }, err => {
+          if (!err) {
+            addLog('\nCopied ' + file + ' to ' + node);
+            console.log('\nCopied ' + file + ' to ' + node);
+          }
+        });
+      } else {
+        request.post({
+          url: 'http://' + node + ':' + agent_port + '/receive-file',
+          formData
+        }, err => {
+          if (!err) {
+            addLog('\nCopied ' + file + ' to ' + node);
+            console.log('\nCopied ' + file + ' to ' + node);
+          }
+        });
+      }
     });
   });
 }
@@ -1264,6 +2216,7 @@ app.post('/listcommands', (req, res) => {
   }
 });
 
+/* eslint-disable no-lonely-if */
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   let selected_node = '';
@@ -1278,48 +2231,131 @@ app.post('/exec', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const command = JSON.stringify({
-      command: req.body.command,
-      token
-    });
+    if (config.ssl) {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
 
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-
-      if (selected_node.length === 0) {
-        request(options, (error, response) => {
-          if (error) {
-            res.end('An error has occurred.');
-          } else {
-            const results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
+        if (selected_node.length === 0) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        if (selected_node.indexOf(node) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        res.end('');
       }
-      if (selected_node.indexOf(node) > -1) {
-        request(options, (error, response) => {
-          if (error) {
-            res.end('An error has occurred.');
-          } else {
-            const results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
+    } else if (config.ssl && config.ssl_self_signed) {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
+
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (selected_node.length === 0) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        if (selected_node.indexOf(node) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        res.end('');
       }
-      res.end('');
+    } else {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
+
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
+        const options = {
+          url: 'http://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (selected_node.length === 0) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        if (selected_node.indexOf(node) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        res.end('');
+      }
     }
   }
 });
+/* eslint-enable no-lonely-if */
 
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
@@ -1332,26 +2368,68 @@ app.get('/prune', (req, res) => {
     });
     for (let i = 0; i < config.layout.length; i++) {
       const node = config.layout[i].node;
+      if (config.ssl) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      const options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
+            console.log('\nNode:' + results.node + '\n' + results.output);
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      request(options, (error, response) => {
-        if (error) {
-          res.end('An error has occurred.');
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('\nNode:' + results.node + '\n' + results.output);
-          console.log('\nNode:' + results.node + '\n' + results.output);
-        }
-      });
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
+            console.log('\nNode:' + results.node + '\n' + results.output);
+          }
+        });
+      } else {
+        const options = {
+          url: 'http://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
+            console.log('\nNode:' + results.node + '\n' + results.output);
+          }
+        });
+      }
       res.end('');
     }
   }
@@ -1360,18 +2438,48 @@ app.get('/prune', (req, res) => {
 function move_container(container, newhost) {
   console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
   addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
-  const options = {
-    url: `http://127.0.0.1:3000/changehost?token=${token}&container=${container}&newhost=${newhost}`,
-    method: 'GET'
-  };
 
-  request(options, error => {
-    if (error) {
-      console.log('Error connecting with server. ' + error);
-    } else {
-      config.automatic_heartbeat = 'enabled';
-    }
-  });
+  if (config.ssl) {
+    const options = {
+      url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      method: 'GET'
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log('Error connecting with server. ' + error);
+      } else {
+        config.automatic_heartbeat = 'enabled';
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      rejectUnauthorized: 'false',
+      method: 'GET'
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log('Error connecting with server. ' + error);
+      } else {
+        config.automatic_heartbeat = 'enabled';
+      }
+    });
+  } else {
+    const options = {
+      url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      method: 'GET'
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log('Error connecting with server. ' + error);
+      } else {
+        config.automatic_heartbeat = 'enabled';
+      }
+    });
+  }
 }
 
 function container_failover(container) {
@@ -1428,15 +2536,39 @@ function hb_check(node, container_port, container) {
         container_failover(container);
       }
 
-      const options = {
-        host: '127.0.0.1',
-        path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-        port
-      };
+      if (config.ssl) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+          port: server_port
+        };
 
-      http.get(options).on('error', e => {
-        console.error(e);
-      });
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+          rejectUnauthorized: 'false',
+          port: server_port
+        };
+
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+      } else {
+        const options = {
+          host: '127.0.0.1',
+          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+          port: server_port
+        };
+
+        http.get(options).on('error', e => {
+          console.error(e);
+        });
+      }
+
       client.destroy();
     });
   }
@@ -1484,20 +2616,53 @@ app.get('/log', (req, res) => {
   }
 });
 
+/* eslint-disable no-lonely-if */
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    request(`http://${config.rsyslog_host}:${config.agent_port}/rsyslog?token=${token}`, (error, response, body) => {
-      if (!error && response.statusCode === 200) {
-        res.end(body);
-      } else {
-        res.end('Error connecting with server. ' + error);
-      }
-    });
+    if (config.ssl) {
+      const options = {
+        url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
+      };
+
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    } else if (config.ssl && config.ssl_self_signed) {
+      const options = {
+        url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token,
+        rejectUnauthorized: 'false'
+      };
+
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    } else {
+      const options = {
+        url: 'http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
+      };
+
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    }
   }
 });
+/* eslint-enable no-lonely-if */
 
 app.get('/reloadconfig', (req, res) => {
   const check_token = req.query.token;
@@ -1550,21 +2715,56 @@ app.get('/killvip', (req, res) => {
             token
           });
 
-          const options = {
-            url: 'http://' + node + ':' + agentPort + '/killvip',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': token_body.length
-            },
-            body: token_body
-          };
+          if (config.ssl) {
+            const options = {
+              url: 'https://' + node + ':' + agent_port + '/killvip',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
+            };
 
-          request(options, error => {
-            if (error) {
-              res.end('An error has occurred.');
-            }
-          });
+            request(options, error => {
+              if (error) {
+                res.end('An error has occurred.');
+              }
+            });
+          } else if (config.ssl && config.ssl_self_signed) {
+            const options = {
+              url: 'https://' + node + ':' + agent_port + '/killvip',
+              rejectUnauthorized: 'false',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
+            };
+
+            request(options, error => {
+              if (error) {
+                res.end('An error has occurred.');
+              }
+            });
+          } else {
+            const options = {
+              url: 'http://' + node + ':' + agent_port + '/killvip',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
+            };
+
+            request(options, error => {
+              if (error) {
+                res.end('An error has occurred.');
+              }
+            });
+          }
         });
       });
     }
@@ -1595,6 +2795,20 @@ app.post('/updateconfig', (req, res) => {
   }
 });
 
-server.listen(port, () => {
-  console.log('Listening on port %d', port);
-});
+if (config.ssl && config.ssl_cert && config.ssl_key) {
+  console.log('SSL Server API enabled');
+  const ssl_options = {
+    cert: fs.readFileSync(config.ssl_cert),
+    key: fs.readFileSync(config.ssl_key)
+  };
+  const server = https.createServer(ssl_options, app);
+  server.listen(server_port, () => {
+    console.log('Listening on port %d', server_port);
+  });
+} else {
+  console.log('Non-SSL Server API enabled');
+  const server = http.createServer(app);
+  server.listen(server_port, () => {
+    console.log('Listening on port %d', server_port);
+  });
+}
