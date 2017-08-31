@@ -37,31 +37,31 @@ let dockerFolder = config.docker;
 const container_faillog = [];
 
 if (config.elasticsearch && config.elasticsearch_index) {
-  var mapping = {
-    "settings": {
-      "index": {
-        "number_of_shards": 3,
-        "number_of_replicas": 2
+  const mapping = {
+    'settings': {
+      'index': {
+        'number_of_shards': 3,
+        'number_of_replicas': 2
       }
     },
-    "mappings": {
-      "picluster": {
-        "properties": {
-          "date": {
-            "type": "date",
-            "index": "true",
-            "format": "yyyy-MM-dd HH:mm:ss"
+    'mappings': {
+      'picluster': {
+        'properties': {
+          'date': {
+            'type': 'date',
+            'index': 'true',
+            'format': 'yyyy-MM-dd HH:mm:ss'
           },
-          "data": {
-            "type": "keyword",
-            "index": "true"
+          'data': {
+            "type": 'keyword',
+            'index': 'true'
           }
         }
       }
     }
-  }
+  };
 
-  var options = {
+  const options = {
     url: config.elasticsearch + '/' + config.elasticsearch_index,
     method: 'PUT',
     headers: {
@@ -69,10 +69,10 @@ if (config.elasticsearch && config.elasticsearch_index) {
       'Content-Length': mapping.length
     },
     body: JSON.stringify(mapping)
-  }
+  };
 
-  request(options, function(error, response, body) {
-    console.log('\nCreating Elasticsearch Map......')
+  request(options, function(error, response) {
+    console.log('\nCreating Elasticsearch Map......');
     if (error) {
       console.log(error);
     }
@@ -991,14 +991,14 @@ app.get('/addhost', (req, res) => {
 });
 
 function elasticsearch(data) {
-  var dt = dateTime.create();
+  const dt = dateTime.create();
 
-  var elasticsearch_data = JSON.stringify({
-    "data": data,
-    "date": dt.format('Y-m-d H:M:S')
+  const elasticsearch_data = JSON.stringify({
+    'data': data,
+    'date': dt.format('Y-m-d H:M:S')
   });
 
-  var options = {
+  const options = {
     url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
     method: 'POST',
     headers: {
@@ -1006,9 +1006,9 @@ function elasticsearch(data) {
       'Content-Length': elasticsearch_data.length
     },
     body: elasticsearch_data
-  }
+  };
 
-  request(options, function(error, response, body) {
+  request(options, function (error, response, body) {
     if (error) {
       console.log(error);
     }
@@ -1016,19 +1016,19 @@ function elasticsearch(data) {
 };
 
 app.get('/clear-elasticsearch', function(req, res) {
-  var check_token = req.query['token'];
-  var host = req.query['host'];
-  var data = req.query['data'];
+  const check_token = req.query.token;
+  const host = req.query.host;
+  const data = req.query.data;
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
     const message = {
-      "query": {
-        "match_all": {}
+      'query': {
+        'match_all': {}
       }
 
-    }
+    };
 
     const options = {
       url: config.elasticsearch + '/' + config.elasticsearch_index,
@@ -1038,9 +1038,9 @@ app.get('/clear-elasticsearch', function(req, res) {
         'Content-Length': message.length
       },
       body: JSON.stringify(message)
-    }
+    };
 
-    request(options, function(error, response, body) {
+    request(options, function (error, response, body) {
       if (error) {
         res.end(error);
         console.log(error);
@@ -1049,7 +1049,7 @@ app.get('/clear-elasticsearch', function(req, res) {
         console.log('\nCleared Elasticsearch data:' + body);
       }
     });
-  };
+  }
 });
 
 app.get('/rmhost', (req, res) => {
@@ -2059,7 +2059,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
   } else {
     fs.readFile(req.file.path, (err, data) => {
       const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => {
+      fs.writeFile(newPath, data => {
         copyToAgents(newPath);
       });
     });
@@ -2459,11 +2459,6 @@ app.get('/hb', (req, res) => {
     res.end('');
   }
 });
-
-function gatherLog(callback) {
-  callback(log);
-}
-
 
 app.get('/log', (req, res) => {
   const check_token = req.query.token;
