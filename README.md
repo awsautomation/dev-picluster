@@ -113,7 +113,7 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 * [AidanHarris](https://github.com/aidanharris), core developer.
 
-PiCluster Logos by chzbacon.
+* PiCluster Logos by chzbacon.
 
 ## Images
 
