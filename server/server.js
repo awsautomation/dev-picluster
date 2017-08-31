@@ -2040,9 +2040,13 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
     fs.readFile(req.file.path, (err, data) => {
       if (data) {
         const newPath = '../' + req.file.originalname;
-        fs.writeFile(newPath, data => {
-          if (data) {
-            copyToAgents(newPath);
+        fs.writeFile("text.txt", data, (error) => {
+          if (error) {
+            console.log('\nError:' + error);
+          } else {
+            if (data) {
+              copyToAgents(newPath);
+            }
           }
         });
       }
