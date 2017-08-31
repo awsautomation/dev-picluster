@@ -1,4 +1,3 @@
-/* eslint "no-warning-comments": [1, { "terms": ["todo","fixme"] }] */
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
@@ -13,9 +12,6 @@ const getos = require('picluster-getos');
 const async = require('async');
 const exec = require('child-process-promise').exec;
 const si = require('systeminformation');
-/* eslint-disable capitalized-comments */
-// require('request-debug')(request);
-/* eslint-enable capitalized-comments */
 
 let config;
 if (process.env.PICLUSTER_CONFIG) {
