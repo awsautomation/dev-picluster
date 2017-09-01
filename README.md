@@ -34,6 +34,9 @@
 - Pull container images from a registry
 - Upload Dockerfile archives to the entire cluster
 
+## Public Demo Server
+Click [here](https://www.linux-toys.com/archives/1455) for more informaion.
+
 ## Prerequisites
 
 - Docker
