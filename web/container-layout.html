@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
@@ -14,6 +14,14 @@
 			font-size: 0.5 rem;
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
+		}
+
+		a:link {
+			color: black;
+		}
+
+		a:visited {
+			color: black;
 		}
 
 		#windowfont {
@@ -115,42 +123,39 @@
 		}
 	</style>
 	<script>
+		function linkFunction(container) {
+			parent.manage_container = container;
+		};
+
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			if (div) {
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for containers</label></font>';
 			}
-			$.get("/status?token=" + parent.token, function(data) {
-				var get_data = data.split('Node:');
-				var dists = data.split('\n');
-				dists = getDists(dists);
+			$.get("/nodes?token=" + parent.token, function(data) {
+				var check_data = data;
+
 				if (div) {
 					div.innerHTML = '';
 				}
-				for (i = 0, dist = 0; i != get_data.length; i++) {
-					if (get_data[i].length > 2) {
-						var hostname = get_data[i].split('CONTAINER');
-						var containers = hostname[1].split('NAMES');
-						var show_containers = containers[1].split('\n');
-						if (div) {
-							div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dists[dist++]) + '<br><font size=+3>' + hostname[0] + '</font><br><ol>';
-						}
-
-						for (j = 0; j != show_containers.length; j++) {
-							var parse_output = show_containers[j].split('  ');
-							if (parse_output.length > 1) {
-								if (div) {
-									div.innerHTML = div.innerHTML + '<font size=+1><li>' + parse_output[parse_output.length - 1] + '</li>';
-								}
-
+				for (var i in check_data.data) {
+					if (div) {
+						var dist = check_data.data[i].os_type || '';
+						dist = dist.toLowerCase();
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br>'+ '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br><br>';
+						var array = check_data.data[i].running_containers;
+						for (var j in array) {
+							if (array[j]) {
+								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
 							}
 						}
-						if (div) {
-							div.innerHTML = div.innerHTML + '</ol>';
-						}
 					}
+					if (div) {
+						div.innerHTML = div.innerHTML + '</ol>';
+					}
+					addFontLinux();
+
 				}
-				addFontLinux();
 			});
 		}
 	</script>

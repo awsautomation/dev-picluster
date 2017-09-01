@@ -2,11 +2,11 @@
 <title>PiCluster Web Console</title>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-ui.css">
-	<script src="/node_modules/moment/min/moment.min.js"></script>
+	<script src="/assets/moment.js"></script>
 	<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
 	<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
@@ -241,6 +241,9 @@
 		}
 	</style>
 	<script>
+		var manage_container = '';
+		var manage_image = '';
+
 		function clear(callback) {
 			var iframe = document.getElementById('iframe_a').contentWindow.document;
 			iframe.write('<html>');
@@ -291,11 +294,14 @@
 			$('#hb').click(function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
+			$('#upload').click(function() {
+				$('#iframe_a').attr('src', '/upload.html');
+			});
 			$('#pull').click(function() {
 				$('#iframe_a').attr('src', '/pullimages.html');
 			});
 			$('#build').click(function() {
-				$('#iframe_a').attr('src', '/build.html');
+				$('#iframe_a').attr('src', '/manage-images.html');
 			});
 			$('#stop').click(function() {
 				$('#iframe_a').attr('src', '/stop.html');
@@ -382,7 +388,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>PiCluster 2.0 Login</h2>
+				<h2>PiCluster 2.1 Login</h2>
 			</div>
 			<div class="modal-body">
 				<p align=center>
@@ -426,8 +432,9 @@
 					<li><a href="#!">Images</a>
 						<ul class="dropdown">
 							<li><a href="#" id="pull">Pull</a></li>
-							<li><a href="#" id="build">Build</a></li>
+							<li><a href="#" id="build">Manage</a></li>
 							<li><a href="#" id="image-layout">List</a></li>
+								<li><a href="#" id="upload">Upload Files</a></li>
 						</ul>
 					</li>
 					<li><a href="#!">Operations</a>

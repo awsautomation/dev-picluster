@@ -1,140 +1,179 @@
-#!/bin/bash
+#!/usr/bin/env bash
 clear
-server='127.0.0.1'
-port='3000'
-token='1234567890ABCDEFGHJKLMNOP'
 
-hb(){
-clear
-echo "Heartbeat is now checking....."
-curl -s $server:$port/hb?token=$token
-logs
-}
+# Test if jq is installed
+if type jq &>/dev/null; then
+  # Config file
+  config="config-example.json"
 
-nodes(){
-clear
-echo "Active Nodes:"
-curl -s $server:$port/nodes?token=$token
-logs
-}
+  # Set config parameters to assign to variables
+  config_token=$(jq .token $config | sed -e 's/\"//g')
+  config_server_port=$(jq .server_port $config | sed -e 's/\"//g')
+  config_ssl=$(jq .ssl $config | sed -e 's/\"//g')
+  config_web_connect=$(jq .web_connect $config | sed -e 's/\"//g')
 
-stop(){
-clear
-echo "Stopping the container(s)....."
-curl -s -G -d "token=$token&container=$1" http://$server:$port/stop
-logs
-}
+  hb(){
+    clear
+    echo "Heartbeat is now checking....."
+    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/hb?token=${config_token}"
+    else curl -s "http://${config_web_connect}:${config_server_port}/hb?token=${config_token}"
+    fi
+    logs
+  }
 
-images(){
-clear
-echo "Gathering a list of images....."
-curl -s  http://$server:$port/images?token=$token
-logs
-}
+  nodes(){
+    clear
+    echo "Active Nodes:"
+    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}"
+    else curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}"
+    fi
+    logs
+  }
 
-reloadconfig(){
-clear
-echo "Reloading the configuration...."
-curl -s http://$server:$port/reloadconfig?token=$token
-logs
-}
+  stop(){
+    clear
+    echo "Stopping the container(s)....."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/stop"
+    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/stop"
+    fi
 
+    logs
+  }
 
-shell(){
-  clear
-  echo "Running the command....."
-   curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"$token"'"}' http://$server:$port/exec
-   logs
-}
+  images(){
+    clear
+    echo "Gathering a list of images....."
+    if [ "${config_ssl}" == "true" ]; then curl -s  "https://${config_web_connect}:${config_server_port}/images?token=${config_token}"
+    else curl -s  "http://${config_web_connect}:${config_server_port}/images?token=${config_token}"
+    fi
+    logs
+  }
 
-clean(){
-clear
-echo "Cleaning stale Docker images and containers...."
-curl -s http://$server:$port/prune?token=$token
-logs
-}
-
-build() {
-  clear
-  echo "Building the container(s) in the background. This may take a while. Continue to check the logs for progress."
-  curl -s -G -d "token=$token&image=$1" http://$server:$port/build
-  logs
-}
-
-logs(){
-  sleep 5
-  clear
-  echo "Checking the logs....."
-  curl -s http://$server:$port/log?token=$token
-}
-
-create() {
-clear
-echo "Running the container(s)....."
-curl -s -G -d "token=$token&container=$1" http://$server:$port/create
-logs
-}
-
-start(){
-clear
-echo "Starting the container(s)....."
-curl -s -G -d "token=$token&container=$1" http://$server:$port/start
-logs
-}
-
-restart(){
-clear
-echo "Restarting the container(s)....."
-curl -s -G -d "token=$token&container=$1" http://$server:$port/restart
-logs
-}
-
-changehost(){
-clear
-echo "Changing the host....."
-curl -s -G -d "token=$token&newhost=$2&container=$1" http://$server:$port/changehost
-logs
-}
-
-delete(){
-clear
-echo "Deleting the container(s)....."
-curl -s -G -d "token=$token&container=$1" http://$server:$port/delete
-logs
-}
-
-status() {
-  clear
-  echo "Checking the status....."
-curl -s http://$server:$port/status?token=$token
-logs
-}
+  reloadconfig(){
+    clear
+    echo "Reloading the configuration...."
+    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/reloadconfig?token=${config_token}"
+    else curl -s "http://${config_web_connect}:${config_server_port}/reloadconfig?token=${config_token}"
+    fi
+    logs
+  }
 
 
-if [  -z "$1" ]; then
-echo "Error, no args specified!"
-echo
-arguments="build nodes reloadconfig images start create status exec start stop clean "
-echo "Valid arguments are: $arguments"
-echo
-exit
-fi;
+  shell(){
+    clear
+    echo "Running the command....."
+    if [ "${config_ssl}" == "true" ]; then curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"${config_token}"'"}' "https://${config_web_connect}:${config_server_port}/exec"
+    else curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"${config_token}"'"}' "http://${config_web_connect}:${config_server_port}/exec"
+    fi
+    logs
+  }
 
-if [ "$1" = "hb" ]; then hb;exit; fi;
+  clean(){
+    clear
+    echo "Cleaning stale Docker images and containers...."
+    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/prune?token=${config_token}"
+    else curl -s "http://${config_web_connect}:${config_server_port}/prune?token=${config_token}"
+    fi
+    logs
+  }
 
-if [ "$1" = "exec" ]; then shell "$2";exit; fi;
+  build() {
+    clear
+    echo "Building the container(s) in the background. This may take a while. Continue to check the logs for progress."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&image=$1 https://${config_web_connect}:${config_server_port}/build"
+    else curl -s -G -d "token=${config_token}&image=$1 http://${config_web_connect}:${config_server_port}/build"
+    fi
+    logs
+  }
 
+  logs(){
+    sleep 5
+    clear
+    echo "Checking the logs....."
+    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/log?token=${config_token}"
+    else curl -s "http://${config_web_connect}:${config_server_port}/log?token=${config_token}"
+    fi
+  }
 
-if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
-if [ "$1" = "nodes" ]; then nodes;exit; fi;
-if [ "$1" = "clean" ]; then clean;exit; fi;
-if [ "$1" = "images" ]; then images;exit; fi;
-if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
-if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
-if [ "$1" = "restart" ]; then restart "$2";exit; fi;
-if [ "$1" = "changehost" ]; then changehost "$2" "$3";exit; fi;
-if [ "$1" = "delete" ]; then delete "$2";exit; fi;
-if [ "$1" = "build" ]; then echo "Building Images....";build "$2"; fi;
-if [ "$1" = "start" ]; then echo "Running container(s)....";start "$2"; fi;
-if [ "$1" = "stop" ]; then echo "Stopping container(s)....";stop "$2"; fi;
-if [ "$1" = "create" ]; then echo "Creating container(s)....";create "$2"; fi;
+  create() {
+    clear
+    echo "Running the container(s)....."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/create"
+    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/create"
+    fi
+    logs
+  }
+
+  start(){
+    clear
+    echo "Starting the container(s)....."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/start"
+    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/start"
+    fi
+    logs
+  }
+
+  restart(){
+    clear
+    echo "Restarting the container(s)....."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/restart"
+    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/restart"
+    fi
+    logs
+  }
+
+  changehost(){
+    clear
+    echo "Changing the host....."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&newhost=$2&container=$1 https://${config_web_connect}:${config_server_port}/changehost"
+    else curl -s -G -d "token=${config_token}&newhost=$2&container=$1 http://${config_web_connect}:${config_server_port}/changehost"
+    fi
+    logs
+  }
+
+  delete(){
+    clear
+    echo "Deleting the container(s)....."
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/delete"
+    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/delete"
+    fi
+
+    logs
+  }
+
+  status() {
+    clear
+    echo "Checking the status....."
+    if [ "${config_ssl}" == "true" ]; then curl -s "http://${config_web_connect}:${config_server_port}/status?token=${config_token}"
+    else curl -s "http://${config_web_connect}:${config_server_port}/status?token=${config_token}"
+    fi
+    logs
+  }
+
+  if [  -z "$1" ]; then
+    echo "Error, no args specified!"
+    echo
+    arguments="build nodes reloadconfig images start create status exec start stop clean "
+    echo "Valid arguments are: $arguments"
+    echo
+    exit
+  fi;
+
+  if [ "$1" = "hb" ]; then hb;exit; fi;
+  if [ "$1" = "exec" ]; then shell "$2";exit; fi;
+  if [ "$1" = "status" ]; then echo "Gathering Cluster Status....";status;exit; fi;
+  if [ "$1" = "nodes" ]; then nodes;exit; fi;
+  if [ "$1" = "clean" ]; then clean;exit; fi;
+  if [ "$1" = "images" ]; then images;exit; fi;
+  if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
+  if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
+  if [ "$1" = "restart" ]; then restart "$2";exit; fi;
+  if [ "$1" = "changehost" ]; then changehost "$2" "$3";exit; fi;
+  if [ "$1" = "delete" ]; then delete "$2";exit; fi;
+  if [ "$1" = "build" ]; then echo "Building Images....";build "$2"; fi;
+  if [ "$1" = "start" ]; then echo "Running container(s)....";start "$2"; fi;
+  if [ "$1" = "stop" ]; then echo "Stopping container(s)....";stop "$2"; fi;
+  if [ "$1" = "create" ]; then echo "Creating container(s)....";create "$2"; fi;
+else
+  echo "Please install jq"
+fi

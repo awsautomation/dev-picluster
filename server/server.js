@@ -1,55 +1,67 @@
-var express = require('express');
-var dateTime = require('node-datetime');
-var request = require('request');
-var app = express();
-var http = require('http');
-var net = require('net');
-var fs = require('fs');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+const net = require('net');
+const bodyParser = require('body-parser');
+const multer = require('multer');
+const express = require('express');
+const dateTime = require('node-datetime');
+const request = require('request');
+
+let config;
+let config_file;
 if (process.env.PICLUSTER_CONFIG) {
-  var config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-  var config_file = process.env.PICLUSTER_CONFIG;
+  config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+  config_file = process.env.PICLUSTER_CONFIG;
 } else {
-  var config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-  var config_file = '../config.json';
+  config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  config_file = '../config.json';
 }
-var port = config.server_port;
-var agentPort = config.agent_port;
-var bodyParser = require('body-parser');
+
+if (config.ssl_self_signed) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
+const app = express();
+
 app.use(bodyParser());
-//require('request-debug')(request);
-var exec = require('child_process').exec;
-var server = require("http").createServer(app);
-var log = '';
-var token = config.token;
-var dockerFolder = config.docker;
-var container_faillog = [];
+
+const upload = multer({
+  dest: '../'
+});
+const server_port = config.server_port;
+const agent_port = config.agent_port;
+let log = '';
+let token = config.token;
+let dockerFolder = config.docker;
+const container_faillog = [];
 
 if (config.elasticsearch && config.elasticsearch_index) {
-  var mapping = {
-    "settings": {
-      "index": {
-        "number_of_shards": 3,
-        "number_of_replicas": 2
+  const mapping = {
+    settings: {
+      index: {
+        number_of_shards: 3,
+        number_of_replicas: 2
       }
     },
-    "mappings": {
-      "picluster": {
-        "properties": {
-          "date": {
-            "type": "date",
-            "index": "true",
-            "format": "yyyy-MM-dd HH:mm:ss"
+    mappings: {
+      picluster: {
+        properties: {
+          date: {
+            type: 'date',
+            index: 'true',
+            format: 'yyyy-MM-dd HH:mm:ss'
           },
-          "data": {
-            "type": "keyword",
-            "index": "true"
+          data: {
+            type: 'keyword',
+            index: 'true'
           }
         }
       }
     }
-  }
+  };
 
-  var options = {
+  const options = {
     url: config.elasticsearch + '/' + config.elasticsearch_index,
     method: 'PUT',
     headers: {
@@ -57,15 +69,16 @@ if (config.elasticsearch && config.elasticsearch_index) {
       'Content-Length': mapping.length
     },
     body: JSON.stringify(mapping)
-  }
+  };
 
-  request(options, function(error, response, body) {
-    console.log('\nCreating Elasticsearch Map......')
+  request(options, error => {
+    console.log('\nCreating Elasticsearch Map......');
     if (error) {
       console.log(error);
     }
   });
 }
+
 if (config.automatic_heartbeat) {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     if (config.heartbeat_interval) {
@@ -83,198 +96,258 @@ if (config.automatic_heartbeat) {
 
 function automatic_heartbeat() {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
-    setTimeout(function() {
-      var options = {
-        host: '127.0.0.1',
-        path: '/hb?token=' + token,
-        port: port
-      };
-      var request = http.get(options, function(response) {}).on('error', function(e) {
-        console.error(e);
-      });
-      automatic_heartbeat();
+    setTimeout(() => {
+      if (config.ssl) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/hb?token=' + token,
+          port: server_port
+        };
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+        automatic_heartbeat();
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/hb?token=' + token,
+          port: server_port,
+          rejectUnauthorized: 'false'
+        };
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+        automatic_heartbeat();
+      } else {
+        const options = {
+          host: '127.0.0.1',
+          path: '/hb?token=' + token,
+          port: server_port
+        };
+        http.get(options).on('error', e => {
+          console.error(e);
+        });
+        automatic_heartbeat();
+      }
     }, config.heartbeat_interval);
   } else {
     console.log('\nAutomatic Heartbeat Disabled.');
   }
 }
 
-app.get('/status', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var command = JSON.stringify({
-      "command": 'hostname;docker container ps;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
-      "token": token
-    });
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
-
-      //Runs a command on each node
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      }
-
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end("An error has occurred.");
-        } else {
-          var results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output);
-        }
-      })
-
-    }
-    res.end('');
-  }
-});
-
-app.get('/clearlog', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/clearlog', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
     log = '';
     res.end();
   }
 });
 
+app.get('/nodes', (req, res) => {
+  const node_metrics = {
+    data: []
+  };
 
-app.get('/nodes', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var command = JSON.stringify({
-      "command": 'hostname;echo;uname -a;df -h /;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\'',
-      "token": token
-    });
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
+  function addData(data) {
+    node_metrics.data.push(data);
+  }
 
-      //Runs a command on each node
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      }
+  function getData() {
+    let total_node_count = 0;
+    let total_containers = 0;
+    const node_list = [];
+    const container_list = [];
 
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end(error);
-        } else {
-          var results = JSON.parse(response.body);
-          addLog('Node: ' + results.output);
+    for (let i = 0; i < config.layout.length; i++) {
+      for (const key in config.layout[i]) {
+        if (config.layout[i].hasOwnProperty(key)) {
+          const node = config.layout[i].node;
+          const node_info = config.layout[i][key];
+          if (node_info === node) {
+            total_node_count++;
+            node_list.push(node);
+          } else {
+            total_containers++;
+            container_list.push(key);
+          }
         }
-      })
-
+      }
     }
-    res.end('');
+    node_metrics.total_containers = total_containers;
+    node_metrics.total_nodes = total_node_count;
+    node_metrics.container_list = container_list;
+    node_metrics.nodes = node_list;
+    return node_metrics;
+  }
+
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    config.layout.forEach(get_node => {
+      const node = get_node.node;
+      if (!node) {
+        console.error('Invalid Config for node', get_node);
+        return;
+      }
+      if (config.ssl) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/node-status?token=' + token,
+          method: 'GET'
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            console.error(error);
+          } else {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/node-status?token=' + token,
+          method: 'GET',
+          rejectUnauthorized: 'false'
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            console.error(error);
+          } else {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
+          }
+        });
+      } else {
+        const options = {
+          url: 'http://' + node + ':' + agent_port + '/node-status?token=' + token,
+          method: 'GET'
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            console.error(error);
+          } else {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
+          }
+        });
+      }
+    });
+    setTimeout(() => {
+      res.json(getData());
+    }, 3000);
   }
 });
-
-
-app.get('/images', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
-  } else {
-    var command = JSON.stringify({
-      "command": 'hostname;docker image list;node -e \'const getos = require("getos");getos(function(e,os){var dist = (e) ? "" : os.dist || os.os;console.log("Dist: " + dist);})\';',
-      "token": token
-    });
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
-
-      //Runs a command on each node
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      }
-
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end("An error has occurred.");
-        } else {
-          var results = JSON.parse(response.body);
-          addLog('\nNode: ' + results.output);
-        }
-      })
-
-    }
-    res.end('');
-  }
-});
-
 
 function addLog(data) {
   log += data;
 }
 
-app.get('/build', function(req, res) {
-  var check_token = req.query['token'];
-  var image = '';
-  if (req.query['image']) {
-    image = req.query['image'];
+app.get('/build', (req, res) => {
+  const check_token = req.query.token;
+  const no_cache = req.query.no_cache;
+  let image = '';
+  if (req.query.image) {
+    image = req.query.image;
   }
 
-  if (image.indexOf("*") > -1) {
+  if (image.indexOf('*') > -1) {
     image = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-        var command = JSON.stringify({
-          "command": 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
-          "token": token
-        });
-
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
+        let command;
+        if (no_cache.indexOf('true') > -1) {
+          command = JSON.stringify({
+            command: 'docker image build --no-cache ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
+            token
+          });
+        } else {
+          command = JSON.stringify({
+            command: 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
+            token
+          });
         }
 
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            rejectUnauthorized: 'false',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -282,61 +355,235 @@ app.get('/build', function(req, res) {
   }
 });
 
+app.get('/delete-image', (req, res) => {
+  const check_token = req.query.token;
+  let image = '';
+  if (req.query.image) {
+    image = req.query.image;
+  }
 
-app.get('/create', function(req, res) {
-  var check_token = req.query['token'];
-  container = '';
+  if (image.indexOf('*') > -1) {
+    image = '*';
+  }
 
-  if (req.query['container']) {
-    container = req.query['container'];
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
+        const node = config.layout[i].node;
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
+        }
+        const command = JSON.stringify({
+          command: 'docker image rm ' + key,
+          token
+        });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            rejectUnauthorized: 'false',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\n' + results.output);
+              }
+            });
+          }
+        }
+      });
+    });
+    res.end('');
+  }
+});
+
+app.get('/create', (req, res) => {
+  const check_token = req.query.token;
+  let container = '';
+
+  if (req.query.container) {
+    container = req.query.container;
   }
 
   if (container.indexOf('*') > -1) {
     container = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
-        const node = config.layout[i].node;
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        var command = JSON.stringify({
-          "command": 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-          "token": token
-        });
-
-        var options = {
-          hostname: node,
-          port: agentPort,
-          path: '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
+    let responseString = '';
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
+        if (config.ssl) {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
           }
-        }
-
-        if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          var request = http.request(options, function(response) {
-            response.on('data', function(data) {
-              responseString += data;
-            });
-            response.on('end', function(data) {
-              if (!responseString.body) {} else {
-                var results = JSON.parse(body.toString("utf8"));
-                addLog(results.output);
-              }
-            });
-          }).on('error', function(e) {
-            console.error(e);
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
           });
-          request.write(command);
-          req.end;
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            hostname: node,
+            port: agent_port,
+            path: '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            }
+          };
+
+          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+            const request = https.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
+            });
+            request.write(command);
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            hostname: node,
+            port: agent_port,
+            rejectUnauthorized: 'false',
+            path: '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            }
+          };
+
+          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+            const request = https.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
+            });
+            request.write(command);
+          }
+        } else {
+          const node = config.layout[i].node;
+          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+            return;
+          }
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+            token
+          });
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            hostname: node,
+            port: agent_port,
+            path: '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            }
+          };
+
+          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+            const request = http.request(options, response => {
+              response.on('data', data => {
+                responseString += data;
+              });
+              response.on('end', () => {
+                if (responseString.body) {
+                  const body = responseString.body;
+                  const results = JSON.parse(body.toString('utf8'));
+                  addLog(results.output);
+                }
+              });
+            }).on('error', e => {
+              console.error(e);
+            });
+            request.write(command);
+          }
         }
       });
     });
@@ -344,48 +591,90 @@ app.get('/create', function(req, res) {
   res.end('');
 });
 
-app.get('/start', function(req, res) {
-  var check_token = req.query['token'];
-  var container = '';
-  if (req.query['container']) {
-    container = req.query['container'];
+app.get('/start', (req, res) => {
+  const check_token = req.query.token;
+  let container = '';
+  if (req.query.container) {
+    container = req.query.container;
   }
   if (container.indexOf('*') > -1) {
-    var container = '*';
+    container = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-        var command = JSON.stringify({
-          "command": 'docker container start ' + key,
-          "token": token
+        const command = JSON.stringify({
+          command: 'docker container start ' + key,
+          token
         });
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nStarting: ' + key + '\n' + results.output);
-            }
-          });
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -394,150 +683,320 @@ app.get('/start', function(req, res) {
 });
 
 function migrate(container, original_host, new_host, original_container_data) {
-  var existing_automatic_heartbeat_value = '';
+  let existing_automatic_heartbeat_value = '';
   if (config.automatic_heartbeat) {
     existing_automatic_heartbeat_value = config.automatic_heartbeat;
     if (config.automatic_heartbeat.indexOf('enabled') > -1) {
       config.automatic_heartbeat = 'disabled';
     }
   }
-  var command = JSON.stringify({
-    "command": 'docker rm -f ' + container,
-    "token": token
+  const command = JSON.stringify({
+    command: 'docker rm -f ' + container,
+    token
   });
-  var options = {
-    url: 'http://' + original_host + ':' + agentPort + '/run',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': command.length
-    },
-    body: command
-  }
+  if (config.ssl) {
+    const options = {
+      url: 'https://' + original_host + ':' + agent_port + '/run',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
 
-  request(options, function(error, response, body) {
-    if (error) {
-      addLog("An error has occurred.");
-    } else {
+    request(options, error => {
+      if (error) {
+        addLog('An error has occurred.');
+      } else {
+        const command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
 
-      var command = JSON.stringify({
-        "command": 'docker image build ' + dockerFolder + '/' + container + ' -t ' + container + ' -f ' + dockerFolder + '/' + container + '/Dockerfile' + ';docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-        "token": token
-      });
+        const options = {
+          url: 'https://' + new_host + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      var options = {
-        url: 'http://' + new_host + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      }
+        request(options, error => {
+          if (error) {
+            addLog('An error has occurred.');
+          } else {
+            const command = JSON.stringify({
+              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+              token
+            });
 
-
-      request(options, function(error, response, body) {
-        if (error) {
-          addLog("An error has occurred.");
-        } else {
-          var command = JSON.stringify({
-            "command": 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-            "token": token
-          });
-
-          var options = {
-            url: 'http://' + new_host + ':' + agentPort + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          }
-          request(options, function(error, response, body) {
-            if (error) {
-              addLog("An error has occurred.");
-            } else {
-              addLog('\nStarting ' + container);
-              if (config.automatic_heartbeat) {
-                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
+            const options = {
+              url: 'https://' + new_host + ':' + agent_port + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            };
+            request(options, error => {
+              if (error) {
+                addLog('An error has occurred.');
+              } else {
+                addLog('\nStarting ' + container);
+                if (config.automatic_heartbeat) {
+                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                  }
                 }
               }
-            }
-          });
-        }
-      });
-    }
-  });
-};
+            });
+          }
+        });
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url: 'https://' + original_host + ':' + agent_port + '/run',
+      method: 'POST',
+      rejectUnauthorized: 'false',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
 
-app.get('/addhost', function(req, res) {
-  var check_token = req.query['token'];
-  var host = req.query['host'];
+    request(options, error => {
+      if (error) {
+        addLog('An error has occurred.');
+      } else {
+        const command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+        const options = {
+          url: 'https://' + new_host + ':' + agent_port + '/run',
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, error => {
+          if (error) {
+            addLog('An error has occurred.');
+          } else {
+            const command = JSON.stringify({
+              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+              token
+            });
+
+            const options = {
+              url: 'https://' + new_host + ':' + agent_port + '/run',
+              rejectUnauthorized: 'false',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            };
+            request(options, error => {
+              if (error) {
+                addLog('An error has occurred.');
+              } else {
+                addLog('\nStarting ' + container);
+                if (config.automatic_heartbeat) {
+                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                  }
+                }
+              }
+            });
+          }
+        });
+      }
+    });
   } else {
-    var proceed = 1;
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
-        if (config.layout[i].node.indexOf(host) > -1) {
-          proceed = 0;
-        }
+    const options = {
+      url: 'http://' + original_host + ':' + agent_port + '/run',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, error => {
+      if (error) {
+        addLog('An error has occurred.');
+      } else {
+        const command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
+
+        const options = {
+          url: 'http://' + new_host + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, error => {
+          if (error) {
+            addLog('An error has occurred.');
+          } else {
+            const command = JSON.stringify({
+              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+              token
+            });
+
+            const options = {
+              url: 'http://' + new_host + ':' + agent_port + '/run',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': command.length
+              },
+              body: command
+            };
+            request(options, error => {
+              if (error) {
+                addLog('An error has occurred.');
+              } else {
+                addLog('\nStarting ' + container);
+                if (config.automatic_heartbeat) {
+                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
+                  }
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+}
+
+app.get('/addhost', (req, res) => {
+  const check_token = req.query.token;
+  const host = req.query.host;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    let proceed = 1;
+    for (let i = 0; i < config.layout.length; i++) {
+      if (config.layout[i].node.indexOf(host) > -1) {
+        proceed = 0;
       }
     }
 
     if (proceed) {
-      //Add New Host
+      // Add New Host
       config.layout.push({
-        "node": host
+        node: host
       });
 
       if (config.hb) {
         config.hb.push({
-          "node": host
+          node: host
         });
       }
 
-      var new_config = JSON.stringify({
-        "payload": JSON.stringify(config),
-        "token": token
+      const new_config = JSON.stringify({
+        payload: JSON.stringify(config),
+        token
       });
 
-      //Save Configuration
-      var options = {
-        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config,
+      if (config.ssl) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+          }
+        });
+      } else {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            res.end('\nAdded host ' + host + ' to the configuration.');
+          }
+        });
       }
-
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end('\nAdded host ' + host + ' to the configuration.');
-        }
-      });
     } else {
       res.end('\nError: Host already exists');
     }
-  };
+  }
 });
 
 function elasticsearch(data) {
-  var dt = dateTime.create();
+  const dt = dateTime.create();
 
-  var elasticsearch_data = JSON.stringify({
-    "data": data,
-    "date": dt.format('Y-m-d H:M:S')
+  const elasticsearch_data = JSON.stringify({
+    data,
+    date: dt.format('Y-m-d H:M:S')
   });
 
-  var options = {
+  const options = {
     url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
     method: 'POST',
     headers: {
@@ -545,31 +1004,28 @@ function elasticsearch(data) {
       'Content-Length': elasticsearch_data.length
     },
     body: elasticsearch_data
-  }
+  };
 
-  request(options, function(error, response, body) {
+  request(options, error => {
     if (error) {
       console.log(error);
     }
   });
-};
+}
 
-app.get('/clear-elasticsearch', function(req, res) {
-  var check_token = req.query['token'];
-  var host = req.query['host'];
-  var data = req.query['data'];
+app.get('/clear-elasticsearch', (req, res) => {
+  const check_token = req.query.token;
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var message = {
-      "query": {
-        "match_all": {}
+    const message = {
+      query: {
+        match_all: {}
       }
+    };
 
-    }
-
-    var options = {
+    const options = {
       url: config.elasticsearch + '/' + config.elasticsearch_index,
       method: 'DELETE',
       headers: {
@@ -577,9 +1033,9 @@ app.get('/clear-elasticsearch', function(req, res) {
         'Content-Length': message.length
       },
       body: JSON.stringify(message)
-    }
+    };
 
-    request(options, function(error, response, body) {
+    request(options, (error, response, body) => {
       if (error) {
         res.end(error);
         console.log(error);
@@ -588,79 +1044,112 @@ app.get('/clear-elasticsearch', function(req, res) {
         console.log('\nCleared Elasticsearch data:' + body);
       }
     });
-  };
+  }
 });
 
-app.get('/rmhost', function(req, res) {
-  var check_token = req.query['token'];
-  var host = req.query['host'];
+app.get('/rmhost', (req, res) => {
+  const check_token = req.query.token;
+  const host = req.query.host;
+  let hb_proceed = 0;
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-
-    //Ensures that the host exists
-    var hb_proceed = 0;
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
-        if (config.layout[i].node.indexOf(host) > -1) {
-          config.layout.splice(i, 1);
-          hb_proceed = 1;
-          break;
-        }
+    // Ensures that the host exists
+    for (let i = 0; i < config.layout.length; i++) {
+      if (config.layout[i].node.indexOf(host) > -1) {
+        config.layout.splice(i, 1);
+        hb_proceed = 1;
+        break;
       }
     }
   }
 
   if (hb_proceed) {
     if (config.hb) {
-      for (var i = 0; i < config.hb.length; i++) {
-        for (var key in config.hb[i]) {
-          if (config.hb[i].node.indexOf(host) > -1) {
-            config.hb.splice(i, 1);
-            break;
-          }
+      for (let i = 0; i < config.hb.length; i++) {
+        if (config.hb[i].node.indexOf(host) > -1) {
+          config.hb.splice(i, 1);
+          break;
         }
       }
     }
   }
-  var new_config = JSON.stringify({
-    "payload": JSON.stringify(config),
-    "token": token
+  const new_config = JSON.stringify({
+    payload: JSON.stringify(config),
+    token
   });
 
-  //Save Configuration
-  var options = {
-    url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': new_config.length
-    },
-    body: new_config,
+  if (config.ssl) {
+    // Save Configuration
+    const options = {
+      url: `https://127.0.0.1:${server_port}/updateconfig`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nAdded host ' + host + ' to the configuration.');
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    // Save Configuration
+    const options = {
+      url: `https://127.0.0.1:${server_port}/updateconfig`,
+      rejectUnauthorized: 'false',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nAdded host ' + host + ' to the configuration.');
+      }
+    });
+  } else {
+    // Save Configuration
+    const options = {
+      url: `http://127.0.0.1:${server_port}/updateconfig`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nAdded host ' + host + ' to the configuration.');
+      }
+    });
   }
-
-  request(options, function(error, response, body) {
-    if (error) {
-      res.end(error);
-    } else {
-      res.end('\nAdded host ' + host + ' to the configuration.');
-    }
-  });
-
 });
 
-app.get('/removecontainerconfig', function(req, res) {
-  var check_token = req.query['token'];
-  var container = req.query['container'];
+app.get('/removecontainerconfig', (req, res) => {
+  const check_token = req.query.token;
+  const container = req.query.container;
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
-        const node = config.layout[i].node;
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
@@ -671,9 +1160,8 @@ app.get('/removecontainerconfig', function(req, res) {
     });
 
     if (config.hb) {
-      Object.keys(config.hb).forEach(function(get_node, i) {
-        Object.keys(config.hb[i]).forEach(function(key) {
-          const node = config.hb[i].node;
+      Object.keys(config.hb).forEach((get_node, i) => {
+        Object.keys(config.hb[i]).forEach(key => {
           if ((!config.hb[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
           }
@@ -685,23 +1173,22 @@ app.get('/removecontainerconfig', function(req, res) {
     }
 
     if (config.container_host_constraints) {
-      Object.keys(config.container_host_constraints).forEach(function(get_node, i) {
-        Object.keys(config.container_host_constraints[i]).forEach(function(key) {
-          const node = config.container_host_constraints[i].node;
+      Object.keys(config.container_host_constraints).forEach((get_node, i) => {
+        Object.keys(config.container_host_constraints[i]).forEach(key => {
           if ((!config.container_host_constraints[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
           }
-          var analyze = config.container_host_constraints[i][key].split(',');
+          const analyze = config.container_host_constraints[i][key].split(',');
           if (container.indexOf(analyze[0]) > -1) {
             config.container_host_constraints.splice(i, i + 1);
           }
         });
       });
 
-      for (var i = 0; i < config.container_host_constraints.length; i++) {
-        for (var key in config.container_host_constraints[i]) {
+      for (let i = 0; i < config.container_host_constraints.length; i++) {
+        for (const key in config.container_host_constraints[i]) {
           if (container.length > 0) {
-            var analyze = config.container_host_constraints[i][key].split(',');
+            const analyze = config.container_host_constraints[i][key].split(',');
             if (container.indexOf(analyze[0]) > -1) {
               config.container_host_constraints.splice(i, i + 1);
             }
@@ -710,140 +1197,240 @@ app.get('/removecontainerconfig', function(req, res) {
       }
     }
 
-    var new_config = JSON.stringify({
-      "payload": JSON.stringify(config),
-      "token": token
+    const new_config = JSON.stringify({
+      payload: JSON.stringify(config),
+      token
     });
 
-    //Save Configuration
-    var options = {
-      url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': new_config.length
-      },
-      body: new_config,
+    if (config.ssl) {
+      // Save Configuration
+      const options = {
+        url: `https://127.0.0.1:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nRemoved Container ' + container + ' from the configuration.');
+        }
+      });
+    } else if (config.ssl && config.ssl_self_signed) {
+      // Save Configuration
+      const options = {
+        url: `https://127.0.0.1:${server_port}/updateconfig`,
+        method: 'POST',
+        rejectUnauthorized: 'false',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nRemoved Container ' + container + ' from the configuration.');
+        }
+      });
+    } else {
+      // Save Configuration
+      const options = {
+        url: `http://127.0.0.1:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      request(options, error => {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end('\nRemoved Container ' + container + ' from the configuration.');
+        }
+      });
     }
-
-    request(options, function(error, response, body) {
-      if (error) {
-        res.end(error);
-      } else {
-        res.end('\nRemoved Container ' + container + ' from the configuration.');
-      }
-    });
-  };
-
+  }
 });
 
+app.get('/addcontainer', (req, res) => {
+  const check_token = req.query.token;
+  const host = req.query.host;
+  const container = req.query.container;
+  const container_args = req.query.container_args;
+  const heartbeat_args = req.query.heartbeat_args;
+  const failover_constraints = req.query.failover_constraints;
 
-app.get('/addcontainer', function(req, res) {
-  var check_token = req.query['token'];
-  var host = req.query['host'];
-  var container = req.query['container'];
-  var container_args = req.query['container_args'];
-  var heartbeat_args = req.query['heartbeat_args'];
-  var failover_constraints = req.query['failover_constraints'];
-
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-
-    //Ensures that the host exists
-    var proceed = 0;
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
-        if (config.layout[i].node.indexOf(host) > -1) {
-          proceed++;
-        }
+    // Ensures that the host exists
+    let proceed = 0;
+    for (let i = 0; i < config.layout.length; i++) {
+      if (config.layout[i].node.indexOf(host) > -1) {
+        proceed++;
       }
     }
 
     if (proceed < 1) {
       res.end('\nError: Node does not exist!');
     } else {
+      // Add Data to New Host
 
-      //Add Data to New Host
-
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].node.indexOf(host) > -1) {
-            config.layout[i][container] = container_args;
-          }
+      for (let i = 0; i < config.layout.length; i++) {
+        if (config.layout[i].node.indexOf(host) > -1) {
+          config.layout[i][container] = container_args;
         }
       }
 
-      //Adds Heartbeat Data
+      // Adds Heartbeat Data
       if (config.hb) {
         if (heartbeat_args) {
-          for (var i = 0; i < config.hb.length; i++) {
-            for (var key in config.hb[i]) {
-              if (config.hb[i].node.indexOf(host) > -1) {
-                config.hb[i][container] = heartbeat_args;
-              }
+          for (let i = 0; i < config.hb.length; i++) {
+            if (config.hb[i].node.indexOf(host) > -1) {
+              config.hb[i][container] = heartbeat_args;
             }
           }
         }
       }
 
       if (config.container_host_constraints) {
-        var found = '';
         if (failover_constraints) {
           config.container_host_constraints.push({
-            "container": failover_constraints
+            container: failover_constraints
           });
         }
       }
-      var new_config = JSON.stringify({
-        "payload": JSON.stringify(config),
-        "token": token
+      const new_config = JSON.stringify({
+        payload: JSON.stringify(config),
+        token
       });
 
-      //Save Configuration
-      var options = {
-        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config,
+      if (config.ssl) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            const container_options = {
+              url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+              rejectUnauthorized: 'false'
+            };
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(container_options, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            const container_options = {
+              url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+              rejectUnauthorized: 'false'
+            };
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(container_options, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
+        });
+      } else {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            const container_options = {
+              url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+              rejectUnauthorized: 'false'
+            };
+            // Res.end('\nAdded ' + container + ' to the configuration.');
+            request(container_options, (error, response) => {
+              if (!error && response.statusCode === 200) {
+                res.end('\nAdded ' + container + ' to the configuration.');
+              } else {
+                res.end('\nError connecting with server.');
+              }
+            });
+          }
+        });
       }
-
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end('\nAdded ' + container + ' to the configuration.');
-        }
-      });
-    };
-  };
+    }
+  }
 });
 
-app.get('/changehost', function(req, res) {
-  var check_token = req.query['token'];
-  var container = '';
-  var original_host = '';
-  var original_container_data = '';
-  var original_heartbeat_data = '';
-  var new_host = req.query['newhost'];
+app.get('/changehost', (req, res) => {
+  const check_token = req.query.token;
+  let container = '';
+  let original_host = '';
+  let original_container_data = '';
+  let original_heartbeat_data = '';
+  const new_host = req.query.newhost;
 
-  if (req.query['container']) {
-    container = req.query['container'];
+  if (req.query.container) {
+    container = req.query.container;
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-
-    //Ensures that the host exists
-    var proceed = 0;
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
+    // Ensures that the host exists
+    let proceed = 0;
+    for (let i = 0; i < config.layout.length; i++) {
+      for (const key in config.layout[i]) {
         if (container.length > 0) {
           if (config.layout[i].node.indexOf(new_host) > -1) {
             proceed++;
@@ -860,10 +1447,9 @@ app.get('/changehost', function(req, res) {
     if (proceed < 2) {
       res.end('\nError: Node or Container does not exist!');
     } else {
-
-      //Find Current Host
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
+      // Find Current Host
+      for (let i = 0; i < config.layout.length; i++) {
+        for (const key in config.layout[i]) {
           if (container.length > 0) {
             if (key.indexOf(container) > -1) {
               original_host = config.layout[i].node;
@@ -875,9 +1461,9 @@ app.get('/changehost', function(req, res) {
       }
 
       if (config.hb) {
-        //Checks for HB
-        for (var i = 0; i < config.hb.length; i++) {
-          for (var key in config.hb[i]) {
+        // Checks for HB
+        for (let i = 0; i < config.hb.length; i++) {
+          for (const key in config.hb[i]) {
             if (container.length > 0) {
               if (key.indexOf(container) > -1) {
                 original_heartbeat_data = config.hb[i][key];
@@ -888,97 +1474,179 @@ app.get('/changehost', function(req, res) {
         }
       }
 
-      for (var i = 0; i < config.layout.length; i++) {
-        for (var key in config.layout[i]) {
-          if (config.layout[i].node.indexOf(new_host) > -1) {
-            config.layout[i][container] = original_container_data;
-          }
+      for (let i = 0; i < config.layout.length; i++) {
+        if (config.layout[i].node.indexOf(new_host) > -1) {
+          config.layout[i][container] = original_container_data;
         }
       }
 
-      //Adds Heartbeat Data
+      // Adds Heartbeat Data
       if (config.hb) {
         if (original_heartbeat_data) {
-          for (var i = 0; i < config.hb.length; i++) {
-            for (var key in config.hb[i]) {
-              if (config.hb[i].node.indexOf(new_host) > -1) {
-                config.hb[i][container] = original_heartbeat_data;
-              }
+          for (let i = 0; i < config.hb.length; i++) {
+            if (config.hb[i].node.indexOf(new_host) > -1) {
+              config.hb[i][container] = original_heartbeat_data;
             }
           }
         }
       }
 
-      var new_config = JSON.stringify({
-        "payload": JSON.stringify(config),
-        "token": token
+      const new_config = JSON.stringify({
+        payload: JSON.stringify(config),
+        token
       });
 
-      //Save Configuration
-      var options = {
-        url: 'http://127.0.0.1' + ':' + port + '/updateconfig',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config,
+      if (config.ssl) {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            migrate(container, original_host, new_host, original_container_data);
+            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        // Save Configuration
+        const options = {
+          url: `https://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          rejectUnauthorized: 'false',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            migrate(container, original_host, new_host, original_container_data);
+            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+          }
+        });
+      } else {
+        // Save Configuration
+        const options = {
+          url: `http://127.0.0.1:${server_port}/updateconfig`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end(error);
+          } else {
+            migrate(container, original_host, new_host, original_container_data);
+            res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
+          }
+        });
       }
-
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end(error);
-        } else {
-          migrate(container, original_host, new_host, original_container_data);
-          res.end('\nMigration may take awhile. Please observe the logs and running containers for the latest information.');
-        }
-      });
-    };
-  };
+    }
+  }
 });
 
-app.get('/stop', function(req, res) {
-  var check_token = req.query['token'];
-  var container = '';
-  if (req.query['container']) {
-    container = req.query['container'];
+app.get('/stop', (req, res) => {
+  const check_token = req.query.token;
+  let container = '';
+  if (req.query.container) {
+    container = req.query.container;
   }
   if (container.indexOf('*') > -1) {
-    var container = '*';
+    container = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-        var command = JSON.stringify({
-          "command": 'docker container stop ' + key,
-          "token": token
+        const command = JSON.stringify({
+          command: 'docker container stop ' + key,
+          token
         });
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
-            }
-          });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -986,53 +1654,96 @@ app.get('/stop', function(req, res) {
   }
 });
 
-
-
-app.get('/delete', function(req, res) {
-  var check_token = req.query['token'];
-  var container = '';
-  if (req.query['container']) {
-    container = req.query['container'];
+app.get('/delete', (req, res) => {
+  const check_token = req.query.token;
+  let container = '';
+  if (req.query.container) {
+    container = req.query.container;
   }
 
   if (container.indexOf('*') > -1) {
     container = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
 
-        var command = JSON.stringify({
-          "command": 'docker container rm -f ' + key,
-          "token": token
+        const command = JSON.stringify({
+          command: 'docker container rm -f ' + key,
+          token
         });
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
 
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
-            }
-          });
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nStopping: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1040,48 +1751,91 @@ app.get('/delete', function(req, res) {
   res.end('');
 });
 
-app.get('/restart', function(req, res) {
-  var check_token = req.query['token'];
-  var selected_container = '';
-  if (req.query['container']) {
-    selected_container = req.query['container'];
+app.get('/restart', (req, res) => {
+  const check_token = req.query.token;
+  let selected_container = '';
+  if (req.query.container) {
+    selected_container = req.query.container;
   }
   if (selected_container.indexOf('*') > -1) {
     selected_container = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-        var command = JSON.stringify({
-          "command": 'docker container restart ' + key,
-          "token": token
+        const command = JSON.stringify({
+          command: 'docker container restart ' + key,
+          token
         });
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nRestarting: ' + key + '\n' + results.output);
-            }
-          });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nRestarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nRestarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nRestarting: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1089,49 +1843,92 @@ app.get('/restart', function(req, res) {
   }
 });
 
-app.get('/containerlog', function(req, res) {
-  var check_token = req.query['token'];
-  var selected_container = '';
-  if (req.query['container']) {
-    selected_container = req.query['container'];
+app.get('/containerlog', (req, res) => {
+  const check_token = req.query.token;
+  let selected_container = '';
+  if (req.query.container) {
+    selected_container = req.query.container;
   }
   if (selected_container.indexOf('*') > -1) {
     selected_container = '*';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    Object.keys(config.layout).forEach(function(get_node, i) {
-      Object.keys(config.layout[i]).forEach(function(key) {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
 
-        var command = JSON.stringify({
-          "command": 'docker container logs ' + key,
-          "token": token
+        const command = JSON.stringify({
+          command: 'docker container logs ' + key,
+          token
         });
-        var options = {
-          url: 'http://' + node + ':' + agentPort + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        }
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            } else {
-              var results = JSON.parse(response.body);
-              addLog('\nLogs for Container: ' + key + '\n' + results.output);
-            }
-          });
+
+        if (config.ssl) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nLogs for Container: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else if (config.ssl && config.ssl_self_signed) {
+          const options = {
+            url: 'https://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            rejectUnauthorized: 'false',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nLogs for Container: ' + key + '\n' + results.output);
+              }
+            });
+          }
+        } else {
+          const options = {
+            url: 'http://' + node + ':' + agent_port + '/run',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+          if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
+            request(options, (error, response) => {
+              if (error) {
+                res.end('An error has occurred.');
+              } else {
+                const results = JSON.parse(response.body);
+                addLog('\nLogs for Container: ' + key + '\n' + results.output);
+              }
+            });
+          }
         }
       });
     });
@@ -1139,21 +1936,21 @@ app.get('/containerlog', function(req, res) {
   res.end('');
 });
 
-app.post('/listcontainers', function(req, res) {
-  var command = req.body.command;
-  var node = req.body.node;
-  var check_token = req.body.token;
-  var output = [];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.post('/listcontainers', (req, res) => {
+  let node = req.body.node;
+  const check_token = req.body.token;
+  const output = [];
+  let container;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
+    for (let i = 0; i < config.layout.length; i++) {
+      for (const key in config.layout[i]) {
         if (config.layout[i].hasOwnProperty(key)) {
           container = key;
           node = config.layout[i].node;
-          var check_port = config.layout[i][key];
-          if (check_port != node) {
+          const check_port = config.layout[i][key];
+          if (check_port !== node) {
             output.push(container);
           }
         }
@@ -1163,21 +1960,19 @@ app.post('/listcontainers', function(req, res) {
   }
 });
 
-
-app.post('/listnodes', function(req, res) {
-  var command = req.body.command;
-  var check_token = req.body.token;
-  var output = [];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.post('/listnodes', (req, res) => {
+  const check_token = req.body.token;
+  const output = [];
+  let node;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    for (var i = 0; i < config.layout.length; i++) {
-      for (var key in config.layout[i]) {
+    for (let i = 0; i < config.layout.length; i++) {
+      for (const key in config.layout[i]) {
         if (config.layout[i].hasOwnProperty(key)) {
-          container = key;
           node = config.layout[i].node;
-          var port_check = config.layout[i][key];
-          if (port_check == node) {
+          const port_check = config.layout[i][key];
+          if (port_check === node) {
             output.push(node);
           }
         }
@@ -1187,112 +1982,302 @@ app.post('/listnodes', function(req, res) {
   }
 });
 
-app.post('/listcommands', function(req, res) {
-  var command = req.body.command;
-  var check_token = req.body.token;
-  var output = [];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+function copyToAgents(file) {
+  Object.keys(config.layout).forEach((get_node, i) => {
+    Object.keys(config.layout[i]).forEach(key => {
+      const node = config.layout[i].node;
+      if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+        return;
+      }
+
+      const formData = {
+        name: 'file',
+        token,
+        file: fs.createReadStream(file)
+      };
+
+      if (config.ssl) {
+        request.post({
+          url: 'https://' + node + ':' + agent_port + '/receive-file',
+          formData
+        }, err => {
+          if (!err) {
+            addLog('\nCopied ' + file + ' to ' + node);
+            console.log('\nCopied ' + file + ' to ' + node);
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        request.post({
+          url: 'https://' + node + ':' + agent_port + '/receive-file',
+          rejectUnauthorized: 'false',
+          formData
+        }, err => {
+          if (!err) {
+            addLog('\nCopied ' + file + ' to ' + node);
+            console.log('\nCopied ' + file + ' to ' + node);
+          }
+        });
+      } else {
+        request.post({
+          url: 'http://' + node + ':' + agent_port + '/receive-file',
+          formData
+        }, err => {
+          if (!err) {
+            addLog('\nCopied ' + file + ' to ' + node);
+            console.log('\nCopied ' + file + ' to ' + node);
+          }
+        });
+      }
+    });
+  });
+}
+
+app.post('/receive-file', upload.single('file'), (req, res) => {
+  const check_token = req.body.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    if (config.commandlist) {
-      res.end(JSON.stringify(config.commandlist));
-    } else {
-      res.end('');
-    }
+    fs.readFile(req.file.path, (err, data) => {
+      if (data) {
+        const newPath = '../' + req.file.originalname;
+        fs.writeFile(newPath, data, err => {
+          if (err) {
+            console.log(err);
+          } else {
+            copyToAgents(newPath);
+          }
+        });
+      }
+    });
+    res.end('');
   }
 });
 
+app.post('/listcommands', (req, res) => {
+  const check_token = req.body.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else if (config.commandlist) {
+    res.end(JSON.stringify(config.commandlist));
+  } else {
+    res.end('');
+  }
+});
 
-app.post('/exec', function(req, res) {
-  var check_token = req.body.token;
-  var selected_node = '';
+/* eslint-disable no-lonely-if */
+app.post('/exec', (req, res) => {
+  const check_token = req.body.token;
+  let selected_node = '';
   if (req.body.node) {
     selected_node = req.body.node;
   }
 
   if (selected_node.indexOf('*') > -1) {
-    var selected_node = '';
+    selected_node = '';
   }
 
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var command = JSON.stringify({
-      "command": req.body.command,
-      "token": token
-    });
+    if (config.ssl) {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
 
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
+        if (selected_node.length === 0) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        if (selected_node.indexOf(node) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        res.end('');
       }
+    } else if (config.ssl && config.ssl_self_signed) {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
 
-      if (selected_node.length == 0) {
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end("An error has occurred.");
-          } else {
-            var results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (selected_node.length === 0) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        if (selected_node.indexOf(node) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        res.end('');
       }
-      if (selected_node.indexOf(node) > -1) {
-        request(options, function(error, response, body) {
-          if (error) {
-            res.end("An error has occurred.");
-          } else {
-            var results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
+    } else {
+      const command = JSON.stringify({
+        command: req.body.command,
+        token
+      });
+
+      for (let i = 0; i < config.layout.length; i++) {
+        const node = config.layout[i].node;
+        const options = {
+          url: 'http://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (selected_node.length === 0) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        if (selected_node.indexOf(node) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\nNode:' + results.node + '\n' + results.output);
+            }
+          });
+        }
+        res.end('');
       }
-      res.end('');
     }
   }
 });
+/* eslint-enable no-lonely-if */
 
-app.get('/prune', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/prune', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var command = JSON.stringify({
-      "command": 'docker system prune -a -f',
-      "token": token
+    const command = JSON.stringify({
+      command: 'docker system prune -a -f',
+      token
     });
-    for (var i = 0; i < config.layout.length; i++) {
-      var node = config.layout[i].node;
-      var responseString = '';
+    for (let i = 0; i < config.layout.length; i++) {
+      const node = config.layout[i].node;
+      if (config.ssl) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      var options = {
-        url: 'http://' + node + ':' + agentPort + '/run',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
+            console.log('\nNode:' + results.node + '\n' + results.output);
+          }
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          url: 'https://' + node + ':' + agent_port + '/run',
+          rejectUnauthorized: 'false',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
+            console.log('\nNode:' + results.node + '\n' + results.output);
+          }
+        });
+      } else {
+        const options = {
+          url: 'http://' + node + ':' + agent_port + '/run',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            addLog('\nNode:' + results.node + '\n' + results.output);
+            console.log('\nNode:' + results.node + '\n' + results.output);
+          }
+        });
       }
-
-      request(options, function(error, response, body) {
-        if (error) {
-          res.end("An error has occurred.");
-        } else {
-          var results = JSON.parse(response.body);
-          addLog('\nNode:' + results.node + '\n' + results.output);
-          console.log('\nNode:' + results.node + '\n' + results.output);
-        }
-      });
       res.end('');
     }
   }
@@ -1301,25 +2286,55 @@ app.get('/prune', function(req, res) {
 function move_container(container, newhost) {
   console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
   addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
-  var options = {
-    url: 'http://127.0.0.1:3000' + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost,
-    method: 'GET'
-  }
 
-  request(options, function(error, response, body) {
-    if (error) {
-      console.log('Error connecting with server. ' + error);
-    } else {
-      config.automatic_heartbeat = 'enabled';
-    }
-  });
+  if (config.ssl) {
+    const options = {
+      url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      method: 'GET'
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log('Error connecting with server. ' + error);
+      } else {
+        config.automatic_heartbeat = 'enabled';
+      }
+    });
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      rejectUnauthorized: 'false',
+      method: 'GET'
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log('Error connecting with server. ' + error);
+      } else {
+        config.automatic_heartbeat = 'enabled';
+      }
+    });
+  } else {
+    const options = {
+      url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      method: 'GET'
+    };
+
+    request(options, error => {
+      if (error) {
+        console.log('Error connecting with server. ' + error);
+      } else {
+        config.automatic_heartbeat = 'enabled';
+      }
+    });
+  }
 }
 
 function container_failover(container) {
-  var container_fail_counter = 0;
-  var proceed = '';
+  let container_fail_counter = 0;
+  let proceed = '';
 
-  for (var key in container_faillog) {
+  for (const key in container_faillog) {
     if (log.hasOwnProperty(key)) {
       if (container_faillog[key].indexOf(container) > -1) {
         container_fail_counter++;
@@ -1328,7 +2343,7 @@ function container_failover(container) {
   }
 
   if (container_fail_counter >= 3) {
-    for (var bkey in container_faillog) {
+    for (const bkey in container_faillog) {
       if (container_faillog[bkey].indexOf(container) > -1) {
         delete container_faillog[bkey];
         proceed = 1;
@@ -1336,12 +2351,12 @@ function container_failover(container) {
     }
 
     if (proceed) {
-      for (var key in config.container_host_constraints) {
+      for (const key in config.container_host_constraints) {
         if (config.container_host_constraints.hasOwnProperty(key)) {
-          var analyze = config.container_host_constraints[key].container.split(',');
+          const analyze = config.container_host_constraints[key].container.split(',');
           if (container.indexOf(analyze[0]) > -1) {
             analyze.splice(0, 1);
-            var newhost = analyze[Math.floor(Math.random() * analyze.length)];
+            const newhost = analyze[Math.floor(Math.random() * analyze.length)];
             move_container(container, newhost);
             config.automatic_heartbeat = 'disabled';
           }
@@ -1351,18 +2366,17 @@ function container_failover(container) {
   }
 }
 
-
 function hb_check(node, container_port, container) {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
-    var client = new net.Socket();
+    const client = new net.Socket();
 
-    client.connect(container_port, node, container, function() {});
+    client.connect(container_port, node, container, () => {});
 
-    client.on('end', function(data) {
+    client.on('end', () => {
       addLog('\nA Heart Beat Check Just Ran.');
     });
 
-    client.on('error', function(data) {
+    client.on('error', () => {
       addLog('\n' + container + ' failed on: ' + node);
       console.log('\n' + container + ' failed on: ' + node);
       if (config.container_host_constraints) {
@@ -1370,36 +2384,59 @@ function hb_check(node, container_port, container) {
         container_failover(container);
       }
 
-      var options = {
-        host: '127.0.0.1',
-        path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-        port: port
-      };
+      if (config.ssl) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+          port: server_port
+        };
 
-      var request = http.get(options, function(response) {}).on('error', function(e) {
-        console.error(e);
-      });
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+      } else if (config.ssl && config.ssl_self_signed) {
+        const options = {
+          host: '127.0.0.1',
+          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+          rejectUnauthorized: 'false',
+          port: server_port
+        };
+
+        https.get(options).on('error', e => {
+          console.error(e);
+        });
+      } else {
+        const options = {
+          host: '127.0.0.1',
+          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
+          port: server_port
+        };
+
+        http.get(options).on('error', e => {
+          console.error(e);
+        });
+      }
+
       client.destroy();
     });
   }
-};
+}
 
-app.get('/hb', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/hb', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    var node = '';
-    var check_port = ''
-    var container = '';
-    for (var i = 0; i < config.hb.length; i++) {
-      for (var key in config.hb[i]) {
+    let node = '';
+    let check_port = '';
+    let container = '';
+    for (let i = 0; i < config.hb.length; i++) {
+      for (const key in config.hb[i]) {
         if (config.hb[i].hasOwnProperty(key)) {
           container = key;
           node = config.hb[i].node;
           check_port = config.hb[i][key];
-          if (check_port != node) {
+          if (check_port !== node) {
             hb_check(node, check_port, container);
           }
         }
@@ -1409,16 +2446,10 @@ app.get('/hb', function(req, res) {
   }
 });
 
-
-
-function gatherLog(callback) {
-  callback(log);
-}
-
-app.get('/log', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/log', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
     if (config.elasticsearch && config.elasticsearch_index) {
       elasticsearch(log);
@@ -1427,25 +2458,58 @@ app.get('/log', function(req, res) {
   }
 });
 
-app.get('/rsyslog', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+/* eslint-disable no-lonely-if */
+app.get('/rsyslog', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    request('http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?' + 'token=' + token, function(error, response, body) {
-      if (!error && response.statusCode == 200) {
-        res.end(body);
-      } else {
-        res.end('Error connecting with server. ' + error);
-      }
-    })
+    if (config.ssl) {
+      const options = {
+        url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
+      };
+
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    } else if (config.ssl && config.ssl_self_signed) {
+      const options = {
+        url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token,
+        rejectUnauthorized: 'false'
+      };
+
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    } else {
+      const options = {
+        url: 'http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
+      };
+
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          res.end(body);
+        } else {
+          res.end('Error connecting with server. ' + error);
+        }
+      });
+    }
   }
 });
+/* eslint-enable no-lonely-if */
 
-app.get('/reloadconfig', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/reloadconfig', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
     if (process.env.PICLUSTER_CONFIG) {
       config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
@@ -1454,73 +2518,113 @@ app.get('/reloadconfig', function(req, res) {
     }
     token = config.token;
     dockerFolder = config.docker;
+
+    if (config.heartbeat_interval && config.automatic_heartbeat) {
+      if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+        console.log('\nEnabing Heartbeat.');
+        automatic_heartbeat();
+      }
+    }
     addLog('\nReloading Config.json\n');
     res.end('');
   }
 });
 
-app.get('/getconfig', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/getconfig', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
     res.send(config);
   }
 });
 
-app.get('/killvip', function(req, res) {
-  var check_token = req.query['token'];
-  if ((check_token != token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials')
+app.get('/killvip', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
   } else {
-    var responseString = '';
-    if (!config.vip) {
+    if (!config.vip) { // eslint-disable-line no-negated-condition,no-lonely-if
       res.end('\nError: VIP not configured.');
     } else {
-      Object.keys(config.vip).forEach(function(get_node, i) {
-        Object.keys(config.vip[i]).forEach(function(key) {
+      Object.keys(config.vip).forEach((get_node, i) => {
+        Object.keys(config.vip[i]).forEach(key => {
           const node = config.vip[i].node;
           if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
           }
-          var token_body = JSON.stringify({
-            "token": token
+          const token_body = JSON.stringify({
+            token
           });
 
-          var options = {
-            url: 'http://' + node + ':' + agentPort + '/killvip',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': token_body.length
-            },
-            body: token_body
-          }
+          if (config.ssl) {
+            const options = {
+              url: 'https://' + node + ':' + agent_port + '/killvip',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
+            };
 
-          request(options, function(error, response, body) {
-            if (error) {
-              res.end("An error has occurred.");
-            }
-          })
+            request(options, error => {
+              if (error) {
+                res.end('An error has occurred.');
+              }
+            });
+          } else if (config.ssl && config.ssl_self_signed) {
+            const options = {
+              url: 'https://' + node + ':' + agent_port + '/killvip',
+              rejectUnauthorized: 'false',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
+            };
+
+            request(options, error => {
+              if (error) {
+                res.end('An error has occurred.');
+              }
+            });
+          } else {
+            const options = {
+              url: 'http://' + node + ':' + agent_port + '/killvip',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': token_body.length
+              },
+              body: token_body
+            };
+
+            request(options, error => {
+              if (error) {
+                res.end('An error has occurred.');
+              }
+            });
+          }
         });
       });
     }
   }
   res.end('');
-
 });
 
-app.post('/updateconfig', function(req, res) {
-  var payload = req.body.payload;
-  var check_token = req.body.token;
+app.post('/updateconfig', (req, res) => {
+  let payload = req.body.payload;
+  const check_token = req.body.token;
 
   try {
-    var verify_payload = JSON.parse(req.body.payload);
-    if ((check_token != token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials')
+    const verify_payload = JSON.parse(req.body.payload);
+    if ((check_token !== token) || (!check_token)) {
+      res.end('\nError: Invalid Credentials');
     } else {
       payload = JSON.stringify(verify_payload, null, 4);
-      fs.writeFile(config_file, payload, function(err) {
+      fs.writeFile(config_file, payload, err => {
         if (err) {
           console.log('\nError while writing config.' + err);
         } else {
@@ -1528,13 +2632,25 @@ app.post('/updateconfig', function(req, res) {
         }
       });
     }
-  } catch (e) {
+  } catch (err) {
     res.end('Error: Invalid JSON. Configuration not saved.');
   }
-
 });
 
-
-server.listen(port, function() {
-  console.log('Listening on port %d', port);
-});
+if (config.ssl && config.ssl_cert && config.ssl_key) {
+  console.log('SSL Server API enabled');
+  const ssl_options = {
+    cert: fs.readFileSync(config.ssl_cert),
+    key: fs.readFileSync(config.ssl_key)
+  };
+  const server = https.createServer(ssl_options, app);
+  server.listen(server_port, () => {
+    console.log('Listening on port %d', server_port);
+  });
+} else {
+  console.log('Non-SSL Server API enabled');
+  const server = http.createServer(app);
+  server.listen(server_port, () => {
+    console.log('Listening on port %d', server_port);
+  });
+}

@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
@@ -135,7 +135,8 @@
 			font-size: 12px;
 			border: 1px solid #888;
 			width: 70%;
-			height: : 70%;
+			height: 70%;
+			overflow: auto;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -288,32 +289,28 @@
 					<script>
 						$(function() {
 							var option = '';
-							$.post('/listcontainers', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
+							if (parent.manage_container) {
+								option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
 								$('#containerlist').append(option);
-							});
+								parent.manage_container = '';
+							} else {
+								$.get("/nodes?token=" + parent.token, function(data) {
+									for (var i in data.container_list) {
+										option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+									}
+									option += '<option value="' + '*' + '">' + '*' + '</option>';
+									$('#containerlist').append(option);
+								});
+							}
+
 						});
 						$(function() {
 							var option = '';
-							$.post('/listnodes', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							$.get("/nodes?token=" + parent.token, function(data) {
+								for (var i in data.nodes) {
+									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
+								option += '<option value="' + '*' + '">' + '*' + '</option>';
 								$('#nodelist').append(option);
 							});
 						});

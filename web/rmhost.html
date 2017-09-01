@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
@@ -172,15 +172,9 @@
 					</p>
 					<script>
 						var option = '';
-						$.post('/listnodes', {
-							token: parent.token
-						}, function(data) {
-							data = data.replace(/\[/gi, '');
-							data = data.replace(/\]/gi, '');
-							data = data.replace(/\"/gi, '');
-							var parse_data = data.split(',');
-							for (var i = 0; i < parse_data.length; i++) {
-								option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+						$.get("/nodes?token=" + parent.token, function(data) {
+							for (var i in data.nodes) {
+								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 							}
 							$('#nodelist').append(option);
 						});

@@ -1,6 +1,7 @@
 <html>
 
 <head>
+	<script src="/assets/jquery.min.js"></script>
 	<style>
 		body {
 			display: block;
@@ -12,7 +13,63 @@
 			border-bottom: 2px solid transparent;
 			color: black;
 		}
+
+		.page {
+			margin: 10px;
+		}
+
+		h1 {
+			margin: 40px 0 60px 0;
+		}
+
+		.dark-area {
+			background-color: #666;
+			padding: 40px;
+			margin: 0 -40px 20px -40px;
+			clear: both;
+		}
+
+		.clearfix:before,
+		.clearfix:after {
+			content: " ";
+			display: table;
+		}
+
+		.clearfix:after {
+			clear: both;
+		}
+
+		.clearfix {
+			*zoom: 1;
+		}
 	</style>
+	<link rel="stylesheet" href="/assets/circle.css">
+	<script>
+		function getContainerStatus() {
+			setTimeout(function() {
+				if (parent.token) {
+					$.get("/nodes?token=" + parent.token, function(data) {
+						var check_data = data;
+						var total = check_data.total_containers;
+						var running = 0;
+						for (var i in check_data.data) {
+							running = running + check_data.data[i].total_running_containers;
+						}
+						var calc = Math.floor((running / total * 100));
+						var percent = 0;
+						if (!calc == 100) {
+							percent = percent = Math.ceil((calc + 1) / 100) * 10;
+						} else {
+							percent = calc;
+						}
+						document.getElementById("running_containers").textContent = percent + "%";
+						document.getElementById("running-class").className = "c100 p" + percent + " small";
+						getContainerStatus();
+					});
+				}
+			}, 5000)
+		}
+	</script>
 </head>
 
 <body>
@@ -22,6 +79,7 @@
 		<br>
 		<b>Welcome to PiCluster!
 	</p>
+
 	<p align=center>
 		<table style="width:20%">
 			<tr>
@@ -31,8 +89,22 @@
 				<td>
 		<a href='https://github.com/picluster/picluster/issues' style="text-decoration:none" target="_blank"> <img height="75" width="100" src="/assets/images/Debug-Bug-icon.png"><br>&nbsp;&nbsp;&nbsp;Report Issue</a>
 				</td>
+				<td>
+					<div class="page">
+							<div class="clearfix">
+									<div id="running-class" class="c100 p0 small">
+										<span id='running_containers'>0%</span>
+											<div class="slice">
+													<div class="bar"></div>
+													<div class="fill"></div>
+											</div>
+									</div>
+										<font size="3"><a style="text-decoration:none" href="/container-layout.html"> &nbsp;&nbsp;Running</a></font>
 			</tr>
 		</table>
+		<script>
+			getContainerStatus();
+		</script>
 
 </body>
 

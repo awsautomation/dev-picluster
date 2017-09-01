@@ -1,20 +1,20 @@
 <html>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
-	<script src="/assets/distLogo.js"></script>
 	<style>
 		body {
 			display: block;
 			color: rgba(255, 255, 255, .9);
 			text-decoration: none;
 			padding: 1rem;
-			font-size: 18px;
+			font-size: 1rem;
 			border-top: 2px solid transparent;
 			border-bottom: 2px solid transparent;
 		}
+
 
 		button {
 			background-color: #565051;
@@ -27,15 +27,26 @@
 			font-size: 16px;
 		}
 
-		#imagelist {
+		#nodelist {
+			font-size: 18px;
+		}
+
+		form {
+			font-size: 18px;
+			background-color: #565051;
+			border: none;
+			color: white;
+			padding: 15px 32px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+		}
+
+		#windowfont {
 			font-size: 18px;
 		}
 
 		#modal-body2 {
-			font-size: 18px;
-		}
-
-		label {
 			font-size: 18px;
 		}
 
@@ -60,7 +71,7 @@
 			font-size: 12px;
 			padding: 0;
 			border: 1px solid #888;
-			width: 50%;
+			width: 45%;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -134,26 +145,7 @@
 			animation-duration: 0.4s
 		}
 	</style>
-	<script>
-		function exec() {
-			var e = document.getElementById("imagelist");
-			var image = e.options[e.selectedIndex].value;
-
-			if (image) {
-
-				$.post('/build', {
-					token: parent.token,
-					image: image
-				}, function(data) {
-					var div = document.getElementById('modal-body2');
-					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
-				});
-			} else {
-				alert('Error, you did not select an image.')
-			}
-
-		}
-	</script>
+	<script src="/assets/dropzone.js"></script>
 </head>
 
 <body>
@@ -161,55 +153,22 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Build a Container Image</h2>
+				<h2>Upload Dockerfile Archive</h2>
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					<fieldset>
-						<label for="imagelist">Select a Container</label>
-						<select name="imagelist" id="imagelist">
-			    </select>
-						<br> <br>
-						<p align=center>
-							<button id="myBtn">Submit</button>
-						</p>
-						<script>
-							$(function() {
-								var option = '';
-								$.post('/listcontainers', {
-									token: parent.token
-								}, function(data) {
-									data = data.replace(/\[/gi, '');
-									data = data.replace(/\]/gi, '');
-									data = data.replace(/\"/gi, '');
-									var parse_data = data.split(',');
-									for (var i = 0; i < parse_data.length; i++) {
-										option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-									}
-									option += '<option value="' + '*' + '">' + '*' + '</option>';
-									$('#imagelist').append(option);
-								});
-							});
-						</script>
-						<p align=center>
-						</p>
-						<script>
-							$(function() {
-								var option = '';
-								$.post('/listnodes', {
-									token: parent.token
-								}, function(data) {
-									data = data.replace(/\[/gi, '');
-									data = data.replace(/\]/gi, '');
-									data = data.replace(/\"/gi, '');
-									var parse_data = data.split(',');
-									for (var i = 0; i < parse_data.length; i++) {
-										option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
-									}
-									$('#nodelist').append(option);
-								});
-							});
-						</script>
+					<label id="windowfont">This will upload a .zip archive of a containers Dockerfile and required files.
+				  <br><br>
+					The .zip archive will be copied to each node and extracted in the Docker directory.
+						<br><br>
+					<form id="upload-widget" method="post" action="/upload" class="dropzone">
+					<input type="hidden" name="token" id="token">
+					</form>
+					<br><br>
+					</fieldset>
+					<script>
+					 document.getElementById("token").value = parent.token;
+					</script>
 			</div>
 		</div>
 	</div>
@@ -243,12 +202,9 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
-			modal.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
+
 		modal.style.display = "block";
 	</script>
+	</p>
 
 </html>

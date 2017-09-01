@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
@@ -163,7 +163,7 @@
 					command: command,
 					node: node
 				}, function(data) {
-						$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
+					$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
 				});
 			}
 		}
@@ -196,15 +196,9 @@
 					<script>
 						$(function() {
 							var option = '';
-							$.post('/listnodes', {
-								token: parent.token
-							}, function(data) {
-								data = data.replace(/\[/gi, '');
-								data = data.replace(/\]/gi, '');
-								data = data.replace(/\"/gi, '');
-								var parse_data = data.split(',');
-								for (var i = 0; i < parse_data.length; i++) {
-									option += '<option value="' + parse_data[i] + '">' + parse_data[i] + '</option>';
+							$.get("/nodes?token=" + parent.token, function(data) {
+								for (var i in data.nodes) {
+									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
 								$('#nodelist').append(option);
@@ -242,14 +236,17 @@
 			</div>
 			<div class="modal-body">
 				<p align=center>
-				<table style="width:10%">
-					<tr>
-						<td>
-							<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-					</tr>
-				</table>
-				<p align=left>
-					<br>
+					<table style="width:10%">
+						<tr>
+							<td>
+								<p align=center>
+									<button id="myBtn2">Run Again</button>
+									<br><br>
+									<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+						</tr>
+					</table>
+					<p align=left>
+						<br>
 			</div>
 		</div>
 	</div>
@@ -260,6 +257,7 @@
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
 		var btn = document.getElementById("myBtn");
+		var btn2 = document.getElementById("myBtn2");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -271,6 +269,10 @@
 		btn.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
+			exec();
+		}
+		btn2.onclick = function() {
+			$('#command_output').val('');
 			exec();
 		}
 		modal.style.display = "block";
