@@ -50,64 +50,34 @@ function getData() {
       const options = {
         url: 'https://' + server + ':' + server_port + '/nodes?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          /* eslint-disable no-unused-vars */
-          let json;
-          let statusCode = 200;
-          try {
-            nodedata = JSON.parse(response.body);
-          } catch (err) {
-            statusCode = 500;
-            console.error(err);
-          }
-          /* eslint-enable no-unused-vars */
-        } else {
-          console.log('\nError connecting with server. ' + error);
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/nodes?token=' + token,
         rejectUnauthorized: false
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          /* eslint-disable no-unused-vars */
-          let json;
-          let statusCode = 200;
-          try {
-            nodedata = JSON.parse(response.body);
-          } catch (err) {
-            statusCode = 500;
-            console.error(err);
-          }
-          /* eslint-enable no-unused-vars */
-        } else {
-          console.log('\nError connecting with server. ' + error);
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/nodes?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          /* eslint-disable no-unused-vars */
-          let json;
-          let statusCode = 200;
-          try {
-            nodedata = JSON.parse(response.body);
-          } catch (err) {
-            statusCode = 500;
-            console.error(err);
-          }
-          /* eslint-enable no-unused-vars */
-        } else {
-          console.log('\nError connecting with server. ' + error);
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        /* eslint-disable no-unused-vars */
+        let json;
+        let statusCode = 200;
+        try {
+          nodedata = JSON.parse(response.body);
+        } catch (err) {
+          statusCode = 500;
+          console.error(err);
+        }
+        /* eslint-enable no-unused-vars */
+      } else {
+        console.log('\nError connecting with server. ' + error);
+      }
+    });
+
     getData();
   }, 5000);
 }
@@ -162,14 +132,6 @@ app.post('/sendconfig', (req, res) => {
         body: command,
         token
       };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(body);
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/updateconfig',
@@ -182,14 +144,6 @@ app.post('/sendconfig', (req, res) => {
         body: command,
         token
       };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(body);
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/updateconfig',
@@ -201,15 +155,15 @@ app.post('/sendconfig', (req, res) => {
         body: command,
         token
       };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(body);
-        }
-      });
     }
+
+    request(options, (error, response, body) => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end(body);
+      }
+    });
   }
 });
 
@@ -229,19 +183,18 @@ app.post('/', (req, res) => {
 });
 
 app.post('/exec', (req, res) => {
-  if (config.ssl) {
-    const check_token = req.body.token;
-    const node = req.body.node;
+  const check_token = req.body.token;
+  const node = req.body.node;
 
-    if ((check_token !== token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials');
-    } else {
-      const command = JSON.stringify({
-        command: req.body.command,
-        token,
-        node
-      });
-
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const command = JSON.stringify({
+      command: req.body.command,
+      token,
+      node
+    });
+    if (config.ssl) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/exec',
         method: 'POST',
@@ -251,30 +204,7 @@ app.post('/exec', (req, res) => {
         },
         body: command
       };
-
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
-    }
-  } else if (config.ssl && config.ssl_self_signed) {
-    const check_token = req.body.token;
-    const node = req.body.node;
-
-    if ((check_token !== token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials');
-    } else {
-      const command = JSON.stringify({
-        command: req.body.command,
-        token,
-        node
-      });
-
+    } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/exec',
         rejectUnauthorized: 'false',
@@ -285,30 +215,7 @@ app.post('/exec', (req, res) => {
         },
         body: command
       };
-
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
-    }
-  } else {
-    const check_token = req.body.token;
-    const node = req.body.node;
-
-    if ((check_token !== token) || (!check_token)) {
-      res.end('\nError: Invalid Credentials');
     } else {
-      const command = JSON.stringify({
-        command: req.body.command,
-        token,
-        node
-      });
-
       const options = {
         url: 'http://' + server + ':' + server_port + '/exec',
         method: 'POST',
@@ -318,17 +225,17 @@ app.post('/exec', (req, res) => {
         },
         body: command
       };
-
-      request(options, error => {
-        if (error) {
-          res.end(error);
-        } else {
-          display_log(data => {
-            res.end(data);
-          });
-        }
-      });
     }
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        display_log(data => {
+          res.end(data);
+        });
+      }
+    });
   }
 });
 
@@ -460,14 +367,6 @@ app.post('/listcommands', (req, res) => {
         },
         body: token_body
       };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(body);
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/listcommands',
@@ -479,14 +378,6 @@ app.post('/listcommands', (req, res) => {
         },
         body: token_body
       };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(body);
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/listcommands',
@@ -497,66 +388,45 @@ app.post('/listcommands', (req, res) => {
         },
         body: token_body
       };
-
-      request(options, (error, response, body) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(body);
-        }
-      });
     }
+
+    request(options, (error, response, body) => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end(body);
+      }
+    });
   }
 });
 
 function display_log(callback) {
   if (config.ssl) {
-    clear_log(() => {
-      setTimeout(() => {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/log?token=' + token
-        };
-        request(options, (error, response, body) => {
-          if (!error && response.statusCode === 200) {
-            callback(body);
-          } else {
-            callback('\nError connecting with server.');
-          }
-        });
-      }, request_timeout);
-    });
+    const options = {
+      url: 'https://' + server + ':' + server_port + '/log?token=' + token
+    };
   } else if (config.ssl && config.ssl_self_signed) {
-    clear_log(() => {
-      setTimeout(() => {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/log?token=' + token,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response, body) => {
-          if (!error && response.statusCode === 200) {
-            callback(body);
-          } else {
-            callback('\nError connecting with server.');
-          }
-        });
-      }, request_timeout);
-    });
+    const options = {
+      url: 'https://' + server + ':' + server_port + '/log?token=' + token,
+      rejectUnauthorized: 'false'
+    };
   } else {
-    clear_log(() => {
-      setTimeout(() => {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/log?token=' + token
-        };
-        request(options, (error, response, body) => {
-          if (!error && response.statusCode === 200) {
-            callback(body);
-          } else {
-            callback('\nError connecting with server.');
-          }
-        });
-      }, request_timeout);
-    });
+    const options = {
+      url: 'http://' + server + ':' + server_port + '/log?token=' + token
+    };
   }
+
+  clear_log(() => {
+    setTimeout(() => {
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          callback(body);
+        } else {
+          callback('\nError connecting with server.');
+        }
+      });
+    }, request_timeout);
+  });
 }
 
 function clear_log(callback) {
@@ -564,37 +434,24 @@ function clear_log(callback) {
     const options = {
       url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token
     };
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        callback('');
-      } else {
-        console.log('\nError clearing log: ' + error);
-      }
-    });
   } else if (config.ssl && config.ssl_self_signed) {
     const options = {
       url: 'https://' + server + ':' + server_port + '/clearlog?token=' + token,
       rejectUnauthorized: 'false'
     };
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        callback('');
-      } else {
-        console.log('\nError clearing log: ' + error);
-      }
-    });
   } else {
     const options = {
       url: 'http://' + server + ':' + server_port + '/clearlog?token=' + token
     };
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        callback('');
-      } else {
-        console.log('\nError clearing log: ' + error);
-      }
-    });
   }
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      callback('');
+    } else {
+      console.log('\nError clearing log: ' + error);
+    }
+  });
 }
 
 /* eslint-disable no-lonely-if */
@@ -611,43 +468,26 @@ app.post('/containerlog', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/containerlog?token=' + token + '&container=' + container
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end('\n' + data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/containerlog?token=' + token + '&container=' + container,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end('\n' + data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/containerlog?token=' + token + '&container=' + container
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end('\n' + data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end('\n' + data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -667,43 +507,26 @@ app.post('/create', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(() => {
-            res.end('\nSent request to create the containers.');
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(() => {
-            res.end('\nSent request to create the containers.');
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/create?token=' + token + '&container=' + container
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(() => {
-            res.end('\nSent request to create the containers.');
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(() => {
+          res.end('\nSent request to create the containers.');
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -718,37 +541,24 @@ app.get('/rsyslog', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/rsyslog?token=' + token
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/rsyslog?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/rsyslog?token=' + token
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        res.end(body);
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -763,67 +573,34 @@ app.get('/reloadconfig', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/reloadconfig?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          if (process.env.PICLUSTER_CONFIG) {
-            config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-          } else {
-            config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-          }
-          token = config.token;
-          user = config.web_username;
-          password = config.web_password;
-          server = config.web_connect;
-          server_port = config.server_port;
-          res.end('\nRequest to update configuration succeeded.');
-        } else {
-          res.end('\nError connecting with server.' + error);
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/reloadconfig?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          if (process.env.PICLUSTER_CONFIG) {
-            config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-          } else {
-            config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-          }
-          token = config.token;
-          user = config.web_username;
-          password = config.web_password;
-          server = config.web_connect;
-          server_port = config.server_port;
-          res.end('\nRequest to update configuration succeeded.');
-        } else {
-          res.end('\nError connecting with server.' + error);
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/reloadconfig?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          if (process.env.PICLUSTER_CONFIG) {
-            config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-          } else {
-            config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-          }
-          token = config.token;
-          user = config.web_username;
-          password = config.web_password;
-          server = config.web_connect;
-          server_port = config.server_port;
-          res.end('\nRequest to update configuration succeeded.');
-        } else {
-          res.end('\nError connecting with server.' + error);
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        if (process.env.PICLUSTER_CONFIG) {
+          config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
+        } else {
+          config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+        }
+        token = config.token;
+        user = config.web_username;
+        password = config.web_password;
+        server = config.web_connect;
+        server_port = config.server_port;
+        res.end('\nRequest to update configuration succeeded.');
+      } else {
+        res.end('\nError connecting with server.' + error);
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -838,43 +615,26 @@ app.get('/killvip', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/killvip?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/killvip?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/killvip?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -891,96 +651,43 @@ app.post('/delete-image', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: This isn't a massive issue but should still probably be fixed at some point.
-      if (image.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+    if (config.ssl && image.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
+      };
+    } else if (config.ssl) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token
+      };
+    } else if (config.ssl && config.ssl_self_signed && image.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image,
+        rejectUnauthorized: 'false'
+      };
     } else if (config.ssl && config.ssl_self_signed) {
-      // FixMe: This isn't a massive issue but should still probably be fixed at some point.
-      if (image.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete-image?token=' + token,
+        rejectUnauthorized: 'false'
+      };
+    } else if (image.length > 1) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
+      };
     } else {
-      // FixMe: This isn't a massive issue but should still probably be fixed at some point.
-      if (image.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token + '&image=' + image
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/delete-image?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
+        res.end('\nError connecting with server.');
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -998,90 +705,41 @@ app.post('/build', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
-      if (image.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          }
-        });
-      }
+    if (config.ssl && image.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
+      };
+    } else if (config.ssl) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
+      };
+    } else if (config.ssl && config.ssl_self_signed && image.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache,
+        rejectUnauthorized: 'false'
+      };
     } else if (config.ssl && config.ssl_self_signed) {
-      // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
-      if (image.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          }
-        });
-      }
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache,
+        rejectUnauthorized: 'false'
+      };
+    } else if (image.length > 1) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
+      };
     } else {
-      // FixMe: Same as above - Not a massive issue but restructure this at some point in time.
-      if (image.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&image=' + image + '&no_cache=' + no_cache
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/build?token=' + token + '&no_cache=' + no_cache
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1101,96 +759,43 @@ app.post('/delete', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-ifr
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+    if (config.ssl && continainer.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container
+      };
+    } else if (config.ssl) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete?token=' + token
+      };
+    } else if (config.ssl && config.ssl_self_signed && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container,
+        rejectUnauthorized: 'false'
+      };
     } else if (config.ssl && config.ssl_self_signed) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-ifr
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/delete?token=' + token,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/delete?token=' + token,
+        rejectUnauthorized: 'false'
+      };
+    } else if (container.length > 1) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container
+      };
     } else {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/delete?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/delete?token=' + token
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/delete?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
+        res.end('\nError connecting with server.');
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1205,43 +810,27 @@ app.get('/prune', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/prune?token=' + token
       };
-      request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
+
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/prune?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response, body) => {  // eslint-disable-line no-unused-vars
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/prune?token=' + token
       };
-      request(options, (error, response, body) => {  // eslint-disable-line no-unused-vars
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1261,95 +850,42 @@ app.post('/stop', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/stop?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+    if (config.ssl && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container
+      };
+    } else if (config.ssl) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/stop?token=' + token
+      };
+    } else if (config.ssl && config.ssl_self_signed && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container,
+        rejectUnauthorized: 'false'
+      };
     } else if (config.ssl && config.ssl_self_signed) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/stop?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/stop?token=' + token
+      };
+    } else if (container.length > 1) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container
+      };
     } else {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/stop?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/stop?token=' + token
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/stop?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
+        res.end('\nError connecting with server.');
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1369,49 +905,30 @@ app.post('/changehost', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        request('http://' + server + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            request(`http://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`, (error, response) => {
-              if (!error && response.statusCode === 200) {
-                display_log(data => {
-                  res.end(data);
-                });
-              } else {
-                res.end('\nError connecting with server.');
-              }
-            });
-          }
-        });
-      }
-    } else {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        request('http://' + server + ':' + server_port + '/changehost?token=' + token + '&container=' + container + '&newhost=' + newhost, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          }
+    if (config.ssl && container.length > 1) {
+      const options = {
+        url: `https://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`
+      };
+    } else if (config.ssl && config.ssl_self_signed && container.length > 1) {
+      const options = {
+        url: `https://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+        rejectUnauthorized: 'false'
+      };
+    } else if (container.length > 1) {
+      const options = {
+        url: `http://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       } else {
-        request(`http://${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
+        res.end('\nError connecting with server.');
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1435,26 +952,29 @@ app.post('/addcontainer', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else if ((container) && (container_args) && (host)) {
     if (config.ssl) {
-      request('https://' + server + ':' + server_port + '/addcontainer?token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/addcontainer?token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints
+      };
+    } else if (config.ssl && config.ssl_self_signed) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/addcontainer?token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints,
+        rejectUnauthorized: 'false'
+      };
     } else {
-      request('http://' + server + ':' + server_port + '/addcontainer?token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/addcontainer?token=' + token + '&container=' + container + '&host=' + host + '&container_args=' + container_args + '&heartbeat_args=' + heartbeat_args + '&failover_constraints=' + failover_constraints
+      };
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   } else {
     res.end('\nError missing some parameters.');
   }
@@ -1469,40 +989,30 @@ function sendFile(file) {
   };
 
   if (config.ssl) {
-    request.post({
+    const options = {
       url: 'https://' + server + ':' + server_port + '/receive-file',
       formData
-    }, err => {
-      if (err) {
-        console.error('upload failed:', err);
-      } else {
-        console.log('Upload successful!');
-      }
-    });
+    };
   } else if (config.ssl && config.ssl_self_signed) {
-    request.post({
+    const options = {
       url: 'https://' + server + ':' + server_port + '/receive-file',
       rejectUnauthorized: 'false',
       formData
-    }, err => {
-      if (err) {
-        console.error('upload failed:', err);
-      } else {
-        console.log('Upload successful!');
-      }
-    });
+    };
   } else {
-    request.post({
+    const options = {
       url: 'http://' + server + ':' + server_port + '/receive-file',
       formData
-    }, err => {
-      if (err) {
-        console.error('upload failed:', err);
-      } else {
-        console.log('Upload successful!');
-      }
-    });
+    };
   }
+
+  request.post({options}, err => {
+    if (err) {
+      console.error('upload failed:', err);
+    } else {
+      console.log('Upload successful!');
+    }
+  });
 }
 
 app.post('/upload', upload.single('file'), (req, res) => {
@@ -1533,43 +1043,26 @@ app.post('/removecontainerconfig', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + container
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + container,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + container
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   } else {
     res.end('\nError container name.');
   }
@@ -1588,43 +1081,26 @@ app.post('/addhost', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/addhost?token=' + token + '&host=' + host
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/addhost?token=' + token + '&host=' + host,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/addhost?token=' + token + '&host=' + host
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   } else {
     res.end('\nError missing host name.');
   }
@@ -1643,43 +1119,26 @@ app.post('/rmhost', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/rmhost?token=' + token + '&host=' + host
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/rmhost?token=' + token + '&host=' + host,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/rmhost?token=' + token + '&host=' + host
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   } else {
     res.end('\nError missing host name.');
   }
@@ -1699,96 +1158,43 @@ app.post('/start', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/start?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+    if (config.ssl && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container
+      };
+    } else if (config.ssl) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/start?token=' + token
+      };
+    } else if (config.ssl && config.ssl_self_signed && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container,
+        rejectUnauthorized: 'false'
+      };
     } else if (config.ssl && config.ssl_self_signed) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/start?token=' + token,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/start?token=' + token,
+        rejectUnauthorized: 'false'
+      };
+    } else if (container.length > 1) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container
+      };
     } else {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/start?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/start?token=' + token
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/start?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
+        res.end('\nError connecting with server.');
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1808,96 +1214,43 @@ app.post('/restart', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/restart?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+    if (config.ssl && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container
+      };
+    } else if (config.ssl) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/restart?token=' + token
+      };
+    } else if (config.ssl && config.ssl_self_signed && container.length > 1) {
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container,
+        rejectUnauthorized: 'false'
+      };
     } else if (config.ssl && config.ssl_self_signed) {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      } else {
-        const options = {
-          url: 'https://' + server + ':' + server_port + '/restart?token=' + token,
-          rejectUnauthorized: 'false'
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
-      }
+      const options = {
+        url: 'https://' + server + ':' + server_port + '/restart?token=' + token,
+        rejectUnauthorized: 'false'
+      };
+    } else if (container.length > 1) {
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container
+      };
     } else {
-      // FixMe: Fix this!
-      if (container.length > 1) { // eslint-disable-line no-lonely-if
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/restart?token=' + token + '&container=' + container
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
+      const options = {
+        url: 'http://' + server + ':' + server_port + '/restart?token=' + token
+      };
+    }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
         });
       } else {
-        const options = {
-          url: 'http://' + server + ':' + server_port + '/restart?token=' + token
-        };
-        request(options, (error, response) => {
-          if (!error && response.statusCode === 200) {
-            display_log(data => {
-              res.end(data);
-            });
-          } else {
-            res.end('\nError connecting with server.');
-          }
-        });
+        res.end('\nError connecting with server.');
       }
-    }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1912,43 +1265,26 @@ app.get('/hb', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/hb?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/hb?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/hb?token=' + token
       };
-      request(options, (error, response) => {
-        if (!error && response.statusCode === 200) {
-          display_log(data => {
-            res.end(data);
-          });
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -1963,37 +1299,24 @@ app.get('/log', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/log?token=' + token
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/log?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/log?token=' + token
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('\nError connecting with server.');
-        }
-      });
     }
+
+    request(options, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        res.end(body);
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */
@@ -2019,37 +1342,24 @@ app.get('/getconfig', (req, res) => {
       const options = {
         url: 'https://' + server + ':' + server_port + '/getconfig?token=' + token
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('Error connecting with server. ' + error);
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + server + ':' + server_port + '/getconfig?token=' + token,
         rejectUnauthorized: 'false'
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('Error connecting with server. ' + error);
-        }
-      });
     } else {
       const options = {
         url: 'http://' + server + ':' + server_port + '/getconfig?token=' + token
       };
-      request(options, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-          res.end(body);
-        } else {
-          res.end('Error connecting with server. ' + error);
-        }
-      });
     }
+
+    request(options, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        res.end(body);
+      } else {
+        res.end('Error connecting with server. ' + error);
+      }
+    });
   }
 });
 /* eslint-enable no-lonely-if */

@@ -31,6 +31,8 @@ app.use(bodyParser());
 const upload = multer({
   dest: '../'
 });
+const server = config.web_connect;
+const server_port = config.server_port;
 const agent_port = config.agent_port;
 const node = os.hostname();
 const token = config.token;
@@ -124,21 +126,25 @@ monitoring();
 
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
-  const options = {
-    host: config.web_connect,
-    path: '/start?token=' + token + '&container=*',
-    port: config.server_port
-  };
 
   if (config.ssl) {
-    https.get(options).on('error', e => {
-      console.error(e);
-    });
+    const options = {
+      url : `https://${server}:${server_port}/start?token=${token}&container=*`
+    };
+  } else if (config.ssl && config.ssl_self_signed) {
+    const options = {
+      url : `https://${server}:${server_port}/start?token=${token}&container=*`,
+      rejectUnauthorized: 'false'
+    };
   } else {
-    http.get(options).on('error', e => {
-      console.error(e);
-    });
+    const options = {
+      url : `http://${server}:${server_port}/start?token=${token}&container=*`
+    };
   }
+
+  request.get(options).on('error', e => {
+    console.error(e);
+  });
 }
 
 if (config.vip_ip && config.vip) {
@@ -184,42 +190,6 @@ function send_ping() {
         },
         body: token_body
       };
-
-      request(options, (error, response, body) => {
-        let found_vip = false;
-
-        if ((error || response.statusCode !== '200')) {
-          const cmd = ip_add_command;
-          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
-          exec(cmd).then(noop).catch(noop);
-        } else {
-          const interfaces = require('os').networkInterfaces();
-          Object.keys(interfaces).forEach(devName => {
-            const iface = interfaces[devName];
-            iface.forEach(alias => {
-              if (alias.address === vip) {
-                found_vip = true;
-              }
-            });
-          });
-          const json_object = JSON.parse(body);
-
-          if (json_object.vip_detected === 'false' && found_vip === false) {
-            console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
-            const cmd = ip_add_command;
-            exec(cmd).catch(err => {
-              console.log(err);
-            });
-          }
-          if ((json_object.vip_detected === 'true' && found_vip === true)) {
-            console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
-            const cmd = ip_delete_command;
-            exec(cmd).catch(err => {
-              console.log(err);
-            });
-          }
-        }
-      });
     } else if (config.ssl && config.ssl_self_signed) {
       const options = {
         url: 'https://' + vip_slave + ':' + agent_port + '/pong',
@@ -231,42 +201,6 @@ function send_ping() {
         },
         body: token_body
       };
-
-      request(options, (error, response, body) => {
-        let found_vip = false;
-
-        if ((error || response.statusCode !== '200')) {
-          const cmd = ip_add_command;
-          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
-          exec(cmd).then(noop).catch(noop);
-        } else {
-          const interfaces = require('os').networkInterfaces();
-          Object.keys(interfaces).forEach(devName => {
-            const iface = interfaces[devName];
-            iface.forEach(alias => {
-              if (alias.address === vip) {
-                found_vip = true;
-              }
-            });
-          });
-          const json_object = JSON.parse(body);
-
-          if (json_object.vip_detected === 'false' && found_vip === false) {
-            console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
-            const cmd = ip_add_command;
-            exec(cmd).catch(err => {
-              console.log(err);
-            });
-          }
-          if ((json_object.vip_detected === 'true' && found_vip === true)) {
-            console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
-            const cmd = ip_delete_command;
-            exec(cmd).catch(err => {
-              console.log(err);
-            });
-          }
-        }
-      });
     } else {
       const options = {
         url: 'http://' + vip_slave + ':' + agent_port + '/pong',
@@ -277,44 +211,43 @@ function send_ping() {
         },
         body: token_body
       };
-
-      request(options, (error, response, body) => {
-        let found_vip = false;
-
-        if ((error || response.statusCode !== '200')) {
-          const cmd = ip_add_command;
-          // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
-          exec(cmd).then(noop).catch(noop);
-        } else {
-          const interfaces = require('os').networkInterfaces();
-          Object.keys(interfaces).forEach(devName => {
-            const iface = interfaces[devName];
-            iface.forEach(alias => {
-              if (alias.address === vip) {
-                found_vip = true;
-              }
-            });
-          });
-          const json_object = JSON.parse(body);
-
-          if (json_object.vip_detected === 'false' && found_vip === false) {
-            console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
-            const cmd = ip_add_command;
-            exec(cmd).catch(err => {
-              console.log(err);
-            });
-          }
-          if ((json_object.vip_detected === 'true' && found_vip === true)) {
-            console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
-            const cmd = ip_delete_command;
-            exec(cmd).catch(err => {
-              console.log(err);
-            });
-          }
-        }
-      });
     }
 
+    request(options, (error, response, body) => {
+      let found_vip = false;
+
+      if ((error || response.statusCode !== '200')) {
+        const cmd = ip_add_command;
+        // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
+        exec(cmd).then(noop).catch(noop);
+      } else {
+        const interfaces = require('os').networkInterfaces();
+        Object.keys(interfaces).forEach(devName => {
+          const iface = interfaces[devName];
+          iface.forEach(alias => {
+            if (alias.address === vip) {
+              found_vip = true;
+            }
+          });
+        });
+        const json_object = JSON.parse(body);
+
+        if (json_object.vip_detected === 'false' && found_vip === false) {
+          console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
+          const cmd = ip_add_command;
+          exec(cmd).catch(err => {
+            console.log(err);
+          });
+        }
+        if ((json_object.vip_detected === 'true' && found_vip === true)) {
+          console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
+          const cmd = ip_delete_command;
+          exec(cmd).catch(err => {
+            console.log(err);
+          });
+        }
+      }
+    });
     send_ping();
   }, vip_ping_time);
 }
