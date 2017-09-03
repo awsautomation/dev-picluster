@@ -11,20 +11,13 @@ const multer = require('multer');
 const getos = require('picluster-getos');
 const async = require('async');
 const exec = require('child-process-promise').exec;
-const si = require('systeminformation');
-
-let config;
-if (process.env.PICLUSTER_CONFIG) {
-  config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-} else {
-  config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-}
+const sysinfo = require('systeminformation');
+const config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+const app = express();
 
 if (config.ssl_self_signed) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
-
-const app = express();
 
 app.use(bodyParser());
 
@@ -56,7 +49,7 @@ let memory_percentage = 0;
 let images = '';
 
 function monitoring() {
-  si.mem(data => {
+  sysinfo.mem(data => {
     memory_total = data.total;
     memory_buffers = data.buffcache;
     memory_used = data.used;
@@ -127,19 +120,12 @@ monitoring();
 if (config.autostart_containers) {
   console.log('Starting all the containers.....');
 
-  if (config.ssl) {
-    const options = {
-      url : `https://${server}:${server_port}/start?token=${token}&container=*`
-    };
-  } else if (config.ssl && config.ssl_self_signed) {
-    const options = {
-      url : `https://${server}:${server_port}/start?token=${token}&container=*`,
-      rejectUnauthorized: 'false'
-    };
-  } else {
-    const options = {
-      url : `http://${server}:${server_port}/start?token=${token}&container=*`
-    };
+  const options = {
+    url : `${scheme}${server}:${server_port}/start?token=${token}&container=*`
+  };
+
+  if (config.ssl_self_signed) {
+    options.rejectUnauthorized = 'false';
   }
 
   request.get(options).on('error', e => {
@@ -180,37 +166,18 @@ function send_ping() {
       token
     });
 
-    if (config.ssl) {
-      const options = {
-        url: 'https://' + vip_slave + ':' + agent_port + '/pong',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': token_body.length
-        },
-        body: token_body
-      };
-    } else if (config.ssl && config.ssl_self_signed) {
-      const options = {
-        url: 'https://' + vip_slave + ':' + agent_port + '/pong',
-        method: 'POST',
-        rejectUnauthorized: 'false',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': token_body.length
-        },
-        body: token_body
-      };
-    } else {
-      const options = {
-        url: 'http://' + vip_slave + ':' + agent_port + '/pong',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': token_body.length
-        },
-        body: token_body
-      };
+    const options = {
+      url: `${scheme}${vip_slave}:${agent_port}/pong`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': token_body.length
+      },
+      body: token_body
+    };
+
+    if (config.ssl_self_signed) {
+      options.rejectUnauthorized = 'false';
     }
 
     request(options, (error, response, body) => {

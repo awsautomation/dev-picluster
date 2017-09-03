@@ -2,6 +2,7 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const net = require('net');
+const tls = require('tls');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const express = require('express');
@@ -29,6 +30,9 @@ app.use(bodyParser());
 const upload = multer({
   dest: '../'
 });
+const scheme = config.ssl ? 'https://' : 'http://';
+const server = config.web_connect;
+const rsyslog_host = config.rsyslog_host;
 const server_port = config.server_port;
 const agent_port = config.agent_port;
 let log = '';
@@ -97,38 +101,18 @@ if (config.automatic_heartbeat) {
 function automatic_heartbeat() {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     setTimeout(() => {
-      if (config.ssl) {
-        const options = {
-          host: '127.0.0.1',
-          path: '/hb?token=' + token,
-          port: server_port
-        };
-        https.get(options).on('error', e => {
-          console.error(e);
-        });
-        automatic_heartbeat();
-      } else if (config.ssl && config.ssl_self_signed) {
-        const options = {
-          host: '127.0.0.1',
-          path: '/hb?token=' + token,
-          port: server_port,
-          rejectUnauthorized: 'false'
-        };
-        https.get(options).on('error', e => {
-          console.error(e);
-        });
-        automatic_heartbeat();
-      } else {
-        const options = {
-          host: '127.0.0.1',
-          path: '/hb?token=' + token,
-          port: server_port
-        };
-        http.get(options).on('error', e => {
-          console.error(e);
-        });
-        automatic_heartbeat();
+      const options = {
+        url: `${scheme}${server}:${server_port}/hb?token=${token}`
+      };
+
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
       }
+
+      request.get(options).on('error', e => {
+        console.error(e);
+      });
+      automatic_heartbeat();
     }, config.heartbeat_interval);
   } else {
     console.log('\nAutomatic Heartbeat Disabled.');
@@ -188,60 +172,31 @@ app.get('/nodes', (req, res) => {
   } else {
     config.layout.forEach(get_node => {
       const node = get_node.node;
+
       if (!node) {
         console.error('Invalid Config for node', get_node);
         return;
       }
-      if (config.ssl) {
-        const options = {
-          url: 'https://' + node + ':' + agent_port + '/node-status?token=' + token,
-          method: 'GET'
-        };
 
-        request(options, (error, response) => {
-          if (error) {
-            console.error(error);
-          } else {
-            const check = JSON.parse(response.body);
-            if (check.cpu_percent > 0) {
-              addData(check);
-            }
-          }
-        });
-      } else if (config.ssl && config.ssl_self_signed) {
-        const options = {
-          url: 'https://' + node + ':' + agent_port + '/node-status?token=' + token,
-          method: 'GET',
-          rejectUnauthorized: 'false'
-        };
+      const options = {
+        url: `${scheme}${node}:${agent_port}/node-status?token=${token}`,
+        method: 'GET'
+      };
 
-        request(options, (error, response) => {
-          if (error) {
-            console.error(error);
-          } else {
-            const check = JSON.parse(response.body);
-            if (check.cpu_percent > 0) {
-              addData(check);
-            }
-          }
-        });
-      } else {
-        const options = {
-          url: 'http://' + node + ':' + agent_port + '/node-status?token=' + token,
-          method: 'GET'
-        };
-
-        request(options, (error, response) => {
-          if (error) {
-            console.error(error);
-          } else {
-            const check = JSON.parse(response.body);
-            if (check.cpu_percent > 0) {
-              addData(check);
-            }
-          }
-        });
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
       }
+
+      request(options, (error, response) => {
+        if (error) {
+          console.error(error);
+        } else {
+          const check = JSON.parse(response.body);
+          if (check.cpu_percent > 0) {
+            addData(check);
+          }
+        }
+      });
     });
     setTimeout(() => {
       res.json(getData());
@@ -287,67 +242,29 @@ app.get('/build', (req, res) => {
           });
         }
 
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-            request(options, (error, response) => {
-              if (error) {
-                res.end('An error has occurred.');
-              } else {
-                const results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
-            });
-          }
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            rejectUnauthorized: 'false',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-            request(options, (error, response) => {
-              if (error) {
-                res.end('An error has occurred.');
-              } else {
-                const results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
-            });
-          }
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-            request(options, (error, response) => {
-              if (error) {
-                res.end('An error has occurred.');
-              } else {
-                const results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
-            });
-          }
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
+        }
+
+        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\n' + results.output);
+            }
+          });
         }
       });
     });
@@ -372,78 +289,39 @@ app.get('/delete-image', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
+
         const command = JSON.stringify({
           command: 'docker image rm ' + key,
           token
         });
 
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+        const options = {
+          url: `${scheme}${node}:${agent_port}/`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-            request(options, (error, response) => {
-              if (error) {
-                res.end('An error has occurred.');
-              } else {
-                const results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
-            });
-          }
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            rejectUnauthorized: 'false',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
+        }
 
-          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-            request(options, (error, response) => {
-              if (error) {
-                res.end('An error has occurred.');
-              } else {
-                const results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
-            });
-          }
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-
-          if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-            request(options, (error, response) => {
-              if (error) {
-                res.end('An error has occurred.');
-              } else {
-                const results = JSON.parse(response.body);
-                addLog('\n' + results.output);
-              }
-            });
-          }
+        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
+          request(options, (error, response) => {
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              addLog('\n' + results.output);
+            }
+          });
         }
       });
     });
@@ -469,121 +347,46 @@ app.get('/create', (req, res) => {
     let responseString = '';
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        if (config.ssl) {
-          const node = config.layout[i].node;
-          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-            return;
-          }
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-            token
-          });
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            hostname: node,
-            port: agent_port,
-            path: '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            }
-          };
+        const node = config.layout[i].node;
 
-          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-            const request = https.request(options, response => {
-              response.on('data', data => {
-                responseString += data;
-              });
-              response.on('end', () => {
-                if (responseString.body) {
-                  const body = responseString.body;
-                  const results = JSON.parse(body.toString('utf8'));
-                  addLog(results.output);
-                }
-              });
-            }).on('error', e => {
-              console.error(e);
-            });
-            request.write(command);
-          }
-        } else if (config.ssl && config.ssl_self_signed) {
-          const node = config.layout[i].node;
-          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-            return;
-          }
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-            token
-          });
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            hostname: node,
-            port: agent_port,
-            rejectUnauthorized: 'false',
-            path: '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            }
-          };
+        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
+          return;
+        }
 
-          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-            const request = https.request(options, response => {
-              response.on('data', data => {
-                responseString += data;
-              });
-              response.on('end', () => {
-                if (responseString.body) {
-                  const body = responseString.body;
-                  const results = JSON.parse(body.toString('utf8'));
-                  addLog(results.output);
-                }
-              });
-            }).on('error', e => {
-              console.error(e);
-            });
-            request.write(command);
-          }
-        } else {
-          const node = config.layout[i].node;
-          if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-            return;
-          }
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-            token
-          });
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            hostname: node,
-            port: agent_port,
-            path: '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            }
-          };
+        const command = JSON.stringify({
+          command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
+          token
+        });
 
-          if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-            const request = http.request(options, response => {
-              response.on('data', data => {
-                responseString += data;
-              });
-              response.on('end', () => {
-                if (responseString.body) {
-                  const body = responseString.body;
-                  const results = JSON.parse(body.toString('utf8'));
-                  addLog(results.output);
-                }
-              });
-            }).on('error', e => {
-              console.error(e);
-            });
-            request.write(command);
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
           }
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
+        }
+
+        if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
+          const create_request = request(options, response => {
+            response.on('data', data => {
+              responseString += data;
+            });
+            response.on('end', () => {
+              if (responseString.body) {
+                const body = responseString.body;
+                const results = JSON.parse(body.toString('utf8'));
+                addLog(results.output);
+              }
+            });
+          }).on('error', e => {
+            console.error(e);
+          });
+          create_request.write(command);
         }
       });
     });
@@ -607,45 +410,30 @@ app.get('/start', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
+
         const command = JSON.stringify({
           command: 'docker container start ' + key,
           token
         });
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            rejectUnauthorized: 'false',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
         }
+
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
           request(options, (error, response) => {
             if (error) {
@@ -808,71 +596,84 @@ function migrate(container, original_host, new_host, original_container_data) {
       }
     });
   } else {
-    const options = {
-      url: 'http://' + original_host + ':' + agent_port + '/run',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': command.length
-      },
-      body: command
-    };
+  }
 
-    request(options, error => {
-      if (error) {
-        addLog('An error has occurred.');
-      } else {
-        const command = JSON.stringify({
-          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-          token
-        });
+  const options = {
+    url: `${scheme}${original_host}:${agent_port}/run`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': command.length
+    },
+    body: command
+  };
 
-        const options = {
-          url: 'http://' + new_host + ':' + agent_port + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
+  if (config.ssl_self_signed) {
+    options.rejectUnauthorized = 'false';
+  }
 
-        request(options, error => {
-          if (error) {
-            addLog('An error has occurred.');
-          } else {
-            const command = JSON.stringify({
-              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-              token
-            });
+  request(options, error => {
+    if (error) {
+      addLog('An error has occurred.');
+    } else {
+      const command = JSON.stringify({
+        command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+        token
+      });
 
-            const options = {
-              url: 'http://' + new_host + ':' + agent_port + '/run',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            };
+      const options = {
+        url: `${scheme}${new_host}:${agent_port}/run`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
 
-            request(options, error => {
-              if (error) {
-                addLog('An error has occurred.');
-              } else {
-                addLog('\nStarting ' + container);
-                if (config.automatic_heartbeat) {
-                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                  }
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
+      }
+
+      request(options, error => {
+        if (error) {
+          addLog('An error has occurred.');
+        } else {
+          const command = JSON.stringify({
+            command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
+            token
+          });
+
+          const options = {
+            url: `${scheme}${new_host}:${agent_port}/run`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': command.length
+            },
+            body: command
+          };
+
+          if (config.ssl_self_signed) {
+            options.rejectUnauthorized = 'false';
+          }
+
+          request(options, error => {
+            if (error) {
+              addLog('An error has occurred.');
+            } else {
+              addLog('\nStarting ' + container);
+              if (config.automatic_heartbeat) {
+                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
                 }
               }
-            });
-          }
-        });
-      }
-    });
-  }
+            }
+          });
+        }
+      });
+    }
+  });
 }
 
 app.get('/addhost', (req, res) => {
@@ -906,40 +707,18 @@ app.get('/addhost', (req, res) => {
         token
       });
 
-      if (config.ssl) {
-        // Save Configuration
-        const options = {
-          url: `https://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
-      } else if (config.ssl && config.ssl_self_signed) {
-        // Save Configuration
-        const options = {
-          url: `https://127.0.0.1:${server_port}/updateconfig`,
-          rejectUnauthorized: 'false',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
-      } else {
-        // Save Configuration
-        const options = {
-          url: `http://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
+      const options = {
+        url: `${scheme}${server}:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
       }
 
       request(options, error => {
@@ -1047,40 +826,18 @@ app.get('/rmhost', (req, res) => {
     token
   });
 
-  if (config.ssl) {
-    // Save Configuration
-    const options = {
-      url: `https://127.0.0.1:${server_port}/updateconfig`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': new_config.length
-      },
-      body: new_config
-    };
-  } else if (config.ssl && config.ssl_self_signed) {
-    // Save Configuration
-    const options = {
-      url: `https://127.0.0.1:${server_port}/updateconfig`,
-      rejectUnauthorized: 'false',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': new_config.length
-      },
-      body: new_config
-    };
-  } else {
-    // Save Configuration
-    const options = {
-      url: `http://127.0.0.1:${server_port}/updateconfig`,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': new_config.length
-      },
-      body: new_config
-    };
+  const options = {
+    url: `${scheme}${server}:${server_port}/updateconfig`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': new_config.length
+    },
+    body: new_config
+  };
+
+  if (config.ssl_self_signed) {
+    options.rejectUnauthorized = 'false';
   }
 
   request(options, error => {
@@ -1153,40 +910,18 @@ app.get('/removecontainerconfig', (req, res) => {
       token
     });
 
-    if (config.ssl) {
-      // Save Configuration
-      const options = {
-        url: `https://127.0.0.1:${server_port}/updateconfig`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config
-      };
-    } else if (config.ssl && config.ssl_self_signed) {
-      // Save Configuration
-      const options = {
-        url: `https://127.0.0.1:${server_port}/updateconfig`,
-        method: 'POST',
-        rejectUnauthorized: 'false',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config
-      };
-    } else {
-      // Save Configuration
-      const options = {
-        url: `http://127.0.0.1:${server_port}/updateconfig`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': new_config.length
-        },
-        body: new_config
-      };
+    const options = {
+      url: `${scheme}${server}:${server_port}/updateconfig`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    if (config.ssl_self_signed) {
+      options.rejectUnauthorized = 'false';
     }
 
     request(options, error => {
@@ -1247,60 +982,30 @@ app.get('/addcontainer', (req, res) => {
           });
         }
       }
+
       const new_config = JSON.stringify({
         payload: JSON.stringify(config),
         token
       });
 
-      if (config.ssl) {
-        // Save Configuration
-        const options = {
-          url: `https://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
+      const options = {
+        url: `${scheme}${server}:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
 
-        const container_options = {
-          url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
-          rejectUnauthorized: 'false'
-        };
+      const container_options = {
+        url: `${scheme}${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
+        rejectUnauthorized: 'false'
+      };
 
-      } else if (config.ssl && config.ssl_self_signed) {
-        // Save Configuration
-        const options = {
-          url: `http://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
-
-        const container_options = {
-          url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
-          rejectUnauthorized: 'false'
-        };
-      } else {
-        // Save Configuration
-        const options = {
-          url: `http://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
-
-        const container_options = {
-          url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
-          rejectUnauthorized: 'false'
-        };
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
+        container_options.rejectUnauthorized = 'false';
       }
 
       request(options, error => {
@@ -1404,40 +1109,18 @@ app.get('/changehost', (req, res) => {
         token
       });
 
-      if (config.ssl) {
-        // Save Configuration
-        const options = {
-          url: `http://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
-      } else if (config.ssl && config.ssl_self_signed) {
-        // Save Configuration
-        const options = {
-          url: `https://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          rejectUnauthorized: 'false',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
-      } else {
-        // Save Configuration
-        const options = {
-          url: `http://127.0.0.1:${server_port}/updateconfig`,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': new_config.length
-          },
-          body: new_config
-        };
+      const options = {
+        url: `${scheme}${server}:${server_port}/updateconfig`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': new_config.length
+        },
+        body: new_config
+      };
+
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
       }
 
       request(options, error => {
@@ -1468,46 +1151,30 @@ app.get('/stop', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
+
         const command = JSON.stringify({
           command: 'docker container stop ' + key,
           token
         });
 
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            rejectUnauthorized: 'false',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
         }
+
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
           request(options, (error, response) => {
             if (error) {
@@ -1541,6 +1208,7 @@ app.get('/delete', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
@@ -1550,38 +1218,20 @@ app.get('/delete', (req, res) => {
           token
         });
 
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            rejectUnauthorized: 'false',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
         }
+
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
           request(options, (error, response) => {
             if (error) {
@@ -1614,45 +1264,28 @@ app.get('/restart', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
+
         const command = JSON.stringify({
           command: 'docker container restart ' + key,
           token
         });
 
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            rejectUnauthorized: 'false',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
         }
 
         if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
@@ -1687,6 +1320,7 @@ app.get('/containerlog', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
@@ -1696,38 +1330,20 @@ app.get('/containerlog', (req, res) => {
           token
         });
 
-        if (config.ssl) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else if (config.ssl && config.ssl_self_signed) {
-          const options = {
-            url: 'https://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            rejectUnauthorized: 'false',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-        } else {
-          const options = {
-            url: 'http://' + node + ':' + agent_port + '/run',
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        if (config.ssl_self_signed) {
+          options.rejectUnauthorized = 'false';
         }
+
         if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
           request(options, (error, response) => {
             if (error) {
@@ -1794,6 +1410,7 @@ function copyToAgents(file) {
   Object.keys(config.layout).forEach((get_node, i) => {
     Object.keys(config.layout[i]).forEach(key => {
       const node = config.layout[i].node;
+
       if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
         return;
       }
@@ -1804,22 +1421,13 @@ function copyToAgents(file) {
         file: fs.createReadStream(file)
       };
 
-      if (config.ssl) {
-        const form_options = {
-          url: 'https://' + node + ':' + agent_port + '/receive-file',
-          formData
-        };
-      } else if (config.ssl && config.ssl_self_signed) {
-        const form_options = {
-          url: 'https://' + node + ':' + agent_port + '/receive-file',
-          rejectUnauthorized: 'false',
-          formData
-        };
-      } else {
-        const form_options = {
-          url: 'http://' + node + ':' + agent_port + '/receive-file',
-          formData
-        };
+      const form_options = {
+        url: `${scheme}${node}:${agent_port}/receive-file`,
+        formData
+      };
+
+      if (config.ssl_self_signed) {
+        form_options.rejectUnauthorized = 'false';
       }
 
       request.post(form_options, err => {
@@ -1887,37 +1495,18 @@ app.post('/exec', (req, res) => {
     for (let i = 0; i < config.layout.length; i++) {
       const node = config.layout[i].node;
 
-      if (config.ssl) {
-        const options = {
-          url: 'https://' + node + ':' + agent_port + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-      } else if (config.ssl && config.ssl_self_signed) {
-        const options = {
-          url: 'https://' + node + ':' + agent_port + '/run',
-          rejectUnauthorized: 'false',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-      } else {
-        const options = {
-          url: 'http://' + node + ':' + agent_port + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
+      const options = {
+        url: `${scheme}${node}:${agent_port}/run`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
       }
 
       if (selected_node.length === 0) {
@@ -1957,37 +1546,19 @@ app.get('/prune', (req, res) => {
     });
     for (let i = 0; i < config.layout.length; i++) {
       const node = config.layout[i].node;
-      if (config.ssl) {
-        const options = {
-          url: 'https://' + node + ':' + agent_port + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-      } else if (config.ssl && config.ssl_self_signed) {
-        const options = {
-          url: 'https://' + node + ':' + agent_port + '/run',
-          rejectUnauthorized: 'false',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-      } else {
-        const options = {
-          url: 'http://' + node + ':' + agent_port + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
+
+      const options = {
+        url: `${scheme}${node}:${agent_port}/run`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      if (config.ssl_self_signed) {
+        options.rejectUnauthorized = 'false';
       }
 
       request(options, (error, response) => {
@@ -2009,22 +1580,13 @@ function move_container(container, newhost) {
   console.log('\nMigrating container ' + container + ' to ' + newhost + '......');
   addLog('\nMigrating container ' + container + ' to ' + newhost + '......');
 
-  if (config.ssl) {
-    const options = {
-      url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
-      method: 'GET'
-    };
-  } else if (config.ssl && config.ssl_self_signed) {
-    const options = {
-      url: `https://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
-      rejectUnauthorized: 'false',
-      method: 'GET'
-    };
-  } else {
-    const options = {
-      url: `http://127.0.0.1:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
-      method: 'GET'
-    };
+  const options = {
+    url: `${scheme}${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+    method: 'GET'
+  };
+
+  if (config.ssl_self_signed) {
+    options.rejectUnauthorized = 'false';
   }
 
   request(options, error => {
@@ -2074,7 +1636,7 @@ function container_failover(container) {
 
 function hb_check(node, container_port, container) {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
-    const client = new net.Socket();
+    const client = config.ssl ? new tls.TLSSocket() : new net.Socket();
 
     client.connect(container_port, node, container, () => {});
 
@@ -2085,43 +1647,19 @@ function hb_check(node, container_port, container) {
     client.on('error', () => {
       addLog('\n' + container + ' failed on: ' + node);
       console.log('\n' + container + ' failed on: ' + node);
+
       if (config.container_host_constraints) {
         container_faillog.push(container);
         container_failover(container);
       }
 
-      if (config.ssl) {
-        const options = {
-          host: '127.0.0.1',
-          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-          port: server_port
-        };
+      const options = {
+        url: `${scheme}${server}:${server_port}/restart?node=${node}&container=${container}&token=${token}`
+      };
 
-        https.get(options).on('error', e => {
-          console.error(e);
-        });
-      } else if (config.ssl && config.ssl_self_signed) {
-        const options = {
-          host: '127.0.0.1',
-          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-          rejectUnauthorized: 'false',
-          port: server_port
-        };
-
-        https.get(options).on('error', e => {
-          console.error(e);
-        });
-      } else {
-        const options = {
-          host: '127.0.0.1',
-          path: '/restart?node=' + node + '&container=' + container + '&token=' + token,
-          port: server_port
-        };
-
-        http.get(options).on('error', e => {
-          console.error(e);
-        });
-      }
+      http.get(options).on('error', e => {
+        console.error(e);
+      });
 
       client.destroy();
     });
@@ -2167,22 +1705,16 @@ app.get('/log', (req, res) => {
 /* eslint-disable no-lonely-if */
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.ssl) {
-      const options = {
-        url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
-      };
-    } else if (config.ssl && config.ssl_self_signed) {
-      const options = {
-        url: 'https://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token,
-        rejectUnauthorized: 'false'
-      };
-    } else {
-      const options = {
-        url: 'http://' + config.rsyslog_host + ':' + config.agent_port + '/rsyslog?token=' + token
-      };
+    const options = {
+      url: `${scheme}${rsyslog_host}:${agent_port}/rsyslog?token=${token}`
+    };
+
+    if (config.ssl_self_signed) {
+      options.rejectUnauthorized = 'false';
     }
 
     request(options, (error, response, body) => {
@@ -2240,44 +1772,27 @@ app.get('/killvip', (req, res) => {
       Object.keys(config.vip).forEach((get_node, i) => {
         Object.keys(config.vip[i]).forEach(key => {
           const node = config.vip[i].node;
+
           if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
           }
+          
           const token_body = JSON.stringify({
             token
           });
 
-          if (config.ssl) {
-            const options = {
-              url: 'https://' + node + ':' + agent_port + '/killvip',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': token_body.length
-              },
-              body: token_body
-            };
-          } else if (config.ssl && config.ssl_self_signed) {
-            const options = {
-              url: 'https://' + node + ':' + agent_port + '/killvip',
-              rejectUnauthorized: 'false',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': token_body.length
-              },
-              body: token_body
-            };
-          } else {
-            const options = {
-              url: 'http://' + node + ':' + agent_port + '/killvip',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': token_body.length
-              },
-              body: token_body
-            };
+          const options = {
+            url: `${scheme}${node}:${agent_port}/killvip`,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': token_body.length
+            },
+            body: token_body
+          };
+
+          if (config.ssl_self_signed) {
+            options.rejectUnauthorized = 'false';
           }
 
           request(options, error => {
