@@ -31,6 +31,7 @@ const upload = multer({
   dest: '../'
 });
 const scheme = config.ssl ? 'https://' : 'http://';
+const ssl_self_signed = config.ssl_self_signed ? 'false' : 'true';
 const server = config.web_connect;
 const rsyslog_host = config.rsyslog_host;
 const server_port = config.server_port;
@@ -102,12 +103,9 @@ function automatic_heartbeat() {
   if (config.automatic_heartbeat.indexOf('enabled') > -1) {
     setTimeout(() => {
       const options = {
-        url: `${scheme}${server}:${server_port}/hb?token=${token}`
+        url: `${scheme}${server}:${server_port}/hb?token=${token}`,
+        rejectUnauthorized: ssl_self_signed
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       request.get(options).on('error', e => {
         console.error(e);
@@ -182,12 +180,9 @@ app.get('/nodes', (req, res) => {
 
       const options = {
         url: `${scheme}${node}:${agent_port}/node-status?token=${token}`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'GET'
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       request(options, (error, response) => {
         if (error) {
@@ -249,6 +244,7 @@ app.get('/build', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -256,10 +252,6 @@ app.get('/build', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
           request(options, (error, response) => {
@@ -307,6 +299,7 @@ app.get('/delete-image', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -314,10 +307,6 @@ app.get('/delete-image', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
           request(options, (error, response) => {
@@ -366,16 +355,13 @@ app.get('/create', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': command.length
           }
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
           const create_request = request(options, response => {
@@ -430,6 +416,7 @@ app.get('/start', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -437,10 +424,6 @@ app.get('/start', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
           request(options, (error, response) => {
@@ -475,6 +458,7 @@ function migrate(container, original_host, new_host, original_container_data) {
 
   const options = {
     url: `${scheme}${original_host}:${agent_port}/run`,
+    rejectUnauthorized: ssl_self_signed,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -482,10 +466,6 @@ function migrate(container, original_host, new_host, original_container_data) {
     },
     body: command
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   request(options, error => {
     if (error) {
@@ -498,6 +478,7 @@ function migrate(container, original_host, new_host, original_container_data) {
 
       const options = {
         url: `${scheme}${new_host}:${agent_port}/run`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -505,10 +486,6 @@ function migrate(container, original_host, new_host, original_container_data) {
         },
         body: command
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       request(options, error => {
         if (error) {
@@ -521,6 +498,7 @@ function migrate(container, original_host, new_host, original_container_data) {
 
           const options = {
             url: `${scheme}${new_host}:${agent_port}/run`,
+            rejectUnauthorized: ssl_self_signed,
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -528,10 +506,6 @@ function migrate(container, original_host, new_host, original_container_data) {
             },
             body: command
           };
-
-          if (config.ssl_self_signed) {
-            options['rejectUnauthorized'] = 'false';
-          }
 
           request(options, error => {
             if (error) {
@@ -583,6 +557,7 @@ app.get('/addhost', (req, res) => {
 
       const options = {
         url: `${scheme}${server}:${server_port}/updateconfig`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -590,10 +565,6 @@ app.get('/addhost', (req, res) => {
         },
         body: new_config
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       request(options, error => {
         if (error) {
@@ -703,6 +674,7 @@ app.get('/rmhost', (req, res) => {
 
   const options = {
     url: `${scheme}${server}:${server_port}/updateconfig`,
+    rejectUnauthorized: ssl_self_signed,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -710,10 +682,6 @@ app.get('/rmhost', (req, res) => {
     },
     body: new_config
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   request(options, error => {
     if (error) {
@@ -787,6 +755,7 @@ app.get('/removecontainerconfig', (req, res) => {
 
     const options = {
       url: `${scheme}${server}:${server_port}/updateconfig`,
+      rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -794,10 +763,6 @@ app.get('/removecontainerconfig', (req, res) => {
       },
       body: new_config
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, error => {
       if (error) {
@@ -865,6 +830,7 @@ app.get('/addcontainer', (req, res) => {
 
       const options = {
         url: `${scheme}${server}:${server_port}/updateconfig`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -875,13 +841,8 @@ app.get('/addcontainer', (req, res) => {
 
       const container_options = {
         url: `${scheme}${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${host}`,
-        rejectUnauthorized: 'false'
+        rejectUnauthorized: ssl_self_signed
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-        container_options['rejectUnauthorized'] = 'false';
-      }
 
       request(options, error => {
         if (error) {
@@ -986,6 +947,7 @@ app.get('/changehost', (req, res) => {
 
       const options = {
         url: `${scheme}${server}:${server_port}/updateconfig`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -993,10 +955,6 @@ app.get('/changehost', (req, res) => {
         },
         body: new_config
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       request(options, error => {
         if (error) {
@@ -1040,6 +998,7 @@ app.get('/stop', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1047,10 +1006,6 @@ app.get('/stop', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
           request(options, (error, response) => {
@@ -1098,6 +1053,7 @@ app.get('/delete', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1105,10 +1061,6 @@ app.get('/delete', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
           request(options, (error, response) => {
@@ -1156,6 +1108,7 @@ app.get('/restart', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1163,10 +1116,6 @@ app.get('/restart', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
           request(options, (error, response) => {
@@ -1214,6 +1163,7 @@ app.get('/containerlog', (req, res) => {
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1221,10 +1171,6 @@ app.get('/containerlog', (req, res) => {
           },
           body: command
         };
-
-        if (config.ssl_self_signed) {
-          options['rejectUnauthorized'] = 'false';
-        }
 
         if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
           request(options, (error, response) => {
@@ -1307,12 +1253,9 @@ function copyToAgents(file) {
 
       const form_options = {
         url: `${scheme}${node}:${agent_port}/receive-file`,
+        rejectUnauthorized: ssl_self_signed,
         formData
       };
-
-      if (config.ssl_self_signed) {
-        form_options['rejectUnauthorized'] = 'false';
-      }
 
       request.post(form_options, err => {
         if (!err) {
@@ -1383,6 +1326,7 @@ app.post('/exec', (req, res) => {
 
       const options = {
         url: `${scheme}${node}:${agent_port}/run`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1390,10 +1334,6 @@ app.post('/exec', (req, res) => {
         },
         body: command
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       if (selected_node.length === 0) {
         request(options, (error, response) => {
@@ -1437,6 +1377,7 @@ app.get('/prune', (req, res) => {
 
       const options = {
         url: `${scheme}${node}:${agent_port}/run`,
+        rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1444,10 +1385,6 @@ app.get('/prune', (req, res) => {
         },
         body: command
       };
-
-      if (config.ssl_self_signed) {
-        options['rejectUnauthorized'] = 'false';
-      }
 
       request(options, (error, response) => {
         if (error) {
@@ -1470,12 +1407,9 @@ function move_container(container, newhost) {
 
   const options = {
     url: `${scheme}${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+    rejectUnauthorized: ssl_self_signed,
     method: 'GET'
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   request(options, error => {
     if (error) {
@@ -1542,7 +1476,8 @@ function hb_check(node, container_port, container) {
       }
 
       const options = {
-        url: `${scheme}${server}:${server_port}/restart?node=${node}&container=${container}&token=${token}`
+        url: `${scheme}${server}:${server_port}/restart?node=${node}&container=${container}&token=${token}`,
+        rejectUnauthorized: ssl_self_signed
       };
 
       http.get(options).on('error', e => {
@@ -1601,12 +1536,9 @@ app.get('/rsyslog', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${rsyslog_host}:${agent_port}/rsyslog?token=${token}`
+      url: `${scheme}${rsyslog_host}:${agent_port}/rsyslog?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
@@ -1677,6 +1609,7 @@ app.get('/killvip', (req, res) => {
 
           const options = {
             url: `${scheme}${node}:${agent_port}/killvip`,
+            rejectUnauthorized: ssl_self_signed,
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -1684,10 +1617,6 @@ app.get('/killvip', (req, res) => {
             },
             body: token_body
           };
-
-          if (config.ssl_self_signed) {
-            options['rejectUnauthorized'] = 'false';
-          }
 
           request(options, error => {
             if (error) {

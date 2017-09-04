@@ -26,6 +26,7 @@ const upload = multer({
   dest: '../'
 });
 const scheme = config.ssl ? 'https://' : 'http://';
+const ssl_self_signed = config.ssl_self_signed ? 'false' : 'true';
 const server = config.web_connect;
 const server_port = config.server_port;
 const agent_port = config.agent_port;
@@ -123,12 +124,9 @@ if (config.autostart_containers) {
   console.log('Starting all the containers.....');
 
   const options = {
-    url: `${scheme}${server}:${server_port}/start?token=${token}&container=*`
+    url: `${scheme}${server}:${server_port}/start?token=${token}&container=*`,
+    rejectUnauthorized: ssl_self_signed
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   request.get(options).on('error', e => {
     console.error(e);
@@ -170,6 +168,7 @@ function send_ping() {
 
     const options = {
       url: `${scheme}${vip_slave}:${agent_port}/pong`,
+      rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -177,10 +176,6 @@ function send_ping() {
       },
       body: token_body
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       let found_vip = false;

@@ -31,6 +31,7 @@ const upload = multer({
   dest: '../'
 });
 const scheme = config.ssl ? 'https://' : 'http://';
+const ssl_self_signed = config.ssl_self_signed ? 'false' : 'true';
 const request_timeout = 5000;
 const web_port = config.web_port;
 let token = config.token;
@@ -48,12 +49,9 @@ if (config.syslog) {
 function getData() {
   setTimeout(() => {
     const options = {
-      url: `${scheme}${server}:${server_port}/nodes?token=${token}`
+      url: `${scheme}${server}:${server_port}/nodes?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -111,6 +109,7 @@ app.post('/sendconfig', (req, res) => {
 
     const options = {
       url: `${scheme}${server}:${server_port}/updateconfig`,
+      rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -119,10 +118,6 @@ app.post('/sendconfig', (req, res) => {
       body: command,
       token
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       if (error) {
@@ -164,6 +159,7 @@ app.post('/exec', (req, res) => {
 
     const options = {
       url: `${scheme}${server}:${server_port}/exec`,
+      rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -171,10 +167,6 @@ app.post('/exec', (req, res) => {
       },
       body: command
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, error => {
       if (error) {
@@ -311,6 +303,7 @@ app.post('/listcommands', (req, res) => {
 
     const options = {
       url: `${scheme}${server}:${server_port}/listcommands`,
+      rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -318,10 +311,6 @@ app.post('/listcommands', (req, res) => {
       },
       body: token_body
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       if (error) {
@@ -335,12 +324,9 @@ app.post('/listcommands', (req, res) => {
 
 function display_log(callback) {
   const options = {
-    url: `${scheme}${server}:${server_port}/log?token=${token}`
+    url: `${scheme}${server}:${server_port}/log?token=${token}`,
+    rejectUnauthorized: ssl_self_signed
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   clear_log(() => {
     setTimeout(() => {
@@ -357,12 +343,9 @@ function display_log(callback) {
 
 function clear_log(callback) {
   const options = {
-    url: `${scheme}${server}:${server_port}/clearlog?token=${token}`
+    url: `${scheme}${server}:${server_port}/clearlog?token=${token}`,
+    rejectUnauthorized: ssl_self_signed
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   request(options, (error, response) => {
     if (!error && response.statusCode === 200) {
@@ -376,19 +359,18 @@ function clear_log(callback) {
 app.post('/containerlog', (req, res) => {
   const check_token = req.body.token;
   let container = '';
+
   if (req.body.token) {
     container = req.body.container;
   }
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/containerlog?token=${token}&container=${container}`
+      url: `${scheme}${server}:${server_port}/containerlog?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -414,12 +396,9 @@ app.post('/create', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/create?token=${token}&container=${container}`
+      url: `${scheme}${server}:${server_port}/create?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -440,12 +419,9 @@ app.get('/rsyslog', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/rsyslog?token=${token}`
+      url: `${scheme}${server}:${server_port}/rsyslog?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
@@ -464,12 +440,9 @@ app.get('/reloadconfig', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/reloadconfig?token=${token}`
+      url: `${scheme}${server}:${server_port}/reloadconfig?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -498,12 +471,9 @@ app.get('/killvip', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/killvip?token=${token}`
+      url: `${scheme}${server}:${server_port}/killvip?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -528,11 +498,7 @@ app.post('/delete-image', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`} : {url: `${scheme}${server}:${server_port}/delete-image?token=${token}`};
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
+    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/delete-image?token=${token}`, rejectUnauthorized: ssl_self_signed};
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -558,11 +524,7 @@ app.post('/build', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`} : {url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`};
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
+    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`, rejectUnauthorized: ssl_self_signed};
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -588,11 +550,7 @@ app.post('/delete', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/delete?token=${token}`};
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/delete?token=${token}`, rejectUnauthorized: ssl_self_signed};
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -613,12 +571,9 @@ app.get('/prune', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/prune?token=${token}`
+      url: `${scheme}${server}:${server_port}/prune?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
       if (!error && response.statusCode === 200) {
@@ -646,11 +601,7 @@ app.post('/stop', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/stop?token=${token}`};
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/stop?token=${token}`, rejectUnauthorized: ssl_self_signed};
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -680,12 +631,9 @@ app.post('/changehost', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`
+      url: `${scheme}${server}:${server_port}/changehost?token=${token}&container=${container}&newhost=${newhost}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -717,12 +665,9 @@ app.post('/addcontainer', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else if ((container) && (container_args) && (host)) {
     const options = {
-      url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}`
+      url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -747,12 +692,9 @@ function sendFile(file) {
 
   const options = {
     url: `${scheme}${server}:${server_port}/receive-file`,
+    rejectUnauthorized: ssl_self_signed,
     formData
   };
-
-  if (config.ssl_self_signed) {
-    options['rejectUnauthorized'] = 'false';
-  }
 
   request.post({options}, err => {
     if (err) {
@@ -788,12 +730,9 @@ app.post('/removecontainerconfig', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else if (container) {
     const options = {
-      url: 'http://' + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + container
+      url: `${scheme}${server}:${server_port}/removecontainerconfig?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -817,12 +756,9 @@ app.post('/addhost', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
     const options = {
-      url: `${scheme}${server}:${server_port}/addhost?token=${token}&host=${host}`
+      url: `${scheme}${server}:${server_port}/addhost?token=${token}&host=${host}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -846,12 +782,9 @@ app.post('/rmhost', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
     const options = {
-      url: `${scheme}${server}:${server_port}/rmhost?token=${token}&host=${host}`
+      url: `${scheme}${server}:${server_port}/rmhost?token=${token}&host=${host}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -881,11 +814,7 @@ app.post('/start', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/start?token=${token}`};
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/start?token=${token}`, rejectUnauthorized: ssl_self_signed};
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -913,11 +842,7 @@ app.post('/restart', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/restart?token=${token}`};
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/restart?token=${token}`, rejectUnauthorized: ssl_self_signed};
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -938,12 +863,9 @@ app.get('/hb', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/hb?token=${token}`
+      url: `${scheme}${server}:${server_port}/hb?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -964,12 +886,9 @@ app.get('/log', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/log?token=${token}`
+      url: `${scheme}${server}:${server_port}/log?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
@@ -998,12 +917,9 @@ app.get('/getconfig', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/getconfig?token=${token}`
+      url: `${scheme}${server}:${server_port}/getconfig?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
     };
-
-    if (config.ssl_self_signed) {
-      options['rejectUnauthorized'] = 'false';
-    }
 
     request(options, (error, response, body) => {
       if (!error && response.statusCode === 200) {
