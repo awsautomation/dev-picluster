@@ -121,6 +121,7 @@ function automatic_heartbeat() {
 
 app.get('/clearlog', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -159,6 +160,7 @@ app.get('/nodes', (req, res) => {
         }
       }
     }
+
     node_metrics.total_containers = total_containers;
     node_metrics.total_nodes = total_node_count;
     node_metrics.container_list = container_list;
@@ -212,6 +214,7 @@ app.get('/build', (req, res) => {
   const check_token = req.query.token;
   const no_cache = req.query.no_cache;
   let image = '';
+
   if (req.query.image) {
     image = req.query.image;
   }
@@ -226,10 +229,12 @@ app.get('/build', (req, res) => {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
+        let command;
+
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-        let command;
+
         if (no_cache.indexOf('true') > -1) {
           command = JSON.stringify({
             command: 'docker image build --no-cache ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
@@ -275,6 +280,7 @@ app.get('/build', (req, res) => {
 app.get('/delete-image', (req, res) => {
   const check_token = req.query.token;
   let image = '';
+
   if (req.query.image) {
     image = req.query.image;
   }
@@ -397,9 +403,11 @@ app.get('/create', (req, res) => {
 app.get('/start', (req, res) => {
   const check_token = req.query.token;
   let container = '';
+
   if (req.query.container) {
     container = req.query.container;
   }
+
   if (container.indexOf('*') > -1) {
     container = '*';
   }
@@ -558,7 +566,6 @@ app.get('/addhost', (req, res) => {
     }
 
     if (proceed) {
-      // Add New Host
       config.layout.push({
         node: host
       });
@@ -688,6 +695,7 @@ app.get('/rmhost', (req, res) => {
       }
     }
   }
+
   const new_config = JSON.stringify({
     payload: JSON.stringify(config),
     token
@@ -814,6 +822,7 @@ app.get('/addcontainer', (req, res) => {
   } else {
     // Ensures that the host exists
     let proceed = 0;
+
     for (let i = 0; i < config.layout.length; i++) {
       if (config.layout[i].node.indexOf(host) > -1) {
         proceed++;
@@ -824,7 +833,6 @@ app.get('/addcontainer', (req, res) => {
       res.end('\nError: Node does not exist!');
     } else {
       // Add Data to New Host
-
       for (let i = 0; i < config.layout.length; i++) {
         if (config.layout[i].node.indexOf(host) > -1) {
           config.layout[i][container] = container_args;
@@ -924,10 +932,10 @@ app.get('/changehost', (req, res) => {
       }
     }
 
+  // Find Current Host
     if (proceed < 2) {
       res.end('\nError: Node or Container does not exist!');
     } else {
-      // Find Current Host
       for (let i = 0; i < config.layout.length; i++) {
         for (const key in config.layout[i]) {
           if (container.length > 0) {
@@ -940,8 +948,8 @@ app.get('/changehost', (req, res) => {
         }
       }
 
+      // Checks for HB
       if (config.hb) {
-        // Checks for HB
         for (let i = 0; i < config.hb.length; i++) {
           for (const key in config.hb[i]) {
             if (container.length > 0) {
@@ -1005,9 +1013,11 @@ app.get('/changehost', (req, res) => {
 app.get('/stop', (req, res) => {
   const check_token = req.query.token;
   let container = '';
+
   if (req.query.container) {
     container = req.query.container;
   }
+
   if (container.indexOf('*') > -1) {
     container = '*';
   }
@@ -1061,6 +1071,7 @@ app.get('/stop', (req, res) => {
 app.get('/delete', (req, res) => {
   const check_token = req.query.token;
   let container = '';
+
   if (req.query.container) {
     container = req.query.container;
   }
@@ -1118,9 +1129,11 @@ app.get('/delete', (req, res) => {
 app.get('/restart', (req, res) => {
   const check_token = req.query.token;
   let selected_container = '';
+
   if (req.query.container) {
     selected_container = req.query.container;
   }
+
   if (selected_container.indexOf('*') > -1) {
     selected_container = '*';
   }
@@ -1174,9 +1187,11 @@ app.get('/restart', (req, res) => {
 app.get('/containerlog', (req, res) => {
   const check_token = req.query.token;
   let selected_container = '';
+
   if (req.query.container) {
     selected_container = req.query.container;
   }
+
   if (selected_container.indexOf('*') > -1) {
     selected_container = '*';
   }
@@ -1232,6 +1247,7 @@ app.post('/listcontainers', (req, res) => {
   const check_token = req.body.token;
   const output = [];
   let container;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1255,6 +1271,7 @@ app.post('/listnodes', (req, res) => {
   const check_token = req.body.token;
   const output = [];
   let node;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1309,6 +1326,7 @@ function copyToAgents(file) {
 
 app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1330,6 +1348,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
 
 app.post('/listcommands', (req, res) => {
   const check_token = req.body.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (config.commandlist) {
@@ -1339,10 +1358,10 @@ app.post('/listcommands', (req, res) => {
   }
 });
 
-/* eslint-disable no-lonely-if */
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   let selected_node = '';
+
   if (req.body.node) {
     selected_node = req.body.node;
   }
@@ -1386,6 +1405,7 @@ app.post('/exec', (req, res) => {
           }
         });
       }
+
       if (selected_node.indexOf(node) > -1) {
         request(options, (error, response) => {
           if (error) {
@@ -1400,10 +1420,10 @@ app.post('/exec', (req, res) => {
     }
   }
 });
-/* eslint-enable no-lonely-if */
 
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1411,6 +1431,7 @@ app.get('/prune', (req, res) => {
       command: 'docker system prune -a -f',
       token
     });
+
     for (let i = 0; i < config.layout.length; i++) {
       const node = config.layout[i].node;
 
@@ -1535,18 +1556,21 @@ function hb_check(node, container_port, container) {
 
 app.get('/hb', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     let node = '';
     let check_port = '';
     let container = '';
+
     for (let i = 0; i < config.hb.length; i++) {
       for (const key in config.hb[i]) {
         if (config.hb[i].hasOwnProperty(key)) {
           container = key;
           node = config.hb[i].node;
           check_port = config.hb[i][key];
+
           if (check_port !== node) {
             hb_check(node, check_port, container);
           }
@@ -1559,6 +1583,7 @@ app.get('/hb', (req, res) => {
 
 app.get('/log', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1569,7 +1594,6 @@ app.get('/log', (req, res) => {
   }
 });
 
-/* eslint-disable no-lonely-if */
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
 
@@ -1593,10 +1617,10 @@ app.get('/rsyslog', (req, res) => {
     });
   }
 });
-/* eslint-enable no-lonely-if */
 
 app.get('/reloadconfig', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1614,6 +1638,7 @@ app.get('/reloadconfig', (req, res) => {
         automatic_heartbeat();
       }
     }
+
     addLog('\nReloading Config.json\n');
     res.end('');
   }
@@ -1621,6 +1646,7 @@ app.get('/reloadconfig', (req, res) => {
 
 app.get('/getconfig', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1630,6 +1656,7 @@ app.get('/getconfig', (req, res) => {
 
 app.get('/killvip', (req, res) => {
   const check_token = req.query.token;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -1680,10 +1707,12 @@ app.post('/updateconfig', (req, res) => {
 
   try {
     const verify_payload = JSON.parse(req.body.payload);
+
     if ((check_token !== token) || (!check_token)) {
       res.end('\nError: Invalid Credentials');
     } else {
       payload = JSON.stringify(verify_payload, null, 4);
+
       fs.writeFile(config_file, payload, err => {
         if (err) {
           console.log('\nError while writing config.' + err);

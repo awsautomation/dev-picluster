@@ -187,7 +187,6 @@ function send_ping() {
 
       if ((error || response.statusCode !== '200')) {
         const cmd = ip_add_command;
-        // Console.log("\nUnable to connect to: " + vip_slave + ". Bringing up VIP on this host.");
         exec(cmd).then(noop).catch(noop);
       } else {
         const interfaces = require('os').networkInterfaces();
