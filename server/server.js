@@ -31,7 +31,7 @@ const upload = multer({
   dest: '../'
 });
 const scheme = config.ssl ? 'https://' : 'http://';
-const ssl_self_signed = config.ssl_self_signed ? 'false' : 'true';
+const ssl_self_signed = config.ssl_self_signed ? false : true;
 const server = config.web_connect;
 const rsyslog_host = config.rsyslog_host;
 const server_port = config.server_port;
