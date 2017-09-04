@@ -31,7 +31,7 @@ const upload = multer({
   dest: '../'
 });
 const scheme = config.ssl ? 'https://' : 'http://';
-const ssl_self_signed = config.ssl_self_signed !== false;
+const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
 let token = config.token;

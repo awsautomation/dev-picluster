@@ -26,7 +26,7 @@ const upload = multer({
   dest: '../'
 });
 const scheme = config.ssl ? 'https://' : 'http://';
-const ssl_self_signed = config.ssl_self_signed !== false;
+const ssl_self_signed = config.ssl_self_signed === false;
 const server = config.web_connect;
 const server_port = config.server_port;
 const agent_port = config.agent_port;
