@@ -106,7 +106,7 @@ function automatic_heartbeat() {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       request.get(options).on('error', e => {
@@ -186,7 +186,7 @@ app.get('/nodes', (req, res) => {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       request(options, (error, response) => {
@@ -258,7 +258,7 @@ app.get('/build', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
@@ -316,7 +316,7 @@ app.get('/delete-image', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
@@ -374,7 +374,7 @@ app.get('/create', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
@@ -439,7 +439,7 @@ app.get('/start', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
@@ -484,7 +484,7 @@ function migrate(container, original_host, new_host, original_container_data) {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   request(options, error => {
@@ -507,7 +507,7 @@ function migrate(container, original_host, new_host, original_container_data) {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       request(options, error => {
@@ -530,7 +530,7 @@ function migrate(container, original_host, new_host, original_container_data) {
           };
 
           if (config.ssl_self_signed) {
-            options.rejectUnauthorized = 'false';
+            options['rejectUnauthorized'] = 'false';
           }
 
           request(options, error => {
@@ -592,7 +592,7 @@ app.get('/addhost', (req, res) => {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       request(options, error => {
@@ -712,7 +712,7 @@ app.get('/rmhost', (req, res) => {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   request(options, error => {
@@ -796,7 +796,7 @@ app.get('/removecontainerconfig', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, error => {
@@ -879,8 +879,8 @@ app.get('/addcontainer', (req, res) => {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
-        container_options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
+        container_options['rejectUnauthorized'] = 'false';
       }
 
       request(options, error => {
@@ -995,7 +995,7 @@ app.get('/changehost', (req, res) => {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       request(options, error => {
@@ -1049,7 +1049,7 @@ app.get('/stop', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
@@ -1107,7 +1107,7 @@ app.get('/delete', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
@@ -1165,7 +1165,7 @@ app.get('/restart', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
@@ -1223,7 +1223,7 @@ app.get('/containerlog', (req, res) => {
         };
 
         if (config.ssl_self_signed) {
-          options.rejectUnauthorized = 'false';
+          options['rejectUnauthorized'] = 'false';
         }
 
         if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
@@ -1311,7 +1311,7 @@ function copyToAgents(file) {
       };
 
       if (config.ssl_self_signed) {
-        form_options.rejectUnauthorized = 'false';
+        form_options['rejectUnauthorized'] = 'false';
       }
 
       request.post(form_options, err => {
@@ -1392,7 +1392,7 @@ app.post('/exec', (req, res) => {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       if (selected_node.length === 0) {
@@ -1446,7 +1446,7 @@ app.get('/prune', (req, res) => {
       };
 
       if (config.ssl_self_signed) {
-        options.rejectUnauthorized = 'false';
+        options['rejectUnauthorized'] = 'false';
       }
 
       request(options, (error, response) => {
@@ -1474,7 +1474,7 @@ function move_container(container, newhost) {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   request(options, error => {
@@ -1605,7 +1605,7 @@ app.get('/rsyslog', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {
@@ -1686,7 +1686,7 @@ app.get('/killvip', (req, res) => {
           };
 
           if (config.ssl_self_signed) {
-            options.rejectUnauthorized = 'false';
+            options['rejectUnauthorized'] = 'false';
           }
 
           request(options, error => {

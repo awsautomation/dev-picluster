@@ -52,7 +52,7 @@ function getData() {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -121,7 +121,7 @@ app.post('/sendconfig', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {
@@ -173,7 +173,7 @@ app.post('/exec', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, error => {
@@ -320,7 +320,7 @@ app.post('/listcommands', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {
@@ -339,7 +339,7 @@ function display_log(callback) {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   clear_log(() => {
@@ -361,7 +361,7 @@ function clear_log(callback) {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   request(options, (error, response) => {
@@ -387,7 +387,7 @@ app.post('/containerlog', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -418,7 +418,7 @@ app.post('/create', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -444,7 +444,7 @@ app.get('/rsyslog', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {
@@ -468,7 +468,7 @@ app.get('/reloadconfig', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -502,7 +502,7 @@ app.get('/killvip', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -531,7 +531,7 @@ app.post('/delete-image', (req, res) => {
     const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`} : {url: `${scheme}${server}:${server_port}/delete-image?token=${token}`};
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -561,7 +561,7 @@ app.post('/build', (req, res) => {
     const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`} : {url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`};
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -591,7 +591,7 @@ app.post('/delete', (req, res) => {
     const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/delete?token=${token}`};
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -617,7 +617,7 @@ app.get('/prune', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
@@ -649,7 +649,7 @@ app.post('/stop', (req, res) => {
     const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/stop?token=${token}`};
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -684,7 +684,7 @@ app.post('/changehost', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -721,7 +721,7 @@ app.post('/addcontainer', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -751,7 +751,7 @@ function sendFile(file) {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   request.post({options}, err => {
@@ -792,7 +792,7 @@ app.post('/removecontainerconfig', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -821,7 +821,7 @@ app.post('/addhost', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -850,7 +850,7 @@ app.post('/rmhost', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -884,7 +884,7 @@ app.post('/start', (req, res) => {
     const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/start?token=${token}`};
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -916,7 +916,7 @@ app.post('/restart', (req, res) => {
     const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/restart?token=${token}`};
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -942,7 +942,7 @@ app.get('/hb', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response) => {
@@ -968,7 +968,7 @@ app.get('/log', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {
@@ -1002,7 +1002,7 @@ app.get('/getconfig', (req, res) => {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {

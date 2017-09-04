@@ -127,7 +127,7 @@ if (config.autostart_containers) {
   };
 
   if (config.ssl_self_signed) {
-    options.rejectUnauthorized = 'false';
+    options['rejectUnauthorized'] = 'false';
   }
 
   request.get(options).on('error', e => {
@@ -179,7 +179,7 @@ function send_ping() {
     };
 
     if (config.ssl_self_signed) {
-      options.rejectUnauthorized = 'false';
+      options['rejectUnauthorized'] = 'false';
     }
 
     request(options, (error, response, body) => {
