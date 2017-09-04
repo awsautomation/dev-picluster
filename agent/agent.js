@@ -12,6 +12,7 @@ const getos = require('picluster-getos');
 const async = require('async');
 const exec = require('child-process-promise').exec;
 const sysinfo = require('systeminformation');
+
 const config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(bodyParser());
 const upload = multer({
   dest: '../'
 });
+const scheme = config.ssl ? 'https://' : 'http://';
 const server = config.web_connect;
 const server_port = config.server_port;
 const agent_port = config.agent_port;
@@ -121,7 +123,7 @@ if (config.autostart_containers) {
   console.log('Starting all the containers.....');
 
   const options = {
-    url : `${scheme}${server}:${server_port}/start?token=${token}&container=*`
+    url: `${scheme}${server}:${server_port}/start?token=${token}&container=*`
   };
 
   if (config.ssl_self_signed) {

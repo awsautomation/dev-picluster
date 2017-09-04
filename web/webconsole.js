@@ -602,7 +602,7 @@ app.post('/delete', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/delete?token=${token}`};
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/delete?token=${token}`};
 
     if (config.ssl_self_signed) {
       options.rejectUnauthorized = 'false';
@@ -663,7 +663,7 @@ app.post('/stop', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/stop?token=${token}`};
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/stop?token=${token}`};
 
     if (config.ssl_self_signed) {
       options.rejectUnauthorized = 'false';
@@ -905,7 +905,7 @@ app.post('/start', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/start?token=${token}`};
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/start?token=${token}`};
 
     if (config.ssl_self_signed) {
       options.rejectUnauthorized = 'false';
@@ -939,7 +939,7 @@ app.post('/restart', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/restart?token=${token}`};
+    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`} : {url: `${scheme}${server}:${server_port}/restart?token=${token}`};
 
     if (config.ssl_self_signed) {
       options.rejectUnauthorized = 'false';

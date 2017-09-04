@@ -452,151 +452,18 @@ app.get('/start', (req, res) => {
 
 function migrate(container, original_host, new_host, original_container_data) {
   let existing_automatic_heartbeat_value = '';
+
   if (config.automatic_heartbeat) {
     existing_automatic_heartbeat_value = config.automatic_heartbeat;
     if (config.automatic_heartbeat.indexOf('enabled') > -1) {
       config.automatic_heartbeat = 'disabled';
     }
   }
+
   const command = JSON.stringify({
     command: 'docker rm -f ' + container,
     token
   });
-  if (config.ssl) {
-    const options = {
-      url: 'https://' + original_host + ':' + agent_port + '/run',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': command.length
-      },
-      body: command
-    };
-
-    request(options, error => {
-      if (error) {
-        addLog('An error has occurred.');
-      } else {
-        const command = JSON.stringify({
-          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-          token
-        });
-
-        const options = {
-          url: 'https://' + new_host + ':' + agent_port + '/run',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        request(options, error => {
-          if (error) {
-            addLog('An error has occurred.');
-          } else {
-            const command = JSON.stringify({
-              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-              token
-            });
-
-            const options = {
-              url: 'https://' + new_host + ':' + agent_port + '/run',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            };
-
-            request(options, error => {
-              if (error) {
-                addLog('An error has occurred.');
-              } else {
-                addLog('\nStarting ' + container);
-                if (config.automatic_heartbeat) {
-                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                  }
-                }
-              }
-            });
-          }
-        });
-      }
-    });
-  } else if (config.ssl && config.ssl_self_signed) {
-    const options = {
-      url: 'https://' + original_host + ':' + agent_port + '/run',
-      method: 'POST',
-      rejectUnauthorized: 'false',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': command.length
-      },
-      body: command
-    };
-
-    request(options, error => {
-      if (error) {
-        addLog('An error has occurred.');
-      } else {
-        const command = JSON.stringify({
-          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-          token
-        });
-
-        const options = {
-          url: 'https://' + new_host + ':' + agent_port + '/run',
-          rejectUnauthorized: 'false',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        request(options, error => {
-          if (error) {
-            addLog('An error has occurred.');
-          } else {
-            const command = JSON.stringify({
-              command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-              token
-            });
-
-            const options = {
-              url: 'https://' + new_host + ':' + agent_port + '/run',
-              rejectUnauthorized: 'false',
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': command.length
-              },
-              body: command
-            };
-
-            request(options, error => {
-              if (error) {
-                addLog('An error has occurred.');
-              } else {
-                addLog('\nStarting ' + container);
-                if (config.automatic_heartbeat) {
-                  if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                    config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                  }
-                }
-              }
-            });
-          }
-        });
-      }
-    });
-  } else {
-  }
 
   const options = {
     url: `${scheme}${original_host}:${agent_port}/run`,
@@ -1776,7 +1643,7 @@ app.get('/killvip', (req, res) => {
           if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
           }
-          
+
           const token_body = JSON.stringify({
             token
           });
