@@ -2,7 +2,7 @@
     "name": "picluster",
     "scripts": {
         "test": "xo",
-        "install": "cd server && npm install server.js; cd ../agent && npm install agent.js; cd ../web && npm install webconsole.js; cd .. && git clone https://github.com/picluster/picluster.wiki.git docs"
+        "install": "cd server && npm install server.js && cd ../agent && npm install agent.js && cd ../web && npm install webconsole.js && cd .. && git clone https://github.com/picluster/picluster.wiki.git docs"
     },
     "config": {
       "unsafe-perm":true
