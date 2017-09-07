@@ -1,6 +1,9 @@
 {
   "name": "picluster-webconsole",
   "version": "0.0.1",
+  "config": {
+    "unsafe-perm":true
+  },
   "dependencies": {
     "body-parser": "^1.17.2",
     "exec": "",

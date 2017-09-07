@@ -1,6 +1,9 @@
 {
   "name": "picluster-agent",
   "version": "0.0.1",
+  "config": {
+    "unsafe-perm":true
+  },
   "dependencies": {
     "async": "^2.5.0",
     "body-parser": "latest",
