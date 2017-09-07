@@ -696,7 +696,7 @@ function sendFile(file) {
     formData
   };
 
-  request.post({options}, err => {
+  request.post(options, err => {
     if (err) {
       console.error('upload failed:', err);
     } else {
