@@ -154,7 +154,7 @@ app.get('/function', (req, res) => {
     });
     if (function_counter === 0) {
       functions.name.push(function_data);
-      create_function();
+      create_function(name);
       res.end('Creating Function.');
     } else {
       Object.keys(functions.name).forEach((get_name, i) => {
@@ -168,7 +168,24 @@ app.get('/function', (req, res) => {
   }
 });
 
-function create_function() {}
+function create_function(name) {
+  const host = 'localhost';
+  const heartbeat_args = '';
+  const container_args = '-e NAME=' + name + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
+  const failover_constraints = '';
+  const container = name;
+
+  const options = {
+    url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
+    rejectUnauthorized: ssl_self_signed
+  };
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      console.log('\nCreated Function.');
+    }
+  });
+}
 
 app.get('/clearlog', (req, res) => {
   const check_token = req.query.token;
