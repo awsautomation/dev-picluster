@@ -133,6 +133,7 @@ app.post('/function', (req, res) => {
       if (functions.name[i].name.indexOf(name) > -1) {
         functions.name[i].output = output;
         remove_function(name);
+        res.end('');
       }
     });
   }
