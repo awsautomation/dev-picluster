@@ -8,8 +8,7 @@
 
 [![Build Status](https://travis-ci.org/picluster/picluster.svg?branch=master)](https://travis-ci.org/picluster/picluster) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-![Pic](http://i.imgur.com/N7KBk6z.pngg)
-![Pic](http://i.imgur.com/h63NLRI.png)
+![Pic](https://i.imgur.com/rzhS362.png)
 
 ## Support us on [Patreon](https://www.patreon.com/picluster)
 ## Video [Demo](https://youtu.be/6r29Vc6sbXI)
@@ -33,6 +32,9 @@
 - Automatic container failover to different nodes
 - Pull container images from a registry
 - Upload Dockerfile archives to the entire cluster
+
+## Public Demo Server
+Click [here](https://www.linux-toys.com/archives/1455) for more informaion.
 
 ## Prerequisites
 
