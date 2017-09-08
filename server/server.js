@@ -161,7 +161,7 @@ app.get('/function', (req, res) => {
       res.end('Creating Function.');
     } else {
       Object.keys(functions.name).forEach((get_name, i) => {
-        if (functions.name[i].output.length > 1) {
+        if (functions.name[i].output) {
           res.end(functions.name[i].output);
         } else {
           res.end('No output yet');
