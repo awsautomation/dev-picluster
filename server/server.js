@@ -122,39 +122,35 @@ function automatic_heartbeat() {
 app.get('/function', (req, res) => {
   const check_token = req.query.token;
   const name = req.query.function;
-  var function_data = {
+  const function_data = {
     name,
     output: ''
-  }
-  var function_counter = 0;
+  };
+  const function_counter = 0;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     if (name) {
       Object.keys(functions.name).forEach((get_name, i) => {
-        Object.keys(functions.name[i]).forEach(key => {
           if (functions.name[i].name.indexOf(name) > -1) {
             function_counter++;
           }
-        });
       });
-      if (function_counter == 0) {
+      if (function_counter === 0) {
         functions.name.push(function_data);
         create_function();
         res.end('Creating Function.');
       } else {
         Object.keys(functions.name).forEach((get_name, i) => {
-          Object.keys(functions.name[i]).forEach(key => {
             if (functions.name[i].output.length > 1) {
               res.end(functions.name[i].output);
             } else {
               res.end('No output yet');
             }
           });
-        });
       }
     }
-  };
+  }
 });
 
 function create_function() {}
