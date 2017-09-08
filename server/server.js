@@ -8,6 +8,7 @@ const multer = require('multer');
 const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
+
 const functions = {
   name: []
 };
@@ -119,6 +120,23 @@ function automatic_heartbeat() {
   }
 }
 
+app.post('/function', (req, res) => {
+  const check_token = req.query.token;
+  const name = req.query.function;
+  const output = req.query.output;
+
+  let function_counter = 0;
+  if ((check_token !== token) || (!check_token) || (!name)) {
+    res.end('\nError: Invalid Credentials or missing parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if (functions.name[i].name.indexOf(name) > -1) {
+        functions.name[i].output = output;
+      }
+    });
+  }
+});
+
 app.get('/function', (req, res) => {
   const check_token = req.query.token;
   const name = req.query.function;
@@ -126,29 +144,27 @@ app.get('/function', (req, res) => {
     name,
     output: ''
   };
-  const function_counter = 0;
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
+  let function_counter = 0;
+  if ((check_token !== token) || (!check_token) || (!name)) {
+    res.end('\nError: Invalid Credentials or parameters.');
   } else {
-    if (name) {
-      Object.keys(functions.name).forEach((get_name, i) => {
-          if (functions.name[i].name.indexOf(name) > -1) {
-            function_counter++;
-          }
-      });
-      if (function_counter === 0) {
-        functions.name.push(function_data);
-        create_function();
-        res.end('Creating Function.');
-      } else {
-        Object.keys(functions.name).forEach((get_name, i) => {
-            if (functions.name[i].output.length > 1) {
-              res.end(functions.name[i].output);
-            } else {
-              res.end('No output yet');
-            }
-          });
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if (functions.name[i].name.indexOf(name) > -1) {
+        function_counter++;
       }
+    });
+    if (function_counter === 0) {
+      functions.name.push(function_data);
+      create_function();
+      res.end('Creating Function.');
+    } else {
+      Object.keys(functions.name).forEach((get_name, i) => {
+        if (functions.name[i].output.length > 1) {
+          res.end(functions.name[i].output);
+        } else {
+          res.end('No output yet');
+        }
+      });
     }
   }
 });
