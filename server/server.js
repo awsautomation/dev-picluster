@@ -125,7 +125,6 @@ app.post('/function', (req, res) => {
   const name = req.query.function;
   const output = req.query.output;
 
-  let function_counter = 0;
   if ((check_token !== token) || (!check_token) || (!name)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
   } else {
