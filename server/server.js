@@ -12,6 +12,7 @@ const request = require('request');
 const functions = {
   name: []
 };
+let total_nodes = 0;
 let config;
 let config_file;
 if (process.env.PICLUSTER_CONFIG) {
@@ -170,7 +171,7 @@ app.get('/function', (req, res) => {
 });
 
 function create_function(name) {
-  const host = '192.168.86.45';
+  const host = '*';
   const heartbeat_args = '';
   const container_args = '-e NAME=' + name + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
   const failover_constraints = '';
@@ -261,6 +262,7 @@ app.get('/nodes', (req, res) => {
     node_metrics.total_nodes = total_node_count;
     node_metrics.container_list = container_list;
     node_metrics.nodes = node_list;
+    total_nodes = total_node_count;
     return node_metrics;
   }
 
@@ -874,11 +876,18 @@ app.get('/removecontainerconfig', (req, res) => {
 
 app.get('/addcontainer', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  let host = req.query.host;
   const container = req.query.container;
   const container_args = req.query.container_args;
   const heartbeat_args = req.query.heartbeat_args;
   const failover_constraints = req.query.failover_constraints;
+
+  if (host.indexOf('*') > -1) {
+    const min = 0;
+    const max = total_nodes;
+    const number = Math.floor(Math.random() * (max - min + 1)) + min;
+    host = config.layout[number].node;
+  }
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
