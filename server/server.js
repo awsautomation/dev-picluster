@@ -197,7 +197,7 @@ function remove_function_config(name) {
 
   request(options, (error, response) => {
     if (!error && response.statusCode === 200) {
-      console.log('\nRemoved Function: ' + name + 'from the config.');
+      console.log('\nRemoved Function: ' + name + ' from the config.');
     }
   });
 }
