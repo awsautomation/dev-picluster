@@ -121,9 +121,9 @@ function automatic_heartbeat() {
 }
 
 app.post('/function', (req, res) => {
-  const check_token = req.headers.token;
-  const name = req.headers.name;
-  const output = req.query.output;
+  const check_token = req.body.token;
+  const name = req.body.name;
+  const output = req.body.output;
 
   if ((check_token !== token) || (!check_token) || (!name)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
@@ -131,6 +131,7 @@ app.post('/function', (req, res) => {
     Object.keys(functions.name).forEach((get_name, i) => {
       if (functions.name[i].name.indexOf(name) > -1) {
         functions.name[i].output = output;
+        remove_function(name);
       }
     });
   }
@@ -169,7 +170,7 @@ app.get('/function', (req, res) => {
 });
 
 function create_function(name) {
-  const host = 'localhost';
+  const host = '192.168.86.45';
   const heartbeat_args = '';
   const container_args = '-e NAME=' + name + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
   const failover_constraints = '';
@@ -182,7 +183,34 @@ function create_function(name) {
 
   request(options, (error, response) => {
     if (!error && response.statusCode === 200) {
-      console.log('\nCreated Function.');
+      console.log('\nCreated Function:' + name);
+    }
+  });
+}
+
+function remove_function_config(name) {
+  const options = {
+    url: scheme + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + name,
+    rejectUnauthorized: ssl_self_signed
+  };
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      console.log('\nRemoved Function: ' + name + 'from the config.');
+    }
+  });
+}
+
+function remove_function(name) {
+  const options = {
+    url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name,
+    rejectUnauthorized: ssl_self_signed
+  };
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      console.log('\nDeleted Function:' + name);
+      remove_function_config(name);
     }
   });
 }
