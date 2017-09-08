@@ -121,8 +121,8 @@ function automatic_heartbeat() {
 }
 
 app.post('/function', (req, res) => {
-  const check_token = req.query.token;
-  const name = req.query.function;
+  const check_token = req.headers.token;
+  const name = req.headers.name;
   const output = req.query.output;
 
   if ((check_token !== token) || (!check_token) || (!name)) {
