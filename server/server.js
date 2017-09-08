@@ -8,7 +8,9 @@ const multer = require('multer');
 const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
-
+const functions = {
+  name: []
+};
 let config;
 let config_file;
 if (process.env.PICLUSTER_CONFIG) {
@@ -116,6 +118,46 @@ function automatic_heartbeat() {
     console.log('\nAutomatic Heartbeat Disabled.');
   }
 }
+
+app.get('/function', (req, res) => {
+  const check_token = req.query.token;
+  const name = req.query.function;
+  var function_data = {
+    name,
+    output: ''
+  }
+  var function_counter = 0;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    if (name) {
+      Object.keys(functions.name).forEach((get_name, i) => {
+        Object.keys(functions.name[i]).forEach(key => {
+          if (functions.name[i].name.indexOf(name) > -1) {
+            function_counter++;
+          }
+        });
+      });
+      if (function_counter == 0) {
+        functions.name.push(function_data);
+        create_function();
+        res.end('Creating Function.');
+      } else {
+        Object.keys(functions.name).forEach((get_name, i) => {
+          Object.keys(functions.name[i]).forEach(key => {
+            if (functions.name[i].output.length > 1) {
+              res.end(functions.name[i].output);
+            } else {
+              res.end('No output yet');
+            }
+          });
+        });
+      }
+    }
+  };
+});
+
+function create_function() {}
 
 app.get('/clearlog', (req, res) => {
   const check_token = req.query.token;
@@ -893,7 +935,7 @@ app.get('/changehost', (req, res) => {
       }
     }
 
-  // Find Current Host
+    // Find Current Host
     if (proceed < 2) {
       res.end('\nError: Node or Container does not exist!');
     } else {
