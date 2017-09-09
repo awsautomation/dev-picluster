@@ -665,7 +665,7 @@ app.post('/addcontainer', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else if ((container) && (container_args) && (host)) {
     const options = {
-      url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}`,
+      url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
       rejectUnauthorized: ssl_self_signed
     };
 
@@ -696,7 +696,7 @@ function sendFile(file) {
     formData
   };
 
-  request.post({options}, err => {
+  request.post(options, err => {
     if (err) {
       console.error('upload failed:', err);
     } else {

@@ -9,6 +9,10 @@ const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
 
+const functions = {
+  name: []
+};
+let total_nodes = 0;
 let config;
 let config_file;
 if (process.env.PICLUSTER_CONFIG) {
@@ -117,6 +121,101 @@ function automatic_heartbeat() {
   }
 }
 
+app.post('/function', (req, res) => {
+  const check_token = req.body.token;
+  const name = req.body.name;
+  const output = req.body.output;
+
+  if ((check_token !== token) || (!check_token) || (!name)) {
+    res.end('\nError: Invalid Credentials or missing parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if (functions.name[i].name.indexOf(name) > -1) {
+        functions.name[i].output = output;
+        remove_function(name);
+      }
+    });
+  }
+});
+
+app.get('/function', (req, res) => {
+  const check_token = req.query.token;
+  const name = req.query.function;
+  const function_data = {
+    name,
+    output: ''
+  };
+  let function_counter = 0;
+  if ((check_token !== token) || (!check_token) || (!name)) {
+    res.end('\nError: Invalid Credentials or parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if (functions.name[i].name.indexOf(name) > -1) {
+        function_counter++;
+      }
+    });
+    if (function_counter === 0) {
+      functions.name.push(function_data);
+      create_function(name);
+      res.end('Creating Function.');
+    } else {
+      Object.keys(functions.name).forEach((get_name, i) => {
+        if (functions.name[i].output.length > 1) {
+          res.end(functions.name[i].output);
+        } else {
+          res.end('No output yet');
+        }
+      });
+    }
+  }
+});
+
+function create_function(name) {
+  const host = '*';
+  const heartbeat_args = '';
+  const container_args = '-e NAME=' + name + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
+  const failover_constraints = '';
+  const container = name;
+
+  const options = {
+    url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
+    rejectUnauthorized: ssl_self_signed
+  };
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      console.log('\nCreated Function:' + name);
+    }
+  });
+}
+
+function remove_function_config(name) {
+  const options = {
+    url: scheme + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + name,
+    rejectUnauthorized: ssl_self_signed
+  };
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      console.log('\nRemoved Function: ' + name + ' from the config.');
+    }
+  });
+}
+
+function remove_function(name) {
+  const options = {
+    url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name,
+    rejectUnauthorized: ssl_self_signed
+  };
+
+  request(options, (error, response) => {
+    if (!error && response.statusCode === 200) {
+      console.log('\nDeleted Function:' + name);
+      remove_function_config(name);
+    }
+  });
+}
+
 app.get('/clearlog', (req, res) => {
   const check_token = req.query.token;
 
@@ -163,6 +262,7 @@ app.get('/nodes', (req, res) => {
     node_metrics.total_nodes = total_node_count;
     node_metrics.container_list = container_list;
     node_metrics.nodes = node_list;
+    total_nodes = total_node_count;
     return node_metrics;
   }
 
@@ -776,11 +876,18 @@ app.get('/removecontainerconfig', (req, res) => {
 
 app.get('/addcontainer', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  let host = req.query.host;
   const container = req.query.container;
   const container_args = req.query.container_args;
   const heartbeat_args = req.query.heartbeat_args;
   const failover_constraints = req.query.failover_constraints;
+
+  if (host.indexOf('*') > -1) {
+    const min = 0;
+    const max = total_nodes;
+    const number = Math.floor(Math.random() * (max - min + 1)) + min;
+    host = config.layout[number].node;
+  }
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -893,7 +1000,7 @@ app.get('/changehost', (req, res) => {
       }
     }
 
-  // Find Current Host
+    // Find Current Host
     if (proceed < 2) {
       res.end('\nError: Node or Container does not exist!');
     } else {
