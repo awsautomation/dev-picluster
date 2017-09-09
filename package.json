@@ -5,7 +5,7 @@
     },
     "scripts": {
         "test": "xo",
-        "install": "cd server && npm install && cd ../agent && npm install && cd ../web && npm install && cd .. && ([ -d 'docs' ] || git clone https://github.com/picluster/picluster.wiki.git docs)"
+        "install": "cd server && npm install && cd ../agent && npm install && cd ../web && npm install && cd .. && ([ -d 'docs' ] cd docs && git pull || git clone https://github.com/picluster/picluster.wiki.git docs)"
     },
     "repository": {
         "type": "git",

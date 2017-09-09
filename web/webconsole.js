@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 
 let config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
 
-config.ssl_self_signed ? process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' : ;
+config.ssl_self_signed ? process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' : '';
 
 const app = express();
 
