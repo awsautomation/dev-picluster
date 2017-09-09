@@ -12,10 +12,9 @@ const bodyParser = require('body-parser');
 
 let config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
 
-config.ssl_self_signed ? process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0' : '';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = config.ssl_self_signed ? '0' : '1';
 
 const app = express();
-
 app.use(bodyParser());
 app.use('/assets', express.static(path.join(__dirname, 'assets'), {maxage: '48h'}));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'), {maxage: '48h'}));
@@ -25,12 +24,12 @@ const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
+const syslog = config.syslog ? config.syslog : '';
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
-let syslog = config.syslog ? config.syslog : '';
 let nodedata = '';
 
 function getData() {
