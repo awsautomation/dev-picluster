@@ -172,7 +172,7 @@ app.get('/function', (req, res) => {
 
 function remove_function_data(uuid) {
   Object.keys(functions.name).forEach((get_name, i) => {
-    if (functions.name[i].uuid.indexOf(uuid) > -1) {
+    if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
       functions.name[i].name = '';
       functions.name[i].output = '';
       functions.name[i].uuid = '';
