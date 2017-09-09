@@ -25,7 +25,7 @@ const app = express();
 
 app.use(bodyParser());
 app.use('/assets', express.static(path.join(__dirname, 'assets'), {maxage: '48h'}));
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')), {maxage: '48h'}));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'), {maxage: '48h'}));
 
 const upload = multer({
   dest: '../'
@@ -934,71 +934,48 @@ app.get('/getconfig', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/main.html');
 });
-
 app.get('/blank', (req, res) => {
   res.sendFile(__dirname + '/blank.html');
 });
-
 app.get('/nodes.html', (req, res) => {
   res.sendFile(__dirname + '/nodes.html');
 });
-
 app.get('/container-layout.html', (req, res) => {
   res.sendFile(__dirname + '/container-layout.html');
 });
-
 app.get('/prune.html', (req, res) => {
   res.sendFile(__dirname + '/prune.html');
 });
-
-app.get('/background', (req, res) => {
-  res.sendFile(__dirname + '/background.jpg');
-});
-
 app.get('/reloadconfig.html', (req, res) => {
   res.sendFile(__dirname + '/reloadconfig.html');
 });
-
 app.get('/pullimages.html', (req, res) => {
   res.sendFile(__dirname + '/pullimages.html');
 });
-
 app.get('/manage-images.html', (req, res) => {
   res.sendFile(__dirname + '/manage-images.html');
 });
-
-app.get('/logo.png', (req, res) => {
-  res.sendFile(__dirname + '/logo.png');
-});
-
 app.get('/image-layout.html', (req, res) => {
   res.sendFile(__dirname + '/image-layout.html');
 });
-
 app.get('/log.html', (req, res) => {
   res.sendFile(__dirname + '/log.html');
 });
-
 app.get('/hb.html', (req, res) => {
   res.sendFile(__dirname + '/hb.html');
 });
-
 app.get('/killvip.html', (req, res) => {
   res.sendFile(__dirname + '/killvip.html');
 });
-
 app.get('/syslog.html', (req, res) => {
   res.sendFile(__dirname + '/syslog.html');
 });
-
 app.get('/manage.html', (req, res) => {
   res.sendFile(__dirname + '/manage.html');
 });
-
 app.get('/terminal.html', (req, res) => {
   res.sendFile(__dirname + '/terminal.html');
 });
-
 app.get('/addcontainer.html', (req, res) => {
   res.sendFile(__dirname + '/addcontainer.html');
 });
@@ -1011,17 +988,11 @@ app.get('/rmhost.html', (req, res) => {
 app.get('/rsyslog.html', (req, res) => {
   res.sendFile(__dirname + '/rsyslog.html');
 });
-app.get('/server.jpeg', (req, res) => {
-  res.sendFile(__dirname + '/server.jpeg');
-});
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(__dirname + '/favicon.ico');
 });
 app.get('/upload.html', (req, res) => {
   res.sendFile(__dirname + '/upload.html');
-});
-app.get('/searching.jpeg', (req, res) => {
-  res.sendFile(__dirname + '/searching.jpeg');
 });
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {

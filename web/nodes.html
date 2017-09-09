@@ -11,7 +11,7 @@
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			if (div) {
-				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for nodes</label></font>';
+				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>';
 			}
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
