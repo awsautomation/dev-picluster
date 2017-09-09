@@ -13,15 +13,18 @@
 
 		function exec() {
 			var div = document.getElementById('modal-body2');
+
 			if (div) {
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>';
 			}
+
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
 
 				if (div) {
 					div.innerHTML = '';
 				}
+
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = check_data.data[i].os_type || '';
@@ -38,7 +41,6 @@
 						div.innerHTML = div.innerHTML + '</ol>';
 					}
 					addFontLinux();
-
 				}
 			});
 		}
@@ -65,7 +67,9 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
+
 		output_modal.style.display = "block";
+
 		exec()
 	</script>
 

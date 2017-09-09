@@ -14,7 +14,7 @@
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			if (div) {
-				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for images</label></font>';
+				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/image/searching.jpg"><br><font size=+3><label>Searching for images</label></font>';
 			}
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
@@ -58,6 +58,7 @@
 		</div>
 	</div>
 	</p>
+	
 	<script>
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[0];

@@ -117,6 +117,7 @@
 			else
 				e.style.display = 'block';
 		}
+
 		$(function() {
 			hideshow('menu');
 			hideshow('content');
@@ -181,7 +182,6 @@
 		</div>
 	</div>
 
-	</script>
 	<div id="menu">
 		<nav>
 			<ul>
@@ -245,17 +245,9 @@
 			modal.style.display = "none";
 			login();
 		}
+
 		modal.style.display = "block";
-	</script>
 
-	<div id="content">
-		<div class="left">
-		</div>
-
-		<div style="clear: both;"> </div>
-	</div>
-
-	<script>
 		$("html").click(function() {
 			$(".dropdown").hide();
 		});
@@ -267,6 +259,14 @@
 			e.stopPropagation();
 		});
 	</script>
+
+	<div id="content">
+		<div class="left">
+		</div>
+
+		<div style="clear: both;"> </div>
+	</div>
+	
 	<p align=center>
 		<IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
   </body>

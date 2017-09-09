@@ -19,7 +19,6 @@
 			}
 
 			if (image) {
-
 				if (d.checked) {
 					$.post('/delete-image', {
 						token: parent.token,
@@ -57,8 +56,7 @@
 				<p align=left>
 					<fieldset>
 						<label for="imagelist">Select a Container</label>
-						<select name="imagelist" id="imagelist">
-			    </select>
+						<select name="imagelist" id="imagelist"></select>
 						<br><br>
 						<input type="checkbox" id="cache"><label for="imagelist">Build without Docker Cache</label>
 						<br><br>
@@ -86,8 +84,8 @@
 								});
 							}
 						</script>
-						<p align=center>
-						</p>
+					</fieldset>
+				</p>
 			</div>
 		</div>
 	</div>

@@ -44,6 +44,7 @@
 			}
 
 			var check_counter = 0;
+
 			nodes.forEach(function(node, i) {
 				if (nodes[i].checked) {
 					nodes.forEach(function(node, i) {
@@ -58,6 +59,7 @@
 					});
 				}
 			});
+
 			if (check_counter == 0) {
 				div.innerHTML = 'Error, no hosts were selected.';
 			} else {
@@ -257,6 +259,7 @@
 		</div>
 	</div>
 </body>
+
 <script>
 	var modal = document.getElementById('myModal');
 	var span = document.getElementsByClassName("close")[0];

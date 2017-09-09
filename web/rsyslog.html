@@ -29,19 +29,23 @@
 
 		function search(what, id) {
 			var date = "";
-			if (what.indexOf("today") > -1) {
 
+			if (what.indexOf("today") > -1) {
 				var day_check = moment().format("D");
+
 				if (day_check.length > 1) {
 					date = moment().format("MMM D");
 				} else {
 					date = moment().format("MMM  D");
 				}
+
 				$("#query").val(date);
 			} else {
 				$("#query").val(what);
 			}
+
 			exec();
+
 			document.getElementById(id).checked = false;
 		};
 	</script>
@@ -95,7 +99,6 @@
 		</div>
 	</div>
 
-
 	<script>
 		var modal = document.getElementById('myModal');
 		var span = document.getElementsByClassName("close")[0];
@@ -108,8 +111,9 @@
 		btn.onclick = function() {
 			exec();
 		}
+
 		modal.style.display = "block";
+
 		exec();
 	</script>
-
 </html>

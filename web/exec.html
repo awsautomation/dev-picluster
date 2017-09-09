@@ -114,6 +114,7 @@
 					</table>
 					<p align=left>
 						<br>
+					</p>
 			</div>
 		</div>
 	</div>
@@ -133,18 +134,19 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
+
 		btn.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
 		}
+
 		btn2.onclick = function() {
 			$('#command_output').val('');
 			exec();
 		}
+
 		modal.style.display = "block";
 	</script>
-	</p>
-
 
 </html>
