@@ -123,16 +123,16 @@ function automatic_heartbeat() {
 
 app.post('/function', (req, res) => {
   const check_token = req.body.token;
-  const name = req.body.name;
   const output = req.body.output;
+  const uuid = req.body.uuid;
 
-  if ((check_token !== token) || (!check_token) || (!name)) {
+  if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
   } else {
     Object.keys(functions.name).forEach((get_name, i) => {
-      if (functions.name[i].name.indexOf(name) > -1) {
+      if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
         functions.name[i].output = output;
-        remove_function(name);
+        remove_function(functions.name[i].name);
         res.end('');
       }
     });
@@ -142,10 +142,15 @@ app.post('/function', (req, res) => {
 app.get('/function', (req, res) => {
   const check_token = req.query.token;
   const name = req.query.function;
+  const min = 1;
+  const max = 9999999;
+  const uuid = Math.floor(Math.random() * (max - min + 1)) + min;
   const function_data = {
     name,
+    uuid,
     output: ''
   };
+
   let function_counter = 0;
   if ((check_token !== token) || (!check_token) || (!name)) {
     res.end('\nError: Invalid Credentials or parameters.');
@@ -157,24 +162,46 @@ app.get('/function', (req, res) => {
     });
     if (function_counter === 0) {
       functions.name.push(function_data);
-      create_function(name);
-      res.end('Creating Function.');
+      create_function(name, uuid);
+      res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
     } else {
-      Object.keys(functions.name).forEach((get_name, i) => {
-        if (functions.name[i].output) {
-          res.end(functions.name[i].output);
-        } else {
-          res.end('No output yet');
-        }
-      });
+      res.end('Function already submitted.');
     }
   }
 });
 
-function create_function(name) {
+function remove_function_data(uuid) {
+  Object.keys(functions.name).forEach((get_name, i) => {
+    if (functions.name[i].uuid.indexOf(uuid) > -1) {
+      functions.name[i].name = '';
+      functions.name[i].output = '';
+      functions.name[i].uuid = '';
+    }
+  });
+}
+
+app.get('/getfunction', (req, res) => {
+  const check_token = req.query.token;
+  const uuid = req.query.uuid;
+
+  if ((check_token !== token) || (!check_token) || (!uuid)) {
+    res.end('\nError: Invalid Credentials or parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if ((functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1 && functions.name[i].output.length > 1)) {
+        res.end(functions.name[i].output);
+        remove_function_data(uuid);
+      } else {
+        res.end('');
+      }
+    });
+  }
+});
+
+function create_function(name, uuid) {
   const host = '*';
   const heartbeat_args = '';
-  const container_args = '-e NAME=' + name + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
+  const container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
   const failover_constraints = '';
   const container = name;
 
@@ -195,13 +222,6 @@ function remove_function_config(name) {
     url: scheme + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + name,
     rejectUnauthorized: ssl_self_signed
   };
-
-  Object.keys(functions.name).forEach((get_name, i) => {
-    if (functions.name[i].name.indexOf(name) > -1) {
-      functions.name[i].name = '';
-      functions.name[i].output = '';
-    }
-  });
 
   request(options, (error, response) => {
     if (!error && response.statusCode === 200) {
@@ -598,35 +618,11 @@ function migrate(container, original_host, new_host, original_container_data) {
       request(options, error => {
         if (error) {
           addLog('An error has occurred.');
-        } else {
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-            token
-          });
-
-          const options = {
-            url: `${scheme}${new_host}:${agent_port}/run`,
-            rejectUnauthorized: ssl_self_signed,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-
-          request(options, error => {
-            if (error) {
-              addLog('An error has occurred.');
-            } else {
-              addLog('\nStarting ' + container);
-              if (config.automatic_heartbeat) {
-                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                }
-              }
-            }
-          });
+        }
+        if (config.automatic_heartbeat) {
+          if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+            config.automatic_heartbeat = existing_automatic_heartbeat_value;
+          }
         }
       });
     }
