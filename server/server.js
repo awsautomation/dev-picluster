@@ -125,7 +125,7 @@ app.post('/function', (req, res) => {
   const check_token = req.body.token;
   const output = req.body.output;
   const uuid = req.body.uuid;
-
+  console.log('\n\n' + output);
   if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
   } else {
@@ -151,22 +151,12 @@ app.get('/function', (req, res) => {
     output: ''
   };
 
-  let function_counter = 0;
   if ((check_token !== token) || (!check_token) || (!name)) {
     res.end('\nError: Invalid Credentials or parameters.');
   } else {
-    Object.keys(functions.name).forEach((get_name, i) => {
-      if (functions.name[i].name.indexOf(name) > -1) {
-        function_counter++;
-      }
-    });
-    if (function_counter === 0) {
-      functions.name.push(function_data);
-      create_function(name + '-' + uuid, uuid);
-      res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
-    } else {
-      res.end('Function already submitted.');
-    }
+    functions.name.push(function_data);
+    create_function(name + '-' + uuid, uuid);
+    res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
   }
 });
 
@@ -1152,7 +1142,6 @@ app.get('/delete', (req, res) => {
             command: 'docker container rm -f ' + key + '-' + uuid,
             token
           });
-          console.log('\n\n\n' + JSON.stringify(command.command));
         } else {
           command = JSON.stringify({
             command: 'docker container rm -f ' + key,
