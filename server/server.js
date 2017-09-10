@@ -132,7 +132,7 @@ app.post('/function', (req, res) => {
     Object.keys(functions.name).forEach((get_name, i) => {
       if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
         functions.name[i].output = output;
-        remove_function(functions.name[i].name);
+        remove_function(functions.name[i].name, uuid);
         res.end('');
       }
     });
@@ -162,7 +162,7 @@ app.get('/function', (req, res) => {
     });
     if (function_counter === 0) {
       functions.name.push(function_data);
-      create_function(name, uuid);
+      create_function(name + '-' + uuid, uuid);
       res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
     } else {
       res.end('Function already submitted.');
@@ -199,47 +199,25 @@ app.get('/getfunction', (req, res) => {
 });
 
 function create_function(name, uuid) {
-  const host = '*';
-  const heartbeat_args = '';
   const container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
-  const failover_constraints = '';
   const container = name;
+  const min = 0;
+  const max = total_nodes - 1;
+  const number = Math.floor(Math.random() * (max - min + 1)) + min;
+  const host = config.layout[number].node;
 
-  const options = {
-    url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request(options, (error, response) => {
-    if (!error && response.statusCode === 200) {
-      console.log('\nCreated Function:' + name);
-    }
-  });
+  migrate(container, host, host, container_args, uuid);
 }
 
-function remove_function_config(name) {
+function remove_function(name, uuid) {
   const options = {
-    url: scheme + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + name,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request(options, (error, response) => {
-    if (!error && response.statusCode === 200) {
-      console.log('\nRemoved Function: ' + name + ' from the config.');
-    }
-  });
-}
-
-function remove_function(name) {
-  const options = {
-    url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name,
+    url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name + '&uuid=' + uuid,
     rejectUnauthorized: ssl_self_signed
   };
 
   request(options, (error, response) => {
     if (!error && response.statusCode === 200) {
       console.log('\nDeleted Function:' + name);
-      remove_function_config(name);
     }
   });
 }
@@ -569,7 +547,7 @@ app.get('/start', (req, res) => {
   }
 });
 
-function migrate(container, original_host, new_host, original_container_data) {
+function migrate(container, original_host, new_host, original_container_data, uuid) {
   let existing_automatic_heartbeat_value = '';
 
   if (config.automatic_heartbeat) {
@@ -599,10 +577,19 @@ function migrate(container, original_host, new_host, original_container_data) {
     if (error) {
       addLog('An error has occurred.');
     } else {
-      const command = JSON.stringify({
-        command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-        token
-      });
+      let command = '';
+      if (uuid) {
+        const image_name = container.split('-' + uuid)[0];
+        command = JSON.stringify({
+          command: 'docker image build ' + dockerFolder + '/' + image_name + ' -t ' + container + ' -f ' + dockerFolder + '/' + image_name + '/Dockerfile;docker container run -d --name ' + container + ' ' + original_container_data + ' ' + image_name,
+          token
+        });
+      } else {
+        command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
+      }
 
       const options = {
         url: `${scheme}${new_host}:${agent_port}/run`,
@@ -1136,6 +1123,7 @@ app.get('/stop', (req, res) => {
 
 app.get('/delete', (req, res) => {
   const check_token = req.query.token;
+  const uuid = req.query.uuid;
   let container = '';
 
   if (req.query.container) {
@@ -1157,10 +1145,20 @@ app.get('/delete', (req, res) => {
           return;
         }
 
-        const command = JSON.stringify({
-          command: 'docker container rm -f ' + key,
-          token
-        });
+        let command = '';
+
+        if (uuid) {
+          command = JSON.stringify({
+            command: 'docker container rm -f ' + key + '-' + uuid,
+            token
+          });
+          console.log('\n\n\n' + JSON.stringify(command.command));
+        } else {
+          command = JSON.stringify({
+            command: 'docker container rm -f ' + key,
+            token
+          });
+        }
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
