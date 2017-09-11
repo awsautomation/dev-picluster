@@ -125,13 +125,14 @@ app.post('/function', (req, res) => {
   const check_token = req.body.token;
   const output = req.body.output;
   const uuid = req.body.uuid;
-  console.log('\n\n' + output);
+
   if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
   } else {
     Object.keys(functions.name).forEach((get_name, i) => {
       if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
         functions.name[i].output = output;
+        console.log('\n' + JSON.stringify(functions));
         remove_function(functions.name[i].name, uuid);
         res.end('');
       }
@@ -146,8 +147,8 @@ app.get('/function', (req, res) => {
   const max = 9999999;
   const uuid = Math.floor(Math.random() * (max - min + 1)) + min;
   const function_data = {
-    name,
     uuid,
+    name: name + '-' + uuid,
     output: ''
   };
 
@@ -173,18 +174,17 @@ function remove_function_data(uuid) {
 app.get('/getfunction', (req, res) => {
   const check_token = req.query.token;
   const uuid = req.query.uuid;
-
+  let output = '';
   if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or parameters.');
   } else {
     Object.keys(functions.name).forEach((get_name, i) => {
       if ((functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1 && functions.name[i].output.length > 1)) {
-        res.end(functions.name[i].output);
+        output = functions.name[i].output;
         remove_function_data(uuid);
-      } else {
-        res.end('');
       }
     });
+    res.end(output);
   }
 });
 
@@ -200,6 +200,7 @@ function create_function(name, uuid) {
 }
 
 function remove_function(name, uuid) {
+
   const options = {
     url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name + '&uuid=' + uuid,
     rejectUnauthorized: ssl_self_signed
@@ -207,7 +208,7 @@ function remove_function(name, uuid) {
 
   request(options, (error, response) => {
     if (!error && response.statusCode === 200) {
-      console.log('\nDeleted Function:' + name);
+      console.log('\nDeleted Function: ' + name);
     }
   });
 }
