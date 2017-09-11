@@ -132,8 +132,7 @@ app.post('/function', (req, res) => {
     Object.keys(functions.name).forEach((get_name, i) => {
       if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
         functions.name[i].output = output;
-        console.log('\n' + JSON.stringify(functions));
-        remove_function(functions.name[i].name, uuid);
+        delete_function(functions.name[i].name, functions.name[i].host);
         res.end('');
       }
     });
@@ -146,17 +145,22 @@ app.get('/function', (req, res) => {
   const min = 1;
   const max = 9999999;
   const uuid = Math.floor(Math.random() * (max - min + 1)) + min;
+  const min_node = 0;
+  const max_node = total_nodes - 1;
+  const node_number = Math.floor(Math.random() * (max_node - min_node + 1)) + min_node;
+  const host = config.layout[node_number].node;
   const function_data = {
     uuid,
     name: name + '-' + uuid,
-    output: ''
+    output: '',
+    host
   };
 
   if ((check_token !== token) || (!check_token) || (!name)) {
     res.end('\nError: Invalid Credentials or parameters.');
   } else {
     functions.name.push(function_data);
-    create_function(name + '-' + uuid, uuid);
+    create_function(name + '-' + uuid, uuid, host);
     res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
   }
 });
@@ -167,6 +171,7 @@ function remove_function_data(uuid) {
       functions.name[i].name = '';
       functions.name[i].output = '';
       functions.name[i].uuid = '';
+      functions.name[i].host = '';
     }
   });
 }
@@ -189,28 +194,11 @@ app.get('/getfunction', (req, res) => {
   }
 });
 
-function create_function(name, uuid) {
+function create_function(name, uuid, host) {
   const container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
   const container = name;
-  const min = 0;
-  const max = total_nodes - 1;
-  const number = Math.floor(Math.random() * (max - min + 1)) + min;
-  const host = config.layout[number].node;
 
   migrate(container, host, host, container_args, uuid);
-}
-
-function remove_function(name, uuid) {
-  const options = {
-    url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name + '&uuid=' + uuid,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request(options, (error, response) => {
-    if (!error && response.statusCode === 200) {
-      console.log('\nDeleted Function: ' + name);
-    }
-  });
 }
 
 app.get('/clearlog', (req, res) => {
@@ -1112,9 +1100,33 @@ app.get('/stop', (req, res) => {
   }
 });
 
+function delete_function(name, host) {
+  const node = host;
+
+  const command = JSON.stringify({
+    command: 'docker container rm -f ' + name,
+    token
+  });
+
+  const options = {
+    url: scheme + node + ':' + agent_port + '/run',
+    rejectUnauthorized: ssl_self_signed,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': command.length
+    },
+    body: command
+  };
+  request(options, error => {
+    if (error) {
+      console.log('\n' + error);
+    }
+  });
+}
+
 app.get('/delete', (req, res) => {
   const check_token = req.query.token;
-  const uuid = req.query.uuid;
   let container = '';
 
   if (req.query.container) {
@@ -1135,20 +1147,10 @@ app.get('/delete', (req, res) => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
-        let command = '';
-
-        if (uuid) {
-          command = JSON.stringify({
-            command: 'docker container rm -f ' + key + '-' + uuid,
-            token
-          });
-        } else {
-          command = JSON.stringify({
-            command: 'docker container rm -f ' + key,
-            token
-          });
-        }
+        const command = JSON.stringify({
+          command: 'docker container rm -f ' + key,
+          token
+        });
 
         const options = {
           url: `${scheme}${node}:${agent_port}/run`,
@@ -1167,7 +1169,7 @@ app.get('/delete', (req, res) => {
               res.end('An error has occurred.');
             } else {
               const results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
+              addLog('\nDeleting: ' + key + '\n' + results.output);
             }
           });
         }
