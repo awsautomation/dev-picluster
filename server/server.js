@@ -201,7 +201,6 @@ function create_function(name, uuid) {
 }
 
 function remove_function(name, uuid) {
-
   const options = {
     url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name + '&uuid=' + uuid,
     rejectUnauthorized: ssl_self_signed
