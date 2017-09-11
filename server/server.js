@@ -560,7 +560,7 @@ function migrate(container, original_host, new_host, original_container_data, uu
       if (uuid) {
         const image_name = container.split('-' + uuid)[0];
         command = JSON.stringify({
-          command: 'docker image build ' + dockerFolder + '/' + image_name + ' -t ' + container + ' -f ' + dockerFolder + '/' + image_name + '/Dockerfile;docker container run -d --name ' + container + ' ' + original_container_data + ' ' + image_name,
+          command: 'docker image build ' + dockerFolder + '/' + image_name + ' -t ' + image_name + ' -f ' + dockerFolder + '/' + image_name + '/Dockerfile;docker container run -d --name ' + container + ' ' + original_container_data + ' ' + image_name,
           token
         });
       } else {
