@@ -175,6 +175,7 @@ app.get('/getfunction', (req, res) => {
   const check_token = req.query.token;
   const uuid = req.query.uuid;
   let output = '';
+
   if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or parameters.');
   } else {
