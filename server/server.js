@@ -1100,9 +1100,7 @@ app.get('/stop', (req, res) => {
   }
 });
 
-function delete_function(name, host) {
-  const node = host;
-
+function delete_function(name, node) {
   const command = JSON.stringify({
     command: 'docker container rm -f ' + name,
     token
