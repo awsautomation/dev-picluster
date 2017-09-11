@@ -121,6 +121,19 @@ function automatic_heartbeat() {
   }
 }
 
+app.get('/clear-functions', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      delete_function(functions.name[i].name, functions.name[i].host);
+      remove_function_data(functions.name[i].uuid);
+    });
+    res.end('Sent request to remove stale functions.');
+  }
+});
+
 app.post('/function', (req, res) => {
   const check_token = req.body.token;
   const output = req.body.output;
@@ -537,7 +550,7 @@ function migrate(container, original_host, new_host, original_container_data, uu
   }
 
   const command = JSON.stringify({
-    command: 'docker rm -f ' + container,
+    command: 'docker container rm -f ' + container,
     token
   });
 
