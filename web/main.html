@@ -43,6 +43,9 @@
 			$('#kibana').click(function() {
 				$('#iframe_a').attr('src', '/kibana?token=' + token);
 			});
+			$('#functions').click(function() {
+				$('#iframe_a').attr('src', '/clear-functions.html');
+			});
 			$('#rsyslog').click(function() {
 				$('#iframe_a').attr('src', '/rsyslog.html');
 			});
@@ -217,6 +220,7 @@
 							<li><a href="#" id="hb">Heartbeat</a></li>
 							<li><a href="#" id="prune">Clean Docker</a></li>
 							<li><a href="#" id="terminal">Terminal</a></li>
+							<li><a href="#" id="functions">Remove Functions</a></li>
 							<li><a href="#" id="kibana">Kibana</a></li>
 						</ul>
 					</li>
