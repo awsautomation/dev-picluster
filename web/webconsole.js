@@ -484,7 +484,13 @@ app.post('/delete-image', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/delete-image?token=${token}`, rejectUnauthorized: ssl_self_signed};
+    const options = image.length > 1 ? {
+      url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`,
+      rejectUnauthorized: ssl_self_signed
+    } : {
+      url: `${scheme}${server}:${server_port}/delete-image?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
+    };
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -510,7 +516,13 @@ app.post('/build', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = image.length > 1 ? {url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`, rejectUnauthorized: ssl_self_signed};
+    const options = image.length > 1 ? {
+      url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`,
+      rejectUnauthorized: ssl_self_signed
+    } : {
+      url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`,
+      rejectUnauthorized: ssl_self_signed
+    };
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -536,7 +548,13 @@ app.post('/delete', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/delete?token=${token}`, rejectUnauthorized: ssl_self_signed};
+    const options = container.length > 1 ? {
+      url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
+    } : {
+      url: `${scheme}${server}:${server_port}/delete?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
+    };
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -573,6 +591,27 @@ app.get('/prune', (req, res) => {
   }
 });
 
+app.get('/clear-functions', (req, res) => {
+  const check_token = req.query.token;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const options = {
+      url: `${scheme}${server}:${server_port}/clear-functions?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
+      if (!error && response.statusCode === 200) {
+        res.end('Sent request to delete functions.');
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
+  }
+});
+
 app.post('/stop', (req, res) => {
   const check_token = req.body.token;
   let container = '';
@@ -587,7 +626,13 @@ app.post('/stop', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/stop?token=${token}`, rejectUnauthorized: ssl_self_signed};
+    const options = container.length > 1 ? {
+      url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
+    } : {
+      url: `${scheme}${server}:${server_port}/stop?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
+    };
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -800,7 +845,13 @@ app.post('/start', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/start?token=${token}`, rejectUnauthorized: ssl_self_signed};
+    const options = container.length > 1 ? {
+      url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
+    } : {
+      url: `${scheme}${server}:${server_port}/start?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
+    };
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -828,7 +879,13 @@ app.post('/restart', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`, rejectUnauthorized: ssl_self_signed} : {url: `${scheme}${server}:${server_port}/restart?token=${token}`, rejectUnauthorized: ssl_self_signed};
+    const options = container.length > 1 ? {
+      url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`,
+      rejectUnauthorized: ssl_self_signed
+    } : {
+      url: `${scheme}${server}:${server_port}/restart?token=${token}`,
+      rejectUnauthorized: ssl_self_signed
+    };
 
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
@@ -931,6 +988,9 @@ app.get('/container-layout.html', (req, res) => {
 });
 app.get('/prune.html', (req, res) => {
   res.sendFile(__dirname + '/prune.html');
+});
+app.get('/clear-functions.html', (req, res) => {
+  res.sendFile(__dirname + '/clear-functions.html');
 });
 app.get('/reloadconfig.html', (req, res) => {
   res.sendFile(__dirname + '/reloadconfig.html');

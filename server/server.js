@@ -121,18 +121,32 @@ function automatic_heartbeat() {
   }
 }
 
+app.get('/clear-functions', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      delete_function(functions.name[i].name, functions.name[i].host);
+      remove_function_data(functions.name[i].uuid);
+    });
+    res.end('Sent request to remove stale functions.');
+  }
+});
+
 app.post('/function', (req, res) => {
   const check_token = req.body.token;
-  const name = req.body.name;
   const output = req.body.output;
+  const uuid = req.body.uuid;
 
-  if ((check_token !== token) || (!check_token) || (!name)) {
+  if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
   } else {
     Object.keys(functions.name).forEach((get_name, i) => {
-      if (functions.name[i].name.indexOf(name) > -1) {
+      if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
         functions.name[i].output = output;
-        remove_function(name);
+        delete_function(functions.name[i].name, functions.name[i].host);
+        res.end('');
       }
     });
   }
@@ -141,79 +155,63 @@ app.post('/function', (req, res) => {
 app.get('/function', (req, res) => {
   const check_token = req.query.token;
   const name = req.query.function;
+  const min = 1;
+  const max = 9999999;
+  const uuid = Math.floor(Math.random() * (max - min + 1)) + min;
+  const min_node = 0;
+  const max_node = total_nodes - 1;
+  const node_number = Math.floor(Math.random() * (max_node - min_node + 1)) + min_node;
+  const host = config.layout[node_number].node;
   const function_data = {
-    name,
-    output: ''
+    uuid,
+    name: name + '-' + uuid,
+    output: '',
+    host
   };
-  let function_counter = 0;
+
   if ((check_token !== token) || (!check_token) || (!name)) {
     res.end('\nError: Invalid Credentials or parameters.');
   } else {
-    Object.keys(functions.name).forEach((get_name, i) => {
-      if (functions.name[i].name.indexOf(name) > -1) {
-        function_counter++;
-      }
-    });
-    if (function_counter === 0) {
-      functions.name.push(function_data);
-      create_function(name);
-      res.end('Creating Function.');
-    } else {
-      Object.keys(functions.name).forEach((get_name, i) => {
-        if (functions.name[i].output.length > 1) {
-          res.end(functions.name[i].output);
-        } else {
-          res.end('No output yet');
-        }
-      });
-    }
+    functions.name.push(function_data);
+    create_function(name + '-' + uuid, uuid, host);
+    res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
   }
 });
 
-function create_function(name) {
-  const host = '*';
-  const heartbeat_args = '';
-  const container_args = '-e NAME=' + name + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
-  const failover_constraints = '';
+function remove_function_data(uuid) {
+  Object.keys(functions.name).forEach((get_name, i) => {
+    if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
+      functions.name[i].name = '';
+      functions.name[i].output = '';
+      functions.name[i].uuid = '';
+      functions.name[i].host = '';
+    }
+  });
+}
+
+app.get('/getfunction', (req, res) => {
+  const check_token = req.query.token;
+  const uuid = req.query.uuid;
+  let output = '';
+
+  if ((check_token !== token) || (!check_token) || (!uuid)) {
+    res.end('\nError: Invalid Credentials or parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if ((functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1 && functions.name[i].output.length > 1)) {
+        output = functions.name[i].output;
+        remove_function_data(uuid);
+      }
+    });
+    res.end(output);
+  }
+});
+
+function create_function(name, uuid, host) {
+  const container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
   const container = name;
 
-  const options = {
-    url: `${scheme}${server}:${server_port}/addcontainer?token=${token}&container=${container}&host=${host}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request(options, (error, response) => {
-    if (!error && response.statusCode === 200) {
-      console.log('\nCreated Function:' + name);
-    }
-  });
-}
-
-function remove_function_config(name) {
-  const options = {
-    url: scheme + server + ':' + server_port + '/removecontainerconfig?token=' + token + '&container=' + name,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request(options, (error, response) => {
-    if (!error && response.statusCode === 200) {
-      console.log('\nRemoved Function: ' + name + ' from the config.');
-    }
-  });
-}
-
-function remove_function(name) {
-  const options = {
-    url: scheme + server + ':' + server_port + '/delete?token=' + token + '&container=' + name,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request(options, (error, response) => {
-    if (!error && response.statusCode === 200) {
-      console.log('\nDeleted Function:' + name);
-      remove_function_config(name);
-    }
-  });
+  migrate(container, host, host, container_args, uuid);
 }
 
 app.get('/clearlog', (req, res) => {
@@ -541,7 +539,7 @@ app.get('/start', (req, res) => {
   }
 });
 
-function migrate(container, original_host, new_host, original_container_data) {
+function migrate(container, original_host, new_host, original_container_data, uuid) {
   let existing_automatic_heartbeat_value = '';
 
   if (config.automatic_heartbeat) {
@@ -552,7 +550,7 @@ function migrate(container, original_host, new_host, original_container_data) {
   }
 
   const command = JSON.stringify({
-    command: 'docker rm -f ' + container,
+    command: 'docker container rm -f ' + container,
     token
   });
 
@@ -571,10 +569,19 @@ function migrate(container, original_host, new_host, original_container_data) {
     if (error) {
       addLog('An error has occurred.');
     } else {
-      const command = JSON.stringify({
-        command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-        token
-      });
+      let command = '';
+      if (uuid) {
+        const image_name = container.split('-' + uuid)[0];
+        command = JSON.stringify({
+          command: 'docker image build ' + dockerFolder + '/' + image_name + ' -t ' + image_name + ' -f ' + dockerFolder + '/' + image_name + '/Dockerfile;docker container run -d --name ' + container + ' ' + original_container_data + ' ' + image_name,
+          token
+        });
+      } else {
+        command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
+      }
 
       const options = {
         url: `${scheme}${new_host}:${agent_port}/run`,
@@ -590,35 +597,11 @@ function migrate(container, original_host, new_host, original_container_data) {
       request(options, error => {
         if (error) {
           addLog('An error has occurred.');
-        } else {
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-            token
-          });
-
-          const options = {
-            url: `${scheme}${new_host}:${agent_port}/run`,
-            rejectUnauthorized: ssl_self_signed,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-
-          request(options, error => {
-            if (error) {
-              addLog('An error has occurred.');
-            } else {
-              addLog('\nStarting ' + container);
-              if (config.automatic_heartbeat) {
-                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                }
-              }
-            }
-          });
+        }
+        if (config.automatic_heartbeat) {
+          if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+            config.automatic_heartbeat = existing_automatic_heartbeat_value;
+          }
         }
       });
     }
@@ -884,7 +867,7 @@ app.get('/addcontainer', (req, res) => {
 
   if (host.indexOf('*') > -1) {
     const min = 0;
-    const max = total_nodes;
+    const max = total_nodes - 1;
     const number = Math.floor(Math.random() * (max - min + 1)) + min;
     host = config.layout[number].node;
   }
@@ -1130,6 +1113,29 @@ app.get('/stop', (req, res) => {
   }
 });
 
+function delete_function(name, node) {
+  const command = JSON.stringify({
+    command: 'docker container rm -f ' + name,
+    token
+  });
+
+  const options = {
+    url: scheme + node + ':' + agent_port + '/run',
+    rejectUnauthorized: ssl_self_signed,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': command.length
+    },
+    body: command
+  };
+  request(options, error => {
+    if (error) {
+      console.log('\n' + error);
+    }
+  });
+}
+
 app.get('/delete', (req, res) => {
   const check_token = req.query.token;
   let container = '';
@@ -1152,7 +1158,6 @@ app.get('/delete', (req, res) => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
         const command = JSON.stringify({
           command: 'docker container rm -f ' + key,
           token
@@ -1175,7 +1180,7 @@ app.get('/delete', (req, res) => {
               res.end('An error has occurred.');
             } else {
               const results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
+              addLog('\nDeleting: ' + key + '\n' + results.output);
             }
           });
         }
