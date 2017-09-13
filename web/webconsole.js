@@ -1012,6 +1012,10 @@ app.get('/clear-functions.html', (req, res) => {
   res.sendFile(__dirname + '/clear-functions.html');
 });
 
+app.get('/current-functions.html', (req, res) => {
+  res.sendFile(__dirname + '/current-functions.html');
+});
+
 app.get('/background', (req, res) => {
   res.sendFile(__dirname + '/background.jpg');
 });

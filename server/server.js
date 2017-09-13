@@ -227,7 +227,8 @@ app.get('/clearlog', (req, res) => {
 
 app.get('/nodes', (req, res) => {
   const node_metrics = {
-    data: []
+    data: [],
+    functions
   };
 
   function addData(data) {
