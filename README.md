@@ -32,6 +32,7 @@
 - Automatic container failover to different nodes
 - Pull container images from a registry
 - Upload Dockerfile archives to the entire cluster
+- Functions-as-a-Service (FaaS)
 
 ## Prerequisites
 
