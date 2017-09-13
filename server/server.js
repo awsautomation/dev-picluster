@@ -162,6 +162,8 @@ app.get('/function', (req, res) => {
   const max_node = total_nodes - 1;
   const node_number = Math.floor(Math.random() * (max_node - min_node + 1)) + min_node;
   const host = config.layout[node_number].node;
+  const container_args = req.query.container_args;
+
   const function_data = {
     uuid,
     name: name + '-' + uuid,
@@ -173,7 +175,7 @@ app.get('/function', (req, res) => {
     res.end('\nError: Invalid Credentials or parameters.');
   } else {
     functions.name.push(function_data);
-    create_function(name + '-' + uuid, uuid, host);
+    create_function(name + '-' + uuid, uuid, host, container_args);
     res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
   }
 });
@@ -207,9 +209,13 @@ app.get('/getfunction', (req, res) => {
   }
 });
 
-function create_function(name, uuid, host) {
-  const container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
+function create_function(name, uuid, host, user_container_args) {
+  let container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
   const container = name;
+
+  if (user_container_args) {
+    container_args = user_container_args + ' ' + container_args;
+  }
 
   migrate(container, host, host, container_args, uuid);
 }
