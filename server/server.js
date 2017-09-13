@@ -462,7 +462,6 @@ app.get('/create', (req, res) => {
         };
 
         if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          console.log(JSON.stringify(options));
           request(options, (error, response) => {
             if (error) {
               console.log(error);
