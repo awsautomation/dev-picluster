@@ -33,28 +33,6 @@
 				div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 			});
 		}
-
-		var modal = document.getElementById('modal_container');
-		var span = document.getElementsByClassName("close")[0];
-		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[1];
-		var submit_button = document.getElementById("submit_button");
-
-		span.onclick = function() {
-			modal_container.style.display = "none";
-		}
-
-		output_span.onclick = function() {
-			output_modal.style.display = "none";
-		}
-
-		submit_button.onclick = function() {
-			modal_container.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
-
-		modal_container.style.display = "block";
 	</script>
 </head>
 
@@ -123,5 +101,27 @@
 				$('#host_list').append(checkbox);
 			});
 		});
+
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
+
+		span.onclick = function() {
+			modal_container.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			modal_container.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+
+		modal_container.style.display = "block";
 	</script>
 </html>
