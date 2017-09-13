@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -20,7 +19,7 @@
 				failover_constraints += hosts[i].checked && failover_constraints ? ',' + node.value : node.value;
 			});
 
-			!failover_constraints ? failover_constraints = 'none';
+			(!failover_constraints) ? failover_constraints = 'none' : false;
 
 			$.post(path, {
 				token: parent.token,
@@ -34,11 +33,33 @@
 				div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 			});
 		}
+
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
+
+		span.onclick = function() {
+			modal_container.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			modal_container.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+
+		modal_container.style.display = "block";
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
@@ -68,23 +89,8 @@
 						<br><br>
 					</fieldset>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
-					<script>
-						$(function() {
-							var option = '';
-							var checkbox = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.hosts) {
-									option += '<option value="' + data.hosts[i] + '">' + data.hosts[i] + '</option>';
-									checkbox += '<label id="windowfont" for="host_list">' + data.hosts[i] + '</label><input type="checkbox" name="host_list" value="' + data.hosts[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#node_list').append(option);
-								$('#host_list').append(checkbox);
-							});
-						});
-					</script>
 			</div>
 		</div>
 	</div>
@@ -101,29 +107,21 @@
 			</div>
 		</div>
 	</div>
-
-	<script>
-		var modal = document.getElementById('myModal');
-		var span = document.getElementsByClassName("close")[0];
-		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
-
-		span.onclick = function() {
-			modal.style.display = "none";
-		}
-
-		output_span.onclick = function() {
-			output_modal.style.display = "none";
-		}
-
-		btn.onclick = function() {
-			modal.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
-		modal.style.display = "block";
-	</script>
 	</p>
 
+	<script>
+		$(function() {
+			var option = '';
+			var checkbox = '';
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.hosts) {
+					option += '<option value="' + data.hosts[i] + '">' + data.hosts[i] + '</option>';
+					checkbox += '<label id="windowfont" for="host_list">' + data.hosts[i] + '</label><input type="checkbox" name="host_list" value="' + data.hosts[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+				}
+				option += '<option value="' + '*' + '">' + '*' + '</option>';
+				$('#node_list').append(option);
+				$('#host_list').append(checkbox);
+			});
+		});
+	</script>
 </html>
