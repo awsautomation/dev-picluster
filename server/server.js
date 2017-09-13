@@ -437,7 +437,6 @@ app.get('/create', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    let responseString = '';
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
@@ -458,25 +457,18 @@ app.get('/create', (req, res) => {
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': command.length
-          }
+          },
+          body: command
         };
 
         if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          const create_request = request(options, response => {
-            response.on('data', data => {
-              responseString += data;
-            });
-            response.on('end', () => {
-              if (responseString.body) {
-                const body = responseString.body;
-                const results = JSON.parse(body.toString('utf8'));
-                addLog(results.output);
-              }
-            });
-          }).on('error', e => {
-            console.error(e);
+          request(options, (error, response) => {
+            if (error) {
+              console.log(error);
+            } else {
+              addLog(response.body);
+            }
           });
-          create_request.write(command);
         }
       });
     });
