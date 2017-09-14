@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -7,7 +6,6 @@
   <link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var e = document.getElementById("nodelist");
 			var path = '/addhost';
 			var host = $("#host").val();
 
@@ -23,8 +21,7 @@
 </head>
 
 <body>
-
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
@@ -38,7 +35,7 @@
 					<input type="text" size="30" id="host" name="host" value=""></font>
 					<br><br>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
 			</div>
 		</div>
@@ -59,11 +56,11 @@
 	</p>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -73,7 +70,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
@@ -81,5 +78,4 @@
 
 		modal.style.display = "block";
 	</script>
-
 </html>
