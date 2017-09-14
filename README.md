@@ -90,6 +90,7 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 ## Functions-as-a-Service (FAAS)
 [See Wiki](https://github.com/picluster/picluster/wiki/Functions-as-a-Service-(FaaS))
+[Video Demo](https://www.youtube.com/watch?v=QsXRt_oTJSE)
 
 ## Configuring and using the command-line client "pictl"
 
