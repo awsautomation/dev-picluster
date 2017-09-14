@@ -1012,6 +1012,10 @@ app.get('/clear-functions.html', (req, res) => {
   res.sendFile(__dirname + '/clear-functions.html');
 });
 
+app.get('/functions-viewer.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-viewer.html');
+});
+
 app.get('/current-functions.html', (req, res) => {
   res.sendFile(__dirname + '/current-functions.html');
 });

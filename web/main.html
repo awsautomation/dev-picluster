@@ -267,6 +267,9 @@
 			$('#kibana').click(function() {
 				$('#iframe_a').attr('src', '/kibana?token=' + token);
 			});
+			$('#functions-viewer').click(function() {
+				$('#iframe_a').attr('src', '/functions-viewer.html');
+			});
 			$('#functions-remove').click(function() {
 				$('#iframe_a').attr('src', '/clear-functions.html');
 			});
@@ -457,6 +460,7 @@
 						<ul class="dropdown">
 								<li><a href="#" id="functions-current">Current Functions</a></li>
 							  <li><a href="#" id="functions-remove">Remove Functions</a></li>
+								<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
 						</ul>
 					</li>
 					<li><a href="#!">Logs</a>
