@@ -149,19 +149,49 @@
 		}
 	</style>
 	<script>
+		function get_functions() {
+			var option = '';
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.functions.name) {
+					if (data.functions.name[i].name) {
+						option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
+					}
+				}
+				$('#functionlist').append(option);
+			});
+		}
+
+		$.get("/nodes?token=" + parent.token, function(data) {
+			for (var i in data.functions.name) {
+				if (data.functions.name[i].name) {
+					option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
+				}
+			}
+			$('#functionlist').append(option);
+		});
+
 		function exec() {
 			var e = document.getElementById("functionlist");
-			var get_function = e.options[e.selectedIndex].value;
+			var get_function = '';
+			if (e.options[e.selectedIndex]) {
+				get_function = e.options[e.selectedIndex].value;
+			}
 			var command = '';
+
 			document.getElementById("textarea").value = 'Fetching.....';
 			document.getElementById("url").value = 'Fetching.....';
 
-			if (get_function) {
+			if (get_function.length > 1) {
 				$.get("/nodes?token=" + parent.token, function(data) {
 					for (var i in data.functions.name) {
 						if (data.functions.name[i].name.indexOf(get_function) > -1) {
-							document.getElementById("textarea").value = data.functions.name[i].output;
-							document.getElementById("url").value = 'curl \"' + data.function_server + '?token=' + parent.token + '&uuid=' + data.functions.name[i].uuid + '\"';
+							if (data.functions.name[i].name && data.functions.name[i].output) {
+								document.getElementById("textarea").value = data.functions.name[i].output;
+								document.getElementById("url").value = 'curl \"' + data.function_server + '?token=' + parent.token + '&uuid=' + data.functions.name[i].uuid + '\"';
+							} else {
+								document.getElementById("textarea").value = 'No output or function already removed.';
+								document.getElementById("url").value = 'No output or function already removed.';
+							}
 						}
 					}
 				});
@@ -213,27 +243,7 @@
 					<p align=center>
 					</p>
 					<script>
-						$(function() {
-							var option = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.functions.name) {
-									if (data.functions.name[i].name) {
-										option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
-									}
-								}
-								$('#functionlist').append(option);
-							});
-						});
-						$(function() {
-							var option = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
-							});
-						});
+						get_functions();
 					</script>
 				</p>
 
