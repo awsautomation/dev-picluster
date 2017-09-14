@@ -125,11 +125,12 @@
 
 		textarea {
 			font-size: 18px;
+			resize: none;
 		}
 
 		.fieldset-auto-width {
-         display: inline-block;
-    }
+			display: inline-block;
+		}
 
 		input {
 			font-size: 14px;
@@ -217,8 +218,8 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-						<fieldset class="fieldset-auto-width" name="functions" id="functions">
-							<legend>Select a Function</legend>
+					<fieldset class="fieldset-auto-width" name="functions" id="functions">
+						<legend>Select a Function</legend>
 						<table style="width:100%">
 							<tr>
 								<select name="functionlist" id="functionlist">
@@ -241,10 +242,10 @@
 						<label><i>If you execute the above command on your computer, you will not be able to see the output</i></label>
 						<br>
 						<label><i>here anymore because the function will be removed.</i></label>
-						</fieldset>
-						<fieldset class="fieldset-auto-width" name="outputs" id="output">
+					</fieldset>
+					<fieldset class="fieldset-auto-width" name="outputs" id="output">
 						<legend>Function Data</legend>
-						<textarea id="textarea" rows="15" cols="73">
+						<textarea id="textarea" rows="15" cols="74%">
 						</textarea>
 					</fieldset>
 					<p align=center>
