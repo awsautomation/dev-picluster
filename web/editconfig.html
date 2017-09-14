@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -9,6 +8,7 @@
 	<script>
 		function exec() {
 			var payload = $("#payload").val();
+			
 			$.post("/sendconfig", {
 				token: parent.token,
 				payload: payload
@@ -17,8 +17,7 @@
 				alert(output);
 			});
 		};
-	</script>
-	<script>
+
 		function getconfig() {
 			$.get("/getconfig?token=" + parent.token, function(data) {
 				$("#payload").val(JSON.stringify(JSON.parse(data), null, 2));
@@ -28,7 +27,7 @@
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
@@ -42,7 +41,7 @@
 								<tr>
 									<td>
 										<br><textarea rows="20" cols="75" id="payload" name="payload" value="" enctype="application/json"></textarea><br><br>
-										<button id="myBtn">Submit</button>
+										<button id="submit_button">Submit</button>
 									</td>
 								</tr>
 							</table>
@@ -56,16 +55,18 @@
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
-		btn.onclick = function() {
+
+		submit_button.onclick = function() {
 			exec();
 		}
+
 		modal.style.display = "block";
 	</script>
 </body>
