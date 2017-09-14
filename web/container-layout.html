@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -7,23 +6,19 @@
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-		function linkFunction(container) {
+		function link_function(container) {
 			parent.manage_container = container;
 		};
 
 		function exec() {
 			var div = document.getElementById('modal-body2');
 
-			if (div) {
-				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>';
-			}
+			(div) ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>' : false;
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
 
-				if (div) {
-					div.innerHTML = '';
-				}
+				(div) ? div.innerHTML = '' : false;
 
 				for (var i in check_data.data) {
 					if (div) {
@@ -33,13 +28,13 @@
 						var array = check_data.data[i].running_containers;
 						for (var j in array) {
 							if (array[j]) {
-								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
+								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage.html" style="text-decoration:none" onclick="link_function(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
 							}
 						}
 					}
-					if (div) {
-						div.innerHTML = div.innerHTML + '</ol>';
-					}
+
+					div.innerHTML = div ? div.innerHTML + '</ol>' : false;
+
 					addFontLinux();
 				}
 			});
@@ -55,11 +50,11 @@
 				<h2>PiCluster Containers</h2>
 			</div>
 			<div id="modal-body2" class="modal-body">
-				<p align=center>
+				<p align=center></p>
 			</div>
 		</div>
 	</div>
-	</p>
+
 	<script>
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[0];
@@ -72,5 +67,4 @@
 
 		exec()
 	</script>
-
 </html>
