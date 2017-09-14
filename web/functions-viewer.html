@@ -68,7 +68,7 @@
 			padding: 0;
 			font-size: 12px;
 			border: 1px solid #888;
-			width: 90%;
+			width: 75%;
 			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 			-webkit-animation-name: animatetop;
 			-webkit-animation-duration: 0.4s;
@@ -126,6 +126,10 @@
 		textarea {
 			font-size: 18px;
 		}
+
+		.fieldset-auto-width {
+         display: inline-block;
+    }
 
 		input {
 			font-size: 14px;
@@ -213,7 +217,7 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-						<fieldset name="functions" id="functions">
+						<fieldset class="fieldset-auto-width" name="functions" id="functions">
 							<legend>Select a Function</legend>
 						<table style="width:100%">
 							<tr>
@@ -228,17 +232,19 @@
 							</tr>
 						</table>
 					</fieldset>
-					<fieldset name="options" id="options">
+					<fieldset class="fieldset-auto-width" name="options" id="options">
 						<legend>Access to Function Data</legend>
 						</select>
 						<label>Data Retrieval</label>
 						<input type="text" size="80" id="url" name="url" value=""></font>
 						<br><br>
-						<label><i>If you execute the above command on your computer, you will not be able to see the output here anymore because the function will be removed.</i></label>
+						<label><i>If you execute the above command on your computer, you will not be able to see the output</i></label>
+						<br>
+						<label><i>here anymore because the function will be removed.</i></label>
 						</fieldset>
-						<fieldset name="outputs" id="output">
+						<fieldset class="fieldset-auto-width" name="outputs" id="output">
 						<legend>Function Data</legend>
-						<textarea id="textarea" rows="15" cols="90">
+						<textarea id="textarea" rows="15" cols="73">
 						</textarea>
 					</fieldset>
 					<p align=center>
