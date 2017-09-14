@@ -213,10 +213,10 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					<fieldset>
+						<fieldset name="functions" id="functions">
+							<legend>Select a Function</legend>
 						<table style="width:100%">
 							<tr>
-								<label for="functionlist">Select a Function</label> &nbsp;
 								<select name="functionlist" id="functionlist">
 							</select>
 							</tr>
@@ -229,17 +229,16 @@
 						</table>
 					</fieldset>
 					<fieldset name="options" id="options">
-						<legend>Function Details</legend>
-						<br>
+						<legend>Access to Function Data</legend>
 						</select>
 						<label>Data Retrieval</label>
 						<input type="text" size="80" id="url" name="url" value=""></font>
 						<br><br>
 						<label><i>If you execute the above command on your computer, you will not be able to see the output here anymore because the function will be removed.</i></label>
-						<br>
-						<br>
-						<label>Function Data</label>
-						<textarea id="textarea" rows="15" cols="80">
+						</fieldset>
+						<fieldset name="outputs" id="output">
+						<legend>Function Data</legend>
+						<textarea id="textarea" rows="15" cols="90">
 						</textarea>
 					</fieldset>
 					<p align=center>
