@@ -140,7 +140,7 @@
 				for (var i in check_data.functions.name) {
 					//alert(JSON.stringify(check_data.functions.name));
 					if ((div) && (check_data.functions.name[i].name)) {
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + '<font size="+2"><b><br>Node: ' + check_data.functions.name[i].host + '</b><br>' + '<font size="+0"><br>' + check_data.functions.name[i].name + '</b></font><br><br>';
+						div.innerHTML = div.innerHTML + '<br><br><p align=left><font size="+0"><img height=20 width=30 src=/assets/images/function.png>' + '<font size="+1"><b>&nbsp;' + check_data.functions.name[i].name + '</b><br>' + '<font size="+0"><br>' + '&nbsp;<b>Running on Node:&nbsp;</b>' + check_data.functions.name[i].host + '</b></font><br><br>';
 					}
 					if (div) {
 						div.innerHTML = div.innerHTML + '</ol>';
