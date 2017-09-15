@@ -15,11 +15,13 @@
 					var search_string = $('#query').val();
 					var modified_data = data.split("\n");
 					var search_output = "";
+
 					for (i = 0; i != modified_data.length; i++) {
 						if (modified_data[i].toLowerCase().indexOf(search_string.toLowerCase()) > -1) {
 							search_output += "\n" + modified_data[i];
 						}
 					}
+
 					$("#command_output").val(search_output);
 				} else {
 					$("#command_output").val(data);
@@ -27,32 +29,19 @@
 			});
 		}
 
-		function search(what, id) {
-			var date = "";
+		function search(day, id) {
+			var day_check = moment().format("D");
+			var date = day_check.length > 1 ? moment().format("MMM D") : moment().format("MMM  D");
 
-			if (what.indexOf("today") > -1) {
-				var day_check = moment().format("D");
-
-				if (day_check.length > 1) {
-					date = moment().format("MMM D");
-				} else {
-					date = moment().format("MMM  D");
-				}
-
-				$("#query").val(date);
-			} else {
-				$("#query").val(what);
-			}
-
+			(day.indexOf("today") > -1) ? $("#query").val(date): $("#query").val(day);
 			exec();
-
 			document.getElementById(id).checked = false;
 		};
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
@@ -66,11 +55,11 @@
 								<input type="text" rows="30" cols="60" id="query" name="query" name="query"><br>
 							</td>
 							<td>
-								<button id="myBtn">Search</button>
+								<button id="submit_button">Search</button>
 							</td>
 						</tr>
-
 					</table>
+
 					<table style="width:28%">
 						<tr>
 							<td>
@@ -88,6 +77,7 @@
 							</td>
 						</tr>
 					</table>
+					
 					<table style="width:10%">
 						<tr>
 							<td>
@@ -100,15 +90,15 @@
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			exec();
 		}
 
