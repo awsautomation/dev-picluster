@@ -150,7 +150,7 @@ if (config.vip_ip && config.vip) {
           }
           vip_slave = config.vip[i].slave;
           const vip_eth_device = config.vip[i].vip_eth_device;
-          ip_add_command = 'ip addr add ' + config.vip_ip + ' dev ' + vip_eth_device;
+          ip_add_command = 'ip addr add ' + config.vip_ip + '/32 dev ' + vip_eth_device;
           ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
           vip_ping_time = config.vip[i].vip_ping_time;
           exec(ip_delete_command).then(send_ping).catch(send_ping);
@@ -179,8 +179,7 @@ function send_ping() {
 
     request(options, (error, response, body) => {
       let found_vip = false;
-
-      if ((error || response.statusCode !== '200')) {
+      if (error) {
         const cmd = ip_add_command;
         exec(cmd).then(noop).catch(noop);
       } else {

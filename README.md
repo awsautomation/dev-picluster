@@ -32,6 +32,7 @@
 - Automatic container failover to different nodes
 - Pull container images from a registry
 - Upload Dockerfile archives to the entire cluster
+- Functions-as-a-Service (FaaS)
 
 ## Public Demo Server
 Click [here](https://www.linux-toys.com/archives/1455) for more informaion.
@@ -90,6 +91,10 @@ Finally, in your web browser go to <http://127.0.0.1:3003>
 
 [See Wiki](https://github.com/picluster/picluster/wiki/Upgrading)
 
+## Functions-as-a-Service (FAAS)
+[See Wiki](https://github.com/picluster/picluster/wiki/Functions-as-a-Service-(FaaS))
+<br>
+[Video Demo](https://www.youtube.com/watch?v=QsXRt_oTJSE)
 
 ## Configuring and using the command-line client "pictl"
 

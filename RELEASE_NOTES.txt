@@ -7,4 +7,5 @@
 * Cleaner Code
 
 ## Bug Fixes:
-* None
+* Rsyslog - Displays date correctly when clicking on 'Today'
+* Fixed bug with VIP management to delete and create IP's correctly.
