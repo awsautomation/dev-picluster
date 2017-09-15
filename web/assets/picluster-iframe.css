@@ -31,6 +31,10 @@ button {
   font-size: 16px;
 }
 
+#functionlist {
+  font-size: 18px;
+}
+
 #nodelist {
   font-size: 18px;
 }
@@ -173,6 +177,10 @@ label {
 
 legend {
   font-size: 18px;
+}
+
+input {
+  font-size: 14px;
 }
 
 .dark-area {
