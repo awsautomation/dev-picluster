@@ -150,26 +150,25 @@
 		}
 	</style>
 	<script>
-		function get_functions() {
-			var option = '';
-			$.get("/nodes?token=" + parent.token, function(data) {
-				for (var i in data.functions.name) {
-					if (data.functions.name[i].name) {
-						option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
-					}
-				}
-				$('#functionlist').append(option);
-			});
-		}
+		var option = '';
 
-		$.get("/nodes?token=" + parent.token, function(data) {
-			for (var i in data.functions.name) {
-				if (data.functions.name[i].name) {
-					option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
-				}
+		function get_functions() {
+			if (parent.manage_function && parent.manage_function_uuid) {
+				option = '<option value="' + parent.manage_function_uuid + '">' + parent.manage_function + '</option>';
+				$('#functionlist').append(option);
+				parent.manage_function = '';
+				parent.manage_function_uuid = '';
+			} else {
+				$.get("/nodes?token=" + parent.token, function(data) {
+					for (var i in data.functions.name) {
+						if (data.functions.name[i].name) {
+							option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
+						}
+					}
+					$('#functionlist').append(option);
+				});
 			}
-			$('#functionlist').append(option);
-		});
+		}
 
 		function exec() {
 			var e = document.getElementById("functionlist");
