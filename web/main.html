@@ -150,12 +150,12 @@
 				password: password
 			}, function(auth) {
 				syslog = auth.syslog ? auth.syslog : '';
-				token = auth.token ? (
+				token == auth.token ? (
 					hideshow('login'),
 					hideshow('login'),
 					hideshow('menu'),
 					hideshow('content'),
-					auth.token
+					token = auth.token
 				) : (
 					alert('Access Denied!'),
 					hideshow('login')
