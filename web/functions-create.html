@@ -164,7 +164,8 @@
 
 			if (get_function.length > 1) {
 				$.get("/function?token=" + parent.token + '&function=' + get_function + '&container_args=' + function_args, function(create_data) {
-					alert('\nSent request to create function.');
+					modal.style.display = "none";
+					output_modal.style.display = "block";
 				});
 			} else {
 				alert('Error, you did enter a function name.')
@@ -223,7 +224,7 @@
 			</div>
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
-					Please wait......
+					Sent request to create function.
 			</div>
 		</div>
 	</div>
