@@ -12,7 +12,7 @@
 
 		function exec() {
 			var div = document.getElementById('modal-body2');
-			div.innerHTML = div ? div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/image/searching.jpg"><br><font size=+3><label>Searching for images</label></font>' : '';
+			div.innerHTML = div ? div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for images</label></font>' : '';
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
@@ -45,7 +45,7 @@
 				<span class="close">&times;</span>
 				<h2>PiCluster Images</h2>
 			</div>
-			
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center></p>
 			</div>
