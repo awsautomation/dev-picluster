@@ -9,6 +9,10 @@ const express = require('express');
 const dateTime = require('node-datetime');
 const request = require('request');
 
+const functions = {
+  name: []
+};
+let total_nodes = 0;
 let config;
 let config_file;
 if (process.env.PICLUSTER_CONFIG) {
@@ -117,6 +121,105 @@ function automatic_heartbeat() {
   }
 }
 
+app.get('/clear-functions', (req, res) => {
+  const check_token = req.query.token;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      delete_function(functions.name[i].name, functions.name[i].host);
+      remove_function_data(functions.name[i].uuid);
+    });
+    res.end('Sent request to remove stale functions.');
+  }
+});
+
+app.post('/function', (req, res) => {
+  const check_token = req.body.token;
+  const output = req.body.output;
+  const uuid = req.body.uuid;
+
+  if ((check_token !== token) || (!check_token) || (!uuid)) {
+    res.end('\nError: Invalid Credentials or missing parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
+        functions.name[i].output = output;
+        delete_function(functions.name[i].name, functions.name[i].host);
+        res.end('');
+      }
+    });
+  }
+});
+
+app.get('/function', (req, res) => {
+  const check_token = req.query.token;
+  const name = req.query.function;
+  const min = 1;
+  const max = 9999999;
+  const uuid = Math.floor(Math.random() * (max - min + 1)) + min;
+  const min_node = 0;
+  const max_node = total_nodes - 1;
+  const node_number = Math.floor(Math.random() * (max_node - min_node + 1)) + min_node;
+  const host = config.layout[node_number].node;
+  const container_args = req.query.container_args;
+
+  const function_data = {
+    uuid,
+    name: name + '-' + uuid,
+    output: '',
+    host
+  };
+
+  if ((check_token !== token) || (!check_token) || (!name)) {
+    res.end('\nError: Invalid Credentials or parameters.');
+  } else {
+    functions.name.push(function_data);
+    create_function(name + '-' + uuid, uuid, host, container_args);
+    res.end(scheme + server + ':' + server_port + '/getfunction?token=' + token + '&uuid=' + uuid);
+  }
+});
+
+function remove_function_data(uuid) {
+  Object.keys(functions.name).forEach((get_name, i) => {
+    if (functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1) {
+      functions.name[i].name = '';
+      functions.name[i].output = '';
+      functions.name[i].uuid = '';
+      functions.name[i].host = '';
+    }
+  });
+}
+
+app.get('/getfunction', (req, res) => {
+  const check_token = req.query.token;
+  const uuid = req.query.uuid;
+  let output = '';
+
+  if ((check_token !== token) || (!check_token) || (!uuid)) {
+    res.end('\nError: Invalid Credentials or parameters.');
+  } else {
+    Object.keys(functions.name).forEach((get_name, i) => {
+      if ((functions.name[i].uuid.toString().indexOf(uuid.toString()) > -1 && functions.name[i].output.length > 1)) {
+        output = functions.name[i].output;
+        remove_function_data(uuid);
+      }
+    });
+    res.end(output);
+  }
+});
+
+function create_function(name, uuid, host, user_container_args) {
+  let container_args = '-e UUID=' + uuid + ' -e TOKEN=' + token + ' -e SERVER=' + scheme + server + ':' + server_port;
+  const container = name;
+
+  if (user_container_args) {
+    container_args = user_container_args + ' ' + container_args;
+  }
+
+  migrate(container, host, host, container_args, uuid);
+}
+
 app.get('/clearlog', (req, res) => {
   const check_token = req.query.token;
 
@@ -130,7 +233,9 @@ app.get('/clearlog', (req, res) => {
 
 app.get('/nodes', (req, res) => {
   const node_metrics = {
-    data: []
+    data: [],
+    functions,
+    function_server: `${scheme}${server}:${server_port}/getfunction`
   };
 
   function addData(data) {
@@ -163,6 +268,7 @@ app.get('/nodes', (req, res) => {
     node_metrics.total_nodes = total_node_count;
     node_metrics.container_list = container_list;
     node_metrics.nodes = node_list;
+    total_nodes = total_node_count;
     return node_metrics;
   }
 
@@ -339,7 +445,6 @@ app.get('/create', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    let responseString = '';
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
         const node = config.layout[i].node;
@@ -360,25 +465,18 @@ app.get('/create', (req, res) => {
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': command.length
-          }
+          },
+          body: command
         };
 
         if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          const create_request = request(options, response => {
-            response.on('data', data => {
-              responseString += data;
-            });
-            response.on('end', () => {
-              if (responseString.body) {
-                const body = responseString.body;
-                const results = JSON.parse(body.toString('utf8'));
-                addLog(results.output);
-              }
-            });
-          }).on('error', e => {
-            console.error(e);
+          request(options, (error, response) => {
+            if (error) {
+              console.log(error);
+            } else {
+              addLog(response.body);
+            }
           });
-          create_request.write(command);
         }
       });
     });
@@ -441,7 +539,7 @@ app.get('/start', (req, res) => {
   }
 });
 
-function migrate(container, original_host, new_host, original_container_data) {
+function migrate(container, original_host, new_host, original_container_data, uuid) {
   let existing_automatic_heartbeat_value = '';
 
   if (config.automatic_heartbeat) {
@@ -452,7 +550,7 @@ function migrate(container, original_host, new_host, original_container_data) {
   }
 
   const command = JSON.stringify({
-    command: 'docker rm -f ' + container,
+    command: 'docker container rm -f ' + container,
     token
   });
 
@@ -471,10 +569,19 @@ function migrate(container, original_host, new_host, original_container_data) {
     if (error) {
       addLog('An error has occurred.');
     } else {
-      const command = JSON.stringify({
-        command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
-        token
-      });
+      let command = '';
+      if (uuid) {
+        const image_name = container.split('-' + uuid)[0];
+        command = JSON.stringify({
+          command: 'docker image build ' + dockerFolder + '/' + image_name + ' -t ' + image_name + ' -f ' + dockerFolder + '/' + image_name + '/Dockerfile;docker container run -d --name ' + container + ' ' + original_container_data + ' ' + image_name,
+          token
+        });
+      } else {
+        command = JSON.stringify({
+          command: `docker image build ${dockerFolder}/${container} -t ${container} -f ${dockerFolder}/${container}/Dockerfile;docker container run -d --name ${container} ${original_container_data} ${container}`,
+          token
+        });
+      }
 
       const options = {
         url: `${scheme}${new_host}:${agent_port}/run`,
@@ -490,35 +597,11 @@ function migrate(container, original_host, new_host, original_container_data) {
       request(options, error => {
         if (error) {
           addLog('An error has occurred.');
-        } else {
-          const command = JSON.stringify({
-            command: 'docker container run -d --name ' + container + ' ' + original_container_data + ' ' + container,
-            token
-          });
-
-          const options = {
-            url: `${scheme}${new_host}:${agent_port}/run`,
-            rejectUnauthorized: ssl_self_signed,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': command.length
-            },
-            body: command
-          };
-
-          request(options, error => {
-            if (error) {
-              addLog('An error has occurred.');
-            } else {
-              addLog('\nStarting ' + container);
-              if (config.automatic_heartbeat) {
-                if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
-                  config.automatic_heartbeat = existing_automatic_heartbeat_value;
-                }
-              }
-            }
-          });
+        }
+        if (config.automatic_heartbeat) {
+          if (existing_automatic_heartbeat_value.indexOf('enabled') > -1) {
+            config.automatic_heartbeat = existing_automatic_heartbeat_value;
+          }
         }
       });
     }
@@ -776,11 +859,18 @@ app.get('/removecontainerconfig', (req, res) => {
 
 app.get('/addcontainer', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  let host = req.query.host;
   const container = req.query.container;
   const container_args = req.query.container_args;
   const heartbeat_args = req.query.heartbeat_args;
   const failover_constraints = req.query.failover_constraints;
+
+  if (host.indexOf('*') > -1) {
+    const min = 0;
+    const max = total_nodes - 1;
+    const number = Math.floor(Math.random() * (max - min + 1)) + min;
+    host = config.layout[number].node;
+  }
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -893,7 +983,7 @@ app.get('/changehost', (req, res) => {
       }
     }
 
-  // Find Current Host
+    // Find Current Host
     if (proceed < 2) {
       res.end('\nError: Node or Container does not exist!');
     } else {
@@ -1023,6 +1113,29 @@ app.get('/stop', (req, res) => {
   }
 });
 
+function delete_function(name, node) {
+  const command = JSON.stringify({
+    command: 'docker container rm -f ' + name,
+    token
+  });
+
+  const options = {
+    url: scheme + node + ':' + agent_port + '/run',
+    rejectUnauthorized: ssl_self_signed,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': command.length
+    },
+    body: command
+  };
+  request(options, error => {
+    if (error) {
+      console.log('\n' + error);
+    }
+  });
+}
+
 app.get('/delete', (req, res) => {
   const check_token = req.query.token;
   let container = '';
@@ -1045,7 +1158,6 @@ app.get('/delete', (req, res) => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
         const command = JSON.stringify({
           command: 'docker container rm -f ' + key,
           token
@@ -1068,7 +1180,7 @@ app.get('/delete', (req, res) => {
               res.end('An error has occurred.');
             } else {
               const results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
+              addLog('\nDeleting: ' + key + '\n' + results.output);
             }
           });
         }

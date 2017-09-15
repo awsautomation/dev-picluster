@@ -243,6 +243,8 @@
 	<script>
 		var manage_container = '';
 		var manage_image = '';
+		var manage_function = '';
+	  var manage_function_uuid = '';
 
 		function clear(callback) {
 			var iframe = document.getElementById('iframe_a').contentWindow.document;
@@ -266,6 +268,18 @@
 			});
 			$('#kibana').click(function() {
 				$('#iframe_a').attr('src', '/kibana?token=' + token);
+			});
+			$('#functions-viewer').click(function() {
+				$('#iframe_a').attr('src', '/functions-viewer.html');
+			});
+			$('#functions-create').click(function() {
+				$('#iframe_a').attr('src', '/functions-create.html');
+			});
+			$('#functions-remove').click(function() {
+				$('#iframe_a').attr('src', '/clear-functions.html');
+			});
+			$('#functions-current').click(function() {
+				$('#iframe_a').attr('src', '/current-functions.html');
 			});
 			$('#rsyslog').click(function() {
 				$('#iframe_a').attr('src', '/rsyslog.html');
@@ -388,7 +402,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>PiCluster 2.1 Login</h2>
+				<h2>PiCluster 2.2 Login</h2>
 			</div>
 			<div class="modal-body">
 				<p align=center>
@@ -445,6 +459,14 @@
 							<li><a href="#" id="prune">Clean Docker</a></li>
 							<li><a href="#" id="terminal">Terminal</a></li>
 							<li><a href="#" id="kibana">Kibana</a></li>
+						</ul>
+					</li>
+					<li><a href="#!">Functions</a>
+						<ul class="dropdown">
+								<li><a href="#" id="functions-current">Current Functions</a></li>
+							  <li><a href="#" id="functions-remove">Remove Functions</a></li>
+								<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
+								<li><a href="#" id="functions-create">Create Function</a></li>
 						</ul>
 					</li>
 					<li><a href="#!">Logs</a>

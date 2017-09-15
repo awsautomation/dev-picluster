@@ -1,0 +1,293 @@
+<html>
+
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<style>
+		label {
+			font-size: 18px;
+		}
+
+		legend {
+			font-size: 18px;
+		}
+
+		#modal-body2 {
+			font-size: 18px;
+		}
+
+		body {
+			display: block;
+			color: rgba(255, 255, 255, .9);
+			text-decoration: none;
+			padding: 1rem;
+			font-size: 18px;
+			border-top: 2px solid transparent;
+			border-bottom: 2px solid transparent;
+		}
+
+		#functionlist {
+			font-size: 18px;
+		}
+
+		#nodelist {
+			font-size: 18px;
+		}
+
+		button {
+			background-color: #565051;
+			border: none;
+			color: white;
+			padding: 5px 5px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 1;
+			padding-top: 100px;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgb(0, 0, 0);
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+
+		.modal-content {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			font-size: 12px;
+			border: 1px solid #888;
+			width: 90%;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+
+		@-webkit-keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatetop {
+			from {
+				top: -300px;
+				opacity: 0
+			}
+			to {
+				top: 0;
+				opacity: 1
+			}
+		}
+
+		.close {
+			color: white;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.modal-header {
+			padding: 2px 16px;
+			background-color: #565051;
+			color: white;
+		}
+
+		.modal-body {
+			padding: 2px 16px;
+			color: black
+		}
+
+		textarea {
+			font-size: 18px;
+			resize: none;
+		}
+
+		input {
+			font-size: 14px;
+		}
+
+		.modal-content2 {
+			position: relative;
+			background-color: #fefefe;
+			margin: auto;
+			padding: 0;
+			font-size: 12px;
+			border: 1px solid #888;
+			width: 70%;
+			height: 70%;
+			overflow: auto;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			-webkit-animation-name: animatetop;
+			-webkit-animation-duration: 0.4s;
+			animation-name: animatetop;
+			animation-duration: 0.4s
+		}
+	</style>
+	<script>
+		var option = '';
+
+		function get_functions() {
+			if (parent.manage_function && parent.manage_function_uuid) {
+				option = '<option value="' + parent.manage_function_uuid + '">' + parent.manage_function + '</option>';
+				$('#functionlist').append(option);
+				parent.manage_function = '';
+				parent.manage_function_uuid = '';
+			} else {
+				$.get("/nodes?token=" + parent.token, function(data) {
+					for (var i in data.functions.name) {
+						if (data.functions.name[i].name) {
+							option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
+						}
+					}
+					$('#functionlist').append(option);
+				});
+			}
+		}
+
+		function exec() {
+			var e = document.getElementById("functionlist");
+			var get_function = '';
+			if (e.options[e.selectedIndex]) {
+				get_function = e.options[e.selectedIndex].value;
+			}
+			var command = '';
+
+			document.getElementById("textarea").value = 'Fetching.....';
+			document.getElementById("url").value = 'Fetching.....';
+
+			if (get_function.length > 1) {
+				$.get("/nodes?token=" + parent.token, function(data) {
+					for (var i in data.functions.name) {
+						if (data.functions.name[i].name.indexOf(get_function) > -1) {
+							if (data.functions.name[i].name && data.functions.name[i].output) {
+								document.getElementById("textarea").value = data.functions.name[i].output;
+								document.getElementById("url").value = 'curl \"' + data.function_server + '?token=' + parent.token + '&uuid=' + data.functions.name[i].uuid + '\"';
+							} else {
+								document.getElementById("textarea").value = 'No output or function already removed.';
+								document.getElementById("url").value = 'No output or function already removed.';
+							}
+						}
+					}
+				});
+			} else {
+				alert('Error, you did not select a function.')
+				output_modal.style.display = "none";
+				modal.style.display = "block";
+			}
+		};
+	</script>
+</head>
+
+<body>
+	<div id="myModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>View Functions</h2>
+			</div>
+			<div class="modal-body">
+				<p align=left>
+					<fieldset name="functions" id="functions">
+						<legend>Select a Function</legend>
+						<table style="width:100%">
+							<tr>
+								<select name="functionlist" id="functionlist">
+							</select>
+							</tr>
+							<tr>
+								&nbsp;
+							</tr>
+							<tr>
+								<button id="myBtn">View</button>
+							</tr>
+						</table>
+					</fieldset>
+					<fieldset name="options" id="options">
+						<legend>Function Data</legend>
+						</select>
+						<label>Data Retrieval</label>
+						<input type="text" size="80" id="url" name="url" value=""></font>
+						<br><br>
+						<label><i>If you execute the above command on your computer, you will not be able to see the output</i></label>
+						<br>
+						<label><i>here anymore because the function will be removed.</i></label>
+						<br>
+						<br>
+						<legend>Function Data</legend>
+						<textarea id="textarea" rows="15" cols="74">
+						</textarea>
+					</fieldset>
+					<p align=center>
+					</p>
+					<script>
+						get_functions();
+					</script>
+				</p>
+
+			</div>
+		</div>
+	</div>
+
+
+	<div id="output" class="modal">
+		<div class="modal-content2">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div id="modal-body2" class="modal-body">
+				<p align=center>
+					Please wait......
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var modal = document.getElementById('myModal');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var btn = document.getElementById("myBtn");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		btn.onclick = function() {
+			exec();
+		}
+
+		modal.style.display = "block";
+	</script>
+
+</html>
