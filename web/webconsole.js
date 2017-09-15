@@ -612,6 +612,33 @@ app.get('/clear-functions', (req, res) => {
   }
 });
 
+app.get('/function', (req, res) => {
+  const check_token = req.query.token;
+  const get_function = req.query.function;
+  let get_args = req.query.container_args;
+
+  if (req.query.container_args) {
+    get_args = req.query.container_args;
+  }
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const options = {
+      url: scheme + server + ':' + server_port + '/function?token=' + token + '&function=' + get_function + '&container_args=' + get_args,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
+      if (!error && response.statusCode === 200) {
+        res.end('');
+      } else {
+        console.log('\n' + error);
+      }
+    });
+  }
+});
+
 app.post('/stop', (req, res) => {
   const check_token = req.body.token;
   let container = '';
@@ -991,6 +1018,15 @@ app.get('/prune.html', (req, res) => {
 });
 app.get('/clear-functions.html', (req, res) => {
   res.sendFile(__dirname + '/clear-functions.html');
+});
+app.get('/functions-viewer.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-viewer.html');
+});
+app.get('/functions-create.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-create.html');
+});
+app.get('/current-functions.html', (req, res) => {
+  res.sendFile(__dirname + '/current-functions.html');
 });
 app.get('/reloadconfig.html', (req, res) => {
   res.sendFile(__dirname + '/reloadconfig.html');

@@ -8,18 +8,14 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var e = document.getElementById("nodelist");
-			var c = document.getElementById("commandlist");
+			var node_list = document.getElementById("node_list");
+			var command_list = document.getElementById("command_list");
 			var path = '/exec';
-			var node = e.options[e.selectedIndex].value;
-			var saved_command = c.options[c.selectedIndex].value;
+			var node = node_list.options[node_list.selectedIndex].value;
+			var saved_command = command_list.options[command_list.selectedIndex].value;
 			var command = '';
 
-			if (saved_command.indexOf('Choose') > -1) {
-				command = $("#command_entry").val();
-			} else {
-				command = saved_command;
-			}
+			(saved_command.indexOf('Choose') > -1) ? command = $("#command_entry").val() : command = saved_command;
 
 			if (!command) {
 				output_modal.style.display = "none";
@@ -38,7 +34,7 @@
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
@@ -46,19 +42,19 @@
 			</div>
 			<div class="modal-body">
 				<p align=left>
-					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
-					<select name="nodelist" id="nodelist">
+					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
+					<select name="node_list" id="node_list">
 				    </select>
 					<br><br>
-					<label id="windowfont" for="commandlist"><b>Saved Commands</b></label>
-					<select name="commandlist" id="commandlist">
+					<label id="windowfont" for="command_list"><b>Saved Commands</b></label>
+					<select name="command_list" id="command_list">
 					 </select>
 					<br><br>
 					<b><label id="windowfont">Command:<label></b><br><br>
 					<input type="text" size="30" id="command_entry" name="command_entry" value=""></font>
 					<br><br>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
 					<script>
 						$(function() {
@@ -68,7 +64,7 @@
 									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
+								$('#node_list').append(option);
 							});
 						});
 						$(function() {
@@ -87,7 +83,7 @@
 										}
 									}
 								}
-								$('#commandlist').append(option);
+								$('#command_list').append(option);
 							});
 						});
 					</script>
@@ -101,31 +97,34 @@
 				<span class="close">&times;</span>
 				<h2>PiCluster Terminal</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=center>
 					<table style="width:10%">
 						<tr>
 							<td>
 								<p align=center>
-									<button id="myBtn2">Run Again</button>
+									<button id="rerun_button">Run Again</button>
 									<br><br>
 									<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+								</p>
 						</tr>
 					</table>
-					<p align=left>
-						<br>
-					</p>
+				</p>
+				<p align=left>
+					<br>
+				</p>
 			</div>
 		</div>
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
-		var btn2 = document.getElementById("myBtn2");
+		var submit_button = document.getElementById("submit_button");
+		var rerun_button = document.getElementById("rerun_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -135,18 +134,17 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
 		}
 
-		btn2.onclick = function() {
+		rerun_button.onclick = function() {
 			$('#command_output').val('');
 			exec();
 		}
 
 		modal.style.display = "block";
 	</script>
-
 </html>
