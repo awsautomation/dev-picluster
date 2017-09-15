@@ -21,6 +21,8 @@
 		var manage_image = '';
 		var manage_function = '';
 	  var manage_function_uuid = '';
+		var token = "";
+		var syslog = "";
 
 		function clear(callback) {
 			var iframe = document.getElementById('iframe_a').contentWindow.document;
@@ -125,11 +127,8 @@
 		});
 
 		function hideshow(id) {
-			var e = document.getElementById(id);
-			if (e.style.display == 'block')
-				e.style.display = 'none';
-			else
-				e.style.display = 'block';
+			var element = document.getElementById(id);
+			element.style.display = element.style.display == 'block' ? 'none' : 'block';
 		}
 
 		$(function() {
@@ -138,9 +137,6 @@
 			hideshow('menu');
 			hideshow('content');
 		});
-
-		var token = "";
-		var syslog = "";
 
 		function getToken() {
 			return token;
@@ -153,19 +149,17 @@
 				username: username,
 				password: password
 			}, function(auth) {
-				if (auth.token) {
-					token = auth.token;
-					if (auth.syslog) {
-						syslog = auth.syslog;
-					}
-					hideshow('login');
-					hideshow('login');
-					hideshow('menu');
-					hideshow('content');
-				} else {
-					alert('Access Denied!');
-					hideshow('login');
-				}
+				syslog = auth.syslog ? auth.syslog : '';
+				token = auth.token ? (
+					hideshow('login'),
+					hideshow('login'),
+					hideshow('menu'),
+					hideshow('content'),
+					auth.token
+				) : (
+					alert('Access Denied!'),
+					hideshow('login')
+				)
 			});
 		}
 	</script>
@@ -178,6 +172,7 @@
 				<span class="close">&times;</span>
 				<h2>PiCluster 2.2 Login</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=center>
 					<img src="/assets/images/logo.png" height="250" width="200">
@@ -189,7 +184,7 @@
 						<input type="password" style="width: 250px;" size="18" id="password" name="password">
 						<br>
             <br>
-						<button id="myBtn">Connect</button>
+						<button id="submit_button">Connect</button>
 						<br>
 					</p>
 			</div>
@@ -257,13 +252,13 @@
 	<script>
 		var modal = document.getElementById('login');
 		var span = document.getElementsByClassName("close")[0];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			login();
 		}
@@ -288,9 +283,9 @@
 
 		<div style="clear: both;"> </div>
 	</div>
-	
+
 	<p align=center>
 		<IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
+	</p>
   </body>
-
   </html>
