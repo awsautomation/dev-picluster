@@ -404,7 +404,7 @@ app.get('/delete-image', (req, res) => {
         });
 
         const options = {
-          url: `${scheme}${node}:${agent_port}/`,
+          url: `${scheme}${node}:${agent_port}/run`,
           rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
