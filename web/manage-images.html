@@ -17,8 +17,7 @@
 				if (delete_image.checked) {
 					$.post('/delete-image', {
 						token: parent.token,
-						image: image,
-						dataType: 'json'
+						image: image
 					}, function(data) {
 						var div = document.getElementById('modal-body2');
 						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
@@ -27,8 +26,7 @@
 					$.post('/build', {
 						token: parent.token,
 						image: image,
-						no_cache: no_cache,
-						dataType: 'json'
+						no_cache: no_cache
 					}, function(data) {
 						var div = document.getElementById('modal-body2');
 						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
