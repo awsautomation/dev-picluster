@@ -8,10 +8,10 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var e = document.getElementById("containerlist");
-			var i = document.getElementById("nodelist");
-			var container = e.options[e.selectedIndex].value;
-			var node = i.options[i.selectedIndex].value;
+			var container_list = document.getElementById("container_list");
+			var node_list = document.getElementById("node_list");
+			var container = container_list.options[container_list.selectedIndex].value;
+			var node = node_list.options[node_list.selectedIndex].value;
 			var radio_one = $('input[id=radio-1]:checked').val();
 			var radio_two = $('input[id=radio-2]:checked').val();
 			var radio_three = $('input[id=radio-3]:checked').val();
@@ -77,7 +77,6 @@
 					output_modal.style.display = "none";
 					modal.style.display = "block";
 				} else {
-
 					$.post(path, {
 						token: parent.token,
 						command: command,
@@ -93,13 +92,12 @@
 				output_modal.style.display = "none";
 				modal.style.display = "block";
 			}
-
 		}
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
@@ -108,8 +106,8 @@
 			<div class="modal-body">
 				<p align=left>
 					<fieldset>
-						<label for="containerlist">Select a Container</label>
-						<select name="containerlist" id="containerlist">
+						<label for="container_list">Select a Container</label>
+						<select name="container_list" id="container_list">
 			    </select>
 						<br><br>
 					</fieldset>
@@ -140,45 +138,15 @@
 					</fieldset>
 					<fieldset>
 						<label for="radio-7">Change Host to</label>
-						<select name="nodelist" id="nodelist">
+						<select name="node_list" id="node_list">
 								<input type="radio" name="radio-1" id="radio-7">
 				    </select>
 						<br><br>
 					</fieldset>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
-					<script>
-						$(function() {
-							var option = '';
-							if (parent.manage_container) {
-								option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
-								$('#containerlist').append(option);
-								parent.manage_container = '';
-							} else {
-								$.get("/nodes?token=" + parent.token, function(data) {
-									for (var i in data.container_list) {
-										option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
-									}
-									option += '<option value="' + '*' + '">' + '*' + '</option>';
-									$('#containerlist').append(option);
-								});
-							}
-
-						});
-						$(function() {
-							var option = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
-							});
-						});
-					</script>
 				</p>
-
 			</div>
 		</div>
 	</div>
@@ -198,11 +166,39 @@
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
+
+		$(function() {
+			var option = '';
+			if (parent.manage_container) {
+				option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
+				$('#container_list').append(option);
+				parent.manage_container = '';
+			} else {
+				$.get("/nodes?token=" + parent.token, function(data) {
+					for (var i in data.container_list) {
+						option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+					}
+					option += '<option value="' + '*' + '">' + '*' + '</option>';
+					$('#container_list').append(option);
+				});
+			}
+
+		});
+		$(function() {
+			var option = '';
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.nodes) {
+					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+				}
+				option += '<option value="' + '*' + '">' + '*' + '</option>';
+				$('#node_list').append(option);
+			});
+		});
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -212,7 +208,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
@@ -220,5 +216,4 @@
 
 		modal.style.display = "block";
 	</script>
-
 </html>
