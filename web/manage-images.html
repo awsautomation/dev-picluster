@@ -38,29 +38,6 @@
 				alert('Error, you did not select an image.')
 			}
 		}
-
-		var modal = document.getElementById('modal_container');
-		var span = document.getElementsByClassName("close")[0];
-		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[1];
-		var submit_button = document.getElementById("submit_button");
-		var option = '';
-
-		span.onclick = function() {
-			modal.style.display = "none";
-		}
-
-		output_span.onclick = function() {
-			output_modal.style.display = "none";
-		}
-
-		submit_button.onclick = function() {
-			modal.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
-
-		modal.style.display = "block";
 	</script>
 </head>
 
@@ -122,4 +99,29 @@
 			</div>
 		</div>
 	</div>
+
+	<script>
+	  var modal = document.getElementById('modal_container');
+	  var span = document.getElementsByClassName("close")[0];
+  	var output_modal = document.getElementById('output');
+  	var output_span = document.getElementsByClassName("close")[1];
+	  var submit_button = document.getElementById("submit_button");
+  	var option = '';
+
+	  span.onclick = function() {
+  		modal.style.display = "none";
+	  }
+
+	  output_span.onclick = function() {
+		  output_modal.style.display = "none";
+	  }
+
+  	submit_button.onclick = function() {
+	  	modal.style.display = "none";
+  		output_modal.style.display = "block";
+		  exec();
+	  }
+
+  	modal.style.display = "block";
+	</script>
 </html>
