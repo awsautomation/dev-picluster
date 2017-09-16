@@ -419,8 +419,8 @@ app.get('/delete-image', (req, res) => {
             if (error) {
               res.end('An error has occurred.');
             } else {
-              const results = JSON.parse(response.body);
               console.log(response.body);
+              const results = JSON.parse(response.body);
               addLog('\n' + results.output);
             }
           });
