@@ -38,6 +38,29 @@
 				alert('Error, you did not select an image.')
 			}
 		}
+
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
+		var option = '';
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+
+		modal.style.display = "block";
 	</script>
 </head>
 
@@ -62,6 +85,23 @@
 						<p align=center>
 							<button id="submit_button">Submit</button>
 						</p>
+						<script>
+							if (parent.manage_image) {
+								option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
+								$('#image_list').append(option);
+								parent.manage_image = '';
+							} else {
+								$(function() {
+									$.get("/nodes?token=" + parent.token, function(data) {
+										for (var i in data.container_list) {
+											option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+										}
+										option += '<option value="' + '*' + '">' + '*' + '</option>';
+										$('#image_list').append(option);
+									});
+								});
+							}
+						</script>
 					</fieldset>
 				</p>
 			</div>
@@ -82,45 +122,4 @@
 			</div>
 		</div>
 	</div>
-
-	<script>
-		var modal = document.getElementById('modal_container');
-		var span = document.getElementsByClassName("close")[0];
-		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[1];
-		var submit_button = document.getElementById("submit_button");
-		var option = '';
-
-		if (parent.manage_image) {
-			option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
-			$('#image_list').append(option);
-			parent.manage_image = '';
-		} else {
-			$(function() {
-				$.get("/nodes?token=" + parent.token, function(data) {
-					for (var i in data.container_list) {
-						option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
-					}
-					option += '<option value="' + '*' + '">' + '*' + '</option>';
-					$('#image_list').append(option);
-				});
-			});
-		}
-
-		span.onclick = function() {
-			modal.style.display = "none";
-		}
-
-		output_span.onclick = function() {
-			output_modal.style.display = "none";
-		}
-
-		submit_button.onclick = function() {
-			modal.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
-
-		modal.style.display = "block";
-	</script>
 </html>
