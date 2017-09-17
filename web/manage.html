@@ -9,70 +9,31 @@
 	<script>
 		function exec() {
 			var container_list = document.getElementById("container_list");
-			var node_list = document.getElementById("node_list");
 			var container = container_list.options[container_list.selectedIndex].value;
+			var node_list = document.getElementById("node_list");
 			var node = node_list.options[node_list.selectedIndex].value;
-			var radio_one = $('input[id=radio-1]:checked').val();
-			var radio_two = $('input[id=radio-2]:checked').val();
-			var radio_three = $('input[id=radio-3]:checked').val();
-			var radio_four = $('input[id=radio-4]:checked').val();
-			var radio_five = $('input[id=radio-5]:checked').val();
-			var radio_six = $('input[id=radio-6]:checked').val();
-			var radio_seven = $('input[id=radio-7]:checked').val();
-			var radio_eight = $('input[id=radio-8]:checked').val();
+			var radio_start = $('input[id=radio_start]:checked').val();
+			var radio_stop = $('input[id=radio_stop]:checked').val();
+			var radio_restart = $('input[id=radio_restart]:checked').val();
+			var radio_delete = $('input[id=radio_delete]:checked').val();
+			var radio_create = $('input[id=radio_create]:checked').val();
+			var radio_container_log = $('input[id=radio_container_log]:checked').val();
+			var radio_change_host = $('input[id=radio_change_host]:checked').val();
+			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
 			var command = '';
 			var path = '';
 
-
-			if (radio_one) {
-				if (radio_one.indexOf('on') > -1) {
-					path = '/start';
-				}
-			}
-			if (radio_two) {
-				if (radio_two.indexOf('on') > -1) {
-					path = '/stop';
-				}
-			}
-
-			if (radio_three) {
-				if (radio_three.indexOf('on') > -1) {
-					path = '/restart';
-				}
-			}
-
-			if (radio_four) {
-				if (radio_four.indexOf('on') > -1) {
-					path = '/delete';
-				}
-			}
-
-			if (radio_five) {
-				if (radio_five.indexOf('on') > -1) {
-					path = '/create';
-				}
-			}
-
-			if (radio_six) {
-				if (radio_six.indexOf('on') > -1) {
-					path = '/containerlog';
-				}
-			}
-
-			if (radio_seven) {
-				if (radio_seven.indexOf('on') > -1) {
-					path = '/changehost';
-				}
-			}
-
-			if (radio_eight) {
-				if (radio_eight.indexOf('on') > -1) {
-					path = '/removecontainerconfig';
-				}
-			}
+			path = (radio_start && radio_start.indexOf('on') > -1 ? '/start' : '');
+			path = (radio_stop && radio_stop.indexOf('on') > -1 ? '/stop' : '');
+			path = (radio_restart && radio_restart.indexOf('on') > -1 ? '/restart' : '');
+			path = (radio_delete && radio_delete.indexOf('on') > -1 ? '/delete' : '');
+			path = (radio_create && radio_create.indexOf('on') > -1 ? '/create' : '');
+			path = (radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog' : '');
+			path = (radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost' : '');
+			path = (radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig' : '');
 
 			if (path) {
-				if ((radio_seven) && (container.indexOf('*') > -1) || (radio_eight) && (container.indexOf('*') > -1)) {
+				if ((radio_change_host) && (container.indexOf('*') > -1) || (radio_remove_container_config) && (container.indexOf('*') > -1)) {
 					alert('\nError: You cannot control all of these containers at once for chosen action.');
 					output_modal.style.display = "none";
 					modal.style.display = "block";
@@ -103,6 +64,7 @@
 				<span class="close">&times;</span>
 				<h2>Manage Containers</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=left>
 					<fieldset>
@@ -113,33 +75,33 @@
 					</fieldset>
 					<fieldset name="options" id="options">
 						<legend>Options</legend>
-						<label for="radio-1">Start</label>
-						<input type="radio" name="radio-1" id="radio-1">
+						<label for="radio-start">Start</label>
+						<input type="radio" name="radio_start" id="radio_start">
 						<br>
-						<label for="radio-2">Stop</label>
-						<input type="radio" name="radio-1" id="radio-2">
+						<label for="radio_stop">Stop</label>
+						<input type="radio" name="radio_stop" id="radio_stop">
 						<br>
-						<label for="radio-3">Restart</label>
-						<input type="radio" name="radio-1" id="radio-3">
+						<label for="radio_restart">Restart</label>
+						<input type="radio" name="radio_restart" id="radio_restart">
 						<br>
-						<label for="radio-4">Delete</label>
-						<input type="radio" name="radio-1" id="radio-4">
+						<label for="radio_delete">Delete</label>
+						<input type="radio" name="radio_delete" id="radio_delete">
 						<br>
-						<label for="radio-5">Create and Run</label>
-						<input type="radio" name="radio-1" id="radio-5">
+						<label for="radio_create">Create and Run</label>
+						<input type="radio" name="radio_create" id="radio_create">
 						<br>
-						<label for="radio-6">View Logs</label>
-						<input type="radio" name="radio-1" id="radio-6">
+						<label for="radio_container_log">View Logs</label>
+						<input type="radio" name="radio_container_log" id="radio_container_log">
 						<br>
-						<label for="radio-8">Remove Config</label>
-						<input type="radio" name="radio-1" id="radio-8">
+						<label for="radio_remove_container_config">Remove Config</label>
+						<input type="radio" name="radio_remove_container_config" id="radio_remove_container_config">
 						<br>
 						</select>
 					</fieldset>
 					<fieldset>
-						<label for="radio-7">Change Host to</label>
+						<label for="radio_change_host">Change Host to</label>
 						<select name="node_list" id="node_list">
-								<input type="radio" name="radio-1" id="radio-7">
+								<input type="radio" name="radio_change_host" id="radio_change_host">
 				    </select>
 						<br><br>
 					</fieldset>
@@ -150,7 +112,6 @@
 			</div>
 		</div>
 	</div>
-
 
 	<div id="output" class="modal">
 		<div class="modal-content2">
@@ -187,8 +148,8 @@
 					$('#container_list').append(option);
 				});
 			}
-
 		});
+
 		$(function() {
 			var option = '';
 			$.get("/nodes?token=" + parent.token, function(data) {

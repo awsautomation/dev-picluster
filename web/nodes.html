@@ -10,85 +10,55 @@
 	<script>
 		function exec() {
 			var div = document.getElementById('modal-body2');
-			if (div) {
-				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>';
-			}
+
+			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : false;
+
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
 
-				if (div) {
-					div.innerHTML = '';
-				}
+				div.innerHTML = div ? '' : false;
+
 				for (var i in check_data.data) {
 					if (div) {
-						var dist = check_data.data[i].os_type || '';
-						dist = dist.toLowerCase();
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
-						var div0 = document.createElement('div0');
-						div0.className = "page";
-						var div1 = document.createElement('div1');
-						div1.className = 'clearfix';
-						div1.id = 'div1';
-						var div2 = document.createElement('div2');
-						div2.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
-						div2.id = 'running-class';
+						var dist = (check_data.data[i].os_type || '').toLowerCase();
+
+						div.innerHTML += '<br><br><p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+
+						var div0 = document.createElement('div0').addClass('page');
+						var div1 = document.createElement('div1').addClass('clearfix').attr('id', 'div1');
+						var div2 = document.createElement('div2').addClass('c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small').attr('id', 'running-class');
 						div2.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
-						var div3 = document.createElement('div3');
-						div3.className = "slice";
-						var div4 = document.createElement('div4');
-						div4.className = "bar";
-						var div5 = document.createElement('div5');
-						div5.className = "fill";
+						var div3 = document.createElement('div3').addClass('slice');
+						var div4 = document.createElement('div4').addClass('bar');
+						var div5 = document.createElement('div5').addClass('fill');
 
-						var div6 = document.createElement('div6');
-						div6.className = "page";
-						var div7 = document.createElement('div7');
-						div7.className = 'clearfix';
-						div7.id = 'div7';
-						var div8 = document.createElement('div8');
-						div8.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small';
-						div8.id = 'running-class';
+						var div6 = document.createElement('div6').addClass('page');
+						var div7 = document.createElement('div7').addClass('clearfix').attr('id', 'div7');
+						var div8 = document.createElement('div8').addClass('c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small').attr('id', 'running-class');
 						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + '%</span>';
-						var div9 = document.createElement('div9');
-						div9.className = "slice";
-						var div10 = document.createElement('div10');
-						div10.className = "bar";
-						var div11 = document.createElement('div11');
-						div11.className = "fill";
+						var div9 = document.createElement('div9').addClass('slice');
+						var div10 = document.createElement('div10').addClass('bar');
+						var div11 = document.createElement('div11').addClass('fill');
 
-						var div12 = document.createElement('div12');
-						div12.className = "page";
-						var div13 = document.createElement('div13');
-						div13.className = 'clearfix';
-						div13.id = 'div13';
-						var div14 = document.createElement('div14');
-						div14.className = 'c100 p' + check_data.data[i].memory_percentage + ' small';
-						div14.id = 'running-class';
+						var div12 = document.createElement('div12').addClass('page');
+						var div13 = document.createElement('div13').addClass('clearfix').attr('id', 'div13');
+						var div14 = document.createElement('div14').addClass('c100 p' + check_data.data[i].memory_percentage + ' small').attr('running-class');
 						div14.innerHTML = '<span id="' + i + '">' + check_data.data[i].memory_percentage + '%</span>';
-						var div15 = document.createElement('div15');
-						div15.className = "slice";
-						var div16 = document.createElement('div16');
-						div16.className = "bar";
-						var div17 = document.createElement('div17');
-						div17.className = "fill";
+						var div15 = document.createElement('div15').addClass('slice');
+						var div16 = document.createElement('div16').addClass('bar');
+						var div17 = document.createElement('div17').addClass('fill');
 
-						div0.appendChild(div1);
-						div1.appendChild(div2);
-						div2.appendChild(div3);
-						div3.appendChild(div4);
-						div4.appendChild(div5);
+						for(var i = 0; i < 5; i++) {
+							div[i].appendChild(div[i + 1]);
+						}
 
-						div6.appendChild(div7);
-						div7.appendChild(div8);
-						div8.appendChild(div9);
-						div9.appendChild(div10);
-						div10.appendChild(div11);
+						for(var i = 6; i < 11; i++) {
+							div[i].appendChild(div[i + 1]);
+						}
 
-						div12.appendChild(div13);
-						div13.appendChild(div14);
-						div14.appendChild(div15);
-						div15.appendChild(div16);
-						div16.appendChild(div17);
+						for(var i = 12; i < 17; i++) {
+							div[i].appendChild(div[i + 1]);
+						}
 
 						var table = document.createElement("TABLE");
 						var row = table.insertRow(0);
@@ -107,20 +77,19 @@
 				addFontLinux();
 			});
 		}
+
+		exec();
 	</script>
 </head>
 
 <body>
-	<script>
-		exec();
-	</script>
-
 	<div id="output" class="modal">
 		<div class="modal-content2">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Nodes</h2>
 			</div>
+			
 			<div id="modal-body2" class="modal-body">
 				<p align=center></p>
 			</div>
