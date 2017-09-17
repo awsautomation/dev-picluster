@@ -11,12 +11,6 @@
 	  var output_modal = document.getElementById('output');
 	  var output_span = document.getElementsByClassName("close")[0];
 
-  	output_span.onclick = function() {
-		  output_modal.style.display = "none";
-	  }
-
-  	output_modal.style.display = "block";
-		
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : false;
@@ -146,6 +140,12 @@
 	</div>
 
 	<script>
+	  output_span.onclick = function() {
+		  output_modal.style.display = "none";
+	  }
+
+	  output_modal.style.display = "block";
+
 		exec()
 	</script>
 </html>
