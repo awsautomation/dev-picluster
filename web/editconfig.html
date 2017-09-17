@@ -8,7 +8,7 @@
 	<script>
 		function exec() {
 			var payload = $("#payload").val();
-			
+
 			$.post("/sendconfig", {
 				token: parent.token,
 				payload: payload
@@ -33,6 +33,7 @@
 				<span class="close">&times;</span>
 				<h2>PiCluster Configuraton Editor</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=center>
 					<div id="start" title="PiCluster Configuration Editor">
@@ -47,9 +48,6 @@
 							</table>
 						</p>
 					</div>
-					<script>
-						getconfig();
-					</script>
 			</div>
 		</div>
 	</div>
@@ -68,7 +66,8 @@
 		}
 
 		modal.style.display = "block";
+
+		getconfig();
 	</script>
 </body>
-
 </html>

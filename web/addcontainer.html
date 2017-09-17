@@ -6,17 +6,17 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var nodes = document.getElementById("node_list");
-			var hosts = document.getElementsByName('host_list');
+			var node_list = document.getElementById("node_list");
+			var host_list = document.getElementsByName('host_list');
 			var path = '/addcontainer';
-			var host = nodes.options[nodes.selectedIndex].value;
+			var host = node_list.options[node_list.selectedIndex].value;
 			var container = $("#container_name").val();
 			var container_args = $("#container_args").val();
 			var heartbeat_args = $("#heartbeat_args").val();
 			var failover_constraints = '';
 
-			hosts.forEach(function(node, i) {
-				failover_constraints += hosts[i].checked && failover_constraints ? ',' + node.value : node.value;
+			host_list.forEach(function(node, i) {
+				failover_constraints += host_list[i].checked && failover_constraints ? ',' + node.value : node.value;
 			});
 
 			(!failover_constraints) ? failover_constraints = 'none' : false;
@@ -92,9 +92,9 @@
 			var option = '';
 			var checkbox = '';
 			$.get("/nodes?token=" + parent.token, function(data) {
-				for (var i in data.hosts) {
-					option += '<option value="' + data.hosts[i] + '">' + data.hosts[i] + '</option>';
-					checkbox += '<label id="windowfont" for="host_list">' + data.hosts[i] + '</label><input type="checkbox" name="host_list" value="' + data.hosts[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+				for (var i in data.host_list) {
+					option += '<option value="' + data.host_list[i] + '">' + data.host_list[i] + '</option>';
+					checkbox += '<label id="windowfont" for="host_list">' + data.host_list[i] + '</label><input type="checkbox" name="host_list" value="' + data.host_list[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 				}
 				option += '<option value="' + '*' + '">' + '*' + '</option>';
 				$('#node_list').append(option);

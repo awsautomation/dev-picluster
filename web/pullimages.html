@@ -1,4 +1,4 @@
-<html>
+node_list<html>
 
 <head>
 	<script src="/assets/jquery.min.js"></script>
@@ -12,28 +12,20 @@
 			var image = document.getElementById('image').value;
 			var registry = document.getElementsByName('containerlist')[0].value;
 
-			if (!image || image.length <= 0) {
-				alert('Error, you did not select an image to pull.');
-				return false;
-			}
+			(!image || image.length <= 0) ? (alert('Error, you did not select an image to pull.'),	return false);
 
 			// Build the fully qualified image name to pull
 			// e.g index.docker.io/ubuntu
-			if (registry !== 'hub.docker.com') {
-				image = registry + '/' + image;
-			} else {
-				image = 'index.docker.io/' + image;
-			}
+
+			image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
 
 			if (image.indexOf(':') === -1) {
 				var tag = document.getElementById('imageTags').value;
-				if (tag.toLowerCase() !== 'latest') {
-					image = image + ':' + tag;
-				}
+				image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : false;
 			}
 
 			var command = ["docker", "image", "pull", image].join(' ');
-			var nodes = document.getElementsByName('nodeslist');
+			var node_list = document.getElementsByName('node_list');
 			var div = document.getElementById('modal-body2');
 			var username = document.getElementsByName('imageauth-user')[0].value || '';
 			var password = document.getElementsByName('imageauth-password')[0].value || '';
@@ -45,10 +37,10 @@
 
 			var check_counter = 0;
 
-			nodes.forEach(function(node, i) {
-				if (nodes[i].checked) {
-					nodes.forEach(function(node, i) {
-						if (nodes[i].checked) {
+			node_list.forEach(function(node, i) {
+				if (node_list[i].checked) {
+					node_list.forEach(function(node, i) {
+						if (node_list[i].checked) {
 							check_counter++;
 							$.post(path, {
 								token: parent.token,
@@ -102,9 +94,9 @@
 								<option value="latest" selected="selected">Latest</option>
 							</select>
 					</fieldset>
-					<fieldset name="nodesList" id="nodesList">
+					<fieldset name="node_list" id="node_list">
 						<legend>Nodes:</legend>
-						<label for="nodeslist">All</label><input type="checkbox" name="nodeslist" onClick="checkAll(this);" checked="checked"/>
+						<label for="node_list">All</label><input type="checkbox" name="node_list" onClick="checkAll(this);" checked="checked"/>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 					</fieldset>
 					<p align=center>
@@ -118,7 +110,7 @@
 
 						function checkAll(checkbox) {
 							var checked = checkbox.checked;
-							var checkboxes = document.getElementsByName('nodeslist');
+							var checkboxes = document.getElementsByName('node_list');
 							checkboxes.forEach(function(e) {
 								e.checked = checked;
 							});
@@ -138,17 +130,17 @@
 						});
 						$(function() {
 							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+								for (var i in data.node_list) {
+									option += '<option value="' + data.node_list[i] + '">' + data.node_list[i] + '</option>';
 								}
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
+								$('#node_list').append(option);
 
 								var option = '';
-								for (var i = 0; i < data.nodes.length; i++) {
-									option += '<label for="nodeslist">' + data.nodes[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+								for (var i = 0; i < data.node_list.length; i++) {
+									option += '<label for="node_list">' + data.node_list[i] + '</label><input type="checkbox" name="node_list" checked="checked" value="' + data.node_list[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 								}
-								$('#nodesList').append(option);
+								$('#node_list').append(option);
 
 								var selectImage = function(event, ui) {
 									var image = event.target.value;
