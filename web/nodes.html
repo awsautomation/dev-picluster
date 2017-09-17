@@ -18,7 +18,7 @@
 				div ? div.innerHTML = '' : false;
 
 				for (var i in check_data.data) {
-					div ? (
+					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase(),
 						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>",
 
@@ -115,7 +115,7 @@
 						cell2.appendChild(div6),
 						cell3.appendChild(div12),
 						div.appendChild(table)
-					) : ();
+					}
 				}
 				addFontLinux();
 			});
