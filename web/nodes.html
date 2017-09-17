@@ -21,44 +21,88 @@
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase();
+						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
 
-						div.innerHTML += '<br><br><p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						var div0 = document.createElement('div0');
+						div0.className = "page";
 
-						var div0 = document.createElement('div0').setAttribute('class', 'page');
-						var div1 = document.createElement('div1').setAttribute('class', 'clearfix').setAttribute('id', 'div1');
-						var div2 = document.createElement('div2').setAttribute('class', 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small').setAttribute('id', 'running-class');
+						var div1 = document.createElement('div1');
+						div1.className = 'clearfix';
+						div1.id = 'div1';
+
+						var div2 = document.createElement('div2');
+						div2.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
+						div2.id = 'running-class';
 						div2.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
-						var div3 = document.createElement('div3').setAttribute('class', 'slice');
-						var div4 = document.createElement('div4').setAttribute('class', 'bar');
-						var div5 = document.createElement('div5').setAttribute('class', 'fill');
 
-						var div6 = document.createElement('div6').setAttribute('class', 'page');
-						var div7 = document.createElement('div7').setAttribute('class', 'clearfix').setAttribute('id', 'div7');
-						var div8 = document.createElement('div8').setAttribute('class', 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small').setAttribute('id', 'running-class');
+						var div3 = document.createElement('div3');
+						div3.className = "slice";
+
+						var div4 = document.createElement('div4');
+						div4.className = "bar";
+
+						var div5 = document.createElement('div5');
+						div5.className = "fill";
+
+						var div6 = document.createElement('div6');
+						div6.className = "page";
+
+						var div7 = document.createElement('div7');
+						div7.className = 'clearfix';
+						div7.id = 'div7';
+
+						var div8 = document.createElement('div8');
+						div8.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small';
+						div8.id = 'running-class';
 						div8.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + '%</span>';
-						var div9 = document.createElement('div9').setAttribute('class', 'slice');
-						var div10 = document.createElement('div10').setAttribute('class', 'bar');
-						var div11 = document.createElement('div11').setAttribute('class', 'fill');
 
-						var div12 = document.createElement('div12').setAttribute('class', 'page');
-						var div13 = document.createElement('div13').setAttribute('class', 'clearfix').setAttribute('id', 'div13');
-						var div14 = document.createElement('div14').setAttribute('class', 'c100 p' + check_data.data[i].memory_percentage + ' small').setAttribute('running-class');
+						var div9 = document.createElement('div9');
+						div9.className = "slice";
+
+						var div10 = document.createElement('div10');
+						div10.className = "bar";
+
+						var div11 = document.createElement('div11');
+						div11.className = "fill";
+
+						var div12 = document.createElement('div12');
+						div12.className = "page";
+
+						var div13 = document.createElement('div13');
+						div13.className = 'clearfix';
+						div13.id = 'div13';
+
+						var div14 = document.createElement('div14');
+						div14.className = 'c100 p' + check_data.data[i].memory_percentage + ' small';
+						div14.id = 'running-class';
 						div14.innerHTML = '<span id="' + i + '">' + check_data.data[i].memory_percentage + '%</span>';
-						var div15 = document.createElement('div15').setAttribute('class', 'slice');
-						var div16 = document.createElement('div16').setAttribute('class', 'bar');
-						var div17 = document.createElement('div17').setAttribute('class', 'fill');
 
-						for(var i = 0; i < 5; i++) {
-							div[i].appendChild(div[i + 1]);
-						}
+						var div15 = document.createElement('div15');
+						div15.className = "slice";
 
-						for(var i = 6; i < 11; i++) {
-							div[i].appendChild(div[i + 1]);
-						}
+						var div16 = document.createElement('div16');
+						div16.className = "bar";
 
-						for(var i = 12; i < 17; i++) {
-							div[i].appendChild(div[i + 1]);
-						}
+						var div17 = document.createElement('div17');
+						div17.className = "fill";
+
+						div0.appendChild(div1);
+						div1.appendChild(div2);
+						div2.appendChild(div3);
+						div3.appendChild(div4);
+						div4.appendChild(div5);
+
+						div6.appendChild(div7);
+						div7.appendChild(div8);
+						div8.appendChild(div9);
+						div9.appendChild(div10);
+						div10.appendChild(div11);
+
+						div12.appendChild(div13);
+						div13.appendChild(div14);
+						div14.appendChild(div15);
+						div15.appendChild(div16);
+						div16.appendChild(div17);
 
 						var table = document.createElement("TABLE");
 						var row = table.insertRow(0);
