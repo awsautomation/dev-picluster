@@ -6,50 +6,52 @@
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-		function exec() {
-			var path = '/exec';
-			var image = document.getElementById('image').value;
-			var registry = document.getElementsByName('containerlist')[0].value;
+	function exec() {
+    var path = '/exec';
+    var image = document.getElementById('image').value;
+    var registry = document.getElementsByName('containerlist')[0].value;
 
-			(!image || image.length <= 0) ? ( alert('Error, you did not select an image to pull.'),	return false);
+		!image || image.length <= 0 ? (alert('Error, you did not select an image to pull.'), return false) : false;
 
-			// Build the fully qualified image name to pull
-			// e.g index.docker.io/ubuntu
+    // Build the fully qualified image name to pull
+    // e.g index.docker.io/ubuntu
+		image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
 
-			image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
-
-			if (image.indexOf(':') === -1) {
-				var tag = document.getElementById('imageTags').value;
-				image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : false;
-			}
-
-			var node_list = document.getElementsByName('node_list');
-			var div = document.getElementById('modal-body2');
-			var username = document.getElementsByName('imageauth-user')[0].value || '';
-			var password = document.getElementsByName('imageauth-password')[0].value || '';
-			var check_counter = 0;
-      var bar = 'one';
-
-			// Login first if the user has provided authentication
-			var command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : ["docker", "image", "pull", image].join(' ');
-
-			node_list.forEach(function(node, i) {
-				if (node_list[i].checked) {
-					node_list.forEach(function(node, i) {
-						if (node_list[i].checked) {
-							check_counter++;
-							$.post(path, {
-								token: parent.token,
-								command: command,
-								node: node.value
-							}, function(data) {});
-						}
-					});
-				}
-			});
-			div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
-			return true;
+		if (image.indexOf(':') === -1) {
+			var tag = document.getElementById('imageTags').value;
+			image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : false;
 		}
+
+		var command = ["docker", "image", "pull", image].join(' ');
+		var nodes = document.getElementsByName('nodeslist');
+		var div = document.getElementById('modal-body2');
+		var username = document.getElementsByName('imageauth-user')[0].value || '';
+		var password = document.getElementsByName('imageauth-password')[0].value || '';
+
+		// Login first if the user has provided authentication
+		command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command :;
+
+		var check_counter = 0;
+		nodes.forEach(function(node, i) {
+			if (nodes[i].checked) {
+				nodes.forEach(function(node, i) {
+					if (nodes[i].checked) {
+						check_counter++;
+						$.post(path, {
+							token: parent.token,
+							command: command,
+							node: node.value
+						}, function(data) {});
+					}
+				});
+			}
+		});
+
+		div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
+		return true;
+  }
+
+	exec();
 	</script>
 </head>
 
@@ -60,11 +62,12 @@
 				<span class="close">&times;</span>
 				<h2>Pull Images</h2>
 			</div>
+
 			<div class="modal-body">
 				<div id="container" title="Pull Images">
 					<fieldset>
-						<label for="containerlist">Select Registry</label>
-						<select name="containerlist" id="containerlist" onchange="clearAuth()">
+						<label for="container_list">Select Registry</label>
+						<select name="container_list" id="container_list" onchange="clearAuth()">
 							</select>
 						<legend>Authentication (optional)</legend>
 						<br>
@@ -115,7 +118,7 @@
 									var opt = document.createElement('option');
 									opt.value = e.name;
 									opt.innerHTML = e.name;
-									$('#containerlist').append(opt);
+									$('#container_list').append(opt);
 								});
 							});
 						});
@@ -140,22 +143,22 @@
 								var selectImage = function(event, ui) {
 									var image = event.target.value;
 									var imageTags = document.getElementById('imageTags');
-									var original_tags = '<option value="latest" selected="selected">Latest</option>';
+									var ORIGINAL_TAGS = '<option value="latest" selected="selected">Latest</option>';
 
 									if (!image || image.length <= 0) {
-										imageTags.innerHTML = original_tags;
+										imageTags.innerHTML = ORIGINAL_TAGS;
 										imageTags.disabled = true;
 										return;
 									}
 
 									$.get('/remoteimagetags', {
 										token: parent.token,
-										registry: $('#containerlist').val(),
+										registry: $('#container_list').val(),
 										image: $('#image').val(),
 										username: $('#imageauth-user').val(),
 										password: $('#imageauth-password').val()
 									}, function(tags) {
-										imageTags.innerHTML = original_tags;
+										imageTags.innerHTML = ORIGINAL_TAGS;
 										tags = JSON.parse(tags);
 										if (tags.results) {
 											tags.results.forEach(function(e) {
@@ -177,21 +180,20 @@
 											});
 										}
 
-										imageTags.disabled = imageTags.children.length > 1 ? false;
+										imageTags.disabled = imageTags.children.length > 1 ? false : true;
 									});
 								};
-
 								$("#image").autocomplete({
 									source: function(request, response) {
 										$.get('/remoteimages', {
 											token: parent.token,
-											registry: $('#containerlist').val(),
+											registry: $('#container_list').val(),
 											image: $('#image').val(),
 											username: $('#imageauth-user').val(),
 											password: $('#imageauth-password').val()
 										}, function(images) {
 											images = JSON.parse(images);
-											if ($('#containerlist').val() === 'hub.docker.com') {
+											if ($('#container_list').val() === 'hub.docker.com') {
 												return response(images.results.map(function(e) {
 													return {
 														value: e.repo_name,
@@ -239,6 +241,7 @@
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
 					Please wait......
