@@ -19,7 +19,7 @@
 
 		if (image.indexOf(':') === -1) {
 			var tag = document.getElementById('imageTags').value;
-			image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : false;
+			image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : image;
 		}
 
 		var command = ["docker", "image", "pull", image].join(' ');
