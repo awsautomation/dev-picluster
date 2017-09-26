@@ -123,8 +123,8 @@
 
 						$(function() {
 							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.node_list) {
-									option += '<option value="' + data.node_list[i] + '">' + data.node_list[i] + '</option>';
+								for (var i in data.nodes) {
+									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
 
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
@@ -132,8 +132,8 @@
 
 								var option = '';
 
-								for (var i = 0; i < data.node_list.length; i++) {
-									option += '<label for="node_list">' + data.node_list[i] + '</label><input type="checkbox" name="node_list" checked="checked" value="' + data.node_list[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+								for (var i = 0; i < data.nodes.length; i++) {
+									option += '<label for="node_list">' + data.nodes[i] + '</label><input type="checkbox" name="node_list" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 								}
 
 								$('#node_list').append(option);
