@@ -1,61 +1,10 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
-	<script>
-		function exec() {
-			var container_list = document.getElementById("container_list");
-			var container = container_list.options[container_list.selectedIndex].value;
-			var node_list = document.getElementById("node_list");
-			var node = node_list.options[node_list.selectedIndex].value;
-			var radio_start = $('input[id=radio_start]:checked').val();
-			var radio_stop = $('input[id=radio_stop]:checked').val();
-			var radio_restart = $('input[id=radio_restart]:checked').val();
-			var radio_delete = $('input[id=radio_delete]:checked').val();
-			var radio_create = $('input[id=radio_create]:checked').val();
-			var radio_container_log = $('input[id=radio_container_log]:checked').val();
-			var radio_change_host = $('input[id=radio_change_host]:checked').val();
-			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
-			var command = '';
-			var path = '';
-
-			path = radio_start && radio_start.indexOf('on') > -1 ? '/start'
-			  : radio_stop && radio_stop.indexOf('on') > -1 ? '/stop'
-				: radio_restart && radio_restart.indexOf('on') > -1 ? '/restart'
-			  : radio_delete && radio_delete.indexOf('on') > -1 ? '/delete'
-				: radio_create && radio_create.indexOf('on') > -1 ? '/create'
-				: radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog'
-				: radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost'
-		    : radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig'
-				:;
-
-			if (path) {
-				if ((radio_change_host) && (container.indexOf('*') > -1) || (radio_remove_container_config) && (container.indexOf('*') > -1)) {
-					alert('\nError: You cannot control all of these containers at once for chosen action.');
-					output_modal.style.display = "none";
-					modal.style.display = "block";
-				} else {
-					$.post(path, {
-						token: parent.token,
-						command: command,
-						container: container,
-						newhost: node
-					}, function(data) {
-						var div = document.getElementById('modal-body2');
-						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-					});
-				}
-			} else {
-				alert('Error, you did not select an operation.')
-				output_modal.style.display = "none";
-				modal.style.display = "block";
-			}
-		}
-	</script>
 </head>
 
 <body>
@@ -133,6 +82,55 @@
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
 		var submit_button = document.getElementById("submit_button");
+
+		function exec() {
+			var container_list = document.getElementById("container_list");
+			var container = container_list.options[container_list.selectedIndex].value;
+			var node_list = document.getElementById("node_list");
+			var node = node_list.options[node_list.selectedIndex].value;
+			var radio_start = $('input[id=radio_start]:checked').val();
+			var radio_stop = $('input[id=radio_stop]:checked').val();
+			var radio_restart = $('input[id=radio_restart]:checked').val();
+			var radio_delete = $('input[id=radio_delete]:checked').val();
+			var radio_create = $('input[id=radio_create]:checked').val();
+			var radio_container_log = $('input[id=radio_container_log]:checked').val();
+			var radio_change_host = $('input[id=radio_change_host]:checked').val();
+			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
+			var command = '';
+			var path = '';
+
+			path = radio_start && radio_start.indexOf('on') > -1 ? '/start'
+			  : radio_stop && radio_stop.indexOf('on') > -1 ? '/stop'
+				: radio_restart && radio_restart.indexOf('on') > -1 ? '/restart'
+			  : radio_delete && radio_delete.indexOf('on') > -1 ? '/delete'
+				: radio_create && radio_create.indexOf('on') > -1 ? '/create'
+				: radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog'
+				: radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost'
+		    : radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig'
+				:;
+
+			if (path) {
+				if ((radio_change_host) && (container.indexOf('*') > -1) || (radio_remove_container_config) && (container.indexOf('*') > -1)) {
+					alert('\nError: You cannot control all of these containers at once for chosen action.');
+					output_modal.style.display = "none";
+					modal.style.display = "block";
+				} else {
+					$.post(path, {
+						token: parent.token,
+						command: command,
+						container: container,
+						newhost: node
+					}, function(data) {
+						var div = document.getElementById('modal-body2');
+						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+					});
+				}
+			} else {
+				alert('Error, you did not select an operation.')
+				output_modal.style.display = "none";
+				modal.style.display = "block";
+			}
+		}
 
 		$(function() {
 			var option = '';
