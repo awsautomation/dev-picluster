@@ -50,8 +50,6 @@
 		div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
 		return true;
   }
-
-	exec();
 	</script>
 </head>
 
@@ -273,5 +271,7 @@
 	}
 
 	modal.style.display = "block";
+	
+	exec();
 </script>
 </html>
