@@ -23,14 +23,15 @@
 			var command = '';
 			var path = '';
 
-			path = radio_start && radio_start.indexOf('on') > -1 ? '/start' : '';
-			path = radio_stop && radio_stop.indexOf('on') > -1 ? '/stop' : '';
-			path = radio_restart && radio_restart.indexOf('on') > -1 ? '/restart' : '';
-			path = radio_delete && radio_delete.indexOf('on') > -1 ? '/delete' : '';
-			path = radio_create && radio_create.indexOf('on') > -1 ? '/create' : '';
-			path = radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog' : '';
-			path = radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost' : '';
-			path = radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig' : '';
+			path = radio_start && radio_start.indexOf('on') > -1 ? '/start'
+			  : radio_stop && radio_stop.indexOf('on') > -1 ? '/stop'
+				: radio_restart && radio_restart.indexOf('on') > -1 ? '/restart'
+			  : radio_delete && radio_delete.indexOf('on') > -1 ? '/delete'
+				: radio_create && radio_create.indexOf('on') > -1 ? '/create'
+				: radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog'
+				: radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost' : '';
+		    : radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig'
+				:;
 
 			if (path) {
 				if ((radio_change_host) && (container.indexOf('*') > -1) || (radio_remove_container_config) && (container.indexOf('*') > -1)) {
