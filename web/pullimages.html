@@ -9,7 +9,7 @@
 	function exec() {
     var path = '/exec';
     var image = document.getElementById('image').value;
-    var registry = document.getElementsByName('containerlist')[0].value;
+    var registry = document.getElementsByName('container_list')[0].value;
 
 		!image || image.length <= 0 ? (alert('Error, you did not select an image to pull.'), false) : image;
 
