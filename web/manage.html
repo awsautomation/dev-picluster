@@ -107,7 +107,7 @@
 				: radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog'
 				: radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost'
 		    : radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig'
-				:;
+				: ''
 
 			if (path) {
 				if ((radio_change_host) && (container.indexOf('*') > -1) || (radio_remove_container_config) && (container.indexOf('*') > -1)) {
