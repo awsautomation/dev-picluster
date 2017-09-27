@@ -26,7 +26,12 @@
 			var node_list = document.getElementById("node_list");
 			node = node_list.options[node_list.selectedIndex].value;
 			var term = $('#terminal').terminal(function(command) {
-				command !== '' ? var _this = this, exec(command, function(output) { _this.echo(output); }) : this.echo('');
+				command !== '' ? (
+					var _this = this,
+					exec(command, function(output) { _this.echo(output); })
+				) : (
+					this.echo('')
+				);
 			}, {
 				greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
 				name: 'terminal',
@@ -55,7 +60,7 @@
 					<select name="node_list" id="node_list"></select>
 					<br><br>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
 					<script>
 						$(function() {
@@ -103,7 +108,7 @@
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -113,7 +118,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			init();
