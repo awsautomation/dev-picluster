@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -8,8 +7,8 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var e = document.getElementById("nodelist");
-			var host = e.options[e.selectedIndex].value;
+			var node_list = document.getElementById("node_list");
+			var host = node_list.options[node_list.selectedIndex].value;
 			var path = '/rmhost';
 
 			$.post(path, {
@@ -24,23 +23,23 @@
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Remove a host from PiCluster</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=left>
 					<label id="windowfont">This will remove a host from the PiCluster configuration file. Please stop any running containers</label>
 					<label id="windowfont">on the host before removing it.</label>
 					<br><br>
-					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
-					<select name="nodelist" id="nodelist">
-						</select>
+					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
+					<select name="node_list" id="node_list"></select>
 					<br><br>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
 					<script>
 						var option = '';
@@ -48,7 +47,7 @@
 							for (var i in data.nodes) {
 								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 							}
-							$('#nodelist').append(option);
+							$('#node_list').append(option);
 						});
 					</script>
 				</p>
@@ -62,6 +61,7 @@
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
 					Please wait......
@@ -71,11 +71,11 @@
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -85,7 +85,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
