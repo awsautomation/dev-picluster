@@ -27,9 +27,9 @@
 			node = node_list.options[node_list.selectedIndex].value;
 			var term = $('#terminal').terminal(function(command) {
 				command !== '' ? (
-					exec(command, function(output) { echo(output); })
+					exec(command, function(output) { this.echo(output); })
 				) : (
-					echo('')
+					this.echo('')
 				);
 			}, {
 				greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
