@@ -21,8 +21,8 @@
 		var manage_image = '';
 		var manage_function = '';
 	  var manage_function_uuid = '';
-		var token = "";
-		var syslog = "";
+		var token = '';
+		var syslog = '';
 
 		function clear(callback) {
 			var iframe = document.getElementById('iframe_a').contentWindow.document;
@@ -149,13 +149,13 @@
 				username: username,
 				password: password
 			}, function(auth) {
-				syslog = auth.syslog ? auth.syslog : '';
-				auth.token ? (
+				syslog = auth.syslog ? auth.syslog : syslog;
+				token = auth.token ? (
 					hideshow('login'),
 					hideshow('login'),
 					hideshow('menu'),
 					hideshow('content'),
-					token = auth.token
+					auth.token
 				) : (
 					alert('Access Denied!'),
 					hideshow('login')
