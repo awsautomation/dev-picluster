@@ -1,7 +1,6 @@
 <html>
-<title>PiCluster Web Console</title>
-
 <head>
+	<title>PiCluster Web Console</title>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
@@ -158,10 +157,8 @@
 					auth.token
 				) : (
 					alert('Access Denied!'),
-					hideshow('login'),
-					auth.token
+					hideshow('login')
 				)
-				console.log('token is ' + token)
 			});
 		}
 	</script>
