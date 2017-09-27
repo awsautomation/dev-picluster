@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -9,12 +8,13 @@
 </head>
 
 <body>
-	<div id="myModal" class="modal">
+	<div id="modal_container" class="modal">
 		<div class="modal-content">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Upload Dockerfile Archive</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=left>
 					<label id="windowfont">This will upload a .zip archive of a containers Dockerfile and required files.
@@ -39,6 +39,7 @@
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
 					Please wait......
@@ -48,11 +49,11 @@
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
