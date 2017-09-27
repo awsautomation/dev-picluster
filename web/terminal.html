@@ -26,8 +26,9 @@
 			var node_list = document.getElementById("node_list");
 			node = node_list.options[node_list.selectedIndex].value;
 			var term = $('#terminal').terminal(function(command) {
+				var _this = this;
 				command !== '' ? (
-					exec(command, function(output) { this.echo(output); })
+					exec(command, function(output) { _this.echo(output); })
 				) : (
 					this.echo('')
 				);
