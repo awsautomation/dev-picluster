@@ -10,41 +10,27 @@ const bodyParser = require('body-parser');
 // require('request-debug')(request);
 /* eslint-enable capitalized-comments */
 
-let config;
-if (process.env.PICLUSTER_CONFIG) {
-  config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-} else {
-  config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-}
+let config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
 
-if (config.ssl_self_signed) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-}
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = config.ssl_self_signed ? '0' : '1';
 
 const app = express();
-
 app.use(bodyParser());
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
+app.use('/assets', express.static(path.join(__dirname, 'assets'), {maxage: '48h'}));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'), {maxage: '48h'}));
 
-const upload = multer({
-  dest: '../'
-});
+const upload = multer({dest: '../'});
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
+const syslog = config.syslog ? config.syslog : '';
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
-let syslog = '';
 let nodedata = '';
-
-if (config.syslog) {
-  syslog = config.syslog;
-}
 
 function getData() {
   setTimeout(() => {
@@ -1018,87 +1004,60 @@ app.get('/getconfig', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/main.html');
 });
-
 app.get('/blank', (req, res) => {
   res.sendFile(__dirname + '/blank.html');
 });
-
 app.get('/nodes.html', (req, res) => {
   res.sendFile(__dirname + '/nodes.html');
 });
-
 app.get('/container-layout.html', (req, res) => {
   res.sendFile(__dirname + '/container-layout.html');
 });
-
 app.get('/prune.html', (req, res) => {
   res.sendFile(__dirname + '/prune.html');
 });
-
 app.get('/clear-functions.html', (req, res) => {
   res.sendFile(__dirname + '/clear-functions.html');
 });
-
 app.get('/functions-viewer.html', (req, res) => {
   res.sendFile(__dirname + '/functions-viewer.html');
 });
-
 app.get('/functions-create.html', (req, res) => {
   res.sendFile(__dirname + '/functions-create.html');
 });
-
 app.get('/current-functions.html', (req, res) => {
   res.sendFile(__dirname + '/current-functions.html');
 });
-
-app.get('/background', (req, res) => {
-  res.sendFile(__dirname + '/background.jpg');
-});
-
 app.get('/reloadconfig.html', (req, res) => {
   res.sendFile(__dirname + '/reloadconfig.html');
 });
-
 app.get('/pullimages.html', (req, res) => {
   res.sendFile(__dirname + '/pullimages.html');
 });
-
 app.get('/manage-images.html', (req, res) => {
   res.sendFile(__dirname + '/manage-images.html');
 });
-
-app.get('/logo.png', (req, res) => {
-  res.sendFile(__dirname + '/logo.png');
-});
-
 app.get('/image-layout.html', (req, res) => {
   res.sendFile(__dirname + '/image-layout.html');
 });
-
 app.get('/log.html', (req, res) => {
   res.sendFile(__dirname + '/log.html');
 });
-
 app.get('/hb.html', (req, res) => {
   res.sendFile(__dirname + '/hb.html');
 });
-
 app.get('/killvip.html', (req, res) => {
   res.sendFile(__dirname + '/killvip.html');
 });
-
 app.get('/syslog.html', (req, res) => {
   res.sendFile(__dirname + '/syslog.html');
 });
-
 app.get('/manage.html', (req, res) => {
   res.sendFile(__dirname + '/manage.html');
 });
-
 app.get('/terminal.html', (req, res) => {
   res.sendFile(__dirname + '/terminal.html');
 });
-
 app.get('/addcontainer.html', (req, res) => {
   res.sendFile(__dirname + '/addcontainer.html');
 });
@@ -1111,17 +1070,11 @@ app.get('/rmhost.html', (req, res) => {
 app.get('/rsyslog.html', (req, res) => {
   res.sendFile(__dirname + '/rsyslog.html');
 });
-app.get('/server.jpeg', (req, res) => {
-  res.sendFile(__dirname + '/server.jpeg');
-});
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(__dirname + '/favicon.ico');
 });
 app.get('/upload.html', (req, res) => {
   res.sendFile(__dirname + '/upload.html');
-});
-app.get('/searching.jpeg', (req, res) => {
-  res.sendFile(__dirname + '/searching.jpeg');
 });
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {

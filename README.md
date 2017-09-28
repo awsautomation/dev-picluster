@@ -34,6 +34,9 @@
 - Upload Dockerfile archives to the entire cluster
 - Functions-as-a-Service (FaaS)
 
+## Public Demo Server
+Click [here](https://www.linux-toys.com/archives/1455) for more informaion.
+
 ## Prerequisites
 
 - Docker

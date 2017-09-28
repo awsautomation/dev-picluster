@@ -6,7 +6,7 @@ module.exports = function (_this) {
       _this.evaluate((username, password) => {
         document.getElementById('user').value = username;
         document.getElementById('password').value = password;
-        document.getElementById('myBtn').click();
+        document.getElementById('submit_button').click();
       }, username, password);
     },
     getCasperEngine() {
