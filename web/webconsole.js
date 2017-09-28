@@ -1005,7 +1005,7 @@ app.get('/getconfig', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/main.html');
 });
-app.get('/blank', (req, res) => {
+app.get('/blank.html', (req, res) => {
   res.sendFile(__dirname + '/blank.html');
 });
 app.get('/nodes.html', (req, res) => {

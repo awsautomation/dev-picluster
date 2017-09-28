@@ -31,97 +31,97 @@
 		}
 
 		$(document).ready(function() {
-			$('#sandbox').on('click hover', function() {
+			$('#sandbox').click( function() {
 				$('#iframe_a').attr('src', '/sandbox?token=' + token);
 			});
-			$('#terminal').on('click hover', function() {
+			$('#terminal').(function() {
 				$('#iframe_a').attr('src', '/terminal?token=' + token);
 			});
-			$('#image-layout').on('click hover', function() {
+			$('#image-layout').(function() {
 				$('#iframe_a').attr('src', '/image-layout.html');
 			});
-			$('#syslog').on('click hover', function() {
+			$('#syslog').(function() {
 				$('#iframe_a').attr('src', '/syslog.html');
 			});
-			$('#kibana').on('click hover', function() {
+			$('#kibana').(function() {
 				$('#iframe_a').attr('src', '/kibana?token=' + token);
 			});
-			$('#functions-viewer').on('click hover', function() {
+			$('#functions-viewer').(function() {
 				$('#iframe_a').attr('src', '/functions-viewer.html');
 			});
-			$('#functions-create').on('click hover', function() {
+			$('#functions-create').(function() {
 				$('#iframe_a').attr('src', '/functions-create.html');
 			});
-			$('#functions-remove').on('click hover', function() {
+			$('#functions-remove').(function() {
 				$('#iframe_a').attr('src', '/clear-functions.html');
 			});
-			$('#functions-current').on('click hover', function() {
+			$('#functions-current').(function() {
 				$('#iframe_a').attr('src', '/current-functions.html');
 			});
-			$('#rsyslog').on('click hover', function() {
+			$('#rsyslog').(function() {
 				$('#iframe_a').attr('src', '/rsyslog.html');
 			});
-			$('#nodes').on('click hover', function() {
+			$('#nodes').(function() {
 				$('#iframe_a').attr('src', '/nodes.html');
 			});
-			$('#layout').on('click hover', function() {
+			$('#layout').(function() {
 				$('#iframe_a').attr('src', '/container-layout.html');
 			});
-			$('#addcontainer').on('click hover', function() {
+			$('#addcontainer').(function() {
 				$('#iframe_a').attr('src', '/addcontainer.html');
 			});
-			$('#addhost').on('click hover', function() {
+			$('#addhost').(function() {
 				$('#iframe_a').attr('src', '/addhost.html');
 			});
-			$('#rmhost').on('click hover', function() {
+			$('#rmhost').(function() {
 				$('#iframe_a').attr('src', '/rmhost.html');
 			});
-			$('#editconfig').on('click hover', function() {
+			$('#editconfig').(function() {
 				$('#iframe_a').attr('src', '/editconfig?token=' + token);
 			});
-			$('#log').on('click hover', function() {
+			$('#log').(function() {
 				$('#iframe_a').attr('src', '/log.html');
 			});
-			$('#hb').on('click hover', function() {
+			$('#hb').(function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
-			$('#docs').on('click hover', function() {
+			$('#docs').(function() {
 				$('#iframe_a').attr('src', '/docs.html');
 			});
-			$('#upload').on('click hover', function() {
+			$('#upload').(function() {
 				$('#iframe_a').attr('src', '/upload.html');
 			});
-			$('#pull').on('click hover', function() {
+			$('#pull').(function() {
 				$('#iframe_a').attr('src', '/pullimages.html');
 			});
-			$('#build').on('click hover', function() {
+			$('#build').(function() {
 				$('#iframe_a').attr('src', '/manage-images.html');
 			});
-			$('#stop').on('click hover', function() {
+			$('#stop').(function() {
 				$('#iframe_a').attr('src', '/stop.html');
 			});
-			$('#reloadconfig').on('click hover', function() {
+			$('#reloadconfig').(function() {
 				$('#iframe_a').attr('src', '/reloadconfig.html');
 			});
-			$('#killvip').on('click hover', function() {
+			$('#killvip').(function() {
 				$('#iframe_a').attr('src', '/killvip.html');
 			});
-			$('#manage').on('click hover', function() {
+			$('#manage').(function() {
 				$('#iframe_a').attr('src', '/manage.html');
 			});
-			$('#prune').on('click hover', function() {
+			$('#prune').(function() {
 				$('#iframe_a').attr('src', '/prune.html');
 			});
-			$('#terminal').on('click hover', function() {
+			$('#terminal').(function() {
 				$('#iframe_a').attr('src', '/terminal.html');
 			});
 		});
 
-		$("html").on('click hover', function() {
+		$("html").(function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").on('click hover', function(e) {
+		$("nav ul li a:not(:only-child)").(function(e) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
@@ -196,8 +196,8 @@
 	<div id="menu">
 		<nav>
 			<ul>
-				<li><a href='/blank' target="iframe_a"> <img src="/assets/images/sphere.png" height="65" width="65"></a>
-					<li><a href="#!">System</a>
+				<li><a href='/blank.html' target="iframe_a"> <img src="/assets/images/sphere.png" height="65" width="65"></a>
+					<li><a onmouseover="this.click()" href="#!">System</a>
 						<ul class="dropdown">
 							<li><a href="#" id="nodes">Nodes</a></li>
 							<li><a href="#" id="editconfig">Edit Configuration</a></li>
@@ -206,14 +206,14 @@
 							<li><a href="#" id="rmhost">Remove Host</a></li>
 						</ul>
 					</li>
-					<li><a href="#!">Containers</a>
+					<li><a onmouseover="this.click()" href="#!">Containers</a>
 						<ul class="dropdown">
 							<li><a href="#" id="layout">Running</a></li>
 							<li><a href="#" id="manage">Manage</a></li>
 							<li><a href="#" id="addcontainer">Add</a></li>
 						</ul>
 					</li>
-					<li><a href="#!">Images</a>
+					<li><a onmouseover="this.click()" href="#!">Images</a>
 						<ul class="dropdown">
 							<li><a href="#" id="pull">Pull</a></li>
 							<li><a href="#" id="build">Manage</a></li>
@@ -221,7 +221,7 @@
 								<li><a href="#" id="upload">Upload Files</a></li>
 						</ul>
 					</li>
-					<li><a href="#!">Operations</a>
+					<li><a onmouseover="this.click()" href="#!">Operations</a>
 						<ul class="dropdown">
 							<li><a href="#" id="killvip">Reset Virtual IP</a></li>
 							<li><a href="#" id="sandbox">Run Command(s)</a></li>
@@ -231,7 +231,7 @@
 							<li><a href="#" id="kibana">Kibana</a></li>
 						</ul>
 					</li>
-					<li><a href="#!">Functions</a>
+					<li><a onmouseover="this.click()" href="#!">Functions</a>
 						<ul class="dropdown">
 								<li><a href="#" id="functions-current">Current Functions</a></li>
 							  <li><a href="#" id="functions-remove">Remove Functions</a></li>
@@ -239,13 +239,14 @@
 								<li><a href="#" id="functions-create">Create Function</a></li>
 						</ul>
 					</li>
-					<li><a href="#!">Logs</a>
+					<li><a onmouseover="this.click()" href="#!">Logs</a>
 						<ul class="dropdown">
 							<li><a href="#" id="log">PiCluster Logs</a></li>
 							<li><a href="#" id="syslog">Syslog Analytics</a></li>
 							<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
 						</ul>
 					</li>
+					<li><a href="docs.html" target='iframe_a'>Docs</a>
 			</ul>
 		</nav>
 		</td>
@@ -267,11 +268,11 @@
 
 		modal.style.display = "block";
 
-		$("html").on('click hover', function() {
+		$("html").(function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").on('click hover', function(element) {
+		$("nav ul li a:not(:only-child)").(function(element) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
