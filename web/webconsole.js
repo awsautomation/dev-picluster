@@ -25,7 +25,7 @@ const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
 const syslog = config.syslog ? config.syslog : '';
-const doc_dir = '../docs/'
+const doc_dir = '../docs/';
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
@@ -165,6 +165,12 @@ app.post('/exec', (req, res) => {
       }
     });
   }
+});
+
+app.get('/listdocs', (req, res) => {
+  fs.readdir(doc_dir, (err, docs) => {
+    res.json(docs);
+  })
 });
 
 app.get('/listregistries', (req, res) => {
