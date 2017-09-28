@@ -25,6 +25,7 @@ const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
 const syslog = config.syslog ? config.syslog : '';
+const doc_dir = '../docs/'
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
@@ -1072,6 +1073,9 @@ app.get('/rsyslog.html', (req, res) => {
 });
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(__dirname + '/favicon.ico');
+});
+app.get('/docs.html', (req, res) => {
+  res.sendFile(__dirname + '/docs.html');
 });
 app.get('/upload.html', (req, res) => {
   res.sendFile(__dirname + '/upload.html');

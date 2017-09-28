@@ -31,94 +31,97 @@
 		}
 
 		$(document).ready(function() {
-			$('#sandbox').click(function() {
+			$('#sandbox').on('click hover', function() {
 				$('#iframe_a').attr('src', '/sandbox?token=' + token);
 			});
-			$('#terminal').click(function() {
+			$('#terminal').on('click hover', function() {
 				$('#iframe_a').attr('src', '/terminal?token=' + token);
 			});
-			$('#image-layout').click(function() {
+			$('#image-layout').on('click hover', function() {
 				$('#iframe_a').attr('src', '/image-layout.html');
 			});
-			$('#syslog').click(function() {
+			$('#syslog').on('click hover', function() {
 				$('#iframe_a').attr('src', '/syslog.html');
 			});
-			$('#kibana').click(function() {
+			$('#kibana').on('click hover', function() {
 				$('#iframe_a').attr('src', '/kibana?token=' + token);
 			});
-			$('#functions-viewer').click(function() {
+			$('#functions-viewer').on('click hover', function() {
 				$('#iframe_a').attr('src', '/functions-viewer.html');
 			});
-			$('#functions-create').click(function() {
+			$('#functions-create').on('click hover', function() {
 				$('#iframe_a').attr('src', '/functions-create.html');
 			});
-			$('#functions-remove').click(function() {
+			$('#functions-remove').on('click hover', function() {
 				$('#iframe_a').attr('src', '/clear-functions.html');
 			});
-			$('#functions-current').click(function() {
+			$('#functions-current').on('click hover', function() {
 				$('#iframe_a').attr('src', '/current-functions.html');
 			});
-			$('#rsyslog').click(function() {
+			$('#rsyslog').on('click hover', function() {
 				$('#iframe_a').attr('src', '/rsyslog.html');
 			});
-			$('#nodes').click(function() {
+			$('#nodes').on('click hover', function() {
 				$('#iframe_a').attr('src', '/nodes.html');
 			});
-			$('#layout').click(function() {
+			$('#layout').on('click hover', function() {
 				$('#iframe_a').attr('src', '/container-layout.html');
 			});
-			$('#addcontainer').click(function() {
+			$('#addcontainer').on('click hover', function() {
 				$('#iframe_a').attr('src', '/addcontainer.html');
 			});
-			$('#addhost').click(function() {
+			$('#addhost').on('click hover', function() {
 				$('#iframe_a').attr('src', '/addhost.html');
 			});
-			$('#rmhost').click(function() {
+			$('#rmhost').on('click hover', function() {
 				$('#iframe_a').attr('src', '/rmhost.html');
 			});
-			$('#editconfig').click(function() {
+			$('#editconfig').on('click hover', function() {
 				$('#iframe_a').attr('src', '/editconfig?token=' + token);
 			});
-			$('#log').click(function() {
+			$('#log').on('click hover', function() {
 				$('#iframe_a').attr('src', '/log.html');
 			});
-			$('#hb').click(function() {
+			$('#hb').on('click hover', function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
-			$('#upload').click(function() {
+			$('#docs').on('click hover', function() {
+				$('#iframe_a').attr('src', '/docs.html');
+			});
+			$('#upload').on('click hover', function() {
 				$('#iframe_a').attr('src', '/upload.html');
 			});
-			$('#pull').click(function() {
+			$('#pull').on('click hover', function() {
 				$('#iframe_a').attr('src', '/pullimages.html');
 			});
-			$('#build').click(function() {
+			$('#build').on('click hover', function() {
 				$('#iframe_a').attr('src', '/manage-images.html');
 			});
-			$('#stop').click(function() {
+			$('#stop').on('click hover', function() {
 				$('#iframe_a').attr('src', '/stop.html');
 			});
-			$('#reloadconfig').click(function() {
+			$('#reloadconfig').on('click hover', function() {
 				$('#iframe_a').attr('src', '/reloadconfig.html');
 			});
-			$('#killvip').click(function() {
+			$('#killvip').on('click hover', function() {
 				$('#iframe_a').attr('src', '/killvip.html');
 			});
-			$('#manage').click(function() {
+			$('#manage').on('click hover', function() {
 				$('#iframe_a').attr('src', '/manage.html');
 			});
-			$('#prune').click(function() {
+			$('#prune').on('click hover', function() {
 				$('#iframe_a').attr('src', '/prune.html');
 			});
-			$('#terminal').click(function() {
+			$('#terminal').on('click hover', function() {
 				$('#iframe_a').attr('src', '/terminal.html');
 			});
 		});
 
-		$("html").click(function() {
+		$("html").on('click hover', function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").click(function(e) {
+		$("nav ul li a:not(:only-child)").on('click hover', function(e) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
@@ -264,15 +267,15 @@
 
 		modal.style.display = "block";
 
-		$("html").click(function() {
+		$("html").on('click hover', function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").click(function(e) {
+		$("nav ul li a:not(:only-child)").on('click hover', function(element) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
-			e.stopPropagation();
+			element.stopPropagation();
 		});
 	</script>
 
