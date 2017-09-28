@@ -31,97 +31,97 @@
 		}
 
 		$(document).ready(function() {
-			$('#sandbox').click( function() {
+			$('#sandbox').click(function() {
 				$('#iframe_a').attr('src', '/sandbox?token=' + token);
 			});
-			$('#terminal').(function() {
+			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal?token=' + token);
 			});
-			$('#image-layout').(function() {
+			$('#image-layout').click(function() {
 				$('#iframe_a').attr('src', '/image-layout.html');
 			});
-			$('#syslog').(function() {
+			$('#syslog').click(function() {
 				$('#iframe_a').attr('src', '/syslog.html');
 			});
-			$('#kibana').(function() {
+			$('#kibana').click(function() {
 				$('#iframe_a').attr('src', '/kibana?token=' + token);
 			});
-			$('#functions-viewer').(function() {
+			$('#functions-viewer').click(function() {
 				$('#iframe_a').attr('src', '/functions-viewer.html');
 			});
-			$('#functions-create').(function() {
+			$('#functions-create').click(function() {
 				$('#iframe_a').attr('src', '/functions-create.html');
 			});
-			$('#functions-remove').(function() {
+			$('#functions-remove').click(function() {
 				$('#iframe_a').attr('src', '/clear-functions.html');
 			});
-			$('#functions-current').(function() {
+			$('#functions-current').click(function() {
 				$('#iframe_a').attr('src', '/current-functions.html');
 			});
-			$('#rsyslog').(function() {
+			$('#rsyslog').click(function() {
 				$('#iframe_a').attr('src', '/rsyslog.html');
 			});
-			$('#nodes').(function() {
+			$('#nodes').click(function() {
 				$('#iframe_a').attr('src', '/nodes.html');
 			});
-			$('#layout').(function() {
+			$('#layout').click(function() {
 				$('#iframe_a').attr('src', '/container-layout.html');
 			});
-			$('#addcontainer').(function() {
+			$('#addcontainer').click(function() {
 				$('#iframe_a').attr('src', '/addcontainer.html');
 			});
-			$('#addhost').(function() {
+			$('#addhost').click(function() {
 				$('#iframe_a').attr('src', '/addhost.html');
 			});
-			$('#rmhost').(function() {
+			$('#rmhost').click(function() {
 				$('#iframe_a').attr('src', '/rmhost.html');
 			});
-			$('#editconfig').(function() {
+			$('#editconfig').click(function() {
 				$('#iframe_a').attr('src', '/editconfig?token=' + token);
 			});
-			$('#log').(function() {
+			$('#log').click(function() {
 				$('#iframe_a').attr('src', '/log.html');
 			});
-			$('#hb').(function() {
+			$('#hb').click(function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
-			$('#docs').(function() {
+			$('#docs').click(function() {
 				$('#iframe_a').attr('src', '/docs.html');
 			});
-			$('#upload').(function() {
+			$('#upload').click(function() {
 				$('#iframe_a').attr('src', '/upload.html');
 			});
-			$('#pull').(function() {
+			$('#pull').click(function() {
 				$('#iframe_a').attr('src', '/pullimages.html');
 			});
-			$('#build').(function() {
+			$('#build').click(function() {
 				$('#iframe_a').attr('src', '/manage-images.html');
 			});
-			$('#stop').(function() {
+			$('#stop').click(function() {
 				$('#iframe_a').attr('src', '/stop.html');
 			});
-			$('#reloadconfig').(function() {
+			$('#reloadconfig').click(function() {
 				$('#iframe_a').attr('src', '/reloadconfig.html');
 			});
-			$('#killvip').(function() {
+			$('#killvip').click(function() {
 				$('#iframe_a').attr('src', '/killvip.html');
 			});
-			$('#manage').(function() {
+			$('#manage').click(function() {
 				$('#iframe_a').attr('src', '/manage.html');
 			});
-			$('#prune').(function() {
+			$('#prune').click(function() {
 				$('#iframe_a').attr('src', '/prune.html');
 			});
-			$('#terminal').(function() {
+			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal.html');
 			});
 		});
 
-		$("html").(function() {
+		$("html").click(function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").(function(e) {
+		$("nav ul li a:not(:only-child)").click(function(e) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
@@ -268,11 +268,11 @@
 
 		modal.style.display = "block";
 
-		$("html").(function() {
+		$("html").click(function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").(function(element) {
+		$("nav ul li a:not(:only-child)").click(function(element) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
