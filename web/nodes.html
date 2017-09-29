@@ -10,11 +10,11 @@
 	<script>
 		function exec() {
 			var div = document.getElementById('modal-body2');
-			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : false;
+			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : div;
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
-				div ? div.innerHTML = '' : false;
+				div ? div.innerHTML = '' : div;
 
 				for (var i in check_data.data) {
 					if (div) {
@@ -139,7 +139,7 @@
 	<script>
 	  var output_modal = document.getElementById('output');
 	  var output_span = document.getElementsByClassName("close")[0];
-		
+
 	  output_span.onclick = function() {
 		  output_modal.style.display = "none";
 	  }
