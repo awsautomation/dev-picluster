@@ -230,3 +230,7 @@ textarea {
   animation-name: animatetop;
   animation-duration: 0.4s
 }
+
+#iframe_a {
+  height: auto;
+}
