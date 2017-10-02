@@ -1,9 +1,14 @@
+html {
+  height: auto;
+}
+
 body {
   display: block;
   color: rgba(255, 255, 255, .9);
   text-decoration: none;
   padding: 1rem;
   font-size: 1rem;
+  height: auto;
   border-top: 2px solid transparent;
   border-bottom: 2px solid transparent;
 }
