@@ -231,6 +231,6 @@ textarea {
   animation-duration: 0.4s
 }
 
-#iframe_a {
-  height: auto;
+iframe #iframe_a {
+  height: 100%;
 }
