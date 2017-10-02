@@ -235,11 +235,12 @@ textarea {
 }
 
 #div_iframe {
-  position:fixed;
+  position:relative;
   left:0;
   width:100%;
   top:0;
   height:100%;
+  z-index: -1;
 }
 
 #iframe_a {
