@@ -8,15 +8,6 @@
 	<link rel="stylesheet" href="/assets/circle.css">
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-		function resize_iframe(iframe) {
-			iframe.height = iframe.contentWindow.document.body.scrollHeight;
-		}
-
-		window.addEventListener('DOMContentLoaded', function(e) {
-			var iframe = document.getElementById('modal-body2');
-			resize_iframe(iframe);
-		});
-
 		function exec() {
 			var div = document.getElementById('modal-body2');
 			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : div;
