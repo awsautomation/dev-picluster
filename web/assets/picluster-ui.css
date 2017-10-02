@@ -2,7 +2,6 @@ html {
   min-height: 100%;
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
-  height: auto;
 }
 
 body {
@@ -13,8 +12,12 @@ body {
   font-size: 11px;
   line-height: 18px;
   color: #333333;
-  height: auto;
+  min-height: 100%;
   overflow: auto;
+}
+
+iframe {
+  min-height: 100%;
 }
 
 h1 {
@@ -229,8 +232,4 @@ textarea {
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
   animation-duration: 0.4s
-}
-
-iframe #iframe_a {
-  height: 100%;
 }
