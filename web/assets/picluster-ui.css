@@ -61,6 +61,7 @@ nav ul li {
 }
 
 nav ul li a {
+  padding: 1rem;
   display: block;
   color: rgba(255, 255, 255, .9);
   text-decoration: none;
@@ -88,7 +89,6 @@ nav ul li ul li {
 }
 
 nav ul li ul li a {
-  padding: 1rem;
   background: transparent;
   color: #4a5666;
   border-bottom: 1px solid #DDE0E7;
