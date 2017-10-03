@@ -103,6 +103,7 @@
 						div_memory_bar.appendChild(div_memory_fill);
 
 						var table = document.createElement("table");
+						var line_break = document.createElement("br");
 						var row = table.insertRow(0);
 						var cell_disk_usage = row.insertCell(0);
 						var cell_cpu_usage = row.insertCell(1);
@@ -115,6 +116,7 @@
 						cell_cpu_usage.appendChild(div_cpu_page);
 						cell_memory_usage.appendChild(div_memory_page);
 						div.appendChild(table);
+						div.appendChild(line_break);
 					}
 				}
 				addFontLinux();
