@@ -209,3 +209,7 @@ input {
 .clearfix {
   *zoom: 1;
 }
+
+.node_card {
+  border: 1px solid black;
+}
