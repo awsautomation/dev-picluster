@@ -247,7 +247,11 @@ textarea {
   height:100%;
 }
 
+#logo {
+  padding: 0px;
+}
+
 #nav_logo {
   height: 65px;
-  width: 65%;
+  width: 65px;
 }
