@@ -236,9 +236,7 @@ textarea {
 }
 
 #div_iframe {
-  left:0;
-  width:100%;
-  top:0;
+  width:99.7%;
   height:100%;
   z-index: -1;
 }
