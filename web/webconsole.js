@@ -66,7 +66,7 @@ function directory_list(filename) {
 
   if (stats.isDirectory()) {
     info.type = 'folder';
-    info.children = fs.readdirSync(filename).map(function (child) {
+    info.children = fs.readdirSync(filename).map(child => {
       return directory_list(filename + '/' + child);
     });
   } else {
