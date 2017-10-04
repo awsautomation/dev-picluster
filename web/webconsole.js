@@ -57,7 +57,7 @@ function getData() {
 getData();
 
 function directory_list(filename) {
-  var stats = fs.lstatSync(filename)
+  var stats = fs.lstatSync(filename);
   var info = {
     path: filename,
     name: path.basename(filename)
@@ -66,13 +66,15 @@ function directory_list(filename) {
   if (stats.isDirectory()) {
     info.type = 'folder';
     info.children = fs.readdirSync(filename).map(function(child) {
-      return directory_list(filename + '/' + child)
+      return directory_list(filename + '/' + child);
     });
   } else {
     info.type = 'file';
   }
-}
+  console.log(filename);
 
+  return info;
+}
 
 app.get('/sandbox', (req, res) => {
   const check_token = req.query.token;
