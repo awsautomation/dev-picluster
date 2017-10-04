@@ -59,7 +59,7 @@ getData();
 function directory_list(filename) {
   console.log(filename);
   const stats = fs.statSync(filename);
-  const info = {
+  let info = {
     path: filename,
     name: path.basename(filename)
   };
@@ -73,7 +73,7 @@ function directory_list(filename) {
     info.type = 'file';
   }
 
-  const filter = info.reject(info.path, ".git");
+  info.path = _.omit(info.path, (path.join(__dirname, '.git')));
 
   return info.name;
 }
