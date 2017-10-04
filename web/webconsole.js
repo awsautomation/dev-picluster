@@ -73,7 +73,7 @@ function directory_list(filename) {
     info.type = 'file';
   }
 
-  const filter = _.reject(info.path, ".git");
+  const filter = info.reject(info.path, ".git");
 
   return info.name;
 }
