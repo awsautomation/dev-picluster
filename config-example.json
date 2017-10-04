@@ -1,6 +1,7 @@
 {
   "token": "1234567890ABCDEFGHJKLMNOP",
   "docker": "../docker",
+  "doc_dir": "../docs",
   "server_port": "3000",
   "agent_port": "3001",
   "ssl": false,
