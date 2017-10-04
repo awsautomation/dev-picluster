@@ -58,15 +58,15 @@ getData();
 
 function directory_list(filename) {
   console.log(filename);
-  var stats = fs.lstatSync(filename);
-  var info = {
+  const stats = fs.lstatSync(filename);
+  const info = {
     path: filename,
     name: path.basename(filename)
   };
 
   if (stats.isDirectory()) {
     info.type = 'folder';
-    info.children = fs.readdirSync(filename).map(function(child) {
+    info.children = fs.readdirSync(filename).map(function (child) {
       return directory_list(filename + '/' + child);
     });
   } else {
