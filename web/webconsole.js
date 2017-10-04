@@ -58,7 +58,7 @@ getData();
 
 function directory_list(filename) {
   console.log(filename);
-  const stats = fs.lstatSync(filename);
+  const stats = fs.statSync(filename);
   const info = {
     path: filename,
     name: path.basename(filename)
