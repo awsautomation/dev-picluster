@@ -188,7 +188,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  res.end(directory_list(doc_dir));
+  res.end(directory_list(path.join(__dirname, doc_dir).normalize()));
 });
 
 app.get('/listregistries', (req, res) => {
