@@ -10,16 +10,16 @@
 	<script>
 		function exec() {
 			var div = document.getElementById('modal-body2');
-			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : false;
+			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : div;
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
-				div ? div.innerHTML = '' : false;
+				div ? div.innerHTML = '' : div;
 
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase();
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						div.innerHTML = div.innerHTML + '<p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
 
 						var div_disk_page = document.createElement('div_disk_page');
 						div_disk_page.className = "page";
@@ -102,11 +102,13 @@
 						div_memory_slice.appendChild(div_memory_bar);
 						div_memory_bar.appendChild(div_memory_fill);
 
-						var table = document.createElement("TABLE");
+						var table = document.createElement("table");
+						var line_break = document.createElement("br");
 						var row = table.insertRow(0);
 						var cell_disk_usage = row.insertCell(0);
 						var cell_cpu_usage = row.insertCell(1);
 						var cell_memory_usage = row.insertCell(2);
+						table.className = "node_card";
 						cell_disk_usage.innerHTML += '<font size="+0" color="black"><b>Disk Usage</b>';
 						cell_cpu_usage.innerHTML += '<font size="+0" color="black"><b>CPU Usage</b>';
 						cell_memory_usage.innerHTML += '<font size="+0" color="black"><b>Memory Usage</b>';
@@ -114,6 +116,7 @@
 						cell_cpu_usage.appendChild(div_cpu_page);
 						cell_memory_usage.appendChild(div_memory_page);
 						div.appendChild(table);
+						div.appendChild(line_break);
 					}
 				}
 				addFontLinux();
@@ -139,7 +142,7 @@
 	<script>
 	  var output_modal = document.getElementById('output');
 	  var output_span = document.getElementsByClassName("close")[0];
-		
+
 	  output_span.onclick = function() {
 		  output_modal.style.display = "none";
 	  }

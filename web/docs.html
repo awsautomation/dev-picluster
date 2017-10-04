@@ -1,0 +1,61 @@
+<html>
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+</head>
+
+<body>
+	<div id="modal_container" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Documentation</h2>
+			</div>
+
+			<div class="modal-body">
+				<p align=left>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div id="output" class="modal">
+		<div class="modal-content2">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+
+			<div id="modal-body2" class="modal-body">
+				<p align=center>
+					Please wait......
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		modal.style.display = "block";
+
+		$(function() {
+			var option = '';
+			$.get('/listdocs'), $('#doc_list').append(option);
+			console.log(option);
+		});
+		</script>
+</html>

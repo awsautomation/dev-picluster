@@ -22,7 +22,7 @@ casper.test.begin('main.html', 7, test => {
     });
 
     test.assertEquals(1, iframe.length, 'There should be 1 iframe');
-    test.assertEquals(iframe.url, URL + '/blank', 'Its source should equal ' + URL + '/blank');
+    test.assertEquals(iframe.url, URL + '/blank.html', 'Its source should equal ' + URL + '/blank.html');
 
     this.waitForResource('jquery.min.js', function () {
       const jquery = this.evaluate(() => {

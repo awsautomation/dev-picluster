@@ -85,6 +85,9 @@
 			$('#hb').click(function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
+			$('#docs').click(function() {
+				$('#iframe_a').attr('src', '/docs.html');
+			});
 			$('#upload').click(function() {
 				$('#iframe_a').attr('src', '/upload.html');
 			});
@@ -193,59 +196,59 @@
 	<div id="menu">
 		<nav>
 			<ul>
-				<li><a href='/blank' target="iframe_a"> <img src="/assets/images/sphere.png" height="65" width="65"></a>
-					<li><a href="#!">System</a>
-						<ul class="dropdown">
-							<li><a href="#" id="nodes">Nodes</a></li>
-							<li><a href="#" id="editconfig">Edit Configuration</a></li>
-							<li><a href="#" id="reloadconfig">Reload Configuration</a></li>
-							<li><a href="#" id="addhost">Add Host</a></li>
-							<li><a href="#" id="rmhost">Remove Host</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Containers</a>
-						<ul class="dropdown">
-							<li><a href="#" id="layout">Running</a></li>
-							<li><a href="#" id="manage">Manage</a></li>
-							<li><a href="#" id="addcontainer">Add</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Images</a>
-						<ul class="dropdown">
-							<li><a href="#" id="pull">Pull</a></li>
-							<li><a href="#" id="build">Manage</a></li>
-							<li><a href="#" id="image-layout">List</a></li>
-								<li><a href="#" id="upload">Upload Files</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Operations</a>
-						<ul class="dropdown">
-							<li><a href="#" id="killvip">Reset Virtual IP</a></li>
-							<li><a href="#" id="sandbox">Run Command(s)</a></li>
-							<li><a href="#" id="hb">Heartbeat</a></li>
-							<li><a href="#" id="prune">Clean Docker</a></li>
-							<li><a href="#" id="terminal">Terminal</a></li>
-							<li><a href="#" id="kibana">Kibana</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Functions</a>
-						<ul class="dropdown">
-								<li><a href="#" id="functions-current">Current Functions</a></li>
-							  <li><a href="#" id="functions-remove">Remove Functions</a></li>
-								<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
-								<li><a href="#" id="functions-create">Create Function</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Logs</a>
-						<ul class="dropdown">
-							<li><a href="#" id="log">PiCluster Logs</a></li>
-							<li><a href="#" id="syslog">Syslog Analytics</a></li>
-							<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
-						</ul>
-					</li>
+				<li><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo"></a>
+				<li><a onmouseover="this.click()" href="#!">System</a>
+					<ul class="dropdown">
+						<li><a href="#" id="nodes">Nodes</a></li>
+						<li><a href="#" id="editconfig">Edit Configuration</a></li>
+						<li><a href="#" id="reloadconfig">Reload Configuration</a></li>
+						<li><a href="#" id="addhost">Add Host</a></li>
+						<li><a href="#" id="rmhost">Remove Host</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Containers</a>
+					<ul class="dropdown">
+						<li><a href="#" id="layout">Running</a></li>
+						<li><a href="#" id="manage">Manage</a></li>
+						<li><a href="#" id="addcontainer">Add</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Images</a>
+					<ul class="dropdown">
+						<li><a href="#" id="pull">Pull</a></li>
+						<li><a href="#" id="build">Manage</a></li>
+						<li><a href="#" id="image-layout">List</a></li>
+							<li><a href="#" id="upload">Upload Files</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Operations</a>
+					<ul class="dropdown">
+						<li><a href="#" id="killvip">Reset Virtual IP</a></li>
+						<li><a href="#" id="sandbox">Run Command(s)</a></li>
+						<li><a href="#" id="hb">Heartbeat</a></li>
+						<li><a href="#" id="prune">Clean Docker</a></li>
+						<li><a href="#" id="terminal">Terminal</a></li>
+						<li><a href="#" id="kibana">Kibana</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Functions</a>
+					<ul class="dropdown">
+							<li><a href="#" id="functions-current">Current Functions</a></li>
+						  <li><a href="#" id="functions-remove">Remove Functions</a></li>
+							<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
+							<li><a href="#" id="functions-create">Create Function</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Logs</a>
+					<ul class="dropdown">
+						<li><a href="#" id="log">PiCluster Logs</a></li>
+						<li><a href="#" id="syslog">Syslog Analytics</a></li>
+						<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
+					</ul>
+				</li>
+				<li><a href="docs.html" target='iframe_a'>Docs</a>
 			</ul>
 		</nav>
-		</td>
 	</div>
 
 	<script>
@@ -268,11 +271,11 @@
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").click(function(e) {
+		$("nav ul li a:not(:only-child)").click(function(navmenu) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
-			e.stopPropagation();
+			navmenu.stopPropagation();
 		});
 	</script>
 
@@ -281,8 +284,8 @@
 		<div style="clear: both;"></div>
 	</div>
 
-	<p align=center>
-		<IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
-	</p>
+	<div id="div_iframe">
+		<iframe src="/blank.html" id='iframe_a' name="iframe_a" width="99%">
+	</div>
   </body>
   </html>
