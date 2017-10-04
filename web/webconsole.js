@@ -170,7 +170,7 @@ app.post('/exec', (req, res) => {
 app.get('/listdocs', (req, res) => {
   fs.readdir(doc_dir, (err, docs) => {
     res.json(docs);
-  })
+  });
 });
 
 app.get('/listregistries', (req, res) => {
