@@ -57,6 +57,7 @@ function getData() {
 getData();
 
 function directory_list(filename) {
+  console.log(filename);
   var stats = fs.lstatSync(filename);
   var info = {
     path: filename,
@@ -71,7 +72,6 @@ function directory_list(filename) {
   } else {
     info.type = 'file';
   }
-  console.log(filename);
 
   return info;
 }
