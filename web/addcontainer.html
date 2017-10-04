@@ -19,7 +19,7 @@
 				failover_constraints += host_list[i].checked && failover_constraints ? ',' + node.value : node.value;
 			});
 
-			(!failover_constraints) ? failover_constraints = 'none' : false;
+			failover_constraints = !failover_constraints ? 'none' : failover_constraints;
 
 			$.post(path, {
 				token: parent.token,
