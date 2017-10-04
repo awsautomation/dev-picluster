@@ -73,7 +73,9 @@ function directory_list(filename) {
     info.type = 'file';
   }
 
-  return info;
+  const filter = _.reject(info.path, ".git");
+
+  return info.name;
 }
 
 app.get('/sandbox', (req, res) => {
@@ -188,7 +190,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  res.end(directory_list(path.join(__dirname, doc_dir).normalize()));
+  res.end(directory_list(path.normalize(doc_dir)));
 });
 
 app.get('/listregistries', (req, res) => {
