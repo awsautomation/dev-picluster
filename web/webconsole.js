@@ -56,6 +56,24 @@ function getData() {
 }
 getData();
 
+function directory_list(filename) {
+  var stats = fs.lstatSync(filename)
+  var info = {
+    path: filename,
+    name: path.basename(filename)
+  };
+
+  if (stats.isDirectory()) {
+    info.type = 'folder';
+    info.children = fs.readdirSync(filename).map(function(child) {
+      return directory_list(filename + '/' + child)
+    });
+  } else {
+    info.type = 'file';
+  }
+}
+
+
 app.get('/sandbox', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
@@ -168,9 +186,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  fs.readdir(doc_dir, (err, docs) => {
-    res.json(docs);
-  })
+  res.json(directory_list(doc_dir));
 });
 
 app.get('/listregistries', (req, res) => {
