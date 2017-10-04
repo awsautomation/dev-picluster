@@ -89,6 +89,7 @@ nav ul li ul li {
 }
 
 nav ul li ul li a {
+  line-height: 1.7rem;
   background: transparent;
   color: #4a5666;
   border-bottom: 1px solid #DDE0E7;
