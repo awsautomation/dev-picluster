@@ -105,6 +105,43 @@ ul.dropdown li {
   z-index: 1;
 }
 
+button {
+  background-color: #565051;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+textarea {
+  font-size: 18px;
+}
+
+@-webkit-keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}
+
 .dropdown {
   display: none;
   position: absolute;
@@ -129,17 +166,6 @@ ul.dropdown li {
   border-bottom: 8px solid #F6F7F9;
 }
 
-button {
-  background-color: #565051;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-}
-
 .modal {
   display: none;
   position: fixed;
@@ -161,34 +187,13 @@ button {
   padding: 0;
   font-size: 12px;
   border: 1px solid #888;
-  width: 30%;
+  width: 60%;
+  overflow: auto;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
   animation-duration: 0.4s
-}
-
-@-webkit-keyframes animatetop {
-  from {
-    top: -300px;
-    opacity: 0
-  }
-  to {
-    top: 0;
-    opacity: 1
-  }
-}
-
-@keyframes animatetop {
-  from {
-    top: -300px;
-    opacity: 0
-  }
-  to {
-    top: 0;
-    opacity: 1
-  }
 }
 
 .close {
@@ -214,26 +219,6 @@ button {
 .modal-body {
   padding: 2px 16px;
   color: black
-}
-
-textarea {
-  font-size: 18px;
-}
-
-.modal-content2 {
-  position: relative;
-  background-color: #fefefe;
-  margin: auto;
-  font-size: 12px;
-  padding: 0px;
-  border: 1px solid #888;
-  width: 60%;
-  overflow: auto;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s
 }
 
 #div_iframe {
