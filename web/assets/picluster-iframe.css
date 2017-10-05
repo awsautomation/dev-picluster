@@ -224,3 +224,7 @@ table tbody tr td label {
 #log_type {
   width: 42%;
 }
+
+#log_output {
+  width: 10%;
+}
