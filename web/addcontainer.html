@@ -16,7 +16,7 @@
 			var failover_constraints = '';
 
 			host_list.forEach(function(node, i) {
-				failover_constraints += host_list[i].checked && failover_constraints ? ',' + node.value : node.value;
+				failover_constraints += host_list[i].checked ? (failover_constraints ? ',' + node.value : failover_constraints) : node.value;
 			});
 
 			failover_constraints = !failover_constraints ? 'none' : failover_constraints;
