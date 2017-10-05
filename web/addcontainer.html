@@ -92,9 +92,9 @@
 			var option = '';
 			var checkbox = '';
 			$.get("/nodes?token=" + parent.token, function(data) {
-				for (var i in data.host_list) {
-					option += '<option value="' + data.host_list[i] + '">' + data.host_list[i] + '</option>';
-					checkbox += '<label id="windowfont" for="host_list">' + data.host_list[i] + '</label><input type="checkbox" name="host_list" value="' + data.host_list[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+				for (var i in data.nodes) {
+					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+					checkbox += '<label id="windowfont" for="host_list">' + data.nodes[i] + '</label><input type="checkbox" name="host_list" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 				}
 				option += '<option value="' + '*' + '">' + '*' + '</option>';
 				$('#node_list').append(option);
