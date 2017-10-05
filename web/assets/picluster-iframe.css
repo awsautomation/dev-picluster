@@ -185,8 +185,23 @@ table tbody tr td label {
   display: inline-block;
 }
 
-#terminal {
+#terminal_modal {
   background-color: #000;
+}
+
+#terminal_container {
+  max-width: 100%;
+}
+
+#terminal {
+  width: 100%;
+  position: relative;
+  left: -1.04em;
+  top: -0.3em;
+}
+
+#terminal .prompt {
+  color: #D75F00;
 }
 
 #host {
@@ -223,8 +238,4 @@ table tbody tr td label {
 
 #modal-body2 {
   font-size: 18px;
-}
-
-#terminal .prompt {
-  color: #D75F00;
 }
