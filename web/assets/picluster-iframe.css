@@ -189,6 +189,10 @@ input {
   font-size: 14px;
 }
 
+table tbody tr td label {
+  color: black;
+}
+
 .dark-area {
   background-color: #666;
   padding: 40px;
@@ -211,4 +215,12 @@ input {
 }
 
 .node_card {
+}
+
+#log_search {
+  width: 10%;
+}
+
+#log_type {
+  width: 42%;
 }
