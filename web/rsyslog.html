@@ -33,7 +33,7 @@
 			var day_check = moment().format("D");
 			var date = day_check.length > 1 ? moment().format("MMM D") : moment().format("MMM  D");
 
-			day.indexOf("today") > -1 ? $("#query").val(date): $("#query").val(day);
+			day.indexOf("today") > -1 ? $("#query").val(date) : $("#query").val(day);
 			exec();
 			document.getElementById(id).checked = false;
 		};
@@ -50,7 +50,7 @@
 
 			<div class="modal-body">
 				<p align=center>
-					<table style="width:10%">
+					<table id="log_search">
 						<tr>
 							<td>
 								<input type="text" rows="30" cols="60" id="query" name="query" name="query"><br>
@@ -61,17 +61,16 @@
 						</tr>
 					</table>
 
-					<table style="width:28%">
+					<table id="log_type">
 						<tr>
 							<td>
 								<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
 							</td>
 							<td>
-								<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
-							</td>
+								<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
 							</td>
 							<td>
-								<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
+								<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
 							</td>
 							<td>
 								<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
@@ -79,7 +78,7 @@
 						</tr>
 					</table>
 
-					<table style="width:10%">
+					<table id="log_output">
 						<tr>
 							<td>
 								<textarea rows="25" cols="74" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
