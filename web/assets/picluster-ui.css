@@ -223,9 +223,10 @@ textarea {
 
 #div_iframe {
   width:100%;
-  height:auto;
+  height: 100%;
   z-index: -1;
-  position: relative;
+  position: fixed;
+  overflow-y: scroll;
 }
 
 #iframe_a {
