@@ -63,7 +63,7 @@ nav ul li a {
   display: block;
   color: rgba(255, 255, 255, .9);
   text-decoration: none;
-  font-size: 1.5rem;
+  font-size: 2vw;
   border-top: 2px solid transparent;
   border-bottom: 2px solid transparent;
 }
@@ -221,15 +221,17 @@ textarea {
 }
 
 #menu {
-
+  position: fixed;
+  width: 100%;
 }
 
 #login {
 }
 
 #div_iframe {
+  padding-top: 65px;
   width:100%;
-  max-height: 89.7%;
+  max-height: 100%;
   z-index: -1;
 }
 
