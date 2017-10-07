@@ -232,7 +232,7 @@ textarea {
 #div_iframe {
   padding-top: 1vw;
   width:100%;
-  height: calc(100% - 1vw);
+  height: 100%;
   z-index: -1;
 }
 
