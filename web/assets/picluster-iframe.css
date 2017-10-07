@@ -127,7 +127,8 @@ table tbody tr td label {
 
 .modal-body {
   padding: 1px 10px;
-  color: black
+  color: black;
+  overflow-y: scroll;
 }
 
 .close {
