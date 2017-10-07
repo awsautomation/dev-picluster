@@ -166,12 +166,42 @@ table tbody tr td label {
   margin: 10px;
 }
 
+.log_type_box {
+  width: 30%;
+  display: inline;
+}
+
 #log_search {
-  width: 10%;
+  width: 100%;
+}
+
+#log_search_bar {
+  width:30%;
+  display: inline;
+}
+
+#log_search_button {
+  width: 30%;
+  display: inline;
 }
 
 #log_type {
-  width: 42%;
+  width: 100%;
+}
+
+#log_type_error {
+
+}
+
+#log_type_failure {
+
+}
+
+#log_type_warning {
+
+}
+#log_type_today {
+
 }
 
 #log_output {
@@ -234,6 +264,10 @@ table tbody tr td label {
 
 #command_entry {
   font-size: 18px;
+}
+
+#command_output {
+  width: 100%;
 }
 
 #windowfont {
