@@ -39,6 +39,10 @@ h1 {
   margin: 40px 0 60px 0;
 }
 
+h2 {
+  margin: .4em;
+}
+
 label {
   font-size: 18px;
 }
@@ -120,7 +124,7 @@ table tbody tr td label {
 }
 
 .modal-body {
-  padding: 2px 16px;
+  padding: 1px 10px;
   color: black
 }
 
@@ -173,6 +177,7 @@ table tbody tr td label {
 
 #log_search {
   width: 100%;
+  text-align: center;
 }
 
 #log_search_bar {
@@ -187,6 +192,7 @@ table tbody tr td label {
 
 #log_type {
   width: 100%;
+  text-align: center;
 }
 
 #log_type_error {
@@ -205,7 +211,7 @@ table tbody tr td label {
 }
 
 #log_output {
-  width: 10%;
+  width: 100%;
 }
 
 #upload-widget {
