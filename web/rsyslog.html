@@ -42,47 +42,40 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
-			<div class="modal-header">
-				<span class="close">&times;</span>
-				<h2>PiCluster Rsyslog Viewer</h2>
-			</div>
+		<div class="modal-body">
+			<div class="modal-content modal-medium">
+				<div class="modal-header">
+					<span class="close">&times;</span>
+					<h2>PiCluster Rsyslog Viewer</h2>
+				</div>
 
-			<div class="modal-body">
-				<div class="modal-content modal-medium">
-					<div class="modal-header">
-						<span class="close">&times;</span>
-						<h2>PiCluster Syslog Viewer</h2>
+				<div class="modal-body">
+					<div id="log_search">
+						<div id="log_search_bar">
+							<input id="query" type="text" rows="30" cols="60" name="query" name="query">
+						</div>
+						<div id="log_search_button">
+							<button id="submit_button">Search</button>
+						</div>
 					</div>
 
-					<div class="modal-body">
-						<div id="log_search">
-							<div id="log_search_bar">
-								<input id="query" type="text" rows="30" cols="60" name="query" name="query">
-							</div>
-							<div id="log_search_button">
-								<button id="submit_button">Search</button>
-							</div>
+					<div id="log_type">
+						<div id="log_type_error" class="log_type_box">
+							<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
 						</div>
+						<div id="log_type_failure" class="log_type_box">
+							<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
+						</div>
+						<div id="log_type_warning" class="log_type_box">
+							<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
+						</div>
+						<div id="log_type_today" class="log_type_box">
+							<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
+						</div>
+					</div>
 
-						<div id="log_type">
-							<div id="log_type_error" class="log_type_box">
-								<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
-							</div>
-							<div id="log_type_failure" class="log_type_box">
-								<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
-							</div>
-							<div id="log_type_warning" class="log_type_box">
-								<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
-							</div>
-							<div id="log_type_today" class="log_type_box">
-								<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
-							</div>
-						</div>
-
-						<div id="log_output">
-							<textarea rows="25" cols="74" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-						</div>
+					<div id="log_output">
+						<textarea rows="25" cols="74" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
 					</div>
 				</div>
 			</div>
