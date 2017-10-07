@@ -9,7 +9,7 @@ body {
   padding: 0px;
   margin: 0px;
   font-size: 1rem;
-  height: auto;
+  height: 100%;
 }
 
 button {
@@ -100,7 +100,7 @@ table tbody tr td label {
   border: 1px solid #888;
   width: 75%;
   min-height: 75%;
-  height: auto;
+  height: 100%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
