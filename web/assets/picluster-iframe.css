@@ -244,4 +244,9 @@ table tbody tr td label {
   font-size: 18px;
 }
 
-#config_editor
+#config_editor {
+}
+
+#payload {
+  width: 100%;
+}
