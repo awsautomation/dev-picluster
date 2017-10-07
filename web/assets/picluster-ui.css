@@ -28,6 +28,14 @@ h1 {
   text-align: center;
 }
 
+label {
+  font-size: 18px;
+}
+
+input {
+  font-size: 18px;
+}
+
 nav {
   margin: 0 auto;
   max-width: 100%;
@@ -45,14 +53,6 @@ nav ul {
   padding: 0;
   margin: 0;
   list-style: none;
-}
-
-label {
-  font-size: 18px;
-}
-
-input {
-  font-size: 18px;
 }
 
 nav ul li {
@@ -143,29 +143,6 @@ textarea {
   }
 }
 
-.dropdown {
-  display: none;
-  position: absolute;
-  background: linear-gradient(to bottom right, white, #F8F8F8) !important;
-  box-shadow: 0 4px 10px #565051;
-}
-
-.dropdown::after {
-  content: '';
-  position: absolute;
-  left: 30px;
-  top: -8px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid white;
-}
-
-.dropdown:hover::after {
-  border-bottom: 8px solid #F6F7F9;
-}
-
 .modal-login {
   display: none;
   position: fixed;
@@ -187,7 +164,7 @@ textarea {
   padding: 0;
   font-size: 12px;
   border: 1px solid #888;
-  width: 60%;
+  width: 25%;
   overflow: auto;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   -webkit-animation-name: animatetop;
@@ -205,6 +182,29 @@ textarea {
 .modal-login-body {
   padding: 2px 16px;
   color: black
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  background: linear-gradient(to bottom right, white, #F8F8F8) !important;
+  box-shadow: 0 4px 10px #565051;
+}
+
+.dropdown::after {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: -8px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid white;
+}
+
+.dropdown:hover::after {
+  border-bottom: 8px solid #F6F7F9;
 }
 
 .close {
