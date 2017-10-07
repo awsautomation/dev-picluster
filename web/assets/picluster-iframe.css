@@ -86,7 +86,7 @@ table tbody tr td label {
   top: 0;
   height: 100%;
   width: 100%;
-  overflow: visible;
+  overflow: scroll;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
@@ -109,6 +109,17 @@ table tbody tr td label {
   animation-duration: 0.4s
 }
 
+.modal-header {
+  padding: 2px 16px;
+  background-color: #565051;
+  color: white;
+}
+
+.modal-body {
+  padding: 2px 16px;
+  color: black
+}
+
 .close {
   color: white;
   float: right;
@@ -121,17 +132,6 @@ table tbody tr td label {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-}
-
-.modal-header {
-  padding: 2px 16px;
-  background-color: #565051;
-  color: white;
-}
-
-.modal-body {
-  padding: 2px 16px;
-  color: black
 }
 
 .dark-area {
