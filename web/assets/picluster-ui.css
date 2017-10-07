@@ -1,5 +1,4 @@
 html {
-  min-height: 100%;
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -13,8 +12,7 @@ body {
   margin: 0px;
   line-height: 18px;
   color: #333333;
-  min-height: 100%;
-  overflow: auto;
+  height: auto;
 }
 
 iframe {
