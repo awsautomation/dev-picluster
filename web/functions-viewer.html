@@ -64,39 +64,27 @@
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<fieldset name="functions" id="functions">
-						<legend>Select a Function</legend>
-						<table style="width:100%">
-							<tr>
-								<select name="function_list" id="function_list">
-							</select>
-							</tr>
-							<tr>
-								&nbsp;
-							</tr>
-							<tr>
-								<button id="submit_button">View</button>
-							</tr>
-						</table>
-					</fieldset>
-					<fieldset name="options" id="options">
-						<legend>Function Data</legend>
-						</select>
-						<label>Data Retrieval</label>
-						<input type="text" size="80" id="url" name="url" value=""></font>
-						<br><br>
-						<label><i>If you execute the above command on your computer, you will not be able to see the output</i></label>
-						<br>
-						<label><i>here anymore because the function will be removed.</i></label>
-						<br>
-						<br>
-						<legend>Function Data</legend>
-						<textarea id="textarea" rows="15" cols="74">
-						</textarea>
-					</fieldset>
-					<p align=center></p>
-				</p>
+				<fieldset name="functions" id="functions">
+					<legend>Select a Function</legend>
+					<div>
+						<select name="function_list" id="function_list"></select>
+					</div>
+					<div>
+						<button id="submit_button">View</button>
+					</div>
+				</fieldset>
+				<fieldset name="options" id="options">
+					<legend>Function Data</legend>
+					<label>Data Retrieval</label>
+					<input type="text" id="url" name="url" value="">
+					<br>
+					<label><i>If you execute the above command on your computer, you will not be able to see the output</i></label>
+					<br>
+					<label><i>here anymore because the function will be removed.</i></label>
+					<br>
+					<legend>Function Data</legend>
+					<textarea id="function_output" rows="15"></textarea>
+				</fieldset>
 			</div>
 		</div>
 	</div>

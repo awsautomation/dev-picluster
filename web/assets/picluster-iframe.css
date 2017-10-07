@@ -110,11 +110,13 @@ table tbody tr td label {
 }
 
 .modal-small {
-  width: 35%;
+  width: 44%;
+  min-width: 370px
 }
 
 .modal-medium {
   width: 75%;
+  min-width: 600px;
 }
 
 .modal-header {
@@ -163,8 +165,7 @@ table tbody tr td label {
   *zoom: 1;
 }
 
-.node_card {
-}
+.node_card {}
 
 .page {
   margin: 10px;
@@ -195,20 +196,13 @@ table tbody tr td label {
   text-align: center;
 }
 
-#log_type_error {
+#log_type_error {}
 
-}
+#log_type_failure {}
 
-#log_type_failure {
+#log_type_warning {}
 
-}
-
-#log_type_warning {
-
-}
-#log_type_today {
-
-}
+#log_type_today {}
 
 #log_output {
   width: 100%;
@@ -260,6 +254,12 @@ table tbody tr td label {
   font-size: 18px;
 }
 
+#function_output {
+  width: 100%;
+}
+
+#function_url {}
+
 #node_list {
   font-size: 18px;
 }
@@ -284,8 +284,7 @@ table tbody tr td label {
   font-size: 18px;
 }
 
-#config_editor {
-}
+#config_editor {}
 
 #payload {
   width: 100%;
