@@ -225,6 +225,7 @@ textarea {
   width:100%;
   height:auto;
   z-index: -1;
+  position: relative;
 }
 
 #iframe_a {
