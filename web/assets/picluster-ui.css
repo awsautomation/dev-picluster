@@ -166,7 +166,7 @@ textarea {
   border-bottom: 8px solid #F6F7F9;
 }
 
-.login-modal {
+.modal-login {
   display: none;
   position: fixed;
   z-index: 1;
