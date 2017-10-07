@@ -230,9 +230,9 @@ textarea {
 }
 
 #div_iframe {
-  padding-top: 65px;
+  padding-top: 1vw;
   width:100%;
-  height: calc(100% - 65px);
+  height: calc(100% - 1vw);
   z-index: -1;
 }
 

@@ -171,8 +171,8 @@ table tbody tr td label {
 }
 
 .log_type_box {
-  width: 30%;
-  display: inline;
+  width: 15%;
+  display: inline-block;
 }
 
 #log_search {
