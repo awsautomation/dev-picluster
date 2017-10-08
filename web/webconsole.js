@@ -69,6 +69,16 @@ function get_directory_list(filepath, extention) {
   return output;
 }
 
+function serve_doc_pages() {
+  let doc_pages = get_directory_list(doc_dir, ".md");
+
+  for (let i in doc_pages) {
+    app.get('/doc' + i, (req, res) => {
+      res.sendFile(__dirname + doc_dir + '/' doc_pages[i]);
+    });
+  }
+}
+
 app.get('/sandbox', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
@@ -1097,6 +1107,8 @@ app.get('/docs.html', (req, res) => {
 app.get('/upload.html', (req, res) => {
   res.sendFile(__dirname + '/upload.html');
 });
+
+serve_doc_pages();
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Web Console enabled');
