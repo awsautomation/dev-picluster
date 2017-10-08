@@ -62,7 +62,7 @@ function get_directory_list(filepath, extention) {
   let output = {};
 
   for (let file in files) {
-    if path.extname(files[file]) === extention) {
+    if (path.extname(files[file]) === extention)) {
       output = output.append(file);
     }
   }
