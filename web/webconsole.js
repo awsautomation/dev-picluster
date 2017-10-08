@@ -57,8 +57,8 @@ function getData() {
 getData();
 
 function get_directory_list(filepath, extention) {
-  console.log(filepath + "extention " + extention);
-  const files = fs.readdirSync(path.join(__dirname, filepath));
+  console.log(filepath + " | extention " + extention);
+  const files = fs.readdirSync(filepath));
   let output = {};
 
   for (let file in files) {
@@ -182,7 +182,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  res.json(get_directory_list(doc_dir, ".md"));
+  res.json(get_directory_list(path.join(__dirname, doc_dir.toString()), ".md"));
 });
 
 app.get('/listregistries', (req, res) => {
