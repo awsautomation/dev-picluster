@@ -163,7 +163,6 @@ textarea {
   border: 1px solid #888;
   min-width: 280px;
   width: 25%;
-  overflow: auto;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
@@ -232,7 +231,6 @@ textarea {
   width:100%;
   height: calc(100% - 1vw);
   z-index: -1;
-  overflow-y: scroll;
 }
 
 #iframe_a {
@@ -240,7 +238,9 @@ textarea {
   border-width: 0px;
   height: 100%;
   width:100%;
-
+  position: absolute;
+  z-index: -1;
+  overflow-y: scroll;
 }
 
 #logo {

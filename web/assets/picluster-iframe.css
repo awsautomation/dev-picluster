@@ -90,7 +90,6 @@ table tbody tr td label {
   top: 0;
   height: 100%;
   width: 100%;
-  overflow: scroll;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
@@ -128,7 +127,6 @@ table tbody tr td label {
 .modal-body {
   padding: 1px 10px;
   color: black;
-  overflow-y: scroll;
 }
 
 .close {
