@@ -65,7 +65,7 @@ function get_directory_list(filepath, extention) {
   for (var file in files) {
     console.log(file + " in " + files[file])
     if (path.extname(files[file]) === extention) {
-      output.push(file);
+      output.push(files[file]);
     }
   }
 
