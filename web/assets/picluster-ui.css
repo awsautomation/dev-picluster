@@ -229,6 +229,7 @@ textarea {
 #login {}
 
 #div_iframe {
+  margin-top: 4vw;
   width:100%;
   height: calc(100% - 4vw);
   z-index: -1;
