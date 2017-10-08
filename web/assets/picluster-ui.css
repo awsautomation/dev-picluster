@@ -185,6 +185,7 @@ textarea {
 .dropdown {
   display: none;
   position: absolute;
+  margin-top: 3px;
   background: linear-gradient(to bottom right, white, #F8F8F8) !important;
   box-shadow: 0 4px 10px #565051;
 }
@@ -222,13 +223,13 @@ textarea {
 #menu {
   position: fixed;
   width: 100%;
+  z-index: 10;
 }
 
-#login {
-}
+#login {}
 
 #div_iframe {
-  padding-top: 1vw;
+  padding-top: 4vw;
   width:100%;
   height: calc(100% - 1vw);
   z-index: -1;
