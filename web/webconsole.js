@@ -74,7 +74,7 @@ function serve_doc_pages() {
 
   for (let i in doc_pages) {
     app.get('/doc' + i, (req, res) => {
-      res.sendFile(__dirname + doc_dir + '/' + doc_pages[i]);
+      res.sendFile(__dirname + '/' + doc_dir + '/' + doc_pages[i]);
     });
   }
 }
