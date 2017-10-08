@@ -59,6 +59,7 @@ getData();
 function get_directory_list(filepath, extention) {
   console.log(filepath + " | extention " + extention);
   const files = fs.readdirSync(filepath);
+  console.log(files);
   let output = {};
 
   for (let file in files) {
