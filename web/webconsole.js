@@ -33,7 +33,7 @@ let server = config.web_connect;
 let server_port = config.server_port;
 let nodedata = '';
 
-fs.existsSync doc_dir ? app.use('/docs', express.static(path.join(__dirname, doc_dir))) : doc_dir;
+fs.existsSync(path.normalize(doc_dir)) ? app.use('/docs', express.static(path.join(__dirname, doc_dir))) : doc_dir;
 
 function getData() {
   setTimeout(() => {
