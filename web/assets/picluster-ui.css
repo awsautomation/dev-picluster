@@ -2,6 +2,7 @@ html {
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -14,6 +15,7 @@ body {
   line-height: 18px;
   color: #333333;
   height: 100%;
+  overflow: hidden;
 }
 
 h1 {
@@ -230,6 +232,7 @@ textarea {
   width:100%;
   height: calc(100% - 1vw);
   z-index: -1;
+  overflow-y: scroll;
 }
 
 #iframe_a {
@@ -237,7 +240,7 @@ textarea {
   border-width: 0px;
   height: 100%;
   width:100%;
-  overflow-y: scroll;
+
 }
 
 #logo {
