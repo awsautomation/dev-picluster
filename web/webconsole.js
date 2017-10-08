@@ -70,7 +70,7 @@ function get_directory_list(filepath, extention) {
 }
 
 function serve_doc_pages() {
-  let doc_pages = get_directory_list(doc_dir, ".md");
+  let doc_pages = get_directory_list(path.join(__dirname, doc_dir.toString()), ".md"));
 
   for (let i in doc_pages) {
     app.get('/doc' + i, (req, res) => {
