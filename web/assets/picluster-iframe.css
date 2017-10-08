@@ -83,7 +83,7 @@ table tbody tr td label {
 
 .modal {
   display: none;
-  position: fixed;
+  position: relative;
   z-index: 1;
   padding-top: 5vw;
   left: 0;
