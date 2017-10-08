@@ -33,6 +33,8 @@ let server = config.web_connect;
 let server_port = config.server_port;
 let nodedata = '';
 
+fs.existsSync doc_dir ? app.use('/docs', express.static(path.join(__dirname, doc_dir))) : doc_dir;
+
 function getData() {
   setTimeout(() => {
     const options = {
@@ -57,16 +59,11 @@ function getData() {
 getData();
 
 function get_directory_list(filepath, extention) {
-  console.log(filepath + " | extention " + extention);
   const files = fs.readdirSync(filepath);
-  console.log(files);
   let output = [];
 
-  for (var file in files) {
-    console.log(file + " in " + files[file])
-    if (path.extname(files[file]) === extention) {
-      output.push(files[file]);
-    }
+  for (var i in files) {
+    path.extname(files[i]) === extention ? output.push(files[i]) : output;
   }
 
   return output;
