@@ -9,7 +9,7 @@ body {
   padding: 0px;
   margin: 0px;
   font-size: 1rem;
-  height: auto;
+  height: 100%;
 }
 
 button {
@@ -23,73 +23,40 @@ button {
   font-size: 16px;
 }
 
-#host {
+a:link {
+  color: black;
+}
+
+a:visited {
+  color: black;
+}
+
+textarea {
   font-size: 18px;
 }
 
-#container_list {
-  font-size: 16px;
+h1 {
+  margin: 40px 0 60px 0;
 }
 
-#container {
-  font-size: 16px;
+h2 {
+  margin: .4em;
 }
 
-#function_list {
+label {
   font-size: 18px;
 }
 
-#node_list {
+legend {
   font-size: 18px;
 }
 
-#image_list {
-  font-size: 18px;
+input {
+  font-size: 14px;
 }
 
-#command_entry {
-  font-size: 18px;
-}
-
-#windowfont {
-  font-size: 18px;
-}
-
-#modal-body2 {
-  font-size: 18px;
-}
-
-#terminal .prompt {
-  color: #D75F00;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  padding-top: 5px;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  position: relative;
-  background-color: #fefefe;
-  margin: auto;
-  font-size: 12px;
-  padding: 0;
-  border: 1px solid #888;
-  width: 75%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s
+table tbody tr td label {
+  color: black;
 }
 
 @-webkit-keyframes animatetop {
@@ -114,6 +81,54 @@ button {
   }
 }
 
+.modal {
+  display: none;
+  position: relative;
+  z-index: 1;
+  padding-top: 5vw;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  font-size: 12px;
+  padding: 0;
+  border: 1px solid #888;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+.modal-small {
+  width: 44%;
+  min-width: 370px
+}
+
+.modal-medium {
+  width: 75%;
+  min-width: 600px;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #565051;
+  color: white;
+}
+
+.modal-body {
+  padding: 1px 10px;
+  color: black;
+}
+
 .close {
   color: white;
   float: right;
@@ -126,66 +141,6 @@ button {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-}
-
-.modal-header {
-  padding: 2px 16px;
-  background-color: #565051;
-  color: white;
-}
-
-.modal-body {
-  padding: 2px 16px;
-  color: black
-}
-
-a:link {
-  color: black;
-}
-
-a:visited {
-  color: black;
-}
-
-textarea {
-  font-size: 18px;
-}
-
-.modal-content2 {
-  position: relative;
-  background-color: #fefefe;
-  margin: auto;
-  font-size: 12px;
-  padding: 0;
-  border: 1px solid #888;
-  width: 80%;
-  height: auto;
-  overflow: auto;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s
-}
-
-.page {
-  margin: 10px;
-}
-
-h1 {
-  margin: 40px 0 60px 0;
-}
-
-label {
-  font-size: 18px;
-}
-
-legend {
-  font-size: 18px;
-}
-
-input {
-  font-size: 14px;
 }
 
 .dark-area {
@@ -209,5 +164,127 @@ input {
   *zoom: 1;
 }
 
-.node_card {
+.node_card {}
+
+.page {
+  margin: 10px;
+}
+
+.log_type_box {
+  width: 15%;
+  display: inline-block;
+}
+
+#log_search {
+  width: 100%;
+  text-align: center;
+}
+
+#log_search_bar {
+  width:30%;
+  display: inline;
+}
+
+#log_search_button {
+  width: 30%;
+  display: inline;
+}
+
+#log_type {
+  width: 100%;
+  text-align: center;
+}
+
+#log_type_error {}
+
+#log_type_failure {}
+
+#log_type_warning {}
+
+#log_type_today {}
+
+#log_output {
+  width: 100%;
+}
+
+#upload-widget {
+  font-size: 18px;
+  background-color: #565051;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+#terminal_modal {
+  background-color: #000;
+}
+
+#terminal_container {
+  max-width: 100%;
+}
+
+#terminal {
+  width: 100%;
+  position: relative;
+  left: -1.04em;
+  top: -0.3em;
+}
+
+#terminal .prompt {
+  color: #D75F00;
+}
+
+#host {
+  font-size: 18px;
+}
+
+#container_list {
+  font-size: 16px;
+}
+
+#container {
+  font-size: 16px;
+}
+
+#function_list {
+  font-size: 18px;
+}
+
+#function_output {
+  width: 100%;
+}
+
+#function_url {}
+
+#node_list {
+  font-size: 18px;
+}
+
+#image_list {
+  font-size: 18px;
+}
+
+#command_entry {
+  font-size: 18px;
+}
+
+#command_output {
+  width: 100%;
+}
+
+#windowfont {
+  font-size: 18px;
+}
+
+#modal-body2 {
+  font-size: 18px;
+}
+
+#config_editor {}
+
+#payload {
+  width: 100%;
 }

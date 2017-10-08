@@ -28,26 +28,18 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Configuraton Editor</h2>
 			</div>
 
 			<div class="modal-body">
-				<p align=center>
-					<div id="start" title="PiCluster Configuration Editor">
-						<p align=center>
-							<table style="width:10%">
-								<tr>
-									<td>
-										<br><textarea rows="20" cols="75" id="payload" name="payload" value="" enctype="application/json"></textarea><br><br>
-										<button id="submit_button">Submit</button>
-									</td>
-								</tr>
-							</table>
-						</p>
-					</div>
+				<div id="config_editor" title="PiCluster Configuration Editor">
+					<textarea rows="20" cols="75" id="payload" name="payload" value="" enctype="application/json"></textarea>
+					<br>
+					<button id="submit_button">Submit</button>
+				</div>
 			</div>
 		</div>
 	</div>

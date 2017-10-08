@@ -56,26 +56,18 @@ function getData() {
 }
 getData();
 
-function directory_list(filename) {
-  console.log(filename);
-  const stats = fs.statSync(filename);
-  let info = {
-    path: filename,
-    name: path.basename(filename)
-  };
+function get_directory_list(filepath, extention) {
+  console.log(filepath + "extention " + extention);
+  const files = fs.readdirSync(filepath);
+  let output = {};
 
-  if (stats.isDirectory()) {
-    info.type = 'folder';
-    info.children = fs.readdirSync(filename).map(child => {
-      return directory_list(filename + '/' + child);
-    });
-  } else {
-    info.type = 'file';
+  for (let file in files) {
+    if path.extname(files[file]) === extention) {
+      output = output.append(file);
+    }
   }
 
-  info.path = _.omit(info.path, (path.join(__dirname, '.git')));
-
-  return info.name;
+  return output;
 }
 
 app.get('/sandbox', (req, res) => {
@@ -190,7 +182,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  res.end(directory_list(path.normalize(path.join(__dirname, doc_dir))));
+  res.end(get_directory_list(path.normalize(path.join(__dirname, doc_dir)), ".md"));
 });
 
 app.get('/listregistries', (req, res) => {
