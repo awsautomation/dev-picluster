@@ -223,15 +223,14 @@ textarea {
 #menu {
   position: fixed;
   width: 100%;
-  z-index: 10;
+  z-index: 1;
 }
 
 #login {}
 
 #div_iframe {
-  padding-top: 4vw;
   width:100%;
-  height: calc(100% - 1vw);
+  height: calc(100% - 4vw);
   z-index: -1;
 }
 
