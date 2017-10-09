@@ -38,7 +38,7 @@ fs.existsSync(path.normalize(doc_dir)) ? app.use('/docs', express.static(path.jo
 function getData() {
   setTimeout(() => {
     const options = {
-      url: `${scheme}${server}:${server_port}/nodes.html?token=${token}`,
+      url: `${scheme}${server}:${server_port}/nodes?token=${token}`,
       rejectUnauthorized: ssl_self_signed
     };
 
@@ -338,7 +338,7 @@ app.post('/listcommands', (req, res) => {
 
 function display_log(callback) {
   const options = {
-    url: `${scheme}${server}:${server_port}/log.html?token=${token}`,
+    url: `${scheme}${server}:${server_port}/log?token=${token}`,
     rejectUnauthorized: ssl_self_signed
   };
 
