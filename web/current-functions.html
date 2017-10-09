@@ -15,7 +15,7 @@
 			if (div) {
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>';
 			}
-			$.get("/nodes?token=" + parent.token, function(data) {
+			$.get("/nodes.html?token=" + parent.token, function(data) {
 				var check_data = data;
 
 				if (div) {

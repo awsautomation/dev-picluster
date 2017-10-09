@@ -67,7 +67,7 @@
 								parent.manage_image = '';
 							} else {
 								$(function() {
-									$.get("/nodes?token=" + parent.token, function(data) {
+									$.get("/nodes.html?token=" + parent.token, function(data) {
 										for (var i in data.container_list) {
 											option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
 										}

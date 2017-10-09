@@ -30,12 +30,28 @@
 			callback();
 		}
 
-		function get_doc_links(doc_list) {
+		function build_doc_links(doc_list) {
 			for (var i in doc_list) {
 				$('#doc' + i).click(function() {
 					$('iframe_a').attr('src', '/docs.html?doc_id=doc' + i)
 				});
 			}
+		}
+
+    function build_docs_nav_menu() {
+			const docs_nav = document.getElementById("nav_docs");
+      let output = '';
+
+			output += '<ul  class="dropdown">';
+
+			$.get("/listdocs", function(data) {
+				for (let i in data) {
+					output += '<li><a href="#" id="doc' + i + '">' + data[i] + '</a></li>';
+				}
+			});
+
+			output += '</ul>';
+			$('#nav_docs').append(output);
 		}
 
 		$(document).ready(function() {
@@ -123,6 +139,8 @@
 			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal.html');
 			});
+
+			build_doc_links();
 		});
 
 		$("html").click(function() {
@@ -226,7 +244,7 @@
 						<li><a href="#" id="pull">Pull</a></li>
 						<li><a href="#" id="build">Manage</a></li>
 						<li><a href="#" id="image-layout">List</a></li>
-							<li><a href="#" id="upload">Upload Files</a></li>
+						<li><a href="#" id="upload">Upload Files</a></li>
 					</ul>
 				</li>
 				<li id="nav_operations"><a onmouseover="this.click()" href="#!">Operations</a>
@@ -254,7 +272,7 @@
 						<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
 					</ul>
 				</li>
-				<li id="nav_docs"><a href="docs.html" target='iframe_a'>Docs</a>
+				<li id="nav_docs"><a onmouseover="this.click()" href="#!">Docs</a>
 			</ul>
 		</nav>
 	</div>
@@ -285,6 +303,8 @@
 			$(".dropdown").not($(this).siblings()).hide();
 			navmenu.stopPropagation();
 		});
+
+		build_docs_nav_menu();
 	</script>
 
 	<div id="content">

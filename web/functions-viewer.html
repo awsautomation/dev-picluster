@@ -13,7 +13,7 @@
 				parent.manage_function = '';
 				parent.manage_function_uuid = '';
 			} else {
-				$.get("/nodes?token=" + parent.token, function(data) {
+				$.get("/nodes.html?token=" + parent.token, function(data) {
 					for (var i in data.functions.name) {
 						if (data.functions.name[i].name) {
 							option += '<option value="' + data.functions.name[i].uuid + '">' + data.functions.name[i].name + '</option>';
@@ -33,7 +33,7 @@
 			document.getElementById("url").value = 'Fetching.....';
 
 			if (get_function.length > 1) {
-				$.get("/nodes?token=" + parent.token, function(data) {
+				$.get("/nodes.html?token=" + parent.token, function(data) {
 					for (var i in data.functions.name) {
 						if (data.functions.name[i].name.indexOf(get_function) > -1) {
 							if (data.functions.name[i].name && data.functions.name[i].output) {

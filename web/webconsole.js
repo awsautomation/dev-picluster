@@ -38,7 +38,7 @@ fs.existsSync(path.normalize(doc_dir)) ? app.use('/docs', express.static(path.jo
 function getData() {
   setTimeout(() => {
     const options = {
-      url: `${scheme}${server}:${server_port}/nodes?token=${token}`,
+      url: `${scheme}${server}:${server_port}/nodes.html?token=${token}`,
       rejectUnauthorized: ssl_self_signed
     };
 
@@ -338,7 +338,7 @@ app.post('/listcommands', (req, res) => {
 
 function display_log(callback) {
   const options = {
-    url: `${scheme}${server}:${server_port}/log?token=${token}`,
+    url: `${scheme}${server}:${server_port}/log.html?token=${token}`,
     rejectUnauthorized: ssl_self_signed
   };
 
@@ -977,14 +977,14 @@ app.get('/hb', (req, res) => {
   }
 });
 
-app.get('/log', (req, res) => {
+app.get('/log.html', (req, res) => {
   const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/log?token=${token}`,
+      url: `${scheme}${server}:${server_port}/log.html?token=${token}`,
       rejectUnauthorized: ssl_self_signed
     };
 
@@ -998,7 +998,7 @@ app.get('/log', (req, res) => {
   }
 });
 
-app.get('/nodes', (req, res) => {
+app.get('/nodes.html', (req, res) => {
   const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {

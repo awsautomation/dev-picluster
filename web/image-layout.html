@@ -14,7 +14,7 @@
 			var div = document.getElementById('modal-body2');
 			div.innerHTML = div ? div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for images</label></font>' : '';
 
-			$.get("/nodes?token=" + parent.token, function(data) {
+			$.get("/nodes.html?token=" + parent.token, function(data) {
 				var check_data = data;
 				div.innerHTML = div ? '' : false;
 

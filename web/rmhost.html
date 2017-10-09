@@ -43,7 +43,7 @@
 					</p>
 					<script>
 						var option = '';
-						$.get("/nodes?token=" + parent.token, function(data) {
+						$.get("/nodes.html?token=" + parent.token, function(data) {
 							for (var i in data.nodes) {
 								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 							}
