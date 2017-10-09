@@ -9,7 +9,7 @@ body {
   padding: 0px;
   margin: 0px;
   font-size: 1rem;
-  height: auto;
+  height: 100%;
 }
 
 button {
@@ -37,6 +37,10 @@ textarea {
 
 h1 {
   margin: 40px 0 60px 0;
+}
+
+h2 {
+  margin: .4em;
 }
 
 label {
@@ -79,14 +83,13 @@ table tbody tr td label {
 
 .modal {
   display: none;
-  position: fixed;
+  position: relative;
   z-index: 1;
-  padding-top: 5px;
+  padding-top: 5vw;
   left: 0;
   top: 0;
   height: 100%;
   width: 100%;
-  overflow: visible;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
 }
@@ -98,15 +101,32 @@ table tbody tr td label {
   font-size: 12px;
   padding: 0;
   border: 1px solid #888;
-  width: 75%;
-  min-height: 75%;
-  height: auto;
-  overflow: auto;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
   animation-duration: 0.4s
+}
+
+.modal-small {
+  width: 44%;
+  min-width: 370px
+}
+
+.modal-medium {
+  width: 75%;
+  min-width: 600px;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #565051;
+  color: white;
+}
+
+.modal-body {
+  padding: 1px 10px;
+  color: black;
 }
 
 .close {
@@ -121,17 +141,6 @@ table tbody tr td label {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-}
-
-.modal-header {
-  padding: 2px 16px;
-  background-color: #565051;
-  color: white;
-}
-
-.modal-body {
-  padding: 2px 16px;
-  color: black
 }
 
 .dark-area {
@@ -155,23 +164,47 @@ table tbody tr td label {
   *zoom: 1;
 }
 
-.node_card {
-}
+.node_card {}
 
 .page {
   margin: 10px;
 }
 
+.log_type_box {
+  width: 15%;
+  display: inline-block;
+}
+
 #log_search {
-  width: 10%;
+  width: 100%;
+  text-align: center;
+}
+
+#log_search_bar {
+  width:30%;
+  display: inline;
+}
+
+#log_search_button {
+  width: 30%;
+  display: inline;
 }
 
 #log_type {
-  width: 42%;
+  width: 100%;
+  text-align: center;
 }
 
+#log_type_error {}
+
+#log_type_failure {}
+
+#log_type_warning {}
+
+#log_type_today {}
+
 #log_output {
-  width: 10%;
+  width: 100%;
 }
 
 #upload-widget {
@@ -220,6 +253,12 @@ table tbody tr td label {
   font-size: 18px;
 }
 
+#function_output {
+  width: 100%;
+}
+
+#function_url {}
+
 #node_list {
   font-size: 18px;
 }
@@ -232,10 +271,20 @@ table tbody tr td label {
   font-size: 18px;
 }
 
+#command_output {
+  width: 100%;
+}
+
 #windowfont {
   font-size: 18px;
 }
 
 #modal-body2 {
   font-size: 18px;
+}
+
+#config_editor {}
+
+#payload {
+  width: 100%;
 }

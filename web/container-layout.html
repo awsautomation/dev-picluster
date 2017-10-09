@@ -13,7 +13,7 @@
 		function exec() {
 			var div = document.getElementById('modal-body2');
 
-			(div) ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>' : false;
+			(div) ? div.innerHTML = div.innerHTML + '<p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>' : false;
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
@@ -24,7 +24,7 @@
 					if (div) {
 						var dist = check_data.data[i].os_type || '';
 						dist = dist.toLowerCase();
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br>'+ '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br><br>';
+						div.innerHTML = div.innerHTML + '<p align=left>' + distLogo(dist) + '<br>'+ '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br>';
 						var array = check_data.data[i].running_containers;
 						for (var j in array) {
 							if (array[j]) {
@@ -44,13 +44,12 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Containers</h2>
 			</div>
 			<div id="modal-body2" class="modal-body">
-				<p align=center></p>
 			</div>
 		</div>
 	</div>
