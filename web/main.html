@@ -44,7 +44,7 @@
 
 			output += '<ul  class="dropdown">';
 
-			$.get("/listdocs", function(data) {
+			$.get(JSON.parse("/listdocs"), function(data) {
 				for (let i in data) {
 					output += '<li><a href="#" id="doc' + i + '">' + data[i] + '</a></li>';
 				}
