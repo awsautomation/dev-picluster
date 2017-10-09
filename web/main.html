@@ -42,13 +42,14 @@
 			const docs_nav = document.getElementById("nav_docs");
       let output = '';
 
-			output += '<ul  class="dropdown">';
+			output += '<ul class="dropdown">';
 
 			$.get(JSON.parse("/listdocs"), function(data) {
+				console.log(data);
 				for (let i in data) {
 					output += '<li><a href="#" id="doc' + i + '">' + data[i] + '</a></li>';
 				}
-			});
+			}, json);
 
 			output += '</ul>';
 			$('#nav_docs').append(output);
