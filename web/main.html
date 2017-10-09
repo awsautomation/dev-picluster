@@ -33,7 +33,7 @@
 		function get_doc_links(doc_list) {
 			for (var i in doc_list) {
 				$('#doc' + i).click(function() {
-					$('iframe_a').attr()
+					$('iframe_a').attr('src', '/docs.html?doc_id=doc' + i)
 				});
 			}
 		}
@@ -204,7 +204,7 @@
 	<div id="menu">
 		<nav>
 			<ul>
-				<li><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo"></a>
+				<li id="nav_logo"><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo_image"></a>
 				<li><a onmouseover="this.click()" href="#!">System</a>
 					<ul class="dropdown">
 						<li><a href="#" id="nodes">Nodes</a></li>
@@ -214,14 +214,14 @@
 						<li><a href="#" id="rmhost">Remove Host</a></li>
 					</ul>
 				</li>
-				<li><a onmouseover="this.click()" href="#!">Containers</a>
+				<li id="nav_containers"><a onmouseover="this.click()" href="#!">Containers</a>
 					<ul class="dropdown">
 						<li><a href="#" id="layout">Running</a></li>
 						<li><a href="#" id="manage">Manage</a></li>
 						<li><a href="#" id="addcontainer">Add</a></li>
 					</ul>
 				</li>
-				<li><a onmouseover="this.click()" href="#!">Images</a>
+				<li id="nac_images"><a onmouseover="this.click()" href="#!">Images</a>
 					<ul class="dropdown">
 						<li><a href="#" id="pull">Pull</a></li>
 						<li><a href="#" id="build">Manage</a></li>
@@ -229,7 +229,7 @@
 							<li><a href="#" id="upload">Upload Files</a></li>
 					</ul>
 				</li>
-				<li><a onmouseover="this.click()" href="#!">Operations</a>
+				<li id="nav_operations"><a onmouseover="this.click()" href="#!">Operations</a>
 					<ul class="dropdown">
 						<li><a href="#" id="killvip">Reset Virtual IP</a></li>
 						<li><a href="#" id="sandbox">Run Command(s)</a></li>
@@ -239,7 +239,7 @@
 						<li><a href="#" id="kibana">Kibana</a></li>
 					</ul>
 				</li>
-				<li><a onmouseover="this.click()" href="#!">Functions</a>
+				<li id="nav_functions"><a onmouseover="this.click()" href="#!">Functions</a>
 					<ul class="dropdown">
 							<li><a href="#" id="functions-current">Current Functions</a></li>
 						  <li><a href="#" id="functions-remove">Remove Functions</a></li>
@@ -247,14 +247,14 @@
 							<li><a href="#" id="functions-create">Create Function</a></li>
 					</ul>
 				</li>
-				<li><a onmouseover="this.click()" href="#!">Logs</a>
+				<li id="nav_logs"><a onmouseover="this.click()" href="#!">Logs</a>
 					<ul class="dropdown">
 						<li><a href="#" id="log">PiCluster Logs</a></li>
 						<li><a href="#" id="syslog">Syslog Analytics</a></li>
 						<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
 					</ul>
 				</li>
-				<li><a href="docs.html" target='iframe_a'>Docs</a>
+				<li id="nav_docs"><a href="docs.html" target='iframe_a'>Docs</a>
 			</ul>
 		</nav>
 	</div>

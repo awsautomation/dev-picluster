@@ -58,11 +58,11 @@ function getData() {
 }
 getData();
 
-function get_directory_list(filepath, extention) {
-  const files = fs.readdirSync(filepath);
+function get_file_list_by_extention(dirpath, extention) {
+  const files = fs.readdirSync(dirpath);
   let output = [];
 
-  for (var i in files) {
+  for (let i in files) {
     path.extname(files[i]) === extention ? output.push(files[i]) : output;
   }
 
@@ -70,7 +70,7 @@ function get_directory_list(filepath, extention) {
 }
 
 function serve_doc_pages() {
-  let doc_pages = get_directory_list(path.join(__dirname, doc_dir.toString()), ".md");
+  let doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), ".md");
 
   for (let i in doc_pages) {
     app.get('/doc' + i, (req, res) => {
@@ -191,7 +191,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  res.json(get_directory_list(path.join(__dirname, doc_dir.toString()), ".md"));
+  res.json(get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), ".md"));
 });
 
 app.get('/listregistries', (req, res) => {
