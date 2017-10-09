@@ -79,7 +79,7 @@ function serve_doc_pages() {
   }
 }
 
-app.get('/sandbox', (req, res) => {
+app.get('/sandbox.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -88,7 +88,7 @@ app.get('/sandbox', (req, res) => {
   }
 });
 
-app.get('/editconfig', (req, res) => {
+app.get('/editconfig.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -97,7 +97,7 @@ app.get('/editconfig', (req, res) => {
   }
 });
 
-app.get('/kibana', (req, res) => {
+app.get('/kibana.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token) || (!config.kibana)) {
     res.end('\nError: Invalid Credentials or invalid configuration.');

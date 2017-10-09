@@ -40,10 +40,10 @@
 
 		$(document).ready(function() {
 			$('#sandbox').click(function() {
-				$('#iframe_a').attr('src', '/sandbox?token=' + token);
+				$('#iframe_a').attr('src', '/sandbox.html?token=' + token);
 			});
 			$('#terminal').click(function() {
-				$('#iframe_a').attr('src', '/terminal?token=' + token);
+				$('#iframe_a').attr('src', '/terminal.html?token=' + token);
 			});
 			$('#image-layout').click(function() {
 				$('#iframe_a').attr('src', '/image-layout.html');
@@ -52,7 +52,7 @@
 				$('#iframe_a').attr('src', '/syslog.html');
 			});
 			$('#kibana').click(function() {
-				$('#iframe_a').attr('src', '/kibana?token=' + token);
+				$('#iframe_a').attr('src', '/kibana.html?token=' + token);
 			});
 			$('#functions-viewer').click(function() {
 				$('#iframe_a').attr('src', '/functions-viewer.html');
@@ -85,7 +85,7 @@
 				$('#iframe_a').attr('src', '/rmhost.html');
 			});
 			$('#editconfig').click(function() {
-				$('#iframe_a').attr('src', '/editconfig?token=' + token);
+				$('#iframe_a').attr('src', '/editconfig.html?token=' + token);
 			});
 			$('#log').click(function() {
 				$('#iframe_a').attr('src', '/log.html');
@@ -205,7 +205,7 @@
 		<nav>
 			<ul>
 				<li id="nav_logo"><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo_image"></a>
-				<li><a onmouseover="this.click()" href="#!">System</a>
+				<li id="nav_system"><a onmouseover="this.click()" href="#!">System</a>
 					<ul class="dropdown">
 						<li><a href="#" id="nodes">Nodes</a></li>
 						<li><a href="#" id="editconfig">Edit Configuration</a></li>
@@ -221,7 +221,7 @@
 						<li><a href="#" id="addcontainer">Add</a></li>
 					</ul>
 				</li>
-				<li id="nac_images"><a onmouseover="this.click()" href="#!">Images</a>
+				<li id="nav_images"><a onmouseover="this.click()" href="#!">Images</a>
 					<ul class="dropdown">
 						<li><a href="#" id="pull">Pull</a></li>
 						<li><a href="#" id="build">Manage</a></li>
@@ -241,10 +241,10 @@
 				</li>
 				<li id="nav_functions"><a onmouseover="this.click()" href="#!">Functions</a>
 					<ul class="dropdown">
-							<li><a href="#" id="functions-current">Current Functions</a></li>
-						  <li><a href="#" id="functions-remove">Remove Functions</a></li>
-							<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
-							<li><a href="#" id="functions-create">Create Function</a></li>
+						<li><a href="#" id="functions-current">Current Functions</a></li>
+						 <li><a href="#" id="functions-remove">Remove Functions</a></li>
+						<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
+						<li><a href="#" id="functions-create">Create Function</a></li>
 					</ul>
 				</li>
 				<li id="nav_logs"><a onmouseover="this.click()" href="#!">Logs</a>
