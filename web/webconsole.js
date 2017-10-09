@@ -998,7 +998,7 @@ app.get('/log.html', (req, res) => {
   }
 });
 
-app.get('/nodes.html', (req, res) => {
+app.get('/nodes', (req, res) => {
   const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {
