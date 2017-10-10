@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			$.get("/log.html?token=" + parent.token, function(data) {
+			$.get("/log?token=" + parent.token, function(data) {
 				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 				$("#command_output").val(data);
 			});
