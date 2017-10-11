@@ -1,4 +1,8 @@
 language: generic
+
+services:
+  - docker
+
 before_install:
 - sudo apt-get -qq update
 - sudo apt-get remove -y docker docker-engine docker.io
@@ -14,6 +18,7 @@ before_install:
 - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 - sudo apt-get install -y nodejs
 - cd /tmp;curl -O http://mirrors.kernel.org/ubuntu/pool/universe/s/shellcheck/shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb && sudo dpkg -i shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb;cd $OLDPWD;
+
 script:
 - npm install --unsafe-perm
 - npm test
@@ -25,7 +30,7 @@ script:
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
 - sudo find . -name "node_modules" -exec rm -rf {} \; || true
-- travis_wait 30 docker-compose up -d
+- docker-compose up -d
 - docker-compose ps
 - echo "Waiting for PiCluster...";let i=1;until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do i=$((i+1)); printf '.'; sleep 5; if [ "$i" -eq 60 ] ; then exit 1; fi; done
 - sleep 30 && sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
@@ -37,6 +42,7 @@ script:
 - "./pictl reloadconfig"
 - for container in $(sudo docker-compose ps -q) ; do json=$(sudo docker inspect $container); if [ "$(jq '.[0].State.Running' <<< $json)" != "true" ] ; then sudo docker-compose logs "$(jq -r '.[0].Config.Labels."com.docker.compose.service"' <<< $json)"; fi; done
 - sudo docker-compose down
+
 notifications:
   slack:
     secure: cYlopFAlFeNzjKTK7XyN/P4fsFXejs459f6c1B+IRv2v9hgIOEhTvR1iFFJmaiWdCje/ws47MnVMj6NJiBmaiC1L34BsWRtQhNN6j/bINpCAHF7nfSzS1amiB5OgskTEQ+BHAmjNvSj+EmtLiWfixJpEFkH3P4VXqZXRTas1wYCWQVnBN08BRL5Jz3rNJhNVwhGBpWZByeAD03xcUnuYQ976/ZLX8DRwCbRtCgmHxBRnvYOY+5fgtNPffDZtb4zyFNhZz1Huqqpm9g4K438lx/zOONch8+1q8Y/rvSYKNu61LrZrZ2EhIwkLbCLthosm2ZpsbqlVBrRsZB6sXlcedmNkp7ZrX4VVEIbTYk7rp2JXRddo1P1Q5jDxVc1cIMIDwaTaY7mOZQ5sUr0GWo/Npk53/EHZMKyv/bBX0S5q2aCV8uCaU/ben5pzY7rHr6JhACDciFgvM+rYTI39EOemIHgJFRbbrYHaUVQF2FsVAVFiGyjh9AoLpW/3nWas/kv1Wz26/Qk8EvHklq3BzniUYInByfYcqk5KYQ/VXr/f2kYgIYi6BM3W/Wx0o1+ouGxhbULuNSF9T4yV/G+Ta4BGcGayjqiYGjYKD2+oKbOp05gsgaw+SRrHvqhCDsZRc2kRzFzCm5KmfHi/jbMR1N90on6pHy0s3kGjtuAOLAjG1do=
