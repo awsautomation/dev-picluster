@@ -18,7 +18,8 @@
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase();
-						div.innerHTML = div.innerHTML + distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						var div_logo_page = document.createElement('div_logo_page_class');
+						div_logo_page.innerHTML = distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
 
 						var div_disk_page = document.createElement('div_disk_page');
 						div_disk_page.className = "page";
@@ -104,13 +105,15 @@
 						var table = document.createElement("table");
 						var line_break = document.createElement("br");
 						var row = table.insertRow(0);
-						var cell_disk_usage = row.insertCell(0);
-						var cell_cpu_usage = row.insertCell(1);
-						var cell_memory_usage = row.insertCell(2);
+						var cell_logo_page = row.insertCell(0)
+						var cell_disk_usage = row.insertCell(1);
+						var cell_cpu_usage = row.insertCell(2);
+						var cell_memory_usage = row.insertCell(3);
 						table.className = "node_card";
 						cell_disk_usage.innerHTML += '<font size="+0" color="black"><b>Disk Usage</b>';
 						cell_cpu_usage.innerHTML += '<font size="+0" color="black"><b>CPU Usage</b>';
 						cell_memory_usage.innerHTML += '<font size="+0" color="black"><b>Memory Usage</b>';
+						cell_logo_page.appendChild(div_logo_page);
 						cell_disk_usage.appendChild(div_disk_page);
 						cell_cpu_usage.appendChild(div_cpu_page);
 						cell_memory_usage.appendChild(div_memory_page);
