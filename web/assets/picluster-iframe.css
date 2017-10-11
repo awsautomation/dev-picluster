@@ -116,6 +116,7 @@ table tbody tr td label {
 .modal-medium {
   width: 75%;
   min-width: 600px;
+  min-height: 75%;
 }
 
 .modal-header {
@@ -176,10 +177,11 @@ table tbody tr td label {
 }
 
 .node_status_text {
-  font-size: +1;
+  font-size: medium;
   font-weight: bold;
   white-space: pre-wrap;
   color: black;
+  margin: 0;
 }
 
 #log_search {
