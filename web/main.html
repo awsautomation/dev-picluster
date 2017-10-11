@@ -59,8 +59,8 @@
 			document.getElementById("div_iframe").style.height = document.getElementById("iframe_a").contentWindow.document.body.scrollHeight + "px";
 		}
 
-		function adjust_iframe_height(iframe) {
-			document.getElementById("div_iframe").style.height = parseInt(iframe) + "px";
+		function resize_iframe_height(iframe) {
+			document.getElementById("div_iframe").style.height = "calc(100% - 4vw)px";
 		}
 
 		$(document).ready(function() {
@@ -322,7 +322,7 @@
 	</div>
 
 	<div id="div_iframe">
-		<iframe src="/blank.html" id="iframe_a" name="iframe_a" onload="initialize_iframe_height()">
+		<iframe src="/blank.html" id="iframe_a" name="iframe_a">
 	</div>
   </body>
   </html>
