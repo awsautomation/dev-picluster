@@ -1,6 +1,6 @@
 function distLogo(dist) {
 	var logo = document.createElement('span');
-	logo.className += " node_status_logo";
+
 	switch (dist) {
 		case 'alpine linux':
 			logo.className = "fl-alpine";
@@ -90,6 +90,8 @@ function distLogo(dist) {
 			logo.className = "fl-tux"
 			return logo.outerHTML;
 	}
+
+	logo.className += " node_status_logo";
 }
 
 function getDists(arr) {
