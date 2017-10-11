@@ -91,7 +91,7 @@
 		$(function() {
 			var option = '';
 			var checkbox = '';
-			$.get("/nodes.html?token=" + parent.token, function(data) {
+			$.get("/nodes?token=" + parent.token, function(data) {
 				for (var i in data.nodes) {
 					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 					checkbox += '<label id="windowfont" for="host_list">' + data.nodes[i] + '</label><input type="checkbox" name="host_list" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';

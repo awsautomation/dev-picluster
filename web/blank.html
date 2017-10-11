@@ -7,7 +7,7 @@
 		function getContainerStatus() {
 			setTimeout(function() {
 				if (parent.token) {
-					$.get("/nodes.html?token=" + parent.token, function(data) {
+					$.get("/nodes?token=" + parent.token, function(data) {
 						var check_data = data;
 						var total = check_data.total_containers;
 						var running = 0;
