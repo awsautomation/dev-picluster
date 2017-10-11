@@ -56,11 +56,11 @@
 		}
 
 		function initialize_iframe_height() {
-			document.getElementById("iframe_a").style.height = document.getElementById("iframe_a").contentWindow.document.body.scrollHeight + "px";
+			document.getElementById("div_iframe").style.height = document.getElementById("div_iframe").contentWindow.document.body.scrollHeight + "px";
 		}
 
 		function adjust_iframe_height(iframe) {
-			 document.getElementById("iframe_a").style.height = parseInt(iframe) + "px";
+			 document.getElementById("div_iframe").style.height = parseInt(iframe) + "px";
 		}
 
 		$(document).ready(function() {
