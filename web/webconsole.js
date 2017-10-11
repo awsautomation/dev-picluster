@@ -74,12 +74,14 @@ function get_file_list_by_extention(dirpath, extention) {
 }
 
 function serve_doc_pages() {
-  const doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), ".md");
+  const doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md');
 
-  for (let i in doc_pages) {
-    app.get('/doc' + i, (req, res) => {
-      res.sendFile(path.resolve(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
-    });
+  for (const i in doc_pages) {
+    if (i) {
+      app.get('/doc' + i, (req, res) => {
+        res.sendFile(path.resolve(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
+      });
+    }
   }
 }
 
@@ -195,7 +197,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  res.json(get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), ".md"));
+  res.json(get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md'));
 });
 
 app.get('/listregistries', (req, res) => {
