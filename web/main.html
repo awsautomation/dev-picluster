@@ -55,6 +55,14 @@
 			$('#nav_docs').append(output);
 		}
 
+		function initialize_iframe_height() {
+			document.getElementById("iframe_a").style.height = document.getElementById("iframe_a").contentWindow.document.body.scrollHeight + "px";
+		}
+
+		function adjust_iframe_height(iframe) {
+			 document.getElementById("iframe_a").style.height = parseInt(iframe) + "px";
+		}
+
 		$(document).ready(function() {
 			$('#sandbox').click(function() {
 				$('#iframe_a').attr('src', '/sandbox.html?token=' + token);
@@ -314,7 +322,7 @@
 	</div>
 
 	<div id="div_iframe">
-		<iframe src="/blank.html" id="iframe_a" name="iframe_a">
+		<iframe src="/blank.html" id="iframe_a" name="iframe_a" onload="initialize_iframe_height()">
 	</div>
   </body>
   </html>
