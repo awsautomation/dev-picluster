@@ -14,7 +14,7 @@ before_install:
 - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 - sudo apt-get install -y nodejs
 - cd /tmp;curl -O http://mirrors.kernel.org/ubuntu/pool/universe/s/shellcheck/shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb && sudo dpkg -i shellcheck_0.3.3-1~ubuntu14.04.1_amd64.deb;cd $OLDPWD;
-script:
+script: travis_wait
 - npm install --unsafe-perm
 - npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
@@ -25,7 +25,7 @@ script:
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
 - sudo docker container run -d --name nginx -p 80:80 nginx
 - sudo find . -name "node_modules" -exec rm -rf {} \; || true
-- travis_wait docker-compose up -d
+- docker-compose up -d
 - docker-compose ps
 - echo "Waiting for PiCluster...";let i=1;until $(curl --output /dev/null --silent --head --fail http://$IP:3003); do i=$((i+1)); printf '.'; sleep 5; if [ "$i" -eq 60 ] ; then exit 1; fi; done
 - sleep 30 && sudo docker run -it --rm -v "$PWD:$PWD" -w "$PWD/web/tests/integration" -e URL=http://$IP:3003
