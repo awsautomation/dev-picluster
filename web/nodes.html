@@ -18,7 +18,7 @@
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase();
-						div.innerHTML = div.innerHTML + '<div class="node_status_logo">' + distLogo(dist) + '</div><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						div.innerHTML = div.innerHTML + distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
 
 						var div_disk_page = document.createElement('div_disk_page');
 						div_disk_page.className = "page";
