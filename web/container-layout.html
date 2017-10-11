@@ -64,6 +64,8 @@
 
 		output_modal.style.display = "block";
 
-		exec()
+		exec();
+
+		parent.adjust_iframe_height(document.getElementById("output").scrollHeight);
 	</script>
 </html>

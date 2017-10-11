@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -121,6 +120,7 @@
 		}
 
 		modal.style.display = "block";
-	</script>
 
+		parent.adjust_iframe_height(document.getElementById("output").scrollHeight);
+	</script>
 </html>
