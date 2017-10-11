@@ -97,7 +97,7 @@ function distLogo(dist) {
 			break;
 	}
 
-	logo.className += " node_status_logo";
+	logo.className += " node_status_logo fl-72";
 
 	return logo.outerHTML;
 }
