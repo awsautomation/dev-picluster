@@ -984,7 +984,7 @@ app.get('/log', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     const options = {
-      url: `${scheme}${server}:${server_port}/log.html?token=${token}`,
+      url: `${scheme}${server}:${server_port}/log?token=${token}`,
       rejectUnauthorized: ssl_self_signed
     };
 
