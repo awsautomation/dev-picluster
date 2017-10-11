@@ -977,7 +977,7 @@ app.get('/hb', (req, res) => {
   }
 });
 
-app.get('/log.html', (req, res) => {
+app.get('/log', (req, res) => {
   const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {
