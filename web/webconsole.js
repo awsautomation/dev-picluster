@@ -33,7 +33,9 @@ let server = config.web_connect;
 let server_port = config.server_port;
 let nodedata = '';
 
-fs.existsSync(path.normalize(doc_dir)) ? app.use('/docs', express.static(path.join(__dirname, doc_dir))) : doc_dir;
+if (fs.existsSync(path.normalize(doc_dir))) {
+  app.use('/docs', express.static(path.join(__dirname, doc_dir)));
+}
 
 function getData() {
   setTimeout(() => {
@@ -60,17 +62,19 @@ getData();
 
 function get_file_list_by_extention(dirpath, extention) {
   const files = fs.readdirSync(dirpath);
-  let output = [];
+  const output = [];
 
-  for (let i in files) {
-    path.extname(files[i]) === extention ? output.push(files[i]) : output;
+  for (const i in files) {
+    if (path.extname(files[i]) === extention) {
+      output.push(files[i]);
+    }
   }
 
   return output;
 }
 
 function serve_doc_pages() {
-  let doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), ".md");
+  const doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), ".md");
 
   for (let i in doc_pages) {
     app.get('/doc' + i, (req, res) => {
