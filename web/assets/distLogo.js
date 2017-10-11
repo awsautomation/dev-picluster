@@ -1,6 +1,6 @@
 function distLogo(dist) {
 	var logo = document.createElement('span');
-	logo.addClass("node_status_logo");
+	logo.className += " node_status_logo";
 	switch (dist) {
 		case 'alpine linux':
 			logo.className = "fl-alpine";
