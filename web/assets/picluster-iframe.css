@@ -290,5 +290,7 @@ table tbody tr td label {
 }
 
 #node_status_logo {
-  font-size: 90px
+  font-size: 90px;
+  width: 90px;
+  height: 90px;
 }
