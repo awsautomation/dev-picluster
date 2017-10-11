@@ -175,6 +175,13 @@ table tbody tr td label {
   display: inline-block;
 }
 
+.node_status_text {
+  font-size: +1;
+  font-weight: bold;
+  white-space: pre-wrap;
+  color: black;
+}
+
 #log_search {
   width: 100%;
   text-align: center;

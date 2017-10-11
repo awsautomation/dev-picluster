@@ -19,7 +19,7 @@
 					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase();
 						var div_logo_page = document.createElement('div_logo_page_class');
-						div_logo_page.innerHTML = distLogo(dist) + '<br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						div_logo_page.innerHTML = '<p class="node_status_text">' + check_data.data[i].hostname + "</p><br>" + distLogo(dist);
 
 						var div_disk_page = document.createElement('div_disk_page');
 						div_disk_page.className = "page";
