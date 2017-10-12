@@ -47,5 +47,6 @@ networks:
   picluster:
     driver: bridge
     ipam:
-     config:
-       - subnet: 10.10.10.0/16
+      driver: default
+      config:
+        - subnet: 10.10.10.0/16
