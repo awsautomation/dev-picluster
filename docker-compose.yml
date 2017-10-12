@@ -11,4 +11,6 @@ services:
       - "3001:3001"
       - "3003:3003"
     working_dir: /picluster
-    command: ["sh", "-c", "set -e; apk add --no-cache git python make g++ docker procps; export PATH=/bin:$PATH; npm install -g pm2; npm install --production; export PICLUSTER_CONFIG=/picluster/config.json; pm2 start /picluster/server/server.js; pm2 start /picluster/agent/agent.js; pm2 start /picluster/web/webconsole.js"]
+    command: ["sh", "-c", "set -e; apk add --no-cache git python make g++ docker procps; export PATH=/bin:$PATH && npm install -g pm2; npm install --production; export PICLUSTER_CONFIG=/picluster/config.json; pm2-docker start /picluster/server/server.js && pm2-docker start /picluster/agent/agent.js && pm2-docker start /picluster/web/webconsole.js"]
+    environment:
+      COMPOSE_HTTP_TIMEOUT: 600
