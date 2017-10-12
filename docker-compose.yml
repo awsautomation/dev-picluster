@@ -1,52 +1,14 @@
 version: '3'
 services:
-
   server:
     image: "node:alpine"
     restart: "always"
     volumes:
       - .:/picluster
       - ./docker-compose.config.json:/picluster/config.json
-    networks:
-      picluster:
-        ipv4_address: 10.10.10.1
     ports:
       - "3000:3000"
-    working_dir: /picluster/server
-    command: ["sh", "-c", "set -e;apk add --no-cache ; npm install --production; node server.js;"]
-  agent:
-    image: "node:alpine"
-    restart: "always"
-    volumes:
-      - .:/picluster
-      - ./docker-compose.config.json:/picluster/config.json
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      picluster:
-        ipv4_address: 10.10.10.2
-    ports:
       - "3001:3001"
-    working_dir: /picluster/agent
-    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add  git python make g++ docker procps;export PATH=/bin:$PATH; npm install --production;node agent.js"]
-
-  webconsole:
-    image: "node:alpine"
-    restart: "always"
-    networks:
-      picluster:
-        ipv4_address: 10.10.10.3
-    volumes:
-      - .:/picluster
-      - ./docker-compose.config.json:/picluster/config.json
-    ports:
       - "3003:3003"
-    working_dir: /picluster/web
-    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add git ; npm install --production; node webconsole.js;"]
-
-networks:
-  picluster:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.10.10.0/16
+    working_dir: /picluster
+    command: ["sh", "-c", "set -e; apk add --no-cache git python make g++ docker procps; export PATH=/bin:$PATH; npm install --production; cd /picluster/server; node server.js &; cd /picluster/agent; node agent.js; cd /picluster/web; node webconsole.js"]

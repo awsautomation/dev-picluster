@@ -5,13 +5,13 @@
     "agent_port": "3001",
     "layout": [
         {
-            "node": "10.10.10.2",
+            "node": "127.0.0.1",
             "nginx": "-p 80:80"
         }
     ],
     "hb": [
         {
-            "node": "docker0",
+            "node": "127.0.0.1",
             "nginx": "80"
         }
     ],
@@ -25,6 +25,6 @@
     "syslog": "dmesg",
     "web_username": "admin",
     "web_password": "admin",
-    "web_connect": "10.10.10.1",
+    "web_connect": "0.0.0.0",
     "web_port": "3003"
 }
