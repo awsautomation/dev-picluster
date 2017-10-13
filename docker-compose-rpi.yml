@@ -1,7 +1,7 @@
 version: '3'
 services:
   server:
-    image: "resin/raspberry-pi-alpine:3.4"
+    image: "easypi/alpine-arm"
     restart: "always"
     volumes:
       - .:/picluster
