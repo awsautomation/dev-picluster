@@ -12,6 +12,6 @@ services:
       - "3001:3001"
       - "3003:3003"
     working_dir: /picluster
-    command: ["sh", "-c", "set -e; printf 'http://mirror.clarkson.edu/alpine/edge/main\nhttp://mirror.clarkson.edu/alpine/edge/community' > /etc/apk/repositories; apk update;  apk add --no-cache docker git g++ make nodejs-current nodejs-current-npm procps python; export PATH=/bin:$PATH && npm install -g pm2; /sbin/service docker start; npm install --production --unsafe-perm; export PICLUSTER_CONFIG=/picluster/config.json; pm2-docker start picluster-pm2.config.json"]
+    command: ["sh", "-c", "set -e; printf 'http://mirror.clarkson.edu/alpine/edge/main\nhttp://mirror.clarkson.edu/alpine/edge/community' > /etc/apk/repositories; apk update;  apk add --no-cache docker git g++ make nodejs-current nodejs-current-npm procps python; export PATH=/bin:$PATH && npm install -g pm2; npm install --production --unsafe-perm; export PICLUSTER_CONFIG=/picluster/config.json; pm2-docker start picluster-pm2.config.json"]
     environment:
       COMPOSE_HTTP_TIMEOUT: 600
