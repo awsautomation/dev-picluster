@@ -12,7 +12,7 @@ services:
       - "3001:3001"
       - "3003:3003"
     working_dir: /picluster
-    command: ["sh", "-c", "set -e; printf 'http://mirror.clarkson.edu/alpine/edge/main\nhttp://mirror.clarkson.edu/alpine/edge/community' > /etc/apk/repositories; apk update; apk add --no-cache docker git g++ make nodejs-current nodejs-current-npm openrc procps python; npm install -g pm2; npm install --production --unsafe-perm;  pm2-docker start picluster-pm2.config.json; dockerd &"]
+    command: ["sh", "-c", "set -e; printf 'http://mirror.clarkson.edu/alpine/edge/main\nhttp://mirror.clarkson.edu/alpine/edge/community' > /etc/apk/repositories; apk update; apk add --no-cache docker git g++ make nodejs-current nodejs-current-npm openrc procps python; npm install -g pm2; npm install --production --unsafe-perm; pm2-docker start picluster-pm2.config.json; dockerd &"]
     environment:
       COMPOSE_HTTP_TIMEOUT: 600
     privileged: true
