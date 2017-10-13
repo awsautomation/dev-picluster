@@ -29,9 +29,9 @@ casper.test.begin('nodes.html', 2, test => {
     test.assertEquals(iframe, URL + '/nodes.html', 'The iframes source should equal ' + URL + '/nodes.html');
 
     if (lib.getCasperEngine() === 'slimerjs') {
-      this.waitForSelector('#modal-body2>p>span', function () {
+      this.waitForSelector('.node_status', function () {
         const fontLinux = this.evaluate(() => {
-          return document.querySelector('#modal-body2>p>span').className;
+          return document.querySelector('.node_status').className;
         });
 
         test.assertEquals(fontLinux, flLinux, 'The distro icon should be \'' + flLinux + '\'');
