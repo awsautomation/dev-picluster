@@ -117,6 +117,7 @@ table tbody tr td label {
   width: 75%;
   min-width: 600px;
   min-height: 75%;
+  margin-bottom: 20px;
 }
 
 .modal-header {
@@ -165,10 +166,23 @@ table tbody tr td label {
   *zoom: 1;
 }
 
-.node_card {}
+.node_card {
+  display: inline-block;
+  width: 100%;
+}
 
-.page {
+.node_status_div {
   margin: 10px;
+  width: 105px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+}
+
+.node_status_text {
+  font-size: medium;
+  color: black;
+  width: 96px
 }
 
 .log_type_box {
@@ -176,12 +190,14 @@ table tbody tr td label {
   display: inline-block;
 }
 
-.node_status_text {
+.div_logo_text {
   font-size: medium;
   font-weight: bold;
   white-space: pre-wrap;
   color: black;
   margin: 0;
+  width: 100%;
+  text-align: center;
 }
 
 #log_search {
@@ -299,6 +315,7 @@ table tbody tr td label {
 }
 
 #node_status_logo {
-  font-size: 70px;
-  max-width: 70px;
+  font-size: 72px;
+  max-width: 72px;
+  text-align: center;
 }
