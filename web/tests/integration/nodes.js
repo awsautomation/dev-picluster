@@ -7,7 +7,7 @@ casper.test.begin('nodes.html', 2, test => {
   const URL = casper.cli.get('url');
   const username = casper.cli.get('username');
   const password = casper.cli.get('password');
-  let flLinux = casper.cli.get('font-linux');
+  const flLinux = casper.cli.get('font-linux');
   casper.start(URL);
 
   casper.viewport(1920, 1080).then(function Viewport() {
@@ -31,7 +31,7 @@ casper.test.begin('nodes.html', 2, test => {
     if (lib.getCasperEngine() === 'slimerjs') {
       this.waitForSelector('.node_status_logo', function () {
         const fontLinux = this.evaluate(() => {
-          return document.querySelector('.node_status_logo').className.substring(0,9);
+          return document.querySelector('.node_status_logo').className.substring(0, 9);
         });
 
         test.assertEquals(fontLinux, flLinux, 'The distro icon should be \'' + flLinux + '\'; is ' + fontLinux);
