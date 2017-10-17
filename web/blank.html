@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
@@ -15,13 +14,11 @@
 						for (var i in check_data.data) {
 							running = running + check_data.data[i].total_running_containers;
 						}
+
 						var calc = Math.floor((running / total * 100));
 						var percent = 0;
-						if (!calc == 100) {
-							percent = percent = Math.ceil((calc + 1) / 100) * 10;
-						} else {
-							percent = calc;
-						}
+						(!calc == 100) ? percent = percent = Math.ceil((calc + 1) / 100) * 10 : percent = calc;
+
 						document.getElementById("running_containers").textContent = percent + "%";
 						document.getElementById("running-class").className = "c100 p" + percent + " small";
 						getContainerStatus();
@@ -37,35 +34,36 @@
 		<br>
 		<img heigth="75" width="300" src="/assets/images/logo.png">
 		<br>
-		<b>Welcome to PiCluster!
+		<b>Welcome to PiCluster!</b>
 	</p>
-
-	<p align=center>
-		<table style="width:20%">
-			<tr>
-				<td>
-<a href='https://github.com/picluster/picluster' style="text-decoration:none" target="_blank"> <img height="75" width="100" src="/assets/images/GitHub-Mark-120px-plus.png"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GitHub</a>
-				</td>
-				<td>
-		<a href='https://github.com/picluster/picluster/issues' style="text-decoration:none" target="_blank"> <img height="75" width="100" src="/assets/images/Debug-Bug-icon.png"><br>&nbsp;&nbsp;&nbsp;Report Issue</a>
-				</td>
-				<td>
-					<div class="page">
-							<div class="clearfix">
-									<div id="running-class" class="c100 p0 small">
-										<span id='running_containers'>0%</span>
-											<div class="slice">
-													<div class="bar"></div>
-													<div class="fill"></div>
-											</div>
-									</div>
-										<font size="3"><a style="text-decoration:none" href="/container-layout.html"> &nbsp;&nbsp;Running</a></font>
-			</tr>
-		</table>
-		<script>
-			getContainerStatus();
-		</script>
-
+  <div style="text-align: center;">
+    <a href='https://github.com/picluster/picluster' style="display: inline-block; text-align: center; width: 100px !important; height: 100px; text-decoration:none" target="_blank">
+      <img style="height: 75px; width: auto; vertical-align: top;" src="/assets/images/GitHub-Mark-120px-plus.png">
+      <br>
+      GitHub
+    </a>
+    <a href='https://github.com/picluster/picluster/issues' style="display: inline-block; text-align: center; width: 100px; height: 100px; text-decoration:none" target="_blank">
+      <img style="height: 75px; width: auto; vertical-align: top;" src="/assets/images/Debug-Bug-icon.png">
+      <br>
+      Report Issue
+    </a>
+    <a style="text-decoration:none; display: inline-block; text-align: center; width: 100px; height: 100px; vertical-align: top;" href="container-layout.html">
+      <div class="page" style="height: 75px; width: 75px; margin: 0 auto; display: block;">
+        <div class="clearfix">
+          <div id="running-class" class="c100 p0 small" style="float: none; margin: 0 auto; cursor: pointer;">
+            <span id='running_containers'>0%</span>
+            <div class="slice">
+              <div class="bar"></div>
+              <div class="fill"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      Running
+    </a>
+  </div>
+  <script>
+    getContainerStatus();
+  </script>
 </body>
-
 </html>

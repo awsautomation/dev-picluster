@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -7,38 +6,36 @@
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-		function linkFunction(container) {
+		function link_function(container) {
 			parent.manage_container = container;
 		};
 
 		function exec() {
 			var div = document.getElementById('modal-body2');
-			if (div) {
-				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/searching.jpeg"><br><font size=+3><label>Searching for containers</label></font>';
-			}
+
+			(div) ? div.innerHTML = div.innerHTML + '<p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>' : false;
+
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
 
-				if (div) {
-					div.innerHTML = '';
-				}
+				(div) ? div.innerHTML = '' : false;
+
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = check_data.data[i].os_type || '';
 						dist = dist.toLowerCase();
-						div.innerHTML = div.innerHTML + '<br><br><p align=left>' + distLogo(dist) + '<br>'+ '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br><br>';
+						div.innerHTML = div.innerHTML + '<p align=left>' + distLogo(dist) + '<br>'+ '<font size="+2"><b><br>' + check_data.data[i].hostname + '</b></font><br>';
 						var array = check_data.data[i].running_containers;
 						for (var j in array) {
 							if (array[j]) {
-								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
+								div.innerHTML = div.innerHTML + '<font size=+1><a href="/manage.html" style="text-decoration:none" onclick="link_function(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
 							}
 						}
 					}
-					if (div) {
-						div.innerHTML = div.innerHTML + '</ol>';
-					}
-					addFontLinux();
 
+					div.innerHTML = div ? div.innerHTML + '</ol>' : false;
+
+					addFontLinux();
 				}
 			});
 		}
@@ -47,17 +44,16 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content2">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Containers</h2>
 			</div>
 			<div id="modal-body2" class="modal-body">
-				<p align=center>
 			</div>
 		</div>
 	</div>
-	</p>
+
 	<script>
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[0];
@@ -65,8 +61,9 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
+
 		output_modal.style.display = "block";
+
 		exec()
 	</script>
-
 </html>

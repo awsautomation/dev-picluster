@@ -30,20 +30,11 @@
 			});
 		}
 
-		function search(what, id) {
-			var date = "";
-			if (what.indexOf("today") > -1) {
+		function search(day, id) {
+			var day_check = moment().format("D");
+			var date = day_check.length > 1 ? moment().format("MMM D") : moment().format("MMM  D");
 
-				var day_check = moment().format("D");
-				if (day_check.length > 1) {
-					date = moment().format("MMM D");
-				} else {
-					date = moment().format("MMM  D");
-				}
-				$("#query").val(date);
-			} else {
-				$("#query").val(what);
-			}
+			day.indexOf("today") > -1 ? $("#query").val(date) : $("#query").val(what);
 			exec();
 			document.getElementById(id).checked = false;
 		};
@@ -51,68 +42,60 @@
 </head>
 
 <body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Syslog Viewer</h2>
 			</div>
-			<div class="modal-body">
-				<p align=center>
-					<table style="width:10%">
-						<tr>
-							<td>
-								<input type="text" rows="30" cols="60" id="query" name="query" name="query"><br>
-							</td>
-							<td>
-								<button id="myBtn">Search</button>
-							</td>
-						</tr>
 
-					</table>
-					<table style="width:28%">
-						<tr>
-							<td>
-								<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
-							</td>
-							<td>
-								<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
-							</td>
-							</td>
-							<td>
-								<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
-							</td>
-							<td>
-								<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
-							</td>
-						</tr>
-					</table>
-					<table style="width:10%">
-						<tr>
-							<td>
-								<textarea rows="25" cols="74" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
-							</td>
-						</tr>
-					</table>
+			<div class="modal-body">
+				<div id="log_search">
+					<div id="log_search_bar">
+						<input id="query" type="text" rows="30" cols="60" name="query" name="query">
+					</div>
+					<div id="log_search_button">
+						<button id="submit_button">Search</button>
+					</div>
+				</div>
+
+				<div id="log_type">
+					<div id="log_type_error" class="log_type_box">
+						<label><input type="checkbox" id="error" onchange="search('error','error')" value="error">Errors</label><br>
+					</div>
+					<div id="log_type_failure" class="log_type_box">
+						<label><input type="checkbox" id="failure" onchange="search('failure','failure')" value="failure">Failures</label><br>
+					</div>
+					<div id="log_type_warning" class="log_type_box">
+						<label><input type="checkbox" id="warning" onchange="search('warning','warning')" value="warning">Warnings</label><br>
+					</div>
+					<div id="log_type_today" class="log_type_box">
+						<label><input type="checkbox" id="today" onchange="search('today','today')" value="today">Today</label><br>
+					</div>
+				</div>
+
+				<div id="log_output">
+					<textarea rows="25" cols="74" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+				</div>
 			</div>
 		</div>
 	</div>
 
-
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			exec();
 		}
+
 		modal.style.display = "block";
+
 		exec();
 	</script>
-
 </html>

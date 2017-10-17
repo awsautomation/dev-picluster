@@ -12,60 +12,55 @@
 	<script>
 		var node;
 
-		function exec(cmd, cb) {
-			if (!cb) {
-				cb = function() {};
-			}
+		function exec(command, callback) {
+			callback = !callback ? function() {} : callback;
+
 			$.post('/exec', {
 				token: parent.token,
-				command: cmd,
+				command: command,
 				node: node
-			}, cb);
+			}, callback);
 		}
 
 		function init() {
-			var e = document.getElementById("nodelist");
-			var c = document.getElementById("commandlist");
-			node = e.options[e.selectedIndex].value;
+			var node_list = document.getElementById("node_list");
+			node = node_list.options[node_list.selectedIndex].value;
 			var term = $('#terminal').terminal(function(command) {
-				if (command !== '') {
-					var _this = this;
-					exec(command, function(output) {
-						_this.echo(output);
-					});
-				} else {
-					this.echo('');
-				}
+				var _this = this;
+				command !== '' ? (
+					exec(command, function(output) { _this.echo(output); })
+				) : (
+					this.echo('')
+				);
 			}, {
 				greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
 				name: 'terminal',
 				height: 300,
 				prompt: 'λ '
 			});
+
 			exec('uptime', function(output) {
 				term.echo(output);
 			});
-
 		}
 	</script>
 </head>
 
 <body>
-
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Terminal</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=left>
-					<label for="nodelist"><b>Select a Node</b></label>
-					<select name="nodelist" id="nodelist">
-		    </select>
+					<label for="node_list"><b>Select a Node</b></label>
+					<select name="node_list" id="node_list"></select>
 					<br><br>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
 					<script>
 						$(function() {
@@ -74,45 +69,42 @@
 								for (var i in data.nodes) {
 									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
-								$('#nodelist').append(option);
+								$('#node_list').append(option);
 							});
 						});
 					</script>
-
 				</p>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content2" style="background-color: #000;">
+		<div id="terminal_modal" class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Terminal</h2>
 			</div>
+
 			<div class="modal-body">
 				<table style="width:100%;">
 					<tr>
 						<td>
-							<div id="terminal_container" style="max-width: 100%;">
-								<div id="terminal" style="width: 100%;position: relative;left: -1.04em;top: -0.3em;"></div>
+							<div id="terminal_container">
+								<div id="terminal"></div>
 							</div>
 						</td>
 					</tr>
 				</table>
-				<p align=left>
-					<br>
 			</div>
 		</div>
 	</div>
-	</p>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -122,7 +114,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			init();

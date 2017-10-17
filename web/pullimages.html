@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -7,80 +6,66 @@
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-		function exec() {
-			var path = '/exec';
-			var image = document.getElementById('image').value;
-			var registry = document.getElementsByName('containerlist')[0].value;
+	function exec() {
+    var path = '/exec';
+    var image = document.getElementById('image').value;
+    var registry = document.getElementsByName('container_list')[0].value;
 
-			if (!image || image.length <= 0) {
-				alert('Error, you did not select an image to pull.');
-				return false;
-			}
+		!image || image.length <= 0 ? (alert('Error, you did not select an image to pull.'), false) : image;
 
-			// Build the fully qualified image name to pull
-			// e.g index.docker.io/ubuntu
-			if (registry !== 'hub.docker.com') {
-				image = registry + '/' + image;
-			} else {
-				image = 'index.docker.io/' + image;
-			}
+    // Build the fully qualified image name to pull
+    // e.g index.docker.io/ubuntu
+		image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
 
-			if (image.indexOf(':') === -1) {
-				var tag = document.getElementById('imageTags').value;
-				if (tag.toLowerCase() !== 'latest') {
-					image = image + ':' + tag;
-				}
-			}
-
-			var command = ["docker", "image", "pull", image].join(' ');
-			var nodes = document.getElementsByName('nodeslist');
-			var div = document.getElementById('modal-body2');
-			var username = document.getElementsByName('imageauth-user')[0].value || '';
-			var password = document.getElementsByName('imageauth-password')[0].value || '';
-
-			// Login first if the user has provided authentication
-			if (username.length > 0 && password.length > 0) {
-				command = ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command;
-			}
-
-			var check_counter = 0;
-			nodes.forEach(function(node, i) {
-				if (nodes[i].checked) {
-					nodes.forEach(function(node, i) {
-						if (nodes[i].checked) {
-							check_counter++;
-							$.post(path, {
-								token: parent.token,
-								command: command,
-								node: node.value
-							}, function(data) {});
-						}
-					});
-				}
-			});
-			if (check_counter == 0) {
-				div.innerHTML = 'Error, no hosts were selected.';
-			} else {
-				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.';
-			}
-
-			return true;
+		if (image.indexOf(':') === -1) {
+			var tag = document.getElementById('imageTags').value;
+			image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : image;
 		}
+
+		var command = ["docker", "image", "pull", image].join(' ');
+		var nodes = document.getElementsByName('host_list');
+		var div = document.getElementById('modal-body2');
+		var username = document.getElementsByName('imageauth-user')[0].value || '';
+		var password = document.getElementsByName('imageauth-password')[0].value || '';
+
+		// Login first if the user has provided authentication
+		command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : command;
+
+		var check_counter = 0;
+		nodes.forEach(function(node, i) {
+			if (nodes[i].checked) {
+				nodes.forEach(function(node, i) {
+					if (nodes[i].checked) {
+						check_counter++;
+						$.post(path, {
+							token: parent.token,
+							command: command,
+							node: node.value
+						}, function(data) {});
+					}
+				});
+			}
+		});
+
+		div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
+		return true;
+  }
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Pull Images</h2>
 			</div>
+
 			<div class="modal-body">
 				<div id="container" title="Pull Images">
 					<fieldset>
-						<label for="containerlist">Select Registry</label>
-						<select name="containerlist" id="containerlist" onchange="clearAuth()">
+						<label for="container_list">Select Registry</label>
+						<select name="container_list" id="container_list" onchange="clearAuth()">
 							</select>
 						<legend>Authentication (optional)</legend>
 						<br>
@@ -100,13 +85,13 @@
 								<option value="latest" selected="selected">Latest</option>
 							</select>
 					</fieldset>
-					<fieldset name="nodesList" id="nodesList">
+					<fieldset name="host_list" id="host_list">
 						<legend>Nodes:</legend>
-						<label for="nodeslist">All</label><input type="checkbox" name="nodeslist" onClick="checkAll(this);" checked="checked"/>
+						<label for="host_list">All</label><input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked"/>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 					</fieldset>
 					<p align=center>
-						<button onclick="exec()" id="myBtn"> Submit</button>
+						<button onclick="exec()" id="submit_button"> Submit</button>
 					</p>
 					<script>
 						function clearAuth() {
@@ -116,11 +101,12 @@
 
 						function checkAll(checkbox) {
 							var checked = checkbox.checked;
-							var checkboxes = document.getElementsByName('nodeslist');
+							var checkboxes = document.getElementsByName('host_list');
 							checkboxes.forEach(function(e) {
 								e.checked = checked;
 							});
 						}
+
 						$(function() {
 							var option = '';
 							$.get('/listregistries', {
@@ -130,23 +116,27 @@
 									var opt = document.createElement('option');
 									opt.value = e.name;
 									opt.innerHTML = e.name;
-									$('#containerlist').append(opt);
+									$('#container_list').append(opt);
 								});
 							});
 						});
+
 						$(function() {
 							$.get("/nodes?token=" + parent.token, function(data) {
 								for (var i in data.nodes) {
 									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
+
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
+								$('#node_list').append(option);
 
 								var option = '';
+
 								for (var i = 0; i < data.nodes.length; i++) {
-									option += '<label for="nodeslist">' + data.nodes[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+									option += '<label for="host_list">' + data.nodes[i] + '</label><input type="checkbox" name="host_list" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
 								}
-								$('#nodesList').append(option);
+
+								$('#host_list').append(option);
 
 								var selectImage = function(event, ui) {
 									var image = event.target.value;
@@ -161,7 +151,7 @@
 
 									$.get('/remoteimagetags', {
 										token: parent.token,
-										registry: $('#containerlist').val(),
+										registry: $('#container_list').val(),
 										image: $('#image').val(),
 										username: $('#imageauth-user').val(),
 										password: $('#imageauth-password').val()
@@ -187,22 +177,21 @@
 												}
 											});
 										}
-										if (imageTags.children.length > 1) {
-											imageTags.disabled = false;
-										}
+
+										imageTags.disabled = imageTags.children.length > 1 ? false : true;
 									});
 								};
 								$("#image").autocomplete({
 									source: function(request, response) {
 										$.get('/remoteimages', {
 											token: parent.token,
-											registry: $('#containerlist').val(),
+											registry: $('#container_list').val(),
 											image: $('#image').val(),
 											username: $('#imageauth-user').val(),
 											password: $('#imageauth-password').val()
 										}, function(images) {
 											images = JSON.parse(images);
-											if ($('#containerlist').val() === 'hub.docker.com') {
+											if ($('#container_list').val() === 'hub.docker.com') {
 												return response(images.results.map(function(e) {
 													return {
 														value: e.repo_name,
@@ -245,11 +234,12 @@
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content2">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
 					Please wait......
@@ -257,12 +247,13 @@
 		</div>
 	</div>
 </body>
+
 <script>
-	var modal = document.getElementById('myModal');
+	var modal = document.getElementById('modal_container');
 	var span = document.getElementsByClassName("close")[0];
 	var output_modal = document.getElementById('output');
 	var output_span = document.getElementsByClassName("close")[1];
-	var btn = document.getElementById("myBtn");
+	var submit_button = document.getElementById("submit_button");
 
 	span.onclick = function() {
 		modal.style.display = "none";
@@ -272,7 +263,7 @@
 		output_modal.style.display = "none";
 	}
 
-	btn.onclick = function() {
+	submit_button.onclick = function() {
 		if (exec()) {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
@@ -281,5 +272,4 @@
 
 	modal.style.display = "block";
 </script>
-
 </html>

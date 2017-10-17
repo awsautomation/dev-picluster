@@ -1,7 +1,8 @@
 html {
-  min-height: 100%;
   font-family: 'Nunito', sans-serif;
   -webkit-font-smoothing: antialiased;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -10,9 +11,11 @@ body {
   background-size: 100%;
   font-family: Verdana, Arial, Helvetica, sans-serif;
   font-size: 11px;
+  margin: 0px;
   line-height: 18px;
   color: #333333;
-  ;
+  height: 100%;
+  overflow: hidden;
 }
 
 h1 {
@@ -22,11 +25,20 @@ h1 {
   text-align: center;
 }
 
+label {
+  font-size: 18px;
+}
+
+input {
+  font-size: 18px;
+}
+
 nav {
   margin: 0 auto;
   max-width: 100%;
   max-height: 100%;
   background: #565051;
+  z-index: 10;
 }
 
 nav::after {
@@ -41,25 +53,17 @@ nav ul {
   list-style: none;
 }
 
-label {
-  font-size: 18px;
-}
-
-input {
-  font-size: 18px;
-}
-
 nav ul li {
   float: left;
   position: relative;
 }
 
 nav ul li a {
+  padding: 1vw;
   display: block;
   color: rgba(255, 255, 255, .9);
   text-decoration: none;
-  padding: 1rem;
-  font-size: 1.5rem;
+  font-size: 2vw;
   border-top: 2px solid transparent;
   border-bottom: 2px solid transparent;
 }
@@ -83,6 +87,8 @@ nav ul li ul li {
 }
 
 nav ul li ul li a {
+  padding: 0.9rem;
+  line-height: 1.7rem;
   background: transparent;
   color: #4a5666;
   border-bottom: 1px solid #DDE0E7;
@@ -98,30 +104,6 @@ ul.dropdown li {
   z-index: 1;
 }
 
-.dropdown {
-  display: none;
-  position: absolute;
-  margin-top: 6px;
-  background: linear-gradient(to bottom right, white, #F8F8F8) !important;
-  box-shadow: 0 4px 10px #565051;
-}
-
-.dropdown::after {
-  content: '';
-  position: absolute;
-  left: 30px;
-  top: -8px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-bottom: 8px solid white;
-}
-
-.dropdown:hover::after {
-  border-bottom: 8px solid #F6F7F9;
-}
-
 button {
   background-color: #565051;
   border: none;
@@ -133,33 +115,8 @@ button {
   font-size: 16px;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  padding-top: 100px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-  position: relative;
-  background-color: #fefefe;
-  margin: auto;
-  padding: 0;
-  font-size: 12px;
-  border: 1px solid #888;
-  width: 30%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s
+textarea {
+  font-size: 18px;
 }
 
 @-webkit-keyframes animatetop {
@@ -184,6 +141,71 @@ button {
   }
 }
 
+.modal-login {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-login-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  font-size: 12px;
+  border: 1px solid #888;
+  min-width: 280px;
+  width: 25%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+.modal-login-header {
+  padding: 2px 16px;
+  background-color: #565051;
+  color: white;
+}
+
+.modal-login-body {
+  padding: 2px 16px;
+  color: black
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  margin-top: 3px;
+  background: linear-gradient(to bottom right, white, #F8F8F8) !important;
+  box-shadow: 0 4px 10px #565051;
+}
+
+.dropdown::after {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: -8px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid white;
+}
+
+.dropdown:hover::after {
+  border-bottom: 8px solid #F6F7F9;
+}
+
 .close {
   color: white;
   float: right;
@@ -198,32 +220,34 @@ button {
   cursor: pointer;
 }
 
-.modal-header {
-  padding: 2px 16px;
-  background-color: #565051;
-  color: white;
+#menu {
+  position: fixed;
+  width: 100%;
+  z-index: 1;
 }
 
-.modal-body {
-  padding: 2px 16px;
-  color: black
+#login {}
+
+#div_iframe {
+  width:100%;
+  height: calc(100% - 4vw);
+  z-index: -1;
 }
 
-textarea {
-  font-size: 18px;
+#iframe_a {
+  display: block;
+  border-width: 0px;
+  height: 100%;
+  width:100%;
+  position: absolute;
+  overflow-y: scroll;
 }
 
-.modal-content2 {
-  position: relative;
-  background-color: #fefefe;
-  margin: auto;
-  font-size: 12px;
-  padding: 0;
-  border: 1px solid #888;
-  width: 60%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s
+#logo {
+  padding: 0px;
+}
+
+#nav_logo {
+  height: 4vw;
+  width: 4vw;
 }

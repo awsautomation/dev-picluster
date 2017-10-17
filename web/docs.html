@@ -4,31 +4,19 @@
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
-	<script src="/assets/dropzone.js"></script>
 </head>
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-small">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Upload Dockerfile Archive</h2>
+				<h2>PiCluster Documentation</h2>
 			</div>
 
 			<div class="modal-body">
 				<p align=left>
-					<label id="windowfont">This will upload a .zip archive of a containers Dockerfile and required files.
-				  <br><br>
-					The .zip archive will be copied to each node and extracted in the Docker directory.
-						<br><br>
-					<form id="upload-widget" method="post" action="/upload" class="dropzone">
-					<input type="hidden" name="token" id="token">
-					</form>
-					<br><br>
-					</fieldset>
-					<script>
-					 document.getElementById("token").value = parent.token;
-					</script>
+				</p>
 			</div>
 		</div>
 	</div>
@@ -53,7 +41,6 @@
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -64,5 +51,11 @@
 		}
 
 		modal.style.display = "block";
-	</script>
+
+		$(function() {
+			var option = '';
+			$.get('/listdocs'), $('#doc_list').append(option);
+			console.log(option);
+		});
+		</script>
 </html>

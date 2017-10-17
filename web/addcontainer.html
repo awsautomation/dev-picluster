@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -7,28 +6,20 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var e = document.getElementById("nodelist");
-			var nodes = document.getElementsByName('hostlist');
+			var node_list = document.getElementById("node_list");
+			var host_list = document.getElementsByName('host_list');
 			var path = '/addcontainer';
-			var host = e.options[e.selectedIndex].value;
+			var host = node_list.options[node_list.selectedIndex].value;
 			var container = $("#container_name").val();
 			var container_args = $("#container_args").val();
 			var heartbeat_args = $("#heartbeat_args").val();
 			var failover_constraints = '';
 
-			nodes.forEach(function(node, i) {
-				if (nodes[i].checked) {
-					if (failover_constraints) {
-						failover_constraints += ',' + node.value;
-					} else {
-						failover_constraints += node.value;
-					}
-				}
+			host_list.forEach(function(node, i) {
+				failover_constraints += host_list[i].checked ? (failover_constraints ? ',' + node.value : failover_constraints) : node.value;
 			});
 
-			if (!failover_constraints) {
-				failover_constraints = 'none';
-			}
+			failover_constraints = !failover_constraints ? 'none' : failover_constraints;
 
 			$.post(path, {
 				token: parent.token,
@@ -46,8 +37,8 @@
 </head>
 
 <body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Add a container to PiCluster</h2>
@@ -55,10 +46,10 @@
 			<div class="modal-body">
 				<p align=left>
 					<label id="windowfont">This will add a new container to the PiCluster configuration file.
-					<br><br> Please ensure that the Dockerfile's are already on the node in the correct location.</label>
+					<br><br> Please ensure that the Dockerfiles are already on the node in the correct location.</label>
 					<br><br>
-					<label id="windowfont" for="nodelist"><b>Select a Node</b></label>
-					<select name="nodelist" id="nodelist">
+					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
+					<select name="node_list" id="node_list">
 						</select>
 					<br><br>
 					<b><label id="windowfont">Container Name:</b></label>
@@ -68,7 +59,7 @@
 					<input type="text" size="25" id="container_args" name="container_args" value=""></font>
 					<br><br>
 					<br><b><label id="windowfont">Heartbeat and Host Failover: (Optional)</label></b>
-					<fieldset name="hostList" id="hostList">
+					<fieldset name="host_list" id="host_list">
 						<b><label id="windowfont">Heartbeat Port:</label></b>
 						<input type="text" size="5" id="heartbeat_args" name="heartbeat_args" value=""></font>
 						<br><br>
@@ -76,30 +67,14 @@
 						<br><br>
 					</fieldset>
 					<p align=center>
-						<button id="myBtn">Submit</button>
+						<button id="submit_button">Submit</button>
 					</p>
-					<script>
-						$(function() {
-							var option = '';
-							var checkbox = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-									checkbox += '<label id="windowfont" for="hostlist">' + data.nodes[i] + '</label><input type="checkbox" name="hostlist" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
-								$('#hostList').append(checkbox);
-							});
-						});
-					</script>
 			</div>
 		</div>
 	</div>
 
-
 	<div id="output" class="modal">
-		<div class="modal-content2">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
@@ -110,29 +85,43 @@
 			</div>
 		</div>
 	</div>
+	</p>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		$(function() {
+			var option = '';
+			var checkbox = '';
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.nodes) {
+					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+					checkbox += '<label id="windowfont" for="host_list">' + data.nodes[i] + '</label><input type="checkbox" name="host_list" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+				}
+				option += '<option value="' + '*' + '">' + '*' + '</option>';
+				$('#node_list').append(option);
+				$('#host_list').append(checkbox);
+			});
+		});
+
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
-			modal.style.display = "none";
+			modal_container.style.display = "none";
 		}
 
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
-			modal.style.display = "none";
+		submit_button.onclick = function() {
+			modal_container.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
 		}
-		modal.style.display = "block";
-	</script>
-	</p>
 
+		modal_container.style.display = "block";
+	</script>
 </html>

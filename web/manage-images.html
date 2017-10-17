@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -8,19 +7,14 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var e = document.getElementById("imagelist");
-			var d = document.getElementById("delete");
-			var c = document.getElementById("cache");
-			var no_cache = '';
-			var image = e.options[e.selectedIndex].value;
-
-			if (c.checked) {
-				no_cache = "true";
-			}
+			var image_list = document.getElementById("image_list");
+			var delete_image = document.getElementById("delete_image");
+			var cache = document.getElementById("cache");
+			var no_cache = cache.checked ? 'true' : 'false';
+			var image = image_list.options[image_list.selectedIndex].value;
 
 			if (image) {
-
-				if (d.checked) {
+				if (delete_image.checked) {
 					$.post('/delete-image', {
 						token: parent.token,
 						image: image
@@ -41,38 +35,35 @@
 			} else {
 				alert('Error, you did not select an image.')
 			}
-
 		}
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Manage Images</h2>
 			</div>
+
 			<div class="modal-body">
 				<p align=left>
 					<fieldset>
-						<label for="imagelist">Select a Container</label>
-						<select name="imagelist" id="imagelist">
-			    </select>
+						<label for="image_list">Select a Container</label>
+						<select name="image_list" id="image_list"></select>
 						<br><br>
-						<input type="checkbox" id="cache"><label for="imagelist">Build without Docker Cache</label>
+						<input type="checkbox" id="cache"><label for="image_list">Build without Docker Cache</label>
 						<br><br>
-						<input type="checkbox" id="delete"><label for="imagelist">Delete</label>
+						<input type="checkbox" id="delete_image"><label for="image_list">Delete</label>
 						<br> <br>
 						<p align=center>
-							<button id="myBtn">Submit</button>
+							<button id="submit_button">Submit</button>
 						</p>
 						<script>
-							var option = '';
-
 							if (parent.manage_image) {
 								option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
-								$('#imagelist').append(option);
+								$('#image_list').append(option);
 								parent.manage_image = '';
 							} else {
 								$(function() {
@@ -81,51 +72,54 @@
 											option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
 										}
 										option += '<option value="' + '*' + '">' + '*' + '</option>';
-										$('#imagelist').append(option);
+										$('#image_list').append(option);
 									});
 								});
 							}
 						</script>
-						<p align=center>
-						</p>
+					</fieldset>
+				</p>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content2">
+		<div class="modal-content modal-medium">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
 					Please wait......
+				</p>
 			</div>
 		</div>
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
-		var span = document.getElementsByClassName("close")[0];
-		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+	  var modal = document.getElementById('modal_container');
+	  var span = document.getElementsByClassName("close")[0];
+  	var output_modal = document.getElementById('output');
+  	var output_span = document.getElementsByClassName("close")[1];
+	  var submit_button = document.getElementById("submit_button");
+  	var option = '';
 
-		span.onclick = function() {
-			modal.style.display = "none";
-		}
+	  span.onclick = function() {
+  		modal.style.display = "none";
+	  }
 
-		output_span.onclick = function() {
-			output_modal.style.display = "none";
-		}
+	  output_span.onclick = function() {
+		  output_modal.style.display = "none";
+	  }
 
-		btn.onclick = function() {
-			modal.style.display = "none";
-			output_modal.style.display = "block";
-			exec();
-		}
-		modal.style.display = "block";
+  	submit_button.onclick = function() {
+	  	modal.style.display = "none";
+  		output_modal.style.display = "block";
+		  exec();
+	  }
+
+  	modal.style.display = "block";
 	</script>
-
 </html>

@@ -1,83 +1,120 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+</head>
+
+<body>
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Manage Containers</h2>
+			</div>
+
+			<div class="modal-body">
+				<p align=left>
+					<fieldset>
+						<label for="container_list">Select a Container</label>
+						<select name="container_list" id="container_list">
+			    </select>
+						<br><br>
+					</fieldset>
+					<fieldset name="options" id="options">
+						<legend>Options</legend>
+						<label for="radio_start">Start</label>
+						<input type="radio" name="radio_start" id="radio_start">
+						<br>
+						<label for="radio_stop">Stop</label>
+						<input type="radio" name="radio_stop" id="radio_stop">
+						<br>
+						<label for="radio_restart">Restart</label>
+						<input type="radio" name="radio_restart" id="radio_restart">
+						<br>
+						<label for="radio_delete">Delete</label>
+						<input type="radio" name="radio_delete" id="radio_delete">
+						<br>
+						<label for="radio_create">Create and Run</label>
+						<input type="radio" name="radio_create" id="radio_create">
+						<br>
+						<label for="radio_container_log">View Logs</label>
+						<input type="radio" name="radio_container_log" id="radio_container_log">
+						<br>
+						<label for="radio_remove_container_config">Remove Config</label>
+						<input type="radio" name="radio_remove_container_config" id="radio_remove_container_config">
+						<br>
+						</select>
+					</fieldset>
+					<fieldset>
+						<label for="radio_change_host">Change Host to</label>
+						<select name="node_list" id="node_list">
+								<input type="radio" name="radio_change_host" id="radio_change_host">
+				    </select>
+						<br><br>
+					</fieldset>
+					<p align=center>
+						<button id="submit_button">Submit</button>
+					</p>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div id="output" class="modal">
+		<div class="modal-content modal-medium">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div id="modal-body2" class="modal-body">
+				<p align=center>
+					Please wait......
+			</div>
+		</div>
+	</div>
+
 	<script>
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
+
 		function exec() {
-			var e = document.getElementById("containerlist");
-			var i = document.getElementById("nodelist");
-			var container = e.options[e.selectedIndex].value;
-			var node = i.options[i.selectedIndex].value;
-			var radio_one = $('input[id=radio-1]:checked').val();
-			var radio_two = $('input[id=radio-2]:checked').val();
-			var radio_three = $('input[id=radio-3]:checked').val();
-			var radio_four = $('input[id=radio-4]:checked').val();
-			var radio_five = $('input[id=radio-5]:checked').val();
-			var radio_six = $('input[id=radio-6]:checked').val();
-			var radio_seven = $('input[id=radio-7]:checked').val();
-			var radio_eight = $('input[id=radio-8]:checked').val();
+			var container_list = document.getElementById("container_list");
+			var container = container_list.options[container_list.selectedIndex].value;
+			var node_list = document.getElementById("node_list");
+			var node = node_list.options[node_list.selectedIndex].value;
+			var radio_start = $('input[id=radio_start]:checked').val();
+			var radio_stop = $('input[id=radio_stop]:checked').val();
+			var radio_restart = $('input[id=radio_restart]:checked').val();
+			var radio_delete = $('input[id=radio_delete]:checked').val();
+			var radio_create = $('input[id=radio_create]:checked').val();
+			var radio_container_log = $('input[id=radio_container_log]:checked').val();
+			var radio_change_host = $('input[id=radio_change_host]:checked').val();
+			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
 			var command = '';
 			var path = '';
 
-
-			if (radio_one) {
-				if (radio_one.indexOf('on') > -1) {
-					path = '/start';
-				}
-			}
-			if (radio_two) {
-				if (radio_two.indexOf('on') > -1) {
-					path = '/stop';
-				}
-			}
-
-			if (radio_three) {
-				if (radio_three.indexOf('on') > -1) {
-					path = '/restart';
-				}
-			}
-
-			if (radio_four) {
-				if (radio_four.indexOf('on') > -1) {
-					path = '/delete';
-				}
-			}
-
-			if (radio_five) {
-				if (radio_five.indexOf('on') > -1) {
-					path = '/create';
-				}
-			}
-
-			if (radio_six) {
-				if (radio_six.indexOf('on') > -1) {
-					path = '/containerlog';
-				}
-			}
-
-			if (radio_seven) {
-				if (radio_seven.indexOf('on') > -1) {
-					path = '/changehost';
-				}
-			}
-
-			if (radio_eight) {
-				if (radio_eight.indexOf('on') > -1) {
-					path = '/removecontainerconfig';
-				}
-			}
+			path = radio_start && radio_start.indexOf('on') > -1 ? '/start'
+			  : radio_stop && radio_stop.indexOf('on') > -1 ? '/stop'
+				: radio_restart && radio_restart.indexOf('on') > -1 ? '/restart'
+			  : radio_delete && radio_delete.indexOf('on') > -1 ? '/delete'
+				: radio_create && radio_create.indexOf('on') > -1 ? '/create'
+				: radio_container_log && radio_start.indexOf('on') > -1 ? '/containerlog'
+				: radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost'
+		    : radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig'
+				: ''
 
 			if (path) {
-				if ((radio_seven) && (container.indexOf('*') > -1) || (radio_eight) && (container.indexOf('*') > -1)) {
+				if ((radio_change_host) && (container.indexOf('*') > -1) || (radio_remove_container_config) && (container.indexOf('*') > -1)) {
 					alert('\nError: You cannot control all of these containers at once for chosen action.');
 					output_modal.style.display = "none";
 					modal.style.display = "block";
 				} else {
-
 					$.post(path, {
 						token: parent.token,
 						command: command,
@@ -93,116 +130,35 @@
 				output_modal.style.display = "none";
 				modal.style.display = "block";
 			}
-
 		}
-	</script>
-</head>
 
-<body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<span class="close">&times;</span>
-				<h2>Manage Containers</h2>
-			</div>
-			<div class="modal-body">
-				<p align=left>
-					<fieldset>
-						<label for="containerlist">Select a Container</label>
-						<select name="containerlist" id="containerlist">
-			    </select>
-						<br><br>
-					</fieldset>
-					<fieldset name="options" id="options">
-						<legend>Options</legend>
-						<label for="radio-1">Start</label>
-						<input type="radio" name="radio-1" id="radio-1">
-						<br>
-						<label for="radio-2">Stop</label>
-						<input type="radio" name="radio-1" id="radio-2">
-						<br>
-						<label for="radio-3">Restart</label>
-						<input type="radio" name="radio-1" id="radio-3">
-						<br>
-						<label for="radio-4">Delete</label>
-						<input type="radio" name="radio-1" id="radio-4">
-						<br>
-						<label for="radio-5">Create and Run</label>
-						<input type="radio" name="radio-1" id="radio-5">
-						<br>
-						<label for="radio-6">View Logs</label>
-						<input type="radio" name="radio-1" id="radio-6">
-						<br>
-						<label for="radio-8">Remove Config</label>
-						<input type="radio" name="radio-1" id="radio-8">
-						<br>
-						</select>
-					</fieldset>
-					<fieldset>
-						<label for="radio-7">Change Host to</label>
-						<select name="nodelist" id="nodelist">
-								<input type="radio" name="radio-1" id="radio-7">
-				    </select>
-						<br><br>
-					</fieldset>
-					<p align=center>
-						<button id="myBtn">Submit</button>
-					</p>
-					<script>
-						$(function() {
-							var option = '';
-							if (parent.manage_container) {
-								option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
-								$('#containerlist').append(option);
-								parent.manage_container = '';
-							} else {
-								$.get("/nodes?token=" + parent.token, function(data) {
-									for (var i in data.container_list) {
-										option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
-									}
-									option += '<option value="' + '*' + '">' + '*' + '</option>';
-									$('#containerlist').append(option);
-								});
-							}
+		$(function() {
+			var option = '';
+			if (parent.manage_container) {
+				option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
+				$('#container_list').append(option);
+				parent.manage_container = '';
+			} else {
+				$.get("/nodes?token=" + parent.token, function(data) {
+					for (var i in data.container_list) {
+						option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+					}
+					option += '<option value="' + '*' + '">' + '*' + '</option>';
+					$('#container_list').append(option);
+				});
+			}
+		});
 
-						});
-						$(function() {
-							var option = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-								}
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
-							});
-						});
-					</script>
-				</p>
-
-			</div>
-		</div>
-	</div>
-
-
-	<div id="output" class="modal">
-		<div class="modal-content2">
-			<div class="modal-header">
-				<span class="close">&times;</span>
-				<h2>Command Output</h2>
-			</div>
-			<div id="modal-body2" class="modal-body">
-				<p align=center>
-					Please wait......
-			</div>
-		</div>
-	</div>
-
-	<script>
-		var modal = document.getElementById('myModal');
-		var span = document.getElementsByClassName("close")[0];
-		var output_modal = document.getElementById('output');
-		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		$(function() {
+			var option = '';
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.nodes) {
+					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+				}
+				option += '<option value="' + '*' + '">' + '*' + '</option>';
+				$('#node_list').append(option);
+			});
+		});
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -212,7 +168,7 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
@@ -220,5 +176,4 @@
 
 		modal.style.display = "block";
 	</script>
-
 </html>

@@ -1,7 +1,6 @@
 <html>
-<title>PiCluster Web Console</title>
-
 <head>
+	<title>PiCluster Web Console</title>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
@@ -21,6 +20,8 @@
 		var manage_image = '';
 		var manage_function = '';
 	  var manage_function_uuid = '';
+		var token = '';
+		var syslog = '';
 
 		function clear(callback) {
 			var iframe = document.getElementById('iframe_a').contentWindow.document;
@@ -84,6 +85,9 @@
 			$('#hb').click(function() {
 				$('#iframe_a').attr('src', '/hb.html');
 			});
+			$('#docs').click(function() {
+				$('#iframe_a').attr('src', '/docs.html');
+			});
 			$('#upload').click(function() {
 				$('#iframe_a').attr('src', '/upload.html');
 			});
@@ -125,21 +129,16 @@
 		});
 
 		function hideshow(id) {
-			var e = document.getElementById(id);
-			if (e.style.display == 'block')
-				e.style.display = 'none';
-			else
-				e.style.display = 'block';
+			var element = document.getElementById(id);
+			element.style.display = element.style.display == 'block' ? 'none' : 'block';
 		}
+
 		$(function() {
 			hideshow('menu');
 			hideshow('content');
 			hideshow('menu');
 			hideshow('content');
 		});
-
-		var token = "";
-		var syslog = "";
 
 		function getToken() {
 			return token;
@@ -152,32 +151,31 @@
 				username: username,
 				password: password
 			}, function(auth) {
-				if (auth.token) {
-					token = auth.token;
-					if (auth.syslog) {
-						syslog = auth.syslog;
-					}
-					hideshow('login');
-					hideshow('login');
-					hideshow('menu');
-					hideshow('content');
-				} else {
-					alert('Access Denied!');
-					hideshow('login');
-				}
+				syslog = auth.syslog ? auth.syslog : syslog;
+				token = auth.token ? (
+					hideshow('login'),
+					hideshow('login'),
+					hideshow('menu'),
+					hideshow('content'),
+					auth.token
+				) : (
+					alert('Access Denied!'),
+					hideshow('login')
+				)
 			});
 		}
 	</script>
 </head>
 
 <body>
-	<div id="login" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
+	<div id="login" class="modal-login">
+		<div class="modal-login-content">
+			<div class="modal-login-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster 2.2 Login</h2>
 			</div>
-			<div class="modal-body">
+
+			<div class="modal-login-body">
 				<p align=center>
 					<img src="/assets/images/logo.png" height="250" width="200">
 					<br><label>Please login to continue<label>
@@ -188,109 +186,106 @@
 						<input type="password" style="width: 250px;" size="18" id="password" name="password">
 						<br>
             <br>
-						<button id="myBtn">Connect</button>
+						<button id="submit_button">Connect</button>
 						<br>
 					</p>
 			</div>
 		</div>
 	</div>
 
-	</script>
 	<div id="menu">
 		<nav>
 			<ul>
-				<li><a href='/blank' target="iframe_a"> <img src="/assets/images/sphere.png" height="65" width="65"></a>
-					<li><a href="#!">System</a>
-						<ul class="dropdown">
-							<li><a href="#" id="nodes">Nodes</a></li>
-							<li><a href="#" id="editconfig">Edit Configuration</a></li>
-							<li><a href="#" id="reloadconfig">Reload Configuration</a></li>
-							<li><a href="#" id="addhost">Add Host</a></li>
-							<li><a href="#" id="rmhost">Remove Host</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Containers</a>
-						<ul class="dropdown">
-							<li><a href="#" id="layout">Running</a></li>
-							<li><a href="#" id="manage">Manage</a></li>
-							<li><a href="#" id="addcontainer">Add</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Images</a>
-						<ul class="dropdown">
-							<li><a href="#" id="pull">Pull</a></li>
-							<li><a href="#" id="build">Manage</a></li>
-							<li><a href="#" id="image-layout">List</a></li>
-								<li><a href="#" id="upload">Upload Files</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Operations</a>
-						<ul class="dropdown">
-							<li><a href="#" id="killvip">Reset Virtual IP</a></li>
-							<li><a href="#" id="sandbox">Run Command(s)</a></li>
-							<li><a href="#" id="hb">Heartbeat</a></li>
-							<li><a href="#" id="prune">Clean Docker</a></li>
-							<li><a href="#" id="terminal">Terminal</a></li>
-							<li><a href="#" id="kibana">Kibana</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Functions</a>
-						<ul class="dropdown">
-								<li><a href="#" id="functions-current">Current Functions</a></li>
-							  <li><a href="#" id="functions-remove">Remove Functions</a></li>
-								<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
-								<li><a href="#" id="functions-create">Create Function</a></li>
-						</ul>
-					</li>
-					<li><a href="#!">Logs</a>
-						<ul class="dropdown">
-							<li><a href="#" id="log">PiCluster Logs</a></li>
-							<li><a href="#" id="syslog">Syslog Analytics</a></li>
-							<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
-						</ul>
-					</li>
+				<li><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo"></a>
+				<li><a onmouseover="this.click()" href="#!">System</a>
+					<ul class="dropdown">
+						<li><a href="#" id="nodes">Nodes</a></li>
+						<li><a href="#" id="editconfig">Edit Configuration</a></li>
+						<li><a href="#" id="reloadconfig">Reload Configuration</a></li>
+						<li><a href="#" id="addhost">Add Host</a></li>
+						<li><a href="#" id="rmhost">Remove Host</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Containers</a>
+					<ul class="dropdown">
+						<li><a href="#" id="layout">Running</a></li>
+						<li><a href="#" id="manage">Manage</a></li>
+						<li><a href="#" id="addcontainer">Add</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Images</a>
+					<ul class="dropdown">
+						<li><a href="#" id="pull">Pull</a></li>
+						<li><a href="#" id="build">Manage</a></li>
+						<li><a href="#" id="image-layout">List</a></li>
+							<li><a href="#" id="upload">Upload Files</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Operations</a>
+					<ul class="dropdown">
+						<li><a href="#" id="killvip">Reset Virtual IP</a></li>
+						<li><a href="#" id="sandbox">Run Command(s)</a></li>
+						<li><a href="#" id="hb">Heartbeat</a></li>
+						<li><a href="#" id="prune">Clean Docker</a></li>
+						<li><a href="#" id="terminal">Terminal</a></li>
+						<li><a href="#" id="kibana">Kibana</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Functions</a>
+					<ul class="dropdown">
+							<li><a href="#" id="functions-current">Current Functions</a></li>
+						  <li><a href="#" id="functions-remove">Remove Functions</a></li>
+							<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
+							<li><a href="#" id="functions-create">Create Function</a></li>
+					</ul>
+				</li>
+				<li><a onmouseover="this.click()" href="#!">Logs</a>
+					<ul class="dropdown">
+						<li><a href="#" id="log">PiCluster Logs</a></li>
+						<li><a href="#" id="syslog">Syslog Analytics</a></li>
+						<li><a href="#" id="rsyslog">Rsyslog Analytics</a></li>
+					</ul>
+				</li>
+				<li><a href="docs.html" target='iframe_a'>Docs</a>
 			</ul>
 		</nav>
-		</td>
 	</div>
 
 	<script>
 		var modal = document.getElementById('login');
 		var span = document.getElementsByClassName("close")[0];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			modal.style.display = "none";
 			login();
 		}
+
 		modal.style.display = "block";
-	</script>
 
-	<div id="content">
-		<div class="left">
-		</div>
-
-		<div style="clear: both;"> </div>
-	</div>
-
-	<script>
 		$("html").click(function() {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").click(function(e) {
+		$("nav ul li a:not(:only-child)").click(function(navmenu) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
-			e.stopPropagation();
+			navmenu.stopPropagation();
 		});
 	</script>
-	<p align=center>
-		<IFRAME SRC="/blank" id='iframe_a' name="iframe_a" WIDTH=100% HEIGHT=100%>
-  </body>
 
+	<div id="content">
+		<div class="left"></div>
+		<div style="clear: both;"></div>
+	</div>
+
+	<div id="div_iframe">
+		<iframe src="/blank.html" id="iframe_a" name="iframe_a">
+	</div>
+  </body>
   </html>
