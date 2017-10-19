@@ -25,13 +25,17 @@ const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
 const syslog = config.syslog ? config.syslog : '';
-const doc_dir = '../docs/';
+const doc_dir = config.doc_dir;
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
 let nodedata = '';
+
+if (fs.existsSync(path.normalize(doc_dir))) {
+  app.use('/docs', express.static(path.join(__dirname, doc_dir)));
+}
 
 function getData() {
   setTimeout(() => {
@@ -56,7 +60,32 @@ function getData() {
 }
 getData();
 
-app.get('/sandbox', (req, res) => {
+function get_file_list_by_extention(dirpath, extention) {
+  const files = fs.readdirSync(dirpath);
+  const output = [];
+
+  for (const i in files) {
+    if (path.extname(files[i]) === extention) {
+      output.push(files[i]);
+    }
+  }
+
+  return output;
+}
+
+function serve_doc_pages() {
+  const doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md');
+
+  for (const i in doc_pages) {
+    if (i) {
+      app.get('/doc' + i, (req, res) => {
+        res.sendFile(path.resolve(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
+      });
+    }
+  }
+}
+
+app.get('/sandbox.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -65,7 +94,7 @@ app.get('/sandbox', (req, res) => {
   }
 });
 
-app.get('/editconfig', (req, res) => {
+app.get('/editconfig.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -74,7 +103,7 @@ app.get('/editconfig', (req, res) => {
   }
 });
 
-app.get('/kibana', (req, res) => {
+app.get('/kibana.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token) || (!config.kibana)) {
     res.end('\nError: Invalid Credentials or invalid configuration.');
@@ -168,9 +197,7 @@ app.post('/exec', (req, res) => {
 });
 
 app.get('/listdocs', (req, res) => {
-  fs.readdir(doc_dir, (err, docs) => {
-    res.json(docs);
-  });
+  res.json(get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md'));
 });
 
 app.get('/listregistries', (req, res) => {
@@ -1086,6 +1113,8 @@ app.get('/docs.html', (req, res) => {
 app.get('/upload.html', (req, res) => {
   res.sendFile(__dirname + '/upload.html');
 });
+
+serve_doc_pages();
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Web Console enabled');

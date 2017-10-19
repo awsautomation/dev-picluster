@@ -41,7 +41,7 @@
 				<span class="close">&times;</span>
 				<h2>PiCluster Functions Awaiting Data Retrieval</h2>
 			</div>
-			
+
 			<div id="modal-body2" class="modal-body">
 				<p align=center>
 			</div>
@@ -56,7 +56,11 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
+
 		output_modal.style.display = "block";
-		exec()
+
+		exec();
+
+		parent.resize_iframe_height();
 	</script>
 </html>

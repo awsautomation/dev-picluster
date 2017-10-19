@@ -37,8 +37,11 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
-		exec();
 		output_modal.style.display = "block";
+
+		exec();
+		
+		parent.resize_iframe_height();
 	</script>
 	</p>
 

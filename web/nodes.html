@@ -1,5 +1,4 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -19,104 +18,100 @@
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = (check_data.data[i].os_type || '').toLowerCase();
-						div.innerHTML = div.innerHTML + '<p align=left>' + distLogo(dist) + '</p><br><font size=+1 style="white-space: pre-wrap;"><b>' + check_data.data[i].hostname + '</b><br>' + "</font>";
+						var div_logo = document.createElement('div');
+						div_logo.className = 'node_status_div';
+						div_logo.innerHTML = distLogo(dist) + '<p class="div_logo_text">' + check_data.data[i].hostname + '</p><br>';
 
-						var div_disk_page = document.createElement('div_disk_page');
-						div_disk_page.className = "page";
+						var div_disk = document.createElement('div');
+						div_disk.className = 'node_status_div';
 
-						var div_disk_clearfix = document.createElement('div_disk_clearfix');
+						var div_disk_clearfix = document.createElement('div');
 						div_disk_clearfix.className = 'clearfix';
-						div_disk_clearfix.id = 'div_disk_clearfix';
 
-						var div_disk_running_class = document.createElement('div_disk_running_class');
-						div_disk_running_class.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
-						div_disk_running_class.id = 'running-class';
-						div_disk_running_class.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
+						var div_disk_running = document.createElement('div');
+						div_disk_running.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
+						div_disk_running.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
 
-						var div_disk_slice = document.createElement('div_disk_slice');
+						var div_disk_slice = document.createElement('div');
 						div_disk_slice.className = "slice";
 
-						var div_disk_bar = document.createElement('div_disk_bar');
+						var div_disk_bar = document.createElement('div');
 						div_disk_bar.className = "bar";
 
-						var div_disk_fill = document.createElement('div_disk_fill');
+						var div_disk_fill = document.createElement('div');
 						div_disk_fill.className = "fill";
 
-						var div_cpu_page = document.createElement('div_cpu_page');
-						div_cpu_page.className = "page";
+						var div_cpu = document.createElement('div');
+						div_cpu.className = "node_status_div";
 
-						var div_cpu_clearfix = document.createElement('div_cpu_clearfix');
+						var div_cpu_clearfix = document.createElement('div');
 						div_cpu_clearfix.className = 'clearfix';
-						div_cpu_clearfix.id = 'div_cpu_clearfix';
 
-						var div_cpu_running_class = document.createElement('div_cpu_running_class');
-						div_cpu_running_class.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small';
-						div_cpu_running_class.id = 'running-class';
-						div_cpu_running_class.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + '%</span>';
+						var div_cpu_running = document.createElement('div');
+						div_cpu_running.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small';
+						div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + '%</span>';
 
-						var div_cpu_slice = document.createElement('div_cpu_slice');
+						var div_cpu_slice = document.createElement('div');
 						div_cpu_slice.className = "slice";
 
-						var div_cpu_bar = document.createElement('div_cpu_bar');
+						var div_cpu_bar = document.createElement('div');
 						div_cpu_bar.className = "bar";
 
-						var div_cpu_fill = document.createElement('div_cpu_fill');
+						var div_cpu_fill = document.createElement('div');
 						div_cpu_fill.className = "fill";
 
-						var div_memory_page = document.createElement('div_memory_page');
-						div_memory_page.className = "page";
+						var div_memory = document.createElement('div_memory');
+						div_memory.className = "node_status_div";
 
-						var div_memory_clearfix = document.createElement('div_memory_clearfix');
+						var div_memory_clearfix = document.createElement('div');
 						div_memory_clearfix.className = 'clearfix';
-						div_memory_clearfix.id = 'div_memory_clearfix';
 
-						var div_memory_running_class = document.createElement('div_memory_running_class');
+						var div_memory_running_class = document.createElement('div');
 						div_memory_running_class.className = 'c100 p' + check_data.data[i].memory_percentage + ' small';
-						div_memory_running_class.id = 'running-class';
 						div_memory_running_class.innerHTML = '<span id="' + i + '">' + check_data.data[i].memory_percentage + '%</span>';
 
-						var div_memory_slice = document.createElement('div_memory_slice');
+						var div_memory_slice = document.createElement('div');
 						div_memory_slice.className = "slice";
 
-						var div_memory_bar = document.createElement('div_memory_bar');
+						var div_memory_bar = document.createElement('div');
 						div_memory_bar.className = "bar";
 
-						var div_memory_fill = document.createElement('div_memory_fill');
+						var div_memory_fill = document.createElement('div');
 						div_memory_fill.className = "fill";
 
-						div_disk_page.appendChild(div_disk_clearfix);
-						div_disk_clearfix.appendChild(div_disk_running_class);
-						div_disk_running_class.appendChild(div_disk_slice);
+						div_disk.appendChild(div_disk_clearfix);
+						div_disk_clearfix.appendChild(div_disk_running);
+						div_disk_running.appendChild(div_disk_slice);
 						div_disk_slice.appendChild(div_disk_bar);
 						div_disk_bar.appendChild(div_disk_fill);
+						div_disk.innerHTML += '<font class="node_status_text"><b>Disk Usage</b>';
 
-						div_cpu_page.appendChild(div_cpu_clearfix);
-						div_cpu_clearfix.appendChild(div_cpu_running_class);
-						div_cpu_running_class.appendChild(div_cpu_slice);
+						div_cpu.appendChild(div_cpu_clearfix);
+						div_cpu_clearfix.appendChild(div_cpu_running);
+						div_cpu_running.appendChild(div_cpu_slice);
 						div_cpu_slice.appendChild(div_cpu_bar);
 						div_cpu_bar.appendChild(div_cpu_fill);
+						div_cpu.innerHTML += '<font class="node_status_text"><b>CPU Usage</b>';
 
-						div_memory_page.appendChild(div_memory_clearfix);
+						div_memory.appendChild(div_memory_clearfix);
 						div_memory_clearfix.appendChild(div_memory_running_class);
 						div_memory_running_class.appendChild(div_memory_slice);
 						div_memory_slice.appendChild(div_memory_bar);
 						div_memory_bar.appendChild(div_memory_fill);
+						div_memory.innerHTML += '<font class="node_status_text"><b>Memory Usage</b>';
 
-						var table = document.createElement("table");
-						var line_break = document.createElement("br");
-						var row = table.insertRow(0);
-						var cell_disk_usage = row.insertCell(0);
-						var cell_cpu_usage = row.insertCell(1);
-						var cell_memory_usage = row.insertCell(2);
-						table.className = "node_card";
-						cell_disk_usage.innerHTML += '<font size="+0" color="black"><b>Disk Usage</b>';
-						cell_cpu_usage.innerHTML += '<font size="+0" color="black"><b>CPU Usage</b>';
-						cell_memory_usage.innerHTML += '<font size="+0" color="black"><b>Memory Usage</b>';
-						cell_disk_usage.appendChild(div_disk_page);
-						cell_cpu_usage.appendChild(div_cpu_page);
-						cell_memory_usage.appendChild(div_memory_page);
-						div.appendChild(table);
-						div.appendChild(line_break);
+						var node_card = document.createElement("div")
+						node_card.className = "node_card";
+
+						node_card.appendChild(div_logo);
+						node_card.appendChild(div_disk);
+						node_card.appendChild(div_cpu);
+						node_card.appendChild(div_memory);
+
+						var hr = document.createElement('hr');
+						
+						div.appendChild(node_card);
+						div.appendChild(hr);
 					}
 				}
 				addFontLinux();
@@ -150,5 +145,7 @@
 	  output_modal.style.display = "block";
 
 		exec()
+
+		parent.resize_iframe_height();
 	</script>
 </html>

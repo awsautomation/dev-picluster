@@ -1,6 +1,7 @@
 {
   "token": "1234567890ABCDEFGHJKLMNOP",
   "docker": "../docker",
+  "doc_dir": "../docs",
   "server_port": "3000",
   "agent_port": "3001",
   "ssl": false,
@@ -9,29 +10,14 @@
   "ssl_key": "",
   "layout": [{
       "node": "localhost",
-      "minio": "-p 9000:9000"
-    },
-    {
-      "node": "127.0.0.1",
       "nginx": "-p 80:80"
-    }
-  ],
+  }],
   "hb": [{
       "node": "localhost",
-      "minio": "9000"
-    },
-    {
-      "node": "127.0.0.1",
       "nginx": "80"
-    }
-  ],
+  }],
   "container_host_constraints": [{
-      "container": "nginx,localhost,127.0.0.1"
-    },
-    {
-      "container": "minio,localhost,127.0.0.1"
-    }
-  ],
+  }],
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "10000",
   "syslog": "dmesg",

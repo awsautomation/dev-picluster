@@ -4,6 +4,20 @@
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+  <script>
+	  function display_doc_markdown() {
+			var div = document.getElementById('modal-body2');
+			var docfile = parent.doc_id;
+
+			(div && docfile) ? div.innerHTML(docfile) : div
+		}
+
+	  function exec_docs_html() {
+
+
+
+		}
+	</script>
 </head>
 
 <body>
@@ -57,5 +71,9 @@
 			$.get('/listdocs'), $('#doc_list').append(option);
 			console.log(option);
 		});
+
+		display_doc_markdown();
+
+		parent.resize_iframe_height();
 		</script>
 </html>

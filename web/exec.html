@@ -14,6 +14,7 @@
 			var saved_command = command_list.options[command_list.selectedIndex].value;
 			var command = '';
 
+			// FIXME: refactor ternary into a variable assignment ternary
 			(saved_command.indexOf('Choose') > -1) ? command = $("#command_entry").val() : command = saved_command;
 
 			if (!command) {
@@ -59,16 +60,19 @@
 					<script>
 						$(function() {
 							var option = '';
+
 							$.get("/nodes?token=" + parent.token, function(data) {
 								for (var i in data.nodes) {
 									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
+
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
 								$('#node_list').append(option);
 							});
 						});
 						$(function() {
 							var option = '';
+
 							$.post('/listcommands', {
 								token: parent.token
 							}, function(data) {
@@ -83,6 +87,7 @@
 										}
 									}
 								}
+
 								$('#command_list').append(option);
 							});
 						});
@@ -146,5 +151,7 @@
 		}
 
 		modal.style.display = "block";
+
+		parent.resize_iframe_height();
 	</script>
 </html>

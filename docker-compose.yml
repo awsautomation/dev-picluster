@@ -1,51 +1,18 @@
 version: '3'
 services:
-
   server:
     image: "node:alpine"
     restart: "always"
     volumes:
       - .:/picluster
       - ./docker-compose.config.json:/picluster/config.json
-    networks:
-      picluster:
-        ipv4_address: 10.10.10.1
+      - ./picluster-pm2.config-example.json:/picluster/picluster-pm2.config.json
     ports:
       - "3000:3000"
-    working_dir: /picluster/server
-    command: ["sh", "-c", "set -e;apk add --no-cache ; npm install --production; node server.js;"]
-  agent:
-    image: "node:alpine"
-    restart: "always"
-    volumes:
-      - .:/picluster
-      - ./docker-compose.config.json:/picluster/config.json
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      picluster:
-        ipv4_address: 10.10.10.2
-    ports:
       - "3001:3001"
-    working_dir: /picluster/agent
-    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add  git python make g++ docker procps;export PATH=/bin:$PATH; npm install --production;node agent.js"]
-
-  webconsole:
-    image: "node:alpine"
-    restart: "always"
-    networks:
-      picluster:
-        ipv4_address: 10.10.10.3
-    volumes:
-      - .:/picluster
-      - ./docker-compose.config.json:/picluster/config.json
-    ports:
       - "3003:3003"
-    working_dir: /picluster/web
-    command: ["sh", "-c", "set -e;apk update;apk upgrade;apk add git ; npm install --production; node webconsole.js;"]
-
-networks:
-  picluster:
-    driver: bridge
-    ipam:
-     config:
-       - subnet: 10.10.10.0/16
+    working_dir: /picluster
+    command: ["sh", "-c", "set -e; printf 'http://mirror.clarkson.edu/alpine/edge/main\nhttp://mirror.clarkson.edu/alpine/edge/community' > /etc/apk/repositories; apk update; apk add --no-cache git python make g++ docker procps supervisor; printf \"[supervisord]\n\n[program:dockerd]\ncommand=dockerd\" > /etc/supervisor.conf; npm install -g pm2; supervisord -c /etc/supervisor.conf; npm install --production --unsafe-perm; pm2-docker start /picluster/picluster-pm2.config.json"]
+    environment:
+      COMPOSE_HTTP_TIMEOUT: 600
+    privileged: true

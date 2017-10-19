@@ -1,0 +1,29 @@
+{
+  "apps": [
+    {
+      "name" : "server",
+      "script" : "server.js",
+      "cwd" : "/picluster/server",
+      "watch" : true,
+      "env": {
+        "PICLUSTER_CONFIG": "/picluster/config.json"
+      }
+    },{
+      "name"       : "agent",
+      "script"     : "agent.js",
+      "cwd"         : "/picluster/agent",
+      "watch" : true,
+      "env": {
+        "PICLUSTER_CONFIG": "/picluster/config.json"
+      }
+    },{
+      "name"       : "webconsole",
+      "script"     : "webconsole.js",
+      "cwd"         : "/picluster/web",
+      "watch" : true,
+      "env": {
+        "PICLUSTER_CONFIG": "/picluster/config.json"
+      }
+    }
+  ]
+}

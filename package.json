@@ -1,7 +1,7 @@
 {
     "name": "picluster",
     "config": {
-      "unsafe-perm": true
+        "unsafe-perm": true
     },
     "scripts": {
         "test": "xo",

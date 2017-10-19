@@ -247,7 +247,21 @@ textarea {
   padding: 0px;
 }
 
-#nav_logo {
+#nav_logo_image {
   height: 4vw;
   width: 4vw;
 }
+
+#nav_system {}
+
+#nav_containers {}
+
+#nav_images {}
+
+#nav_operations {}
+
+#nav_functions {}
+
+#nav_logs {}
+
+#nav_docs {}

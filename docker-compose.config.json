@@ -1,30 +1,28 @@
 {
     "token": "1234567890ABCDEFGHJKLMNOP",
     "docker": "../docker",
+    "doc_dir": "../docs",
     "server_port": "3000",
     "agent_port": "3001",
-    "layout": [
-        {
-            "node": "10.10.10.2",
-            "nginx": "-p 80:80"
-        }
-    ],
-    "hb": [
-        {
-            "node": "docker0",
-            "nginx": "80"
-        }
-    ],
-    "container_host_constraints": [
-        {
-            "container": "nginx,agent"
-        }
-    ],
+    "ssl": false,
+    "ssl_self_signed": false,
+    "ssl_cert": "",
+    "ssl_key": "",
+    "layout": [{
+        "node": "127.0.0.1",
+        "nginx": "-p 80:80"
+    }],
+    "hb": [{
+        "node": "127.0.0.1",
+        "nginx": "80"
+    }],
+    "container_host_constraints": [{
+    }],
     "automatic_heartbeat": "enabled",
     "heartbeat_interval": "300000",
     "syslog": "dmesg",
     "web_username": "admin",
     "web_password": "admin",
-    "web_connect": "10.10.10.1",
+    "web_connect": "0.0.0.0",
     "web_port": "3003"
 }
