@@ -319,3 +319,43 @@ table tbody tr td label {
   max-width: 72px;
   text-align: center;
 }
+
+.page {
+  display: block;
+  height: 75px;
+  margin: 0 auto;
+  width: 75px;
+}
+
+#source,
+#issues,
+#status_circle {
+  display: inline-block;
+  height: 100px;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: top;
+  width: 100px;
+}
+
+#source img,
+#issues img {
+  height: 75px;
+  vertical-align: top;
+  width: auto;
+}
+
+#running-class {
+  cursor: pointer;
+  float: none;
+  margin: 0 auto;
+}
+
+#logo {
+  height: auto;
+  width: 300px;
+}
+
+#source_issues_circle {
+  text-align: center;
+}
