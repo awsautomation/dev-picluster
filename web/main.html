@@ -30,29 +30,35 @@
 			callback();
 		}
 
-		function build_doc_links(doc_list) {
-			for (var i in doc_list) {
-				$('#doc' + i).click(function() {
-					$('iframe_a').attr('src', '/docs.html?doc_id=doc' + i)
-				});
-			}
+		function build_doc_links() {
+			var output = '';
+
+			$.get("/listdocs", function(doc_list) {
+				for (var i in doc_list) {
+					output += "$('#doc'" + i + ").click(function() { $('iframe_a').attr('src', '/docs.html?doc_id=doc'" + i + ") });";
+				}
+			});
+
+			return output;
 		}
 
     function build_docs_nav_menu() {
-			const docs_nav = document.getElementById("nav_docs");
-      let output = '';
-
+      var output = '';
 			output += '<ul class="dropdown">';
 
-			$.get(JSON.parse("/listdocs"), function(data) {
-				console.log(data);
-				for (let i in data) {
-					output += '<li><a href="#" id="doc' + i + '">' + data[i] + '</a></li>';
+			$.get("/listdocs", function(doc_list) {
+				for (var i in doc_list) {
+					var doc_id = "doc" + i;
+					$("<li><a href='#' id='" + doc_id + "' onclick='stinky_linker(\"" + doc_id + "\")'>" + doc_list[i] + "</a></li>").appendTo("#nav_docs > ul");
 				}
-			}, json);
+			});
 
 			output += '</ul>';
 			$('#nav_docs').append(output);
+		}
+
+		function stinky_linker(doc_id) {
+			$('#iframe_a').attr('src', '/docs.html?doc_id=' + doc_id);
 		}
 
 		function initialize_iframe_height() {
@@ -60,7 +66,7 @@
 		}
 
 		function resize_iframe_height(iframe) {
-			document.getElementById("div_iframe").style.height = "calc(100% - 4vw)px";
+			document.getElementById("div_iframe").style.height = "calc(100% - 4vw)";
 		}
 
 		$(document).ready(function() {
@@ -148,8 +154,12 @@
 			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal.html');
 			});
+			//$('#doc1').click(function() {
+			//	$('#iframe_a').attr('src', '/docs.html?doc_id=doc1');
+			//});
 
 			build_doc_links();
+
 		});
 
 		$("html").click(function() {
@@ -269,7 +279,7 @@
 				<li id="nav_functions"><a onmouseover="this.click()" href="#!">Functions</a>
 					<ul class="dropdown">
 						<li><a href="#" id="functions-current">Current Functions</a></li>
-						 <li><a href="#" id="functions-remove">Remove Functions</a></li>
+						<li><a href="#" id="functions-remove">Remove Functions</a></li>
 						<li><a href="#" id="functions-viewer">Functions Viewer</a></li>
 						<li><a href="#" id="functions-create">Create Function</a></li>
 					</ul>
@@ -290,6 +300,8 @@
 		var modal = document.getElementById('login');
 		var span = document.getElementsByClassName("close")[0];
 		var submit_button = document.getElementById("submit_button");
+
+		build_docs_nav_menu();
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -312,8 +324,6 @@
 			$(".dropdown").not($(this).siblings()).hide();
 			navmenu.stopPropagation();
 		});
-
-		build_docs_nav_menu();
 	</script>
 
 	<div id="content">
