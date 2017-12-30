@@ -1,7 +1,7 @@
 /* eslint-env phantomjs,browser */
 /* eslint-disable func-names */
 /* global casper,$ */
-casper.test.begin('main.html', 7, test => {
+casper.test.begin('index.html', 7, test => {
   const URL = casper.cli.get('url');
   const username = casper.cli.get('username');
   const password = casper.cli.get('password');

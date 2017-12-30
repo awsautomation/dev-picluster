@@ -3,13 +3,13 @@
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
-	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script src="/assets/distLogo.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			$.get("/clear-functions?token=" + parent.token, function(data) {
-				var div = document.getElementById('modal-body2');
-				div.innerHTML = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+			$.get("/hb?token=" + parent.token, function(data) {
+				var div = document.getElementById('heartbeat-modal-body');
+				div.innerHTML = '\nSent request to do a manual heartbeat. Check the logs for the latest information.' + data;
 			});
 		}
 	</script>
@@ -17,18 +17,17 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Cleaning stale functions</h2>
+				<h2>Running a heartbeat check on all containers</h2>
 			</div>
-			<div id="modal-body2" class="modal-body">
-				<p align=center>
-					Please wait......
+
+			<div id="heartbeat-modal-body" class="modal-body">
+				Please wait.
 			</div>
 		</div>
 	</div>
-	</p>
 
 	<script>
 		var output_modal = document.getElementById('output');
@@ -37,12 +36,13 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
 		output_modal.style.display = "block";
 
 		exec();
-		
-		parent.resize_iframe_height();
 	</script>
-	</p>
-
 </html>

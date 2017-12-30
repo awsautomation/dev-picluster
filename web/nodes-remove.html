@@ -15,7 +15,7 @@
 				token: parent.token,
 				host: host
 			}, function(data) {
-				var div = document.getElementById('modal-body2');
+				var div = document.getElementById('nodes-remove-modal-body');
 				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
 			});
 		}
@@ -31,38 +31,35 @@
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<label id="windowfont">This will remove a host from the PiCluster configuration file. Please stop any running containers</label>
-					<label id="windowfont">on the host before removing it.</label>
-					<br><br>
+				<p class="modal-description">
+					Remove a host from the PiCluster config file.
+				</p>
+				<div id="node_list_remove">
 					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
 					<select name="node_list" id="node_list"></select>
-					<br><br>
-					<p align=center>
-						<button id="submit_button">Submit</button>
-					</p>
-					<script>
-						var option = '';
-						$.get("/nodes?token=" + parent.token, function(data) {
-							for (var i in data.nodes) {
-								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-							}
-							$('#node_list').append(option);
-						});
-					</script>
-				</p>
+					<button id="submit_button">Submit</button>
+				</div>
+				<script>
+					var option = '';
+					$.get("/nodes?token=" + parent.token, function(data) {
+						for (var i in data.nodes) {
+							option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+						}
+						$('#node_list').append(option);
+					});
+				</script>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="nodes-remove-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
 				</p>
@@ -92,7 +89,5 @@
 		}
 
 		modal.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

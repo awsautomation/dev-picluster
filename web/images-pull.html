@@ -24,7 +24,7 @@
 
 		var command = ["docker", "image", "pull", image].join(' ');
 		var nodes = document.getElementsByName('host_list');
-		var div = document.getElementById('modal-body2');
+		var div = document.getElementById('images-pull-modal-body');
 		var username = document.getElementsByName('imageauth-user')[0].value || '';
 		var password = document.getElementsByName('imageauth-password')[0].value || '';
 
@@ -55,7 +55,7 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Pull Images</h2>
@@ -64,31 +64,31 @@
 			<div class="modal-body">
 				<div id="container" title="Pull Images">
 					<fieldset>
-						<label for="container_list">Select Registry</label>
-						<select name="container_list" id="container_list" onchange="clearAuth()">
-							</select>
-						<legend>Authentication (optional)</legend>
+						<legend><b>Authentication</b> <i>(Optional)</i></legend>
+						<label for="container_list">Registry</label>
+						<select name="container_list" class="modal_input" id="container_list" onchange="clearAuth()"></select>
 						<br>
 						<label for="imageauth-user">Username</label>
-						<input type="text" name="imageauth-user" id="imageauth-user" />
+						<input type="text" name="imageauth-user" id="imageauth-user" class="modal_input" />
+						<br>
 						<label for="imageauth-password">Password</label>
-						<input type="password" name="imageauth-password" id="imageauth-password" />
+						<input type="password" name="imageauth-password" id="imageauth-password" class="modal_input" />
 					</fieldset>
-					<br>
+
 					<fieldset name="options" id="options">
-						<legend>Images</legend>
+						<legend><b>Images</b></legend>
 						<p id="imageDescription" style="visibility: hidden;margin: 0;padding: 0;"></p>
-						<label for="image">Image: </label>
+						<label for="image">Image</label>
 						<input id="image">
-						<label for="imageTags">Tags: </label>
+						<label for="imageTags">Tags</label>
 						<select id="imageTags" disabled="disabled">
 								<option value="latest" selected="selected">Latest</option>
 							</select>
 					</fieldset>
 					<fieldset name="host_list" id="host_list">
-						<legend>Nodes:</legend>
-						<label for="host_list">All</label><input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked"/>
-						&nbsp;&nbsp;&nbsp;&nbsp;
+						<legend><b>Nodes</b></legend>
+						<input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked"/>
+						<label for="host_list">All</label><br>
 					</fieldset>
 					<p align=center>
 						<button onclick="exec()" id="submit_button"> Submit</button>
@@ -133,7 +133,7 @@
 								var option = '';
 
 								for (var i = 0; i < data.nodes.length; i++) {
-									option += '<label for="host_list">' + data.nodes[i] + '</label><input type="checkbox" name="host_list" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+									option += '<input type="checkbox" name="host_list" checked="checked" value="' + data.nodes[i] + '" /><label for="host_list">' + data.nodes[i] + '</label><br>';
 								}
 
 								$('#host_list').append(option);
@@ -234,15 +234,14 @@
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
-				<p align=center>
-					Please wait......
+			<div id="images-pull-modal-body" class="modal-body">
+				Please wait.
 			</div>
 		</div>
 	</div>
@@ -271,7 +270,5 @@
 	}
 
 	modal.style.display = "block";
-
-	parent.resize_iframe_height();
 </script>
 </html>

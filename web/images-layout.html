@@ -11,7 +11,7 @@
 		};
 
 		function exec() {
-			var div = document.getElementById('modal-body2');
+			var div = document.getElementById('modal-body');
 			div.innerHTML = div ? div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for images</label></font>' : '';
 
 			$.get("/nodes?token=" + parent.token, function(data) {
@@ -25,7 +25,7 @@
 						var array = check_data.data[i].images;
 						for (var j in array) {
 							if (array[j]) {
-								div.innerHTML += '<font size=+1><a href="/manage-images.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
+								div.innerHTML += '<font size=+1><a href="/images-manage.html" style="text-decoration:none" onclick="linkFunction(\'' + array[j] + '\')">' + array[j] + '</a<</font><br><ol>';
 							}
 						}
 					}
@@ -40,14 +40,13 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content modal-small">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Images</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
-			</div>
+			<div id="modal-body" class="modal-body"></div>
 		</div>
 	</div>
 
@@ -62,7 +61,5 @@
 		output_modal.style.display = "block";
 
 		exec()
-
-		parent.resize_iframe_height();
 	</script>
 </html>

@@ -8,7 +8,7 @@
 	<script>
 		function exec() {
 			$.get("/killvip?token=" + parent.token, function(data) {
-				var div = document.getElementById('modal-body2');
+				var div = document.getElementById('killvip-modal-body');
 				div.innerHTML = 'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data;
 			});
 		}
@@ -23,9 +23,9 @@
 				<h2>Resetting VIP on all hosts</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="kill-vip-modal-body" class="modal-body">
 				<p align=center>
-					Please wait......
+					Please wait.
 				</p>
 			</div>
 		</div>
@@ -42,7 +42,5 @@
 		output_modal.style.display = "block";
 
 		exec();
-
-		parent.resize_iframe_height();
 	</script>
 </html>

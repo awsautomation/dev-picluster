@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var div = document.getElementById('modal-body2');
+			var div = document.getElementById('nodes-list-modal-body');
 			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : div;
 
 			$.get("/nodes?token=" + parent.token, function(data) {
@@ -109,7 +109,7 @@
 						node_card.appendChild(div_memory);
 
 						var hr = document.createElement('hr');
-						
+
 						div.appendChild(node_card);
 						div.appendChild(hr);
 					}
@@ -122,14 +122,13 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Nodes</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
-				<p align=center></p>
+			<div id="nodes-list-modal-body" class="modal-body">
 			</div>
 		</div>
 	</div>
@@ -145,7 +144,5 @@
 	  output_modal.style.display = "block";
 
 		exec()
-
-		parent.resize_iframe_height();
 	</script>
 </html>

@@ -26,53 +26,47 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Create a function</h2>
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<label>This module allows you to easilly create functions for testing purposes.</label>
-					<label>Please ensure that the container files are present on all the nodes.</label>
-					<br>
-					<fieldset name="functions" id="functions">
-						<legend>Enter the function name</legend>
-						<label><i>This should correspond to the container name in the Docker folder.</i></label>
-						<br><br>
-						<label>Name</label>
-						<input type="text" size="50" id="function-name" name="function-name" value=""></font>
-					</fieldset>
-					<fieldset name="options" id="options">
-						<legend>Container arguments (optional)</legend>
-						</select>
-						<label><i>Additional Docker arguments if needed such as ENVAR's or ports.</i></label>
-						<br><br>
-						<label>Arguments</label>
-						<input type="text" size="50" id="function-args" name="function-args" value=""></font>
-						<br><br>
-						<br>
-						<br>
-					</fieldset>
-					<p align=center>
-						<button id="submit_button">Create</button>
-					</p>
+				<label>Create functions for testing purposes.</label>
+				<fieldset name="functions" id="functions">
+					<legend><b>Function Name</b></legend>
+					<label><i>This should correspond to the container name in the Docker folder.</i></label>
+					<br><br>
+					<label>Name</label>
+					<input type="text" id="function-name" class="modal_input" name="function-name" value=""></font>
+				</fieldset>
+
+				<fieldset name="options" id="options">
+					<legend><b>Container Arguments</b> <i>(Optional)</i></legend>
+					</select>
+					<label><i>Additional Docker arguments if needed such as ENVAR's or ports.</i></label>
+					<br><br>
+					<label>Arguments</label>
+					<input type="text" id="function-args" class="modal_input" name="function-args" value=""></font>
+				</fieldset>
+
+				<p align=center>
+					<button id="submit_button">Create</button>
 				</p>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
-				<p align=center>
-					Sent request to create function.
+			<div id="functions-create-modal-body" class="modal-body">
+				Sent request to create function.
 			</div>
 		</div>
 	</div>
@@ -97,7 +91,5 @@
 		}
 
 		modal.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

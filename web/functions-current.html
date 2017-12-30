@@ -11,7 +11,7 @@
 		};
 
 		function exec() {
-			var div = document.getElementById('modal-body2');
+			var div = document.getElementById('functions-current-modal-body');
 			if (div) {
 				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>';
 			}
@@ -36,13 +36,13 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Functions Awaiting Data Retrieval</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="functions-current-modal-body" class="modal-body">
 				<p align=center>
 			</div>
 		</div>
@@ -60,7 +60,5 @@
 		output_modal.style.display = "block";
 
 		exec();
-
-		parent.resize_iframe_height();
 	</script>
 </html>
