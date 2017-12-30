@@ -7,14 +7,16 @@
   <script>
 	  function display_doc_markdown() {
 			var div = document.getElementById('modal-body2');
-			var docfile = parent.doc_id;
+			var docfile = document.doc_id;
 
-			(div && docfile) ? div.innerHTML(docfile) : div
+
+			(div && docfile) ? div.innerHTML(docfile) : div;
+			return docfile;
 		}
 
+		console.log(display_doc_markdown());
+
 	  function exec_docs_html() {
-
-
 
 		}
 	</script>
@@ -30,6 +32,7 @@
 
 			<div class="modal-body">
 				<p align=left>
+					<script>display_doc_markdown()</script>
 				</p>
 			</div>
 		</div>
