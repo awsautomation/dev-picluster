@@ -43,7 +43,7 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Syslog Viewer</h2>
@@ -75,7 +75,7 @@
 				</div>
 
 				<div id="log_output">
-					<textarea rows="25" cols="74" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+					<textarea id="command_output" name="command_output" value="" enctype="application/json"></textarea>
 				</div>
 			</div>
 		</div>
@@ -97,7 +97,5 @@
 		modal.style.display = "block";
 
 		exec();
-
-		parent.resize_iframe_height();
 	</script>
 </html>

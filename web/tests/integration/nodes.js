@@ -3,7 +3,7 @@
 /* global casper */
 casper.options.waitTimeout = 20000;
 
-casper.test.begin('nodes.html', 2, test => {
+casper.test.begin('nodes-list.html', 2, test => {
   const URL = casper.cli.get('url');
   const username = casper.cli.get('username');
   const password = casper.cli.get('password');
@@ -26,7 +26,7 @@ casper.test.begin('nodes.html', 2, test => {
 
     this.page.switchToChildFrame(0);
 
-    test.assertEquals(iframe, URL + '/nodes.html', 'The iframes source should equal ' + URL + '/nodes.html');
+    test.assertEquals(iframe, URL + '/nodes-list.html', 'The iframes source should equal ' + URL + '/nodes-list.html');
 
     if (lib.getCasperEngine() === 'slimerjs') {
       this.waitForSelector('.node_status_logo', function () {

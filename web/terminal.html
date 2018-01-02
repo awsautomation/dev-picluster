@@ -47,53 +47,48 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Terminal</h2>
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<label for="node_list"><b>Select a Node</b></label>
+				<fieldset>
+					<legend><b>Node</b></legend>
 					<select name="node_list" id="node_list"></select>
-					<br><br>
-					<p align=center>
-						<button id="submit_button">Submit</button>
-					</p>
-					<script>
-						$(function() {
-							var option = '';
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-								}
-								$('#node_list').append(option);
-							});
-						});
-					</script>
+				</fieldset>
+
+				<p align=center>
+					<button id="submit_button">Submit</button>
 				</p>
+
+				<script>
+					$(function() {
+						var option = '';
+						$.get("/nodes?token=" + parent.token, function(data) {
+							for (var i in data.nodes) {
+								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+							}
+							$('#node_list').append(option);
+						});
+					});
+				</script>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div id="terminal_modal" class="modal-content modal-medium">
+		<div id="terminal_modal" class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Terminal</h2>
 			</div>
 
 			<div class="modal-body">
-				<table style="width:100%;">
-					<tr>
-						<td>
-							<div id="terminal_container">
-								<div id="terminal"></div>
-							</div>
-						</td>
-					</tr>
-				</table>
+				<div id="terminal_container">
+					<div id="terminal"></div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -120,7 +115,5 @@
 		}
 
 		modal.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

@@ -85,7 +85,7 @@ function serve_doc_pages() {
   }
 }
 
-app.get('/sandbox.html', (req, res) => {
+app.get('/exec.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -94,12 +94,12 @@ app.get('/sandbox.html', (req, res) => {
   }
 });
 
-app.get('/editconfig.html', (req, res) => {
+app.get('/config-edit.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    res.sendFile(__dirname + '/editconfig.html');
+    res.sendFile(__dirname + '/config-edit.html');
   }
 });
 
@@ -1036,22 +1036,22 @@ app.get('/getconfig', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/main.html');
+  res.sendFile(__dirname + '/index.html');
 });
 app.get('/blank.html', (req, res) => {
   res.sendFile(__dirname + '/blank.html');
 });
-app.get('/nodes.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes.html');
+app.get('/nodes-list.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-list.html');
 });
-app.get('/container-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/container-layout.html');
+app.get('/containers-layout.html', (req, res) => {
+  res.sendFile(__dirname + '/containers-layout.html');
 });
-app.get('/prune.html', (req, res) => {
-  res.sendFile(__dirname + '/prune.html');
+app.get('/images-prune.html', (req, res) => {
+  res.sendFile(__dirname + '/images-prune.html');
 });
-app.get('/clear-functions.html', (req, res) => {
-  res.sendFile(__dirname + '/clear-functions.html');
+app.get('/functions-clear.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-clear.html');
 });
 app.get('/functions-viewer.html', (req, res) => {
   res.sendFile(__dirname + '/functions-viewer.html');
@@ -1059,26 +1059,26 @@ app.get('/functions-viewer.html', (req, res) => {
 app.get('/functions-create.html', (req, res) => {
   res.sendFile(__dirname + '/functions-create.html');
 });
-app.get('/current-functions.html', (req, res) => {
-  res.sendFile(__dirname + '/current-functions.html');
+app.get('/functions-current.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-current.html');
 });
-app.get('/reloadconfig.html', (req, res) => {
-  res.sendFile(__dirname + '/reloadconfig.html');
+app.get('/config-reload.html', (req, res) => {
+  res.sendFile(__dirname + '/config-reload.html');
 });
-app.get('/pullimages.html', (req, res) => {
-  res.sendFile(__dirname + '/pullimages.html');
+app.get('/images-pull.html', (req, res) => {
+  res.sendFile(__dirname + '/images-pull.html');
 });
-app.get('/manage-images.html', (req, res) => {
-  res.sendFile(__dirname + '/manage-images.html');
+app.get('/images-manage.html', (req, res) => {
+  res.sendFile(__dirname + '/images-manage.html');
 });
-app.get('/image-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/image-layout.html');
+app.get('/images-layout.html', (req, res) => {
+  res.sendFile(__dirname + '/images-layout.html');
 });
 app.get('/log.html', (req, res) => {
   res.sendFile(__dirname + '/log.html');
 });
-app.get('/hb.html', (req, res) => {
-  res.sendFile(__dirname + '/hb.html');
+app.get('/heartbeat.html', (req, res) => {
+  res.sendFile(__dirname + '/heartbeat.html');
 });
 app.get('/killvip.html', (req, res) => {
   res.sendFile(__dirname + '/killvip.html');
@@ -1086,20 +1086,20 @@ app.get('/killvip.html', (req, res) => {
 app.get('/syslog.html', (req, res) => {
   res.sendFile(__dirname + '/syslog.html');
 });
-app.get('/manage.html', (req, res) => {
-  res.sendFile(__dirname + '/manage.html');
+app.get('/containers-manage.html', (req, res) => {
+  res.sendFile(__dirname + '/containers-manage.html');
 });
 app.get('/terminal.html', (req, res) => {
   res.sendFile(__dirname + '/terminal.html');
 });
-app.get('/addcontainer.html', (req, res) => {
-  res.sendFile(__dirname + '/addcontainer.html');
+app.get('/containers-add.html', (req, res) => {
+  res.sendFile(__dirname + '/containers-add.html');
 });
-app.get('/addhost.html', (req, res) => {
-  res.sendFile(__dirname + '/addhost.html');
+app.get('/nodes-add.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-add.html');
 });
-app.get('/rmhost.html', (req, res) => {
-  res.sendFile(__dirname + '/rmhost.html');
+app.get('/nodes-remove.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-remove.html');
 });
 app.get('/rsyslog.html', (req, res) => {
   res.sendFile(__dirname + '/rsyslog.html');
@@ -1110,8 +1110,8 @@ app.get('/favicon.ico', (req, res) => {
 app.get('/docs.html', (req, res) => {
   res.sendFile(__dirname + '/docs.html');
 });
-app.get('/upload.html', (req, res) => {
-  res.sendFile(__dirname + '/upload.html');
+app.get('/images-upload.html', (req, res) => {
+  res.sendFile(__dirname + '/images-upload.html');
 });
 
 serve_doc_pages();

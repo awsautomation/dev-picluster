@@ -1,5 +1,4 @@
 html {
-  height: 100%;
 }
 
 body {
@@ -59,6 +58,11 @@ table tbody tr td label {
   color: black;
 }
 
+fieldset {
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
 @-webkit-keyframes animatetop {
   from {
     top: -300px;
@@ -83,15 +87,18 @@ table tbody tr td label {
 
 .modal {
   display: none;
-  position: relative;
   z-index: 1;
-  padding-top: 5vw;
-  left: 0;
-  top: 0;
-  height: 100%;
+  padding-top: 5px;
+  height: 99%;
   width: 100%;
   background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.4);3
+}
+
+.modal-description {
+  text-align: center;
+  font-size: 18px;
+  margin: 10px;
 }
 
 .modal-content {
@@ -113,11 +120,11 @@ table tbody tr td label {
   min-width: 370px
 }
 
-.modal-medium {
+.modal-large {
   width: 75%;
   min-width: 600px;
-  min-height: 75%;
-  margin-bottom: 20px;
+  height: 95%;
+  overflow-y: scroll;
 }
 
 .modal-header {
@@ -127,8 +134,13 @@ table tbody tr td label {
 }
 
 .modal-body {
-  padding: 1px 10px;
+  padding: 1px 10px 10px;
   color: black;
+  font-size: 18px;
+}
+
+.modal_input {
+  margin-bottom: 10px;
 }
 
 .close {
@@ -200,6 +212,21 @@ table tbody tr td label {
   text-align: center;
 }
 
+.page {
+  display: block;
+  height: 75px;
+  margin: 0 auto;
+  width: 75px;
+}
+
+#modal_container {
+  height: 99%;
+}
+
+#submit_button {
+  display: inline;
+}
+
 #log_search {
   width: 100%;
   text-align: center;
@@ -230,6 +257,9 @@ table tbody tr td label {
 
 #log_output {
   width: 100%;
+  height: 79%;
+  padding: 0;
+  margin: 0;
 }
 
 #upload-widget {
@@ -253,9 +283,6 @@ table tbody tr td label {
 
 #terminal {
   width: 100%;
-  position: relative;
-  left: -1.04em;
-  top: -0.3em;
 }
 
 #terminal .prompt {
@@ -264,33 +291,74 @@ table tbody tr td label {
 
 #host {
   font-size: 18px;
+  width: 50%;
+  display: inline;
+  margin-right: 5px;
+}
+
+#host_add {
+  text-align: center;
 }
 
 #container_list {
   font-size: 16px;
 }
 
+#container_list_fieldset {}
+#container_list_options_fieldset {}
+#container-add-fieldset {}
+#container-heartbeat-fieldset {}
+
 #container {
   font-size: 16px;
+}
+
+#functions {
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 #function_list {
   font-size: 18px;
 }
 
+#function_list_selector {
+  width: 150px;
+  margin-right: 20px;
+  display: inline;
+}
+
+#function_list_submit {
+  width: 100px;
+  display: inline;
+}
+
 #function_output {
   width: 100%;
+  height: 50%;
 }
 
 #function_url {}
 
 #node_list {
   font-size: 18px;
+  margin-right: 5px;
+}
+
+#node_list_remove {
+  text-align: center;
+}
+
+#node_failover_constraint {
+  margin-bottom: 10px;
 }
 
 #image_list {
   font-size: 18px;
 }
+
+#image_list_fieldset {}
+#image_list_options_fieldset {}
 
 #command_entry {
   font-size: 18px;
@@ -298,33 +366,36 @@ table tbody tr td label {
 
 #command_output {
   width: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+#exec_output {
+  width: 100%;
+  min-height: 80%;
+  padding: 0;
+  margin: 0;
 }
 
 #windowfont {
   font-size: 18px;
 }
 
-#modal-body2 {
-  font-size: 18px;
+#config_editor {
+  width: 100%;
+  height: 80%;
 }
-
-#config_editor {}
 
 #payload {
   width: 100%;
+  height: 100%;
 }
 
 #node_status_logo {
   font-size: 72px;
   max-width: 72px;
   text-align: center;
-}
-
-.page {
-  display: block;
-  height: 75px;
-  margin: 0 auto;
-  width: 75px;
 }
 
 #source,
@@ -363,3 +434,22 @@ table tbody tr td label {
 #rerun_div {
   text-align: center;
 }
+
+#config-reload-modal-body {}
+#containers-add-modal-body {}
+#containers-layout-modal-body {}
+#containers-manage-modal-body {}
+#docs-modal-body {}
+#functions-clear-modal-body {}
+#functions-create-modal-body {}
+#functions-current-modal-body {}
+#functions-viewer-modal-body {}
+#heartbeat-modal-body {}
+#images-manage-modal-body {}
+#images-prune-modal-body {}
+#images-pull-modal-body {}
+#images-upload-modal-body {}
+#killvip-modal-body {}
+#nodes-add-modal-body {}
+#nodes-list-modal-body {}
+#nodes-removed-modal-body {}

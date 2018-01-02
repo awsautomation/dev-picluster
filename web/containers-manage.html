@@ -16,60 +16,51 @@
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<fieldset>
-						<label for="container_list">Select a Container</label>
-						<select name="container_list" id="container_list">
-			    </select>
-						<br><br>
-					</fieldset>
-					<fieldset name="options" id="options">
-						<legend>Options</legend>
-						<label for="radio_start">Start</label>
-						<input type="radio" name="radio_start" id="radio_start">
-						<br>
-						<label for="radio_stop">Stop</label>
-						<input type="radio" name="radio_stop" id="radio_stop">
-						<br>
-						<label for="radio_restart">Restart</label>
-						<input type="radio" name="radio_restart" id="radio_restart">
-						<br>
-						<label for="radio_delete">Delete</label>
-						<input type="radio" name="radio_delete" id="radio_delete">
-						<br>
-						<label for="radio_create">Create and Run</label>
-						<input type="radio" name="radio_create" id="radio_create">
-						<br>
-						<label for="radio_container_log">View Logs</label>
-						<input type="radio" name="radio_container_log" id="radio_container_log">
-						<br>
-						<label for="radio_remove_container_config">Remove Config</label>
-						<input type="radio" name="radio_remove_container_config" id="radio_remove_container_config">
-						<br>
-						</select>
-					</fieldset>
-					<fieldset>
-						<label for="radio_change_host">Change Host to</label>
-						<select name="node_list" id="node_list">
-								<input type="radio" name="radio_change_host" id="radio_change_host">
-				    </select>
-						<br><br>
-					</fieldset>
-					<p align=center>
-						<button id="submit_button">Submit</button>
-					</p>
+				<fieldset id="container_list_fieldset">
+					<legend><b>Container</b></legend>
+					<select name="container_list" id="container_list"></select>
+				</fieldset>
+				<fieldset name="options" id="container_list_options_fieldset">
+					<legend><b>Options</b></legend>
+					<input type="radio" name="options_radio" id="radio_start">
+					<label for="radio_start">Start</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_stop">
+					<label for="radio_stop">Stop</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_restart">
+					<label for="radio_restart">Restart</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_delete">
+					<label for="radio_delete">Delete</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_create">
+					<label for="radio_create">Create and Run</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_container_log">
+					<label for="radio_container_log">View Logs</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_remove_container_config">
+					<label for="radio_remove_container_config">Remove Config</label>
+					<br>
+					<input type="radio" name="options_radio" id="radio_change_host">
+					<label for="radio_change_host">Change Node to</label>
+					<select name="node_list" id="node_list"></select>
+				</fieldset>
+				<p align=center>
+					<button id="submit_button">Submit</button>
 				</p>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-			<div id="modal-body2" class="modal-body">
+			<div id="containers-manage-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
 			</div>
@@ -121,7 +112,7 @@
 						container: container,
 						newhost: node
 					}, function(data) {
-						var div = document.getElementById('modal-body2');
+						var div = document.getElementById('containers-manage-modal-body');
 						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 					});
 				}
@@ -175,7 +166,5 @@
 		}
 
 		modal.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

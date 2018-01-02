@@ -6,7 +6,7 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
   <script>
 	  function display_doc_markdown() {
-			var div = document.getElementById('modal-body2');
+			var div = document.getElementById('docs-modal-body');
 			var docfile = document.doc_id;
 
 
@@ -24,7 +24,7 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Documentation</h2>
@@ -39,13 +39,13 @@
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="docs-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
 				</p>
@@ -76,7 +76,5 @@
 		});
 
 		display_doc_markdown();
-
-		parent.resize_iframe_height();
 		</script>
 </html>

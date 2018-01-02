@@ -42,73 +42,75 @@
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
-					<select name="node_list" id="node_list">
-				    </select>
-					<br><br>
-					<label id="windowfont" for="command_list"><b>Saved Commands</b></label>
-					<select name="command_list" id="command_list">
-					 </select>
-					<br><br>
-					<b><label id="windowfont">Command:<label></b><br><br>
-					<input type="text" size="30" id="command_entry" name="command_entry" value=""></font>
-					<br><br>
+				<fieldset class="">
+					<legend><b>Node</b></legend>
+					<select name="node_list" id="node_list"></select>
+				</fieldset>
+
+				<fieldset>
+					<legend><b>Command</b></legend>
+					<input type="text" size="30" id="command_entry" name="command_entry" class="modal_input" value="">
+					<hr>
+					<div>
+						<label id="windowfont" for="command_list">Saved Commands</label>
+						<select name="command_list" id="command_list" class="modal_input"></select>
+					</div>
 					<p align=center>
 						<button id="submit_button">Submit</button>
 					</p>
-					<script>
-						$(function() {
-							var option = '';
+				</fieldset>
 
-							$.get("/nodes?token=" + parent.token, function(data) {
-								for (var i in data.nodes) {
-									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-								}
+				<script>
+					$(function() {
+						var option = '';
 
-								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#node_list').append(option);
-							});
+						$.get("/nodes?token=" + parent.token, function(data) {
+							for (var i in data.nodes) {
+								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+							}
+
+							option += '<option value="' + '*' + '">' + '*' + '</option>';
+							$('#node_list').append(option);
 						});
-						$(function() {
-							var option = '';
+					});
+					$(function() {
+						var option = '';
 
-							$.post('/listcommands', {
-								token: parent.token
-							}, function(data) {
-								option += '<option value="' + 'Choose' + '">' + 'Choose' + '</option>';
-								if (data) {
-									data = JSON.parse(data);
-									for (var i = 0; i < data.length; i++) {
-										for (var key in data[i]) {
-											if (data[i].hasOwnProperty(key)) {
-												option += '<option value="' + data[i][key] + '">' + key + '</option>';
-											}
+						$.post('/listcommands', {
+							token: parent.token
+						}, function(data) {
+							option += '<option value="' + 'Choose' + '">' + 'Choose' + '</option>';
+							if (data) {
+								data = JSON.parse(data);
+								for (var i = 0; i < data.length; i++) {
+									for (var key in data[i]) {
+										if (data[i].hasOwnProperty(key)) {
+											option += '<option value="' + data[i][key] + '">' + key + '</option>';
 										}
 									}
 								}
+							}
 
-								$('#command_list').append(option);
-							});
+							$('#command_list').append(option);
 						});
-					</script>
+					});
+				</script>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Terminal</h2>
 			</div>
 
 			<div class="modal-body">
+				<textarea id="exec_output" name="command_output" value="" enctype="application/json"></textarea>
 				<div id="rerun_div">
-				  <button id="rerun_button">Run Again</button>
+					<button id="rerun_button">Run Again</button>
 				</div>
-				<br>
-				<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
 			</div>
 		</div>
 	</div>
@@ -141,7 +143,5 @@
 		}
 
 		modal.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

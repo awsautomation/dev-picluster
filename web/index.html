@@ -65,19 +65,20 @@
 			document.getElementById("div_iframe").style.height = document.getElementById("iframe_a").contentWindow.document.body.scrollHeight + "px";
 		}
 
-		function resize_iframe_height(iframe) {
+		/*function resize_iframe_height(iframe) {
 			document.getElementById("div_iframe").style.height = "calc(100% - 4vw)";
 		}
+    */
 
 		$(document).ready(function() {
-			$('#sandbox').click(function() {
-				$('#iframe_a').attr('src', '/sandbox.html?token=' + token);
+			$('#exec').click(function() {
+				$('#iframe_a').attr('src', '/exec.html?token=' + token);
 			});
 			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal.html?token=' + token);
 			});
-			$('#image-layout').click(function() {
-				$('#iframe_a').attr('src', '/image-layout.html');
+			$('#images-layout').click(function() {
+				$('#iframe_a').attr('src', '/images-layout.html');
 			});
 			$('#syslog').click(function() {
 				$('#iframe_a').attr('src', '/syslog.html');
@@ -92,64 +93,61 @@
 				$('#iframe_a').attr('src', '/functions-create.html');
 			});
 			$('#functions-remove').click(function() {
-				$('#iframe_a').attr('src', '/clear-functions.html');
+				$('#iframe_a').attr('src', '/functions-clear.html');
 			});
 			$('#functions-current').click(function() {
-				$('#iframe_a').attr('src', '/current-functions.html');
+				$('#iframe_a').attr('src', '/functions-current.html');
 			});
 			$('#rsyslog').click(function() {
 				$('#iframe_a').attr('src', '/rsyslog.html');
 			});
-			$('#nodes').click(function() {
-				$('#iframe_a').attr('src', '/nodes.html');
+			$('#nodes-list').click(function() {
+				$('#iframe_a').attr('src', '/nodes-list.html');
 			});
-			$('#layout').click(function() {
-				$('#iframe_a').attr('src', '/container-layout.html');
+			$('#containers-layout').click(function() {
+				$('#iframe_a').attr('src', '/containers-layout.html');
 			});
-			$('#addcontainer').click(function() {
-				$('#iframe_a').attr('src', '/addcontainer.html');
+			$('#containers-add').click(function() {
+				$('#iframe_a').attr('src', '/containers-add.html');
 			});
-			$('#addhost').click(function() {
-				$('#iframe_a').attr('src', '/addhost.html');
+			$('#node-add').click(function() {
+				$('#iframe_a').attr('src', '/nodes-add.html');
 			});
-			$('#rmhost').click(function() {
-				$('#iframe_a').attr('src', '/rmhost.html');
+			$('#node-remove').click(function() {
+				$('#iframe_a').attr('src', '/nodes-remove.html');
 			});
-			$('#editconfig').click(function() {
-				$('#iframe_a').attr('src', '/editconfig.html?token=' + token);
+			$('#config-edit').click(function() {
+				$('#iframe_a').attr('src', '/config-edit.html?token=' + token);
 			});
 			$('#log').click(function() {
 				$('#iframe_a').attr('src', '/log.html');
 			});
-			$('#hb').click(function() {
-				$('#iframe_a').attr('src', '/hb.html');
+			$('#heartbeat').click(function() {
+				$('#iframe_a').attr('src', '/heartbeat.html');
 			});
 			$('#docs').click(function() {
 				$('#iframe_a').attr('src', '/docs.html');
 			});
-			$('#upload').click(function() {
-				$('#iframe_a').attr('src', '/upload.html');
+			$('#images-upload').click(function() {
+				$('#iframe_a').attr('src', '/images-upload.html');
 			});
-			$('#pull').click(function() {
-				$('#iframe_a').attr('src', '/pullimages.html');
+			$('#images-pull').click(function() {
+				$('#iframe_a').attr('src', '/images-pull.html');
 			});
-			$('#build').click(function() {
-				$('#iframe_a').attr('src', '/manage-images.html');
+			$('#images-manage').click(function() {
+				$('#iframe_a').attr('src', '/images-manage.html');
 			});
-			$('#stop').click(function() {
-				$('#iframe_a').attr('src', '/stop.html');
-			});
-			$('#reloadconfig').click(function() {
-				$('#iframe_a').attr('src', '/reloadconfig.html');
+			$('#config-reload').click(function() {
+				$('#iframe_a').attr('src', '/config-reload.html');
 			});
 			$('#killvip').click(function() {
 				$('#iframe_a').attr('src', '/killvip.html');
 			});
-			$('#manage').click(function() {
-				$('#iframe_a').attr('src', '/manage.html');
+			$('#containers-manage').click(function() {
+				$('#iframe_a').attr('src', '/containers-manage.html');
 			});
-			$('#prune').click(function() {
-				$('#iframe_a').attr('src', '/prune.html');
+			$('#images-prune').click(function() {
+				$('#iframe_a').attr('src', '/images-prune.html');
 			});
 			$('#terminal').click(function() {
 				$('#iframe_a').attr('src', '/terminal.html');
@@ -158,7 +156,7 @@
 			//	$('#iframe_a').attr('src', '/docs.html?doc_id=doc1');
 			//});
 
-			build_doc_links();
+			images-manage_doc_links();
 
 		});
 
@@ -244,34 +242,34 @@
 				<li id="nav_logo"><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo_image"></a>
 				<li id="nav_system"><a onmouseover="this.click()" href="#!">System</a>
 					<ul class="dropdown">
-						<li><a href="#" id="nodes">Nodes</a></li>
-						<li><a href="#" id="editconfig">Edit Configuration</a></li>
-						<li><a href="#" id="reloadconfig">Reload Configuration</a></li>
-						<li><a href="#" id="addhost">Add Host</a></li>
-						<li><a href="#" id="rmhost">Remove Host</a></li>
+						<li><a href="#" id="nodes-list">Nodes</a></li>
+						<li><a href="#" id="node-add">Add Node</a></li>
+						<li><a href="#" id="node-remove">Remove Node</a></li>
+						<li><a href="#" id="config-edit">Edit Config</a></li>
+						<li><a href="#" id="config-reload">Reload Config</a></li>
 					</ul>
 				</li>
 				<li id="nav_containers"><a onmouseover="this.click()" href="#!">Containers</a>
 					<ul class="dropdown">
-						<li><a href="#" id="layout">Running</a></li>
-						<li><a href="#" id="manage">Manage</a></li>
-						<li><a href="#" id="addcontainer">Add</a></li>
+						<li><a href="#" id="containers-layout">Running</a></li>
+						<li><a href="#" id="containers-manage">Manage</a></li>
+						<li><a href="#" id="containers-add">Add</a></li>
 					</ul>
 				</li>
 				<li id="nav_images"><a onmouseover="this.click()" href="#!">Images</a>
 					<ul class="dropdown">
-						<li><a href="#" id="pull">Pull</a></li>
-						<li><a href="#" id="build">Manage</a></li>
-						<li><a href="#" id="image-layout">List</a></li>
-						<li><a href="#" id="upload">Upload Files</a></li>
+						<li><a href="#" id="images-pull">Pull</a></li>
+						<li><a href="#" id="images-manage">Manage</a></li>
+						<li><a href="#" id="images-layout">List</a></li>
+						<li><a href="#" id="images-upload">Upload</a></li>
 					</ul>
 				</li>
 				<li id="nav_operations"><a onmouseover="this.click()" href="#!">Operations</a>
 					<ul class="dropdown">
 						<li><a href="#" id="killvip">Reset Virtual IP</a></li>
-						<li><a href="#" id="sandbox">Run Command(s)</a></li>
-						<li><a href="#" id="hb">Heartbeat</a></li>
-						<li><a href="#" id="prune">Clean Docker</a></li>
+						<li><a href="#" id="exec">Run Command(s)</a></li>
+						<li><a href="#" id="heartbeat">Heartbeat</a></li>
+						<li><a href="#" id="images-prune">Clean Docker</a></li>
 						<li><a href="#" id="terminal">Terminal</a></li>
 						<li><a href="#" id="kibana">Kibana</a></li>
 					</ul>

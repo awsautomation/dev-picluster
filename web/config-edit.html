@@ -28,7 +28,7 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Configuraton Editor</h2>
@@ -36,9 +36,11 @@
 
 			<div class="modal-body">
 				<div id="config_editor" title="PiCluster Configuration Editor">
-					<textarea rows="20" cols="75" id="payload" name="payload" value="" enctype="application/json"></textarea>
-					<br>
-					<button id="submit_button">Submit</button>
+					<textarea id="payload" name="payload" value="" enctype="application/json"></textarea>
+					
+					<p align=center>
+						<button id="submit_button">Submit</button>
+					</p>
 				</div>
 			</div>
 		</div>
@@ -60,8 +62,6 @@
 		modal.style.display = "block";
 
 		getconfig();
-
-		parent.resize_iframe_height();
 	</script>
 </body>
 </html>

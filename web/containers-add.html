@@ -7,7 +7,7 @@
 	<script>
 		function exec() {
 			var node_list = document.getElementById("node_list");
-			var host_list = document.getElementsByName('host_list');
+			var container-heartbeat-fieldset = document.getElementsByName('container-heartbeat-fieldset');
 			var path = '/addcontainer';
 			var host = node_list.options[node_list.selectedIndex].value;
 			var container = $("#container_name").val();
@@ -15,8 +15,8 @@
 			var heartbeat_args = $("#heartbeat_args").val();
 			var failover_constraints = '';
 
-			host_list.forEach(function(node, i) {
-				failover_constraints += host_list[i].checked ? (failover_constraints ? ',' + node.value : failover_constraints) : node.value;
+			container-heartbeat-fieldset.forEach(function(node, i) {
+				failover_constraints += container-heartbeat-fieldset[i].checked ? (failover_constraints ? ',' + node.value : failover_constraints) : node.value;
 			});
 
 			failover_constraints = !failover_constraints ? 'none' : failover_constraints;
@@ -29,7 +29,7 @@
 				heartbeat_args: heartbeat_args,
 				failover_constraints: container + ',' + failover_constraints
 			}, function(data) {
-				var div = document.getElementById('modal-body2');
+				var div = document.getElementById('containers-add-modal-body');
 				div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 			});
 		}
@@ -38,48 +38,51 @@
 
 <body>
 	<div id="modal_container" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Add a container to PiCluster</h2>
 			</div>
 			<div class="modal-body">
-				<p align=left>
-					<label id="windowfont">This will add a new container to the PiCluster configuration file.
-					<br><br> Please ensure that the Dockerfiles are already on the node in the correct location.</label>
-					<br><br>
-					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
-					<select name="node_list" id="node_list">
-						</select>
-					<br><br>
-					<b><label id="windowfont">Container Name:</b></label>
-					<input type="text" size="15" id="container_name" name="container_name" value=""></font>
-					<br><br>
-					<b><label id="windowfont">Container Arguments:</label></b>
-					<input type="text" size="25" id="container_args" name="container_args" value=""></font>
-					<br><br>
-					<br><b><label id="windowfont">Heartbeat and Host Failover: (Optional)</label></b>
-					<fieldset name="host_list" id="host_list">
-						<b><label id="windowfont">Heartbeat Port:</label></b>
-						<input type="text" size="5" id="heartbeat_args" name="heartbeat_args" value=""></font>
-						<br><br>
-						<b><label id="windowfont">Host Failover Constraints (Optional):</label></b>
-						<br><br>
-					</fieldset>
-					<p align=center>
-						<button id="submit_button">Submit</button>
-					</p>
+				<div class="modal-description">
+					Add a new container to the PiCluster config file.
+				</div>
+
+				<fieldset id="container-add-fieldset">
+					<legend><b>Container</b></legend>
+					<label class="windowfont">Name</label>
+					<input type="text" size="15" id="container_name" class="modal_input" name="container_name" value=""></font>
+					<br>
+					<label class="windowfont">Arguments</label>
+					<input type="text" size="25" id="container_args" class="modal_input" name="container_args" value=""></font>
+					<br>
+					<label class="windowfont">Deploy on</label>
+					<select name="node_list" id="node_list"></select>
+				</fieldset>
+
+				<fieldset name="container-heartbeat-fieldset" id="container-heartbeat-fieldset">
+					<legend><b>Heartbeat/Node Failover</b> <i>(Optional)</i></legend>
+					<label class="windowfont">Heartbeat Port</label>
+					<input type="text" size="5" id="heartbeat_args" class="modal_input" name="heartbeat_args" value="">
+					<br>
+					<div id="node_failover_constraint">
+						<label class="windowfont">Node Failover Constraints <i>(Optional)</i></label>
+					</div>
+				</fieldset>
+				<p align=center>
+					<button id="submit_button">Submit</button>
+				</p>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-			<div id="modal-body2" class="modal-body">
+			<div id="containers-add-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
 			</div>
@@ -94,11 +97,11 @@
 			$.get("/nodes?token=" + parent.token, function(data) {
 				for (var i in data.nodes) {
 					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-					checkbox += '<label id="windowfont" for="host_list">' + data.nodes[i] + '</label><input type="checkbox" name="host_list" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+					checkbox += '<input type="checkbox" name="container-heartbeat-fieldset" class="modal_input" value="' + data.nodes[i] + '" /><label id="windowfont" for="container-heartbeat-fieldset">' + data.nodes[i] + '</label><br>';
 				}
 				option += '<option value="' + '*' + '">' + '*' + '</option>';
 				$('#node_list').append(option);
-				$('#host_list').append(checkbox);
+				$('#container-heartbeat-fieldset').append(checkbox);
 			});
 		});
 
@@ -123,7 +126,5 @@
 		}
 
 		modal_container.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

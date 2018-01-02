@@ -9,7 +9,7 @@
 		function exec() {
 			$.get("/reloadconfig?token=" + parent.token, function(data) {
 				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-				var div = document.getElementById('modal-body2');
+				var div = document.getElementById('config-reload-modal-body');
 				div.innerHTML = data;
 			});
 		}
@@ -24,7 +24,7 @@
 				<h2>Reloading Configuration File</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="config-reload-modal-body" class="modal-body">
 				<p align=center></p>
 			</div>
 		</div>
@@ -41,7 +41,5 @@
 		output_modal.style.display = "block";
 
 		exec();
-
-		parent.resize_iframe_height();
 	</script>
 </html>

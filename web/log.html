@@ -17,14 +17,16 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>PiCluster Log</h2>
 			</div>
 
 			<div class="modal-body">
-				<textarea rows="20" cols="80" id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+				<div id="log_output">
+					<textarea id="command_output" name="command_output" value="" enctype="application/json"></textarea>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -40,7 +42,5 @@
 		output_modal.style.display = "block";
 
 		exec();
-
-		parent.resize_iframe_height();
 	</script>
 </html>

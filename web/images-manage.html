@@ -19,7 +19,7 @@
 						token: parent.token,
 						image: image
 					}, function(data) {
-						var div = document.getElementById('modal-body2');
+						var div = document.getElementById('images-manage-modal-body');
 						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
 					});
 				} else {
@@ -28,7 +28,7 @@
 						image: image,
 						no_cache: no_cache
 					}, function(data) {
-						var div = document.getElementById('modal-body2');
+						var div = document.getElementById('images-manage-modal-body');
 						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
 					});
 				}
@@ -48,49 +48,51 @@
 			</div>
 
 			<div class="modal-body">
-				<p align=left>
-					<fieldset>
-						<label for="image_list">Select a Container</label>
-						<select name="image_list" id="image_list"></select>
-						<br><br>
-						<input type="checkbox" id="cache"><label for="image_list">Build without Docker Cache</label>
-						<br><br>
-						<input type="checkbox" id="delete_image"><label for="image_list">Delete</label>
-						<br> <br>
-						<p align=center>
-							<button id="submit_button">Submit</button>
-						</p>
-						<script>
-							if (parent.manage_image) {
-								option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
-								$('#image_list').append(option);
-								parent.manage_image = '';
-							} else {
-								$(function() {
-									$.get("/nodes?token=" + parent.token, function(data) {
-										for (var i in data.container_list) {
-											option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
-										}
-										option += '<option value="' + '*' + '">' + '*' + '</option>';
-										$('#image_list').append(option);
-									});
-								});
-							}
-						</script>
-					</fieldset>
+				<fieldset id="image_list_fieldset">
+					<legend><b>Container</b></legend>
+					<select name="image_list" id="image_list"></select>
+				</fieldset>
+
+				<fieldset id="image_list_options_fieldset">
+					<legend><b>Options</b></legend>
+					<input type="checkbox" id="cache"><label for="image_list">Build without Docker Cache</label>
+					<br>
+					<input type="checkbox" id="delete_image"><label for="image_list">Delete</label>
+				</fieldset>
+
+				<p align=center>
+					<button id="submit_button">Submit</button>
 				</p>
+
+				<script>
+					if (parent.manage_image) {
+						option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
+						$('#image_list').append(option);
+						parent.manage_image = '';
+					} else {
+						$(function() {
+							$.get("/nodes?token=" + parent.token, function(data) {
+								for (var i in data.container_list) {
+									option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+								}
+								option += '<option value="' + '*' + '">' + '*' + '</option>';
+								$('#image_list').append(option);
+							});
+						});
+					}
+				</script>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="images-manage-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
 				</p>
@@ -121,7 +123,5 @@
 	  }
 
   	modal.style.display = "block";
-
-		parent.resize_iframe_height();
 	</script>
 </html>

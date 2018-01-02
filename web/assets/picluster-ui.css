@@ -188,6 +188,7 @@ textarea {
   margin-top: 3px;
   background: linear-gradient(to bottom right, white, #F8F8F8) !important;
   box-shadow: 0 4px 10px #565051;
+  overflow-y: scroll;
 }
 
 .dropdown::after {
@@ -230,6 +231,7 @@ textarea {
 
 #div_iframe {
   width:100%;
+  padding-top: 4.3vw;
   height: calc(100% - 4vw);
   z-index: -1;
 }
@@ -239,7 +241,6 @@ textarea {
   border-width: 0px;
   height: 100%;
   width:100%;
-  position: absolute;
   overflow-y: scroll;
 }
 

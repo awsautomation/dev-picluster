@@ -3,8 +3,21 @@
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
-	<link rel="stylesheet" href="/assets/picluster-iframe.css">
-	<script src="/assets/dropzone.js"></script>
+  <link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		function exec() {
+			var path = '/addhost';
+			var host = $("#host").val();
+
+			$.post(path, {
+				token: parent.token,
+				host: host
+			}, function(data) {
+				var div = document.getElementById('nodes-add-modal-body');
+				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
+			});
+		}
+	</script>
 </head>
 
 <body>
@@ -12,41 +25,34 @@
 		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Upload Dockerfile Archive</h2>
+				<h2>Add a host to PiCluster</h2>
 			</div>
-
 			<div class="modal-body">
-				<p align=left>
-					<label id="windowfont">This will upload a .zip archive of a containers Dockerfile and required files.
-				  <br><br>
-					The .zip archive will be copied to each node and extracted in the Docker directory.
-						<br><br>
-					<form id="upload-widget" method="post" action="/upload" class="dropzone">
-					<input type="hidden" name="token" id="token">
-					</form>
-					<br><br>
-					</fieldset>
-					<script>
-					 document.getElementById("token").value = parent.token;
-					</script>
+				<p class="modal-description">
+					Add a new host to PiCluster config file.
+				</p>
+				<div id="host_add">
+					<label id="windowfont"><b>Host or IP</b></label>
+					<input type="text" id="host" name="host" value="">
+					<button id="submit_button">Submit</button>
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-medium">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-
-			<div id="modal-body2" class="modal-body">
+			<div id="nodes-add-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
-				</p>
 			</div>
 		</div>
 	</div>
+	</p>
 
 	<script>
 		var modal = document.getElementById('modal_container');
@@ -63,8 +69,12 @@
 			output_modal.style.display = "none";
 		}
 
-		modal.style.display = "block";
+		submit_button.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
 
-		parent.resize_iframe_height();
+		modal.style.display = "block";
 	</script>
 </html>

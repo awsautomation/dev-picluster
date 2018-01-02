@@ -7,9 +7,9 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			$.get("/hb?token=" + parent.token, function(data) {
-				var div = document.getElementById('modal-body2');
-				div.innerHTML = '\nSent request to do a manual heartbeat. Check the logs for the latest information.' + data;
+			$.get("/prune?token=" + parent.token, function(data) {
+				var div = document.getElementById('images-prune-modal-body');
+				div.innerHTML = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 			});
 		}
 	</script>
@@ -20,10 +20,10 @@
 		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Running a heartbeat check on all containers</h2>
+				<h2>Cleaning stale Docker containers</h2>
 			</div>
 
-			<div id="modal-body2" class="modal-body">
+			<div id="images-prune-modal-body" class="modal-body">
 				<p align=center>
 					Please wait......
 				</p>
@@ -39,14 +39,8 @@
 			output_modal.style.display = "none";
 		}
 
-		output_span.onclick = function() {
-			output_modal.style.display = "none";
-		}
-
 		output_modal.style.display = "block";
 
 		exec();
-
-		parent.resize_iframe_height();
 	</script>
 </html>
