@@ -299,13 +299,30 @@ function unzipFile(file) {
 }
 app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
+  const get_config_file = req.body.config_file;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     fs.readFile(req.file.path, (err, data) => {
-      const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => { // eslint-disable-line no-unused-vars
-        unzipFile(newPath);
+      let newPath = '../' + req.file.originalname;
+      let config_file = '';
+
+      if (get_config_file) {
+        if (process.env.PICLUSTER_CONFIG) {
+          config_file = process.env.PICLUSTER_CONFIG;
+        } else {
+          config_file = '../config.json';
+        }
+        newPath = config_file;
+      }
+
+      fs.writeFile(newPath, data, err => {
+        if (!err) {
+          if (req.file.originalname.indexOf('.zip') > -1) {
+            unzipFile(newPath);
+          }
+        }
       });
     });
     res.end('Done');

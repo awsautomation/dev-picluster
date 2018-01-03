@@ -1,7 +1,7 @@
 # Version 2.3
 
 ## New Features:
-* none
+* When config changes are made, they now populate to every node in the cluster
 
 ## Enhancements:
 * Container Layout: Container uptime is now displayed

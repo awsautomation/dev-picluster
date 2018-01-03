@@ -1348,7 +1348,7 @@ app.post('/listnodes', (req, res) => {
   }
 });
 
-function copyToAgents(file) {
+function copyToAgents(file, config_file) {
   Object.keys(config.layout).forEach((get_node, i) => {
     Object.keys(config.layout[i]).forEach(key => {
       const node = config.layout[i].node;
@@ -1360,6 +1360,7 @@ function copyToAgents(file) {
       const formData = {
         name: 'file',
         token,
+        config_file,
         file: fs.createReadStream(file)
       };
 
@@ -1392,7 +1393,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
           if (err) {
             console.log(err);
           } else {
-            copyToAgents(newPath);
+            copyToAgents(newPath, '');
           }
         });
       }
@@ -1758,6 +1759,7 @@ app.post('/updateconfig', (req, res) => {
         if (err) {
           console.log('\nError while writing config.' + err);
         } else {
+          copyToAgents(config_file, 'config');
           res.end('Updated Configuration. Please reload it now for changes to take effect.');
         }
       });
