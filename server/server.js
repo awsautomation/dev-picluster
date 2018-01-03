@@ -1348,7 +1348,7 @@ app.post('/listnodes', (req, res) => {
   }
 });
 
-function copyToAgents(file, config_file) {
+function copyToAgents(file, config_file, temp_file) {
   Object.keys(config.layout).forEach((get_node, i) => {
     Object.keys(config.layout[i]).forEach(key => {
       const node = config.layout[i].node;
@@ -1378,6 +1378,11 @@ function copyToAgents(file, config_file) {
       });
     });
   });
+  fs.unlink(temp_file, error => {
+    if (error) {
+      console.log(error);
+    }
+  });
 }
 
 app.post('/receive-file', upload.single('file'), (req, res) => {
@@ -1393,7 +1398,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
           if (err) {
             console.log(err);
           } else {
-            copyToAgents(newPath, '');
+            copyToAgents(newPath, '', req.file.path);
           }
         });
       }
@@ -1759,7 +1764,7 @@ app.post('/updateconfig', (req, res) => {
         if (err) {
           console.log('\nError while writing config.' + err);
         } else {
-          copyToAgents(config_file, 'config');
+          copyToAgents(config_file, 'config', '');
           res.end('Updated Configuration. Please reload it now for changes to take effect.');
         }
       });

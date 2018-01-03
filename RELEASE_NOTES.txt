@@ -6,6 +6,7 @@
 ## Enhancements:
 * Container Layout: Container uptime is now displayed
 * CSS Enhancements
+* Deletes the temporary uploaded files
 
 ## Bug Fixes:
 * None

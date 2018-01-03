@@ -322,6 +322,11 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
           if (req.file.originalname.indexOf('.zip') > -1) {
             unzipFile(newPath);
           }
+          fs.unlink(req.file.path, error => {
+            if (error) {
+              console.log(error);
+            }
+          });
         }
       });
     });
