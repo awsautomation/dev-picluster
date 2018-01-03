@@ -798,7 +798,6 @@ function sendFile(file, temp_file) {
     if (err) {
       console.error('upload failed:', err);
     } else {
-      console.log('\nDebug:' + temp_file);
       fs.unlink(temp_file, error => {
         if (error) {
           console.log(error);
