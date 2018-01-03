@@ -29,7 +29,7 @@
 			var get_function = function_list.options[function_list.selectedIndex] ? function_list.options[function_list.selectedIndex].value: '';
 			var command = '';
 
-			document.getElementById("textarea").value = 'Fetching.....';
+			document.getElementById("function_output").value = 'Fetching.....';
 			document.getElementById("url").value = 'Fetching.....';
 
 			if (get_function.length > 1) {
@@ -37,10 +37,10 @@
 					for (var i in data.functions.name) {
 						if (data.functions.name[i].name.indexOf(get_function) > -1) {
 							if (data.functions.name[i].name && data.functions.name[i].output) {
-								document.getElementById("textarea").value = data.functions.name[i].output;
+								document.getElementById("function_output").value = data.functions.name[i].output;
 								document.getElementById("url").value = 'curl \"' + data.function_server + '?token=' + parent.token + '&uuid=' + data.functions.name[i].uuid + '\"';
 							} else {
-								document.getElementById("textarea").value = 'No output or function already removed.';
+								document.getElementById("function_output").value = 'No output or function already removed.';
 								document.getElementById("url").value = 'No output or function already removed.';
 							}
 						}
