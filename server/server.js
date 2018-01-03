@@ -1378,11 +1378,13 @@ function copyToAgents(file, config_file, temp_file) {
       });
     });
   });
-  fs.unlink(temp_file, error => {
-    if (error) {
-      console.log(error);
-    }
-  });
+  if (temp_file) {
+    fs.unlink(temp_file, error => {
+      if (error) {
+        console.log(error);
+      }
+    });
+  }
 }
 
 app.post('/receive-file', upload.single('file'), (req, res) => {
