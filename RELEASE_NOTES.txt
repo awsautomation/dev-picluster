@@ -1,11 +1,12 @@
-# Version 2.2
+# Version 2.3
 
 ## New Features:
-* Functions-as-a-Service
+* When config changes are made, they now populate to every node in the cluster
 
 ## Enhancements:
-* Cleaner Code
+* Container Layout: Container uptime is now displayed
+* CSS Enhancements
+* Deletes the temporary uploaded files
 
 ## Bug Fixes:
-* Rsyslog - Displays date correctly when clicking on 'Today'
-* Fixed bug with VIP management to delete and create IP's correctly.
+* None

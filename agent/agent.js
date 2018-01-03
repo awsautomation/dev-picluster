@@ -42,6 +42,7 @@ let cpu_percent = 0;
 let os_type = '';
 let disk_percentage = 0;
 let total_running_containers = 0;
+let container_uptime = '';
 let running_containers = '';
 let cpu_cores = 0;
 let memory_buffers = 0;
@@ -78,6 +79,13 @@ function monitoring() {
       console.error(err);
     }
     running_containers = stdout.split('\n');
+  });
+
+  exec('docker ps --format "{{.Status}}"', (err, stdout) => {
+    if (err) {
+      console.error(err);
+    }
+    container_uptime = stdout.split('\n');
   });
 
   exec('docker images --format "table {{.Repository}}"', (err, stdout) => {
@@ -235,11 +243,11 @@ app.get('/node-status', (req, res) => {
       disk_percentage,
       total_running_containers,
       running_containers,
+      container_uptime,
       images,
       cpu_cores,
       memory_percentage
     });
-
     res.send(json_output);
   }
 });
@@ -291,13 +299,35 @@ function unzipFile(file) {
 }
 app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
+  const get_config_file = req.body.config_file;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     fs.readFile(req.file.path, (err, data) => {
-      const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => { // eslint-disable-line no-unused-vars
-        unzipFile(newPath);
+      let newPath = '../' + req.file.originalname;
+      let config_file = '';
+
+      if (get_config_file) {
+        if (process.env.PICLUSTER_CONFIG) {
+          config_file = process.env.PICLUSTER_CONFIG;
+        } else {
+          config_file = '../config.json';
+        }
+        newPath = config_file;
+      }
+
+      fs.writeFile(newPath, data, err => {
+        if (!err) {
+          if (req.file.originalname.indexOf('.zip') > -1) {
+            unzipFile(newPath);
+          }
+          fs.unlink(req.file.path, error => {
+            if (error) {
+              console.log(error);
+            }
+          });
+        }
       });
     });
     res.end('Done');

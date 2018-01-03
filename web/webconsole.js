@@ -16,10 +16,16 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = config.ssl_self_signed ? '0' : '1';
 
 const app = express();
 app.use(bodyParser());
-app.use('/assets', express.static(path.join(__dirname, 'assets'), {maxage: '48h'}));
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'), {maxage: '48h'}));
+app.use('/assets', express.static(path.join(__dirname, 'assets'), {
+  maxage: '48h'
+}));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'), {
+  maxage: '48h'
+}));
 
-const upload = multer({dest: '../'});
+const upload = multer({
+  dest: '../'
+});
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
@@ -775,7 +781,7 @@ app.post('/addcontainer', (req, res) => {
   }
 });
 
-function sendFile(file) {
+function sendFile(file, temp_file) {
   const formData = {
     name: 'file',
     token,
@@ -792,6 +798,11 @@ function sendFile(file) {
     if (err) {
       console.error('upload failed:', err);
     } else {
+      fs.unlink(temp_file, error => {
+        if (error) {
+          console.log(error);
+        }
+      });
       console.log('Upload successful!');
     }
   });
@@ -803,11 +814,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    // FixMe: Handle the error...
-    fs.readFile(req.file.path, (err, data) => { // eslint-disable-line handle-callback-err
+    fs.readFile(req.file.path, (err, data) => {
       const newPath = '../' + req.file.originalname;
       fs.writeFile(newPath, data, () => {
-        sendFile(newPath, req.file.originalname);
+        sendFile(newPath, req.file.path);
         res.end('');
       });
     });
