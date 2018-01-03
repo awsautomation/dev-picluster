@@ -1363,8 +1363,10 @@ function copyToAgents(file, config_file, temp_file) {
 
     request.post(form_options, err => {
       if (!err) {
-        addLog('\nCopied ' + file + ' to ' + node);
-        console.log('\nCopied ' + file + ' to ' + node);
+        if (!config_file) {
+          addLog('\nCopied ' + file + ' to ' + node);
+          console.log('\nCopied ' + file + ' to ' + node);
+        }
       }
     });
   });
