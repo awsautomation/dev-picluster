@@ -7,7 +7,7 @@
 	<script>
 		function exec() {
 			var node_list = document.getElementById("node_list");
-			var container-heartbeat-fieldset = document.getElementsByName('container-heartbeat-fieldset');
+			var container_heatbeat_fieldset = document.getElementsByName('container_heatbeat_fieldset');
 			var path = '/addcontainer';
 			var host = node_list.options[node_list.selectedIndex].value;
 			var container = $("#container_name").val();
@@ -15,8 +15,8 @@
 			var heartbeat_args = $("#heartbeat_args").val();
 			var failover_constraints = '';
 
-			container-heartbeat-fieldset.forEach(function(node, i) {
-				failover_constraints += container-heartbeat-fieldset[i].checked ? (failover_constraints ? ',' + node.value : failover_constraints) : node.value;
+			container_heatbeat_fieldset.forEach(function(node, i) {
+				failover_constraints += container_heatbeat_fieldset[i].checked ? (failover_constraints ? ',' + node.value : failover_constraints) : node.value;
 			});
 
 			failover_constraints = !failover_constraints ? 'none' : failover_constraints;
@@ -60,7 +60,7 @@
 					<select name="node_list" id="node_list"></select>
 				</fieldset>
 
-				<fieldset name="container-heartbeat-fieldset" id="container-heartbeat-fieldset">
+				<fieldset name="container_heatbeat_fieldset" id="container_heatbeat_fieldset">
 					<legend><b>Heartbeat/Node Failover</b> <i>(Optional)</i></legend>
 					<label class="windowfont">Heartbeat Port</label>
 					<input type="text" size="5" id="heartbeat_args" class="modal_input" name="heartbeat_args" value="">
@@ -97,11 +97,11 @@
 			$.get("/nodes?token=" + parent.token, function(data) {
 				for (var i in data.nodes) {
 					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-					checkbox += '<input type="checkbox" name="container-heartbeat-fieldset" class="modal_input" value="' + data.nodes[i] + '" /><label id="windowfont" for="container-heartbeat-fieldset">' + data.nodes[i] + '</label><br>';
+					checkbox += '<input type="checkbox" name="container_heatbeat_fieldset" class="modal_input" value="' + data.nodes[i] + '" /><label id="windowfont" for="container_heatbeat_fieldset">' + data.nodes[i] + '</label><br>';
 				}
 				option += '<option value="' + '*' + '">' + '*' + '</option>';
 				$('#node_list').append(option);
-				$('#container-heartbeat-fieldset').append(checkbox);
+				$('#container_heatbeat_fieldset').append(checkbox);
 			});
 		});
 
