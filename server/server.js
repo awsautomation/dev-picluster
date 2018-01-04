@@ -809,9 +809,6 @@ app.get('/removecontainerconfig', (req, res) => {
     if (config.container_host_constraints) {
       Object.keys(config.container_host_constraints).forEach((get_node, i) => {
         Object.keys(config.container_host_constraints[i]).forEach(key => {
-          if ((!config.container_host_constraints[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-            return;
-          }
           const analyze = config.container_host_constraints[i][key].split(',');
           if (container.indexOf(analyze[0]) > -1) {
             config.container_host_constraints.splice(i, i + 1);
@@ -1350,32 +1347,27 @@ app.post('/listnodes', (req, res) => {
 
 function copyToAgents(file, config_file, temp_file) {
   Object.keys(config.layout).forEach((get_node, i) => {
-    Object.keys(config.layout[i]).forEach(key => {
-      const node = config.layout[i].node;
+    const node = config.layout[i].node;
+    const formData = {
+      name: 'file',
+      token,
+      config_file,
+      file: fs.createReadStream(file)
+    };
 
-      if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-        return;
-      }
+    const form_options = {
+      url: `${scheme}${node}:${agent_port}/receive-file`,
+      rejectUnauthorized: ssl_self_signed,
+      formData
+    };
 
-      const formData = {
-        name: 'file',
-        token,
-        config_file,
-        file: fs.createReadStream(file)
-      };
-
-      const form_options = {
-        url: `${scheme}${node}:${agent_port}/receive-file`,
-        rejectUnauthorized: ssl_self_signed,
-        formData
-      };
-
-      request.post(form_options, err => {
-        if (!err) {
+    request.post(form_options, err => {
+      if (!err) {
+        if (!config_file) {
           addLog('\nCopied ' + file + ' to ' + node);
           console.log('\nCopied ' + file + ' to ' + node);
         }
-      });
+      }
     });
   });
   if (temp_file) {

@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<title>PiCluster Web Console</title>
 	<script src="/assets/jquery.min.js"></script>
@@ -19,7 +20,7 @@
 		var manage_container = '';
 		var manage_image = '';
 		var manage_function = '';
-	  var manage_function_uuid = '';
+		var manage_function_uuid = '';
 		var token = '';
 		var syslog = '';
 
@@ -42,8 +43,8 @@
 			return output;
 		}
 
-    function build_docs_nav_menu() {
-      var output = '';
+		function build_docs_nav_menu() {
+			var output = '';
 			output += '<ul class="dropdown">';
 
 			$.get("/listdocs", function(doc_list) {
@@ -156,7 +157,7 @@
 			//	$('#iframe_a').attr('src', '/docs.html?doc_id=doc1');
 			//});
 
-			images-manage_doc_links();
+			build_doc_links();
 
 		});
 

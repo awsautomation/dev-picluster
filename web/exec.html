@@ -26,7 +26,7 @@
 					command: command,
 					node: node
 				}, function(data) {
-					$('#command_output').val($('#command_output').val() + '\n' + data + '\n');
+					$('#exec_output').val($('#exec_output').val() + '\n' + data + '\n');
 				});
 			}
 		}
@@ -107,8 +107,9 @@
 			</div>
 
 			<div class="modal-body">
-				<textarea id="exec_output" name="command_output" value="" enctype="application/json"></textarea>
+				<textarea id="exec_output" name="exec_output" value="" enctype="application/json"></textarea>
 				<div id="rerun_div">
+					<br>
 					<button id="rerun_button">Run Again</button>
 				</div>
 			</div>
@@ -138,7 +139,7 @@
 		}
 
 		rerun_button.onclick = function() {
-			$('#command_output').val('');
+			$('#exec_output').val('');
 			exec();
 		}
 
