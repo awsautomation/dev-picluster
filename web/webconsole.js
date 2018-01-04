@@ -32,12 +32,12 @@ const request_timeout = 5000;
 const web_port = config.web_port;
 const syslog = config.syslog ? config.syslog : '';
 const doc_dir = config.doc_dir;
+const theme = config.theme;
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
-let theme = config.theme;
 let nodedata = '';
 
 if (fs.existsSync(path.normalize(doc_dir))) {
@@ -1046,8 +1046,6 @@ app.get('/getconfig', (req, res) => {
   }
 });
 
-
-
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
@@ -1127,7 +1125,7 @@ app.get('/images-upload.html', (req, res) => {
   res.sendFile(__dirname + '/images-upload.html');
 });
 
-let logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
+const logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
 
 app.get('/logo.png', (req, res) => {
   res.sendFile(logo_slug);
