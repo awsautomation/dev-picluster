@@ -233,6 +233,10 @@ fieldset {
   height: 99%;
 }
 
+#query {
+    font-size: 20px;
+}
+
 #submit_button {
   display: inline;
   font-size: 16px;
