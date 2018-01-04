@@ -198,7 +198,7 @@ fieldset {
 }
 
 .log_type_box {
-  width: 15%;
+  width: 16%;
   display: inline-block;
 }
 
@@ -219,12 +219,28 @@ fieldset {
   width: 75px;
 }
 
+#container_searching{}
+#function_searching {}
+#image_searching {}
+#node_searching {}
+
+#landing_page {
+  text-align: center;
+  color: black;
+}
+
 #modal_container {
   height: 99%;
 }
 
 #submit_button {
   display: inline;
+  padding: 2px 14px;
+  text-align: center;
+}
+
+#submit_button_div {
+  text-align: center;
 }
 
 #log_search {
@@ -248,11 +264,8 @@ fieldset {
 }
 
 #log_type_error {}
-
 #log_type_failure {}
-
 #log_type_warning {}
-
 #log_type_today {}
 
 #log_output {
@@ -287,6 +300,11 @@ fieldset {
 
 #terminal .prompt {
   color: #D75F00;
+  padding: 0px;
+}
+
+#terminal_container {
+  height: 89%;
 }
 
 #host {
@@ -296,8 +314,16 @@ fieldset {
   margin-right: 5px;
 }
 
-#host_add {
-  text-align: center;
+#node_add {}
+#node_remove {}
+
+#node_list {
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+#node_failover_constraint {
+  margin-bottom: 10px;
 }
 
 #container_list {
@@ -339,19 +365,6 @@ fieldset {
 }
 
 #function_url {}
-
-#node_list {
-  font-size: 18px;
-  margin-right: 5px;
-}
-
-#node_list_remove {
-  text-align: center;
-}
-
-#node_failover_constraint {
-  margin-bottom: 10px;
-}
 
 #image_list {
   font-size: 18px;

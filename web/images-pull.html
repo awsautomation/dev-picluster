@@ -85,14 +85,17 @@
 								<option value="latest" selected="selected">Latest</option>
 							</select>
 					</fieldset>
+
 					<fieldset name="host_list" id="host_list">
 						<legend><b>Nodes</b></legend>
 						<input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked"/>
 						<label for="host_list">All</label><br>
 					</fieldset>
-					<p align=center>
+
+					<div id="submit_button_div">
 						<button onclick="exec()" id="submit_button"> Submit</button>
-					</p>
+					</div>
+					
 					<script>
 						function clearAuth() {
 							document.getElementById('imageauth-user').value = "";
