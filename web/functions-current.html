@@ -13,7 +13,7 @@
 		function exec() {
 			var div = document.getElementById('functions-current-modal-body');
 			if (div) {
-				div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font>';
+				div.innerHTML = div.innerHTML + '<br><div class="function_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font></div>';
 			}
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
@@ -43,7 +43,7 @@
 			</div>
 
 			<div id="functions-current-modal-body" class="modal-body">
-				<p align=center>
+				<div id="submit_button_div">
 			</div>
 		</div>
 	</div>

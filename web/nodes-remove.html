@@ -34,10 +34,15 @@
 				<p class="modal-description">
 					Remove a host from the PiCluster config file.
 				</p>
-				<div id="node_list_remove">
-					<label id="windowfont" for="node_list"><b>Select a Node</b></label>
-					<select name="node_list" id="node_list"></select>
-					<button id="submit_button">Submit</button>
+				<div id="node_remove">
+					<fieldset>
+						<legend><b>Node</b></legend>
+						<select name="node_list" id="node_list"></select>
+					</fieldset>
+
+					<div id="submit_button_div">
+						<button id="submit_button">Submit</button>
+					</div>
 				</div>
 				<script>
 					var option = '';
@@ -60,9 +65,7 @@
 			</div>
 
 			<div id="nodes-remove-modal-body" class="modal-body">
-				<p align=center>
-					Please wait......
-				</p>
+				Please wait.
 			</div>
 		</div>
 	</div>

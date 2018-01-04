@@ -9,7 +9,7 @@
 	<script>
 		function exec() {
 			var div = document.getElementById('nodes-list-modal-body');
-			div ? div.innerHTML = div.innerHTML + '<br><p align=center><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font>' : div;
+			div ? div.innerHTML = div.innerHTML + '<br><div id="node_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font></div>' : div;
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;

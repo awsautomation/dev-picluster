@@ -32,6 +32,7 @@ const request_timeout = 5000;
 const web_port = config.web_port;
 const syslog = config.syslog ? config.syslog : '';
 const doc_dir = config.doc_dir;
+const theme = config.theme;
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
@@ -1122,6 +1123,12 @@ app.get('/docs.html', (req, res) => {
 });
 app.get('/images-upload.html', (req, res) => {
   res.sendFile(__dirname + '/images-upload.html');
+});
+
+const logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
+
+app.get('/logo.png', (req, res) => {
+  res.sendFile(logo_slug);
 });
 
 serve_doc_pages();

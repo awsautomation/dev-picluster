@@ -24,5 +24,6 @@
   "web_username": "admin",
   "web_password": "admin",
   "web_connect": "127.0.0.1",
-  "web_port": "3003"
+  "web_port": "3003",
+  "theme": "default"
 }
