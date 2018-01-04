@@ -18,7 +18,7 @@
     "multer": "^1.3.0",
     "node-gyp": "",
     "os": "",
-    "picluster-getos": "^3.0.1",
+    "picluster-getos": "git+https://github.com/picluster/getos.git",
     "request": "",
     "request-debug": "",
     "sys": "",

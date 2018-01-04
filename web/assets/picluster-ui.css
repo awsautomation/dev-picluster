@@ -231,7 +231,7 @@ textarea {
 
 #div_iframe {
   width:100%;
-  padding-top: 5vw;
+  padding-top: 4.3vw;
   height: calc(100% - 4vw);
   z-index: -1;
 }
