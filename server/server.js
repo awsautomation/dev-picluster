@@ -37,7 +37,7 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const server = config.web_connect;
-const rsyslog_host = config.rsyslog_host;
+let rsyslog_host = config.rsyslog_host;
 const server_port = config.server_port;
 const agent_port = config.agent_port;
 let log = '';
@@ -1672,8 +1672,10 @@ function reloadConfig() {
   } else {
     config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
   }
+
   token = config.token;
   dockerFolder = config.docker;
+  rsyslog_host = config.rsyslog_host;
 
   if (config.heartbeat_interval && config.automatic_heartbeat) {
     if (config.automatic_heartbeat.indexOf('enabled') > -1) {

@@ -10,7 +10,7 @@
 * No longer have to click on 'Reload Config', config.json is updated automatically when you submit changes.
 * Legacy 'Reload config' removed from the webconsole and server.
 * Can now update variables cluster-wide in config.json via the webconsole such as:
-       username, password, syslog, theme, token, server, and server_port.
+       username, password, syslog, rsyslog, elasticsearch, VIP, theme, token, server, and server_port.
 
 ## Bug Fixes:
 * None
