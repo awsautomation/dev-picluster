@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -6,50 +7,54 @@
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-	function exec() {
-    var path = '/exec';
-    var image = document.getElementById('image').value;
-    var registry = document.getElementsByName('container_list')[0].value;
+		function exec() {
+			var path = '/exec';
+			var image = document.getElementById('image').value;
+			var registry = document.getElementsByName('container_list')[0].value;
+			var localName = document.getElementById('getLocalName').value;
 
-		!image || image.length <= 0 ? (alert('Error, you did not select an image to pull.'), false) : image;
+			if (!image || !localName) {
+				alert('\nError: You did not select an image to pull or left out a local name.');
+			} else {
+				// Build the fully qualified image name to pull
+				// e.g index.docker.io/ubuntu
+				image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
 
-    // Build the fully qualified image name to pull
-    // e.g index.docker.io/ubuntu
-		image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
+				if (image.indexOf(':') === -1) {
+					var tag = document.getElementById('imageTags').value;
+					image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : image;
+				}
 
-		if (image.indexOf(':') === -1) {
-			var tag = document.getElementById('imageTags').value;
-			image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : image;
-		}
+				var command = "docker image pull " + image + ";docker tag " + image + ' ' + localName;
+				//docker tag tokinring/nginx-php-alpine test
+				var nodes = document.getElementsByName('host_list');
+				var div = document.getElementById('images-pull-modal-body');
+				var username = document.getElementsByName('imageauth-user')[0].value || '';
+				var password = document.getElementsByName('imageauth-password')[0].value || '';
 
-		var command = ["docker", "image", "pull", image].join(' ');
-		var nodes = document.getElementsByName('host_list');
-		var div = document.getElementById('images-pull-modal-body');
-		var username = document.getElementsByName('imageauth-user')[0].value || '';
-		var password = document.getElementsByName('imageauth-password')[0].value || '';
+				// Login first if the user has provided authentication
+				command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : command;
 
-		// Login first if the user has provided authentication
-		command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : command;
-
-		var check_counter = 0;
-		nodes.forEach(function(node, i) {
-			if (nodes[i].checked) {
+				var check_counter = 0;
 				nodes.forEach(function(node, i) {
 					if (nodes[i].checked) {
-						check_counter++;
-						$.post(path, {
-							token: parent.token,
-							command: command,
-							node: node.value
-						}, function(data) {});
+						nodes.forEach(function(node, i) {
+							if (nodes[i].checked) {
+								check_counter++;
+								$.post(path, {
+									token: parent.token,
+									command: command,
+									node: node.value
+								}, function(data) {});
+							}
+						});
 					}
 				});
-			}
-		});
 
-		div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
-		return true;
-  }
+				div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
+				return true;
+			}
+		}
 	</script>
 </head>
 
@@ -84,18 +89,22 @@
 						<select id="imageTags" disabled="disabled">
 								<option value="latest" selected="selected">Latest</option>
 							</select>
+						<br><br>
+						<label for="localname-label">Local Name (Simplified name for the image)</label>
+						<br>
+						<input id="getLocalName" name="getLocalName">
 					</fieldset>
 
 					<fieldset name="host_list" id="host_list">
 						<legend><b>Nodes</b></legend>
-						<input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked"/>
+						<input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked" />
 						<label for="host_list">All</label><br>
 					</fieldset>
 
 					<div id="submit_button_div">
 						<button onclick="exec()" id="submit_button"> Submit</button>
 					</div>
-					
+
 					<script>
 						function clearAuth() {
 							document.getElementById('imageauth-user').value = "";
@@ -274,4 +283,5 @@
 
 	modal.style.display = "block";
 </script>
+
 </html>
