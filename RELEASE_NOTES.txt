@@ -13,4 +13,4 @@
        username, password, syslog, rsyslog, elasticsearch, VIP, theme, token, server, and server_port.
 
 ## Bug Fixes:
-* None
+* You can now create containers from pulled images.
