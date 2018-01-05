@@ -30,9 +30,10 @@ const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
-const syslog = config.syslog ? config.syslog : '';
+let syslog = config.syslog ? config.syslog : '';
 const doc_dir = config.doc_dir;
-const theme = config.theme;
+let theme = config.theme;
+let logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
@@ -122,6 +123,7 @@ app.get('/kibana.html', (req, res) => {
 app.post('/sendconfig', (req, res) => {
   const check_token = req.body.token;
   const payload = req.body.payload;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -146,11 +148,48 @@ app.post('/sendconfig', (req, res) => {
       if (error) {
         res.end(error);
       } else {
+        updateConfig(payload);
         res.end(body);
       }
     });
   }
 });
+
+function reloadVariables() {
+  try {
+    config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
+    token = config.token;
+    user = config.web_username;
+    password = config.web_password;
+    server = config.web_connect;
+    server_port = config.server_port;
+    syslog = config.syslog;
+    theme = config.theme;
+    logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
+  } catch (err) {
+    console.log('\nError parsing JSON while trying to update config');
+  }
+}
+
+function updateConfig(payload) {
+  let updated_config_file = '';
+
+  if (process.env.PICLUSTER_CONFIG) {
+    updated_config_file = process.env.PICLUSTER_CONFIG;
+  } else {
+    updated_config_file = '../config.json';
+  }
+
+  setTimeout(() => {
+    fs.writeFile(updated_config_file, payload, err => {
+      if (err) {
+        console.log(err);
+      } else {
+        reloadVariables();
+      }
+    });
+  }, 10000);
+}
 
 app.post('/', (req, res) => {
   const get_user = req.body.username;
@@ -455,37 +494,6 @@ app.get('/rsyslog', (req, res) => {
         res.end(body);
       } else {
         res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
-app.get('/reloadconfig', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = {
-      url: `${scheme}${server}:${server_port}/reloadconfig?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        if (process.env.PICLUSTER_CONFIG) {
-          config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-        } else {
-          config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-        }
-        token = config.token;
-        user = config.web_username;
-        password = config.web_password;
-        server = config.web_connect;
-        server_port = config.server_port;
-        res.end('\nRequest to update configuration succeeded.');
-      } else {
-        res.end('\nError connecting with server.' + error);
       }
     });
   }
@@ -1124,8 +1132,6 @@ app.get('/docs.html', (req, res) => {
 app.get('/images-upload.html', (req, res) => {
   res.sendFile(__dirname + '/images-upload.html');
 });
-
-const logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
 
 app.get('/logo.png', (req, res) => {
   res.sendFile(logo_slug);

@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -9,11 +10,19 @@
 		function exec() {
 			var payload = $("#payload").val();
 
+			try {
+				var payload_json = JSON.parse(payload);
+			} catch (err) {}
+
 			$.post("/sendconfig", {
 				token: parent.token,
 				payload: payload
 			}, function(data) {
 				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+				if (output.indexOf('Error') === -1) {
+					parent.token = payload_json.token;
+					parent.syslog = payload_json.syslog;
+				}
 				alert(output);
 			});
 		};
@@ -64,4 +73,5 @@
 		getconfig();
 	</script>
 </body>
+
 </html>

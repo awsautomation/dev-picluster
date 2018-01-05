@@ -294,9 +294,13 @@ app.get('/nodes', (req, res) => {
         if (error) {
           console.error(error);
         } else {
-          const check = JSON.parse(response.body);
-          if (check.cpu_percent > 0) {
-            addData(check);
+          try {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+            }
+          } catch (err) {
+            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!');
           }
         }
       });
@@ -1662,31 +1666,23 @@ app.get('/rsyslog', (req, res) => {
   }
 });
 
-app.get('/reloadconfig', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
+function reloadConfig() {
+  if (process.env.PICLUSTER_CONFIG) {
+    config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
   } else {
-    if (process.env.PICLUSTER_CONFIG) {
-      config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-    } else {
-      config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-    }
-    token = config.token;
-    dockerFolder = config.docker;
-
-    if (config.heartbeat_interval && config.automatic_heartbeat) {
-      if (config.automatic_heartbeat.indexOf('enabled') > -1) {
-        console.log('\nEnabing Heartbeat.');
-        automatic_heartbeat();
-      }
-    }
-
-    addLog('\nReloading Config.json\n');
-    res.end('');
+    config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
   }
-});
+  token = config.token;
+  dockerFolder = config.docker;
+
+  if (config.heartbeat_interval && config.automatic_heartbeat) {
+    if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+      console.log('\nEnabing Heartbeat.');
+      automatic_heartbeat();
+    }
+  }
+  addLog('\nReloading Config.json\n');
+}
 
 app.get('/getconfig', (req, res) => {
   const check_token = req.query.token;
@@ -1759,7 +1755,8 @@ app.post('/updateconfig', (req, res) => {
           console.log('\nError while writing config.' + err);
         } else {
           copyToAgents(config_file, 'config', '');
-          res.end('Updated Configuration. Please reload it now for changes to take effect.');
+          reloadConfig();
+          res.end('Updated Configuration.');
         }
       });
     }

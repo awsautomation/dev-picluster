@@ -13,7 +13,7 @@ const async = require('async');
 const exec = require('child-process-promise').exec;
 const sysinfo = require('systeminformation');
 
-const config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+let config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 const app = express();
 
 if (config.ssl_self_signed) {
@@ -25,13 +25,14 @@ app.use(bodyParser());
 const upload = multer({
   dest: '../'
 });
+
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
-const server = config.web_connect;
-const server_port = config.server_port;
+let server = config.web_connect;
+let server_port = config.server_port;
 const agent_port = config.agent_port;
 const node = os.hostname();
-const token = config.token;
+let token = config.token;
 const noop = () => {};
 let vip = '';
 let vip_slave = '';
@@ -297,6 +298,14 @@ function unzipFile(file) {
     path: config.docker
   }));
 }
+
+function reloadConfig() {
+  config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  token = config.token;
+  server = config.web_connect;
+  server_port = config.server_port;
+}
+
 app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
   const get_config_file = req.body.config_file;
@@ -319,6 +328,10 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
 
       fs.writeFile(newPath, data, err => {
         if (!err) {
+          if (get_config_file) {
+            reloadConfig();
+          }
+
           if (req.file.originalname.indexOf('.zip') > -1) {
             unzipFile(newPath);
           }
