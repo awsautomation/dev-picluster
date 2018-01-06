@@ -1763,7 +1763,6 @@ app.post('/updateconfig', (req, res) => {
           }
         });
       }, 3000);
-
     }
   } catch (err) {
     res.end('Error: Invalid JSON. Configuration not saved.');
