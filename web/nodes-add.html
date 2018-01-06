@@ -7,11 +7,11 @@
 	<script>
 		function exec() {
 			var path = '/addhost';
-			var host = $("#host").val();
+			var node = $("#node").val();
 
 			$.post(path, {
 				token: parent.token,
-				host: host
+				host: node
 			}, function(data) {
 				var div = document.getElementById('nodes-add-modal-body');
 				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.\n' + data;
@@ -25,16 +25,16 @@
 		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Add a host to PiCluster</h2>
+				<h2>Add a node to PiCluster</h2>
 			</div>
 			<div class="modal-body">
 				<p class="modal-description">
-					Add a new host to PiCluster config file.
+					Add a new node to PiCluster config file.
 				</p>
 				<div id="node_add">
 					<fieldset>
 						<legend><b>Host or IP</b></legend>
-						<input type="text" id="host" name="host" value="">
+						<input type="text" id="node" name="node" value="">
 					</fieldset>
 
 					<div id="submit_button_div">

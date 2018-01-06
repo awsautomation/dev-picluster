@@ -1120,6 +1120,9 @@ app.get('/nodes-add.html', (req, res) => {
 app.get('/nodes-remove.html', (req, res) => {
   res.sendFile(__dirname + '/nodes-remove.html');
 });
+app.get('/nodes-manage.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-manage.html');
+});
 app.get('/rsyslog.html', (req, res) => {
   res.sendFile(__dirname + '/rsyslog.html');
 });
