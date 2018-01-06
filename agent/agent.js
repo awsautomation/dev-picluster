@@ -325,23 +325,24 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
         }
         newPath = config_file;
       }
-
-      fs.writeFile(newPath, data, err => {
-        if (!err) {
-          if (get_config_file) {
-            reloadConfig();
-          }
-
-          if (req.file.originalname.indexOf('.zip') > -1) {
-            unzipFile(newPath);
-          }
-          fs.unlink(req.file.path, error => {
-            if (error) {
-              console.log(error);
+      setTimeout(() => {
+        fs.writeFile(newPath, data, err => {
+          if (!err) {
+            if (get_config_file) {
+              reloadConfig();
             }
-          });
-        }
-      });
+
+            if (req.file.originalname.indexOf('.zip') > -1) {
+              unzipFile(newPath);
+            }
+            fs.unlink(req.file.path, error => {
+              if (error) {
+                console.log(error);
+              }
+            });
+          }
+        });
+      }, 5000);
     });
     res.end('Done');
   }

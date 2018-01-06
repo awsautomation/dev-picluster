@@ -1752,15 +1752,18 @@ app.post('/updateconfig', (req, res) => {
     } else {
       payload = JSON.stringify(verify_payload, null, 4);
 
-      fs.writeFile(config_file, payload, err => {
-        if (err) {
-          console.log('\nError while writing config.' + err);
-        } else {
-          copyToAgents(config_file, 'config', '');
-          reloadConfig();
-          res.end('Updated Configuration.');
-        }
-      });
+      setTimeout(() => {
+        fs.writeFile(config_file, payload, err => {
+          if (err) {
+            console.log('\nError while writing config.' + err);
+          } else {
+            copyToAgents(config_file, 'config', '');
+            reloadConfig();
+            res.end('Updated Configuration.');
+          }
+        });
+      }, 3000);
+
     }
   } catch (err) {
     res.end('Error: Invalid JSON. Configuration not saved.');
