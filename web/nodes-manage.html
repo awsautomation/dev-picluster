@@ -1,0 +1,130 @@
+<html>
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		var option;
+
+		$.get("/nodes?token=" + parent.token, function(data) {
+			for (var i in data.nodes) {
+				option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+			}
+			$('#node_list').append(option);
+		});
+
+		function exec() {
+			var node_list = document.getElementById("node_list");
+			var radio_node_add = $('input[id=radio_node_add]:checked').val();
+			var radio_node_remove = $('input[id=radio_node_remove]:checked').val();
+
+			var path = radio_node_add ? '/addhost'
+				: radio_node_remove ? '/rmhost'
+				: ''
+
+			var node = radio_node_add ? $("#node").val()
+				: radio_node_remove ? node_list.options[node_list.selectedIndex].value
+				: ''
+
+			$.post(path, {
+				token: parent.token,
+				host: node
+			}, function(data) {
+				var div = document.getElementById('nodes-manage-modal-body');
+				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br>' + data;
+			});
+		}
+
+		$(document).ready(function() {
+			$("input[id$='radio_node_add']").click(function() {
+				$(this).is(":checked") ? $("#node").show() : '';
+				$(this).is(":checked") ? $("#node_list").hide() : '';
+			})
+
+			$("input[id$='radio_node_remove']").click(function() {
+				$(this).is(":checked") ? $("#node").hide() : '';
+				$(this).is(":checked") ? $("#node_list").show() : '';
+			})
+
+			$("#node").hide();
+			$("#node_list").hide();
+		});
+	</script>
+</head>
+
+<body>
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Add a node to PiCluster</h2>
+			</div>
+
+			<div class="modal-body">
+				<p class="modal-description">
+					Add or remove a node to PiCluster config file.
+				</p>
+
+				<div id="node_add">
+					<fieldset>
+						<legend><b>Add</b></legend>
+						<input type="radio" name="nodes_radio" id="radio_node_add">
+						<label for="radio_node_add">Host/IP</label>
+						<input type="text" id="node" name="node" value="">
+					</fieldset>
+				</div>
+
+				<div id="node_remove">
+					<fieldset>
+						<legend><b>Remove</b></legend>
+						<input type="radio" name="nodes_radio" id="radio_node_remove">
+						<label for="radio_node_remove">Node</label>
+						<select name="node_list" id="node_list"></select>
+					</fieldset>
+				</div>
+
+				<div id="submit_button_div">
+					<button id="submit_button">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="output" class="modal">
+		<div class="modal-content modal-small">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div id="nodes-manage-modal-body" class="modal-body">
+				Please wait.
+			</div>
+		</div>
+	</div>
+	</p>
+
+	<script>
+	var span = document.getElementsByClassName("close")[0];
+	var modal = document.getElementById('modal_container');
+	var output_modal = document.getElementById('output');
+	var output_span = document.getElementsByClassName("close")[1];
+	var submit_button = document.getElementById("submit_button");
+
+	span.onclick = function() {
+		modal.style.display = "none";
+	}
+
+	output_span.onclick = function() {
+		output_modal.style.display = "none";
+	}
+
+	submit_button.onclick = function() {
+		modal.style.display = "none";
+		output_modal.style.display = "block";
+		exec();
+	}
+
+	modal.style.display = "block";
+	</script>
+</html>

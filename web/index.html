@@ -117,6 +117,9 @@
 			$('#node-remove').click(function() {
 				$('#iframe_a').attr('src', '/nodes-remove.html');
 			});
+			$('#node-manage').click(function() {
+				$('#iframe_a').attr('src', '/nodes-manage.html');
+			});
 			$('#config-edit').click(function() {
 				$('#iframe_a').attr('src', '/config-edit.html?token=' + token);
 			});
@@ -242,23 +245,22 @@
 				<li id="nav_system"><a onmouseover="this.click()" href="#!">System</a>
 					<ul class="dropdown">
 						<li><a href="#" id="nodes-list">Nodes</a></li>
-						<li><a href="#" id="node-add">Add Node</a></li>
-						<li><a href="#" id="node-remove">Remove Node</a></li>
+						<li><a href="#" id="node-manage">Manage</a></li>
 						<li><a href="#" id="config-edit">Edit Config</a></li>
 					</ul>
 				</li>
 				<li id="nav_containers"><a onmouseover="this.click()" href="#!">Containers</a>
 					<ul class="dropdown">
-						<li><a href="#" id="containers-layout">Running</a></li>
+						<li><a href="#" id="containers-layout">List</a></li>
 						<li><a href="#" id="containers-manage">Manage</a></li>
 						<li><a href="#" id="containers-add">Add</a></li>
 					</ul>
 				</li>
 				<li id="nav_images"><a onmouseover="this.click()" href="#!">Images</a>
 					<ul class="dropdown">
-						<li><a href="#" id="images-pull">Pull</a></li>
-						<li><a href="#" id="images-manage">Manage</a></li>
 						<li><a href="#" id="images-layout">List</a></li>
+						<li><a href="#" id="images-manage">Manage</a></li>
+						<li><a href="#" id="images-pull">Pull</a></li>
 						<li><a href="#" id="images-upload">Upload</a></li>
 					</ul>
 				</li>

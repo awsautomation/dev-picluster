@@ -117,7 +117,8 @@ fieldset {
 
 .modal-small {
   width: 44%;
-  min-width: 370px
+  min-width: 370px;
+  min-height: 400px;
 }
 
 .modal-large {
@@ -137,7 +138,7 @@ fieldset {
   padding: 1px 10px 10px;
   color: black;
   font-size: 18px;
-  white-space: nowrap;
+  max-height: 90%;
 }
 
 .modal_input {
@@ -320,6 +321,13 @@ fieldset {
   margin-right: 5px;
 }
 
+#node {
+  font-size: 18px;
+  width: 50%;
+  display: inline;
+  margin-right: 5px;
+}
+
 #node_add {}
 #node_remove {}
 
@@ -465,7 +473,12 @@ fieldset {
 #functions-viewer-modal-body {}
 #heartbeat-modal-body {}
 #images-manage-modal-body {}
-#images-prune-modal-body {}
+
+#images-prune-modal-body {
+  overflow-y: scroll;
+  white-space: nowrap;
+}
+
 #images-pull-modal-body {}
 #images-upload-modal-body {}
 #killvip-modal-body {}
