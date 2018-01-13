@@ -2,6 +2,8 @@
 
 ## New Features:
 * When config changes are made, they now populate to every node in the cluster
+* Initial support for themes
+* JerryCluster - Hungry for Containers?
 
 ## Enhancements:
 * Container Layout: Container uptime is now displayed
@@ -11,6 +13,13 @@
 * Legacy 'Reload config' removed from the webconsole and server.
 * Can now update variables cluster-wide in config.json via the webconsole such as:
        username, password, syslog, rsyslog, elasticsearch, VIP, theme, token, server, and server_port.
+* Merge node functions into combined manage section
+* Merge container functions into combined manage section
+* Merge image functions into combined manage section
+* More consistent user interface and cleaned up navigation
+* Cleaner client-side javascript
+* Refactored node, container, and image listing into a more readable form
 
 ## Bug Fixes:
 * You can now create containers from pulled images.
+* Major modal CSS bugfixes

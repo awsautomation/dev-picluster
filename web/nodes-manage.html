@@ -38,17 +38,17 @@
 
 		$(document).ready(function() {
 			$("input[id$='radio_node_add']").click(function() {
-				$(this).is(":checked") ? $("#node").show() : '';
-				$(this).is(":checked") ? $("#node_list").hide() : '';
+				$(this).is(":checked") ? $("#node_add").show() : '';
+				$(this).is(":checked") ? $("#node_remove").hide() : '';
 			})
 
 			$("input[id$='radio_node_remove']").click(function() {
-				$(this).is(":checked") ? $("#node").hide() : '';
-				$(this).is(":checked") ? $("#node_list").show() : '';
+				$(this).is(":checked") ? $("#node_add").hide() : '';
+				$(this).is(":checked") ? $("#node_remove").show() : '';
 			})
 
-			$("#node").hide();
-			$("#node_list").hide();
+			$("#node_add").hide();
+			$("#node_remove").hide();
 		});
 	</script>
 </head>
@@ -66,23 +66,26 @@
 					Add or remove a node to PiCluster config file.
 				</p>
 
-				<div id="node_add">
-					<fieldset>
-						<legend><b>Add</b></legend>
+				<fieldset>
+					<legend><b>Node</b></legend>
+					<div id="node_list_action_selector">
 						<input type="radio" name="nodes_radio" id="radio_node_add">
+						<label class="windowfont">Add</label>
+						<hr>
+						<input type="radio" name="nodes_radio" id="radio_node_remove">
+						<label class="windowfont">Remove</label>
+					</div>
+
+					<div id="node_add">
 						<label for="radio_node_add">Host/IP</label>
 						<input type="text" id="node" name="node" value="">
-					</fieldset>
-				</div>
+					</div>
 
-				<div id="node_remove">
-					<fieldset>
-						<legend><b>Remove</b></legend>
-						<input type="radio" name="nodes_radio" id="radio_node_remove">
+					<div id="node_remove">
 						<label for="radio_node_remove">Node</label>
 						<select name="node_list" id="node_list"></select>
-					</fieldset>
-				</div>
+					</div>
+				</fieldset>
 
 				<div id="submit_button_div">
 					<button id="submit_button">Submit</button>
