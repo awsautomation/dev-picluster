@@ -199,7 +199,7 @@
 					var div = document.getElementById('images-manage-modal-body');
 					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
 				});
-			} else if (radio_image_pull && image_pull && local_tag_name) {
+			} else if (radio_image_pull && image_pull) {
 				// Build the fully qualified image name to pull
 				image_pull = registry !== 'hub.docker.com' ? registry + '/' + image_pull : 'index.docker.io/' + image_pull;
 
