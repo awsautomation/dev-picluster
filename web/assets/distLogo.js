@@ -119,6 +119,6 @@ function getDists(arr) {
 function addFontLinux() {
     var fontLinux = document.createElement("link");
     fontLinux.rel="stylesheet";
-    fontLinux.href="/node_modules/font-linux/assets/font-linux.css";
+    fontLinux.href="/node_modules/font-logos/assets/font-logos.css";
     document.head.appendChild(fontLinux);
 }
