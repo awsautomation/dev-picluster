@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -44,7 +45,7 @@
 				option += '<option value="' + '*' + '">' + '*' + '</option>';
 				$('#image_list_node_options').append(option);
 				*/
-				var option ='';
+				var option = '';
 
 				for (var i = 0; i < data.nodes.length; i++) {
 					option += '<input type="checkbox" name="node_list" checked="checked" value="' + data.nodes[i] + '" /> <label for="node_list">' + data.nodes[i] + '</label><br>';
@@ -152,19 +153,18 @@
 			parent.manage_image = '';
 		} else {
 			$(function() {
-				$.get("/nodes?token=" + parent.token, function(data) {
-					for (var i in data.container_list) {
-						option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
-					}
-					option += '<option value="' + '*' + '">' + '*' + '</option>';
-					$('#image_list').append(option);
+					$.get("/nodes?token=" + parent.token, function(data) {
+						for (var i in data.container_list) {
+							option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+						}
+						option += '<option value="' + '*' + '">' + '*' + '</option>';
+						$('#image_list').append(option);
+					});
 				});
-			});
 		}
 
 		function exec() {
 			var image_list = document.getElementById("image_list");
-			var delete_image = document.getElementById("delete_image");
 			var cache = document.getElementById("cache");
 			var no_cache = cache.checked ? 'true' : 'false';
 			var image_build = image_list.options[image_list.selectedIndex].value;
@@ -173,25 +173,13 @@
 			var local_tag_name = document.getElementById('local_tag_name').value;
 			var remote_tag_name = document.getElementById('remote_tag_name').value;
 			var radio_image_build = $('input[id=radio_image_build]:checked').val();
+			var radio_image_delete = $('input[id=radio_image_delete]:checked').val();
 			var radio_image_pull = $('input[id=radio_image_pull]:checked').val();
 			var radio_image_upload = $('input[id=radio_start]:checked').val();
+			var path = '';
 
-
-			var path = radio_image_build && delete_image.checked ? '/delete-image'
-				: radio_image_build && !delete_image.checked ? '/build'
-				: radio_image_pull ? '/exec'
-				: ''
-
-			if (radio_image_build && image_build && delete_image.checked) {
-				$.post(path, {
-					token: parent.token,
-					image: image_build
-				}, function(data) {
-					var div = document.getElementById('images-manage-modal-body');
-					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
-				});
-			} else if (radio_image_build && image_build) {
-				$.post(path, {
+			if (radio_image_build && image_build) {
+				$.post('/build', {
 					token: parent.token,
 					image: image_build,
 					no_cache: no_cache
@@ -199,46 +187,57 @@
 					var div = document.getElementById('images-manage-modal-body');
 					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
 				});
-			} else if (radio_image_pull && image_pull) {
-				// Build the fully qualified image name to pull
-				image_pull = registry !== 'hub.docker.com' ? registry + '/' + image_pull : 'index.docker.io/' + image_pull;
+			}
 
-				if (image_pull.indexOf(':') === -1) {
-					image_pull = remote_tag_name.toLowerCase() !== 'latest' ? image_pull + ':' + remote_tag_name : image_pull;
-				}
-
-				var command = "docker image pull " + image_pull + "; docker tag " + image_pull + ' ' + local_tag_name;
-				//docker tag tokinring/nginx-php-alpine test
-				var nodes = document.getElementsByName('node_list');
-				var div = document.getElementById('images-manage-modal-body');
-				var username = document.getElementsByName('imageauth-user')[0].value || '';
-				var password = document.getElementsByName('imageauth-password')[0].value || '';
-
-				// Login first if the user has provided authentication
-				command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : command;
-
-				var check_counter = 0;
-				nodes.forEach(function(node, i) {
-					if (nodes[i].checked) {
-						nodes.forEach(function(node, i) {
-							if (nodes[i].checked) {
-								check_counter++;
-								$.post(path, {
-									token: parent.token,
-									command: command,
-									node: node.value
-								}, function(data) {});
-							}
-						});
-					}
+			if (image_build && radio_image_delete) {
+				$.post('/delete-image', {
+					token: parent.token,
+					image: image_build
+				}, function(data) {
+					var div = document.getElementById('images-manage-modal-body');
+					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
 				});
+			}
 
-				div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
-			} else {
-				alert('Error, you did not select an image.')
+			if (radio_image_pull) {
+				if (image_pull && local_tag_name) {
+					// Build the fully qualified image name to pull
+					image_pull = registry !== 'hub.docker.com' ? registry + '/' + image_pull : 'index.docker.io/' + image_pull;
+
+					if (image_pull.indexOf(':') === -1) {
+						image_pull = remote_tag_name.toLowerCase() !== 'latest' ? image_pull + ':' + remote_tag_name : image_pull;
+					}
+
+					var command = "docker image pull " + image_pull + "; docker tag " + image_pull + ' ' + local_tag_name;
+					//docker tag tokinring/nginx-php-alpine test
+					var nodes = document.getElementsByName('node_list');
+					var div = document.getElementById('images-manage-modal-body');
+					var username = document.getElementsByName('imageauth-user')[0].value || '';
+					var password = document.getElementsByName('imageauth-password')[0].value || '';
+
+					// Login first if the user has provided authentication
+					command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : command;
+					var check_counter = 0;
+					nodes.forEach(function(node, i) {
+						if (nodes[i].checked) {
+							nodes.forEach(function(node, i) {
+								if (nodes[i].checked) {
+									check_counter++;
+									$.post('/exec', {
+										token: parent.token,
+										command: command,
+										node: node.value
+									}, function(data) {});
+								}
+							});
+						}
+					});
+					div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
+				} else {
+					alert('\nError: Missing local tag name or image name. Please try again');
+				}
 			}
 		}
-
 		$(document).ready(function() {
 			// TODO: Refactor individual radio hide/show into an active/inactive class
 			$("input[id$='radio_image_build']").click(function() {
@@ -250,6 +249,16 @@
 				$(this).is(":checked") ? $("#image_description").hide() : '';
 				$(this).is(":checked") ? $("#image_list_upload").hide() : '';
 				$(this).is(":checked") ? $("#image_list_options_fieldset").show() : '';
+				$(this).is(":checked") ? $("#submit_button_div").show() : '';
+			})
+
+			$("input[id$='radio_image_delete']").click(function() {
+				$("#image_list_options_fieldset").hide();
+				$(this).is(":checked") ? $("#image_list_build").show() : '';
+				$(this).is(":checked") ? $("#image_list_pull").hide() : '';
+				$(this).is(":checked") ? $("#image_list_pull_options").hide() : '';
+				$(this).is(":checked") ? $("#image_description").hide() : '';
+				$(this).is(":checked") ? $("#image_list_upload").hide() : '';
 				$(this).is(":checked") ? $("#submit_button_div").show() : '';
 			})
 
@@ -277,7 +286,6 @@
 				$(this).is(":checked") ? $("#submit_button_div").hide() : '';
 				document.getElementById("token").value = parent.token;
 			})
-
 			$("#image_description").hide();
 			$("#image_list_options_fieldset").hide();
 			$("#image_list_build").hide();
@@ -305,6 +313,9 @@
 						<input type="radio" name="image_radio" id="radio_image_build">
 						<label class="windowfont">Build</label>
 						<hr>
+						<input type="radio" name="image_radio" id="radio_image_delete">
+						<label class="windowfont">Delete</label>
+						<hr>
 						<input type="radio" name="image_radio" id="radio_image_pull">
 						<label class="windowfont">Pull</label>
 						<hr>
@@ -317,6 +328,7 @@
 						<select name="image_list" id="image_list"></select>
 					</div>
 
+
 					<div id="image_list_pull">
 						<label for="image_pull">Image</label>
 						<input id="image_pull"><br>
@@ -327,27 +339,25 @@
 						<br>
 						<label for="local_tag_name">Local Tag</label>
 						<input id="local_tag_name" name="local_tag_name">
-						<div id="image_description"><hr></div>
+						<div id="image_description">
+							<hr>
+						</div>
 					</div>
 
 					<div id="image_list_upload">
 						<form id="upload-widget" method="post" action="/upload" class="dropzone">
 							<input type="hidden" name="token" id="token">
 						</form>
-						<hr>
-						The .zip archive will be copied to each node and extracted in the Docker directory.
+						<hr> The .zip archive will be copied to each node and extracted in the Docker directory.
 					</div>
 				</fieldset>
 
 				<fieldset id="image_list_options_fieldset">
 					<legend><b>Options</b></legend>
-
 					<div id="image_list_build_options">
 						<input type="checkbox" id="cache"><label for="image_list">Build without Docker Cache</label>
 						<br>
-						<input type="checkbox" id="delete_image"><label for="image_list">Delete</label>
 					</div>
-
 					<div id="image_list_pull_options">
 						<div id="image_list_pull_auth_option">
 							<legend><b>Authentication</b> <i>(Optional)</i></legend>
@@ -365,7 +375,7 @@
 
 						<div id="image_list_node_options">
 							<legend><b>Nodes</b></legend>
-							<input type="checkbox" name="node_list" onClick="checkAll(this);" checked="checked" />
+							<input type="checkbox" name="node_list" onclick="checkAll(this);" checked="checked" />
 							<label for="node_list">All</label><br>
 						</div>
 					</div>
@@ -386,32 +396,33 @@
 			</div>
 
 			<div id="images-manage-modal-body" class="modal-body">
-				Please wait.
 			</div>
 		</div>
 	</div>
 
 	<script>
-	  var modal = document.getElementById('modal_container');
-	  var span = document.getElementsByClassName("close")[0];
-  	var output_modal = document.getElementById('output');
-  	var output_span = document.getElementsByClassName("close")[1];
-	  var submit_button = document.getElementById("submit_button");
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
 
-	  span.onclick = function() {
-  		modal.style.display = "none";
-	  }
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
 
-	  output_span.onclick = function() {
-		  output_modal.style.display = "none";
-	  }
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
 
-  	submit_button.onclick = function() {
-	  	modal.style.display = "none";
-  		output_modal.style.display = "block";
-		  exec();
-	  }
+		submit_button.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
 
-  	modal.style.display = "block";
+		modal.style.display = "block";
 	</script>
+</body>
+
 </html>
