@@ -17,29 +17,31 @@
 
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
-				
+
 				(div) ? div.innerHTML = '' : div;
 
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = check_data.data[i].os_type.toLowerCase() || '';
-						var container_list = check_data.data[i].running_containers;
+						var container_layout = check_data.data[i].running_containers;
 						var container_uptime = check_data.data[i].container_uptime;
 
-						div.innerHTML = '<div class="container_card"><div class="container_card_logo">' + distLogo(dist) + check_data.data[i].hostname + '</div><div class="container_card_list"><ul id ="ul_' + i + '">';
+						div.innerHTML += '<div class="container_card"><div class="container_card_logo">' + distLogo(dist) + check_data.data[i].hostname + '</div><div class="container_card_list"><ul id ="ul_' + i + '">';
 
-						var container_list_ul = document.getElementById('ul_' + i);
+						var container_layout_ul = document.getElementById('ul_' + i);
 
-						for (var j in container_list) {
-							if (container_list[j]) {
-								container_list_ul.innerHTML += '<li><a href="/containers-manage.html" onclick="link_function(\'' + container_list[j] + '\')">' + container_list[j] + ' - ' + container_uptime[j] + '</a>';
+						for (var j in container_layout) {
+							if (container_layout[j]) {
+								container_layout_ul.innerHTML += '<li><a href="/containers-manage.html" onclick="link_function(\'' + container_layout[j] + '\')">' + container_layout[j] + ' - ' + container_uptime[j] + '</a>';
 							}
 						}
 
-						div.innerHTML += '</ul></div><hr>'
+						div.innerHTML += '</ul></div></div><hr>'
+
 					}
 
 					addFontLinux();
+
 				}
 			});
 		}
