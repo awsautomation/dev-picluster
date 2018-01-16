@@ -3,6 +3,7 @@
     "docker": "../docker",
     "doc_dir": "../docs",
     "server_port": "3000",
+    "theme": "default",
     "agent_port": "3001",
     "ssl": false,
     "ssl_self_signed": false,
@@ -16,8 +17,7 @@
         "node": "127.0.0.1",
         "nginx": "80"
     }],
-    "container_host_constraints": [{
-    }],
+    "container_host_constraints": [{}],
     "automatic_heartbeat": "enabled",
     "heartbeat_interval": "300000",
     "syslog": "dmesg",
