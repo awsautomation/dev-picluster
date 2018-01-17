@@ -112,7 +112,7 @@
 					var div = document.getElementById('containers-manage-modal-body');
 					div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 				});
-			} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config) {
+			} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host) {
 				$.post(path, {
 					token: parent.token,
 					command: command,
