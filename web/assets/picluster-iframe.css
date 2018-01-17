@@ -463,6 +463,10 @@ fieldset {
   width: 100%;
 }
 
+#function-args {
+  width: 100%;
+}
+
 #image_list {
   font-size: 18px;
 }
