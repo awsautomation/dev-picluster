@@ -145,24 +145,25 @@
 			});
 		});
 
-		// Populate image_list drop down
-		if (parent.manage_image) {
-			var option = '';
-			option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
-			$('#image_list').append(option);
-			parent.manage_image = '';
-		} else {
-			$(function() {
-					$.get("/nodes?token=" + parent.token, function(data) {
-						for (var i in data.container_list) {
-							option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
-						}
-						option += '<option value="' + '*' + '">' + '*' + '</option>';
-						$('#image_list').append(option);
-					});
-				});
-		}
-
+$(function() {
+	// Populate image_list drop down
+	var option = '';
+	if (parent.manage_image) {
+		option += '<option value="' + parent.manage_image + '">' + parent.manage_image + '</option>';
+		$('#image_list').append(option);
+		parent.manage_image = '';
+	} else {
+		$(function() {
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.container_list) {
+					option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+				}
+				option += '<option value="' + '*' + '">' + '*' + '</option>';
+				$('#image_list').append(option);
+			});
+		});
+	}
+});
 		function exec() {
 			var image_list = document.getElementById("image_list");
 			var cache = document.getElementById("cache");
