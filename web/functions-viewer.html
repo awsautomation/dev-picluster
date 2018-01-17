@@ -30,7 +30,7 @@
 			var command = '';
 
 			document.getElementById("function_output").value = 'Fetching.....';
-			document.getElementById("url").value = 'Fetching.....';
+			document.getElementById("function_url").value = 'Fetching.....';
 
 			if (get_function.length > 1) {
 				$.get("/nodes?token=" + parent.token, function(data) {
@@ -38,10 +38,10 @@
 						if (data.functions.name[i].name.indexOf(get_function) > -1) {
 							if (data.functions.name[i].name && data.functions.name[i].output) {
 								document.getElementById("function_output").value = data.functions.name[i].output;
-								document.getElementById("url").value = 'curl \"' + data.function_server + '?token=' + parent.token + '&uuid=' + data.functions.name[i].uuid + '\"';
+								document.getElementById("function_url").value = 'curl \"' + data.function_server + '?token=' + parent.token + '&uuid=' + data.functions.name[i].uuid + '\"';
 							} else {
 								document.getElementById("function_output").value = 'No output or function already removed.';
-								document.getElementById("url").value = 'No output or function already removed.';
+								document.getElementById("function_url").value = 'No output or function already removed.';
 							}
 						}
 					}
@@ -78,7 +78,7 @@
 				<fieldset name="options" id="options">
 					<legend><b>Function Data</b></legend>
 					<label>Data Retrieval</label>
-					<input type="text" id="url" name="url" class="modal_input" value="">
+					<input type="text" id="function_url" name="function_url" class="modal_input" value="">
 					<textarea id="function_output"></textarea>
 				</fieldset>
 			</div>

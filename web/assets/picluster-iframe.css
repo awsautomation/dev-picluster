@@ -456,9 +456,12 @@ fieldset {
 #function_output {
   width: 100%;
   height: 50%;
+
 }
 
-#function_url {}
+#function_url {
+  width: 100%;
+}
 
 #image_list {
   font-size: 18px;
