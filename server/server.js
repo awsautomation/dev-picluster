@@ -6,7 +6,7 @@ const tls = require('tls');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const express = require('express');
-const datetime = require('node-datetime');
+const Moment = require('moment');
 const request = require('request');
 
 const functions = {
@@ -710,7 +710,7 @@ app.get('/addhost', (req, res) => {
 });
 
 function elasticsearch_monitoring(cpu, node, disk, memory) {
-var current_time = new moment ().format("YYYY-MM-DD HH:mm:ss Z");
+  const current_time = new Moment().format('YYYY-MM-DD HH:mm:ss Z');
 
   const options = {
     url: config.elasticsearch + '/picluster-monitoring/picluster-monitoring',
@@ -719,8 +719,7 @@ var current_time = new moment ().format("YYYY-MM-DD HH:mm:ss Z");
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      date:  current_time,
-      //dt.format('Y-m-d +-H:M:S'),
+      date: current_time,
       cpu,
       node,
       disk,
@@ -736,11 +735,11 @@ var current_time = new moment ().format("YYYY-MM-DD HH:mm:ss Z");
 }
 
 function elasticsearch(data) {
-  const dt = dateTime.create();
+  const current_time = new Moment().format('YYYY-MM-DD HH:mm:ss Z');
 
   const elasticsearch_data = JSON.stringify({
-    data,
-    date: dt.format('Y-m-d H:M:S')
+    date: current_time,
+    data
   });
 
   const options = {
