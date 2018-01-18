@@ -54,7 +54,7 @@ if (config.elasticsearch && config.elasticsearch_index) {
       }
     },
     mappings: {
-      picluster: {
+      'picluster-logging': {
         properties: {
           date: {
             type: 'date',
@@ -70,8 +70,48 @@ if (config.elasticsearch && config.elasticsearch_index) {
     }
   };
 
+  const monitoring_mapping = {
+    settings: {
+      index: {
+        number_of_shards: 3,
+        number_of_replicas: 2
+      }
+    },
+    mappings: {
+      'picluster-monitoring': {
+        properties: {
+          date: {
+            type: 'date',
+            index: 'true',
+            format: 'yyyy-MM-dd HH:mm:ss'
+          },
+          cpu: {
+            type: 'double'
+          },
+          node: {
+            type: 'keyword',
+            index: 'true'
+          },
+          memory: {
+            type: 'double',
+            index: 'true'
+          },
+          disk: {
+            type: 'double',
+            index: 'true'
+          }
+        }
+      }
+    }
+  };
+
+  create_es_mappings(mapping, 'picluster-logging');
+  create_es_mappings(monitoring_mapping, 'picluster-monitoring');
+}
+
+function create_es_mappings(mapping, index) {
   const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index,
+    url: config.elasticsearch + '/' + index,
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -298,9 +338,12 @@ app.get('/nodes', (req, res) => {
             const check = JSON.parse(response.body);
             if (check.cpu_percent > 0) {
               addData(check);
+              if (config.elasticsearch) {
+                elasticsearch_monitoring(check.cpu_percent, check.hostname, check.disk_percentage, check.memory_percentage);
+              }
             }
           } catch (err) {
-            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!');
+            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!' + err);
           }
         }
       });
@@ -665,6 +708,31 @@ app.get('/addhost', (req, res) => {
     }
   }
 });
+
+function elasticsearch_monitoring(cpu, node, disk, memory) {
+  const dt = dateTime.create();
+
+  const options = {
+    url: config.elasticsearch + '/picluster-monitoring/picluster-monitoring',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      date: dt.format('Y-m-d H:M:S'),
+      cpu,
+      node,
+      disk,
+      memory
+    })
+  };
+
+  request(options, error => {
+    if (error) {
+      console.log(error);
+    }
+  });
+}
 
 function elasticsearch(data) {
   const dt = dateTime.create();
