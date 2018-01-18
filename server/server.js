@@ -59,7 +59,7 @@ if (config.elasticsearch) {
           date: {
             type: 'date',
             index: 'true',
-            format: 'yyyy-MM-dd HH:mm:ss'
+            format: 'yyyy-MM-dd HH:mm:ss Z'
           },
           data: {
             type: 'keyword',

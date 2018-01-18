@@ -10,7 +10,7 @@
     "fs": "",
     "line-reader": "",
     "multer": "^1.3.0",
-    "moment": "",
+    "node-datetime": "^1.0.1",
     "node-gyp": "",
     "request": "",
     "request-debug": "",
