@@ -339,7 +339,7 @@ app.get('/nodes', (req, res) => {
             if (check.cpu_percent > 0) {
               addData(check);
               if (config.elasticsearch) {
-                elasticsearch_monitoring(check.cpu_percent, check.hostname, check.disk_percentage, check.memory_percentage);
+                elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage);
               }
             }
           } catch (err) {
