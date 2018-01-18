@@ -45,7 +45,7 @@ let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
 
-if (config.elasticsearch && config.elasticsearch_index) {
+if (config.elasticsearch) {
   const mapping = {
     settings: {
       index: {
@@ -743,7 +743,7 @@ function elasticsearch(data) {
   });
 
   const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+    url: config.elasticsearch + '/picluster-logging/picluster-logging',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -772,7 +772,7 @@ app.get('/clear-elasticsearch', (req, res) => {
     };
 
     const options = {
-      url: config.elasticsearch + '/' + config.elasticsearch_index,
+      url: config.elasticsearch + '/picluster-logging',
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -1706,7 +1706,7 @@ app.get('/log', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.elasticsearch && config.elasticsearch_index) {
+    if (config.elasticsearch) {
       elasticsearch(log);
     }
     res.send(log);
