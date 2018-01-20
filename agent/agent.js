@@ -45,6 +45,7 @@ let disk_percentage = 0;
 let total_running_containers = 0;
 let container_uptime = '';
 let running_containers = '';
+let container_stats = '';
 let cpu_cores = 0;
 let memory_buffers = 0;
 let memory_swap = 0;
@@ -80,6 +81,13 @@ function monitoring() {
       console.error(err);
     }
     running_containers = stdout.split('\n');
+  });
+
+  exec('docker stats --no-stream  --format "{{.Name}} {{.CPUPerc}} {{.MemPerc}}"', (err, stdout) => {
+    if (err) {
+      console.error(err);
+    }
+    container_stats = stdout.split('\n');
   });
 
   exec('docker ps --format "{{.Status}}"', (err, stdout) => {
@@ -244,6 +252,7 @@ app.get('/node-status', (req, res) => {
       disk_percentage,
       total_running_containers,
       running_containers,
+      container_stats,
       container_uptime,
       images,
       cpu_cores,
