@@ -28,83 +28,79 @@
 						var container_layout = check_data.data[i].running_containers;
 						var container_uptime = check_data.data[i].container_uptime;
 
-						var div_cpu = document.createElement('div');
-						div_cpu.className = "node_status_div";
-
-						var div_cpu_clearfix = document.createElement('div');
-						div_cpu_clearfix.className = 'clearfix';
-
-						var div_cpu_running = document.createElement('div');
-						if (check_data.data[i].container_stats[i]) {
-							var cpu = check_data.data[i].container_stats[i].split(' ');
-							if (cpu.length == 3) {
-								div_cpu_running.className = 'c100 p' + cpu[1].replace('%', '') + ' small';
-								div_cpu_running.innerHTML = '<span id="' + i + '">' + cpu[1].replace('%', '') + '%</span>';
-							}
-						}
-
-
-						var div_cpu_slice = document.createElement('div');
-						div_cpu_slice.className = "slice";
-
-						var div_cpu_bar = document.createElement('div');
-						div_cpu_bar.className = "bar";
-
-						var div_cpu_fill = document.createElement('div');
-						div_cpu_fill.className = "fill";
-
-						var div_memory = document.createElement('div_memory');
-						div_memory.className = "node_status_div";
-
-						var div_memory_clearfix = document.createElement('div');
-						div_memory_clearfix.className = 'clearfix';
-
-						var div_memory_running_class = document.createElement('div');
-						if (check_data.data[i].container_stats[i]) {
-							var mem = check_data.data[i].container_stats[i].split(' ');
-							if (mem.length == 3) {
-								div_memory_running_class.className = 'c100 p' + mem[1].replace('%', '') + ' small';
-								div_memory_running_class.innerHTML = '<span id="' + i + '">' + mem[1].replace('%', '') + '%</span>';
-							}
-						}
-						var div_memory_slice = document.createElement('div');
-						div_memory_slice.className = "slice";
-
-						var div_memory_bar = document.createElement('div');
-						div_memory_bar.className = "bar";
-
-						var div_memory_fill = document.createElement('div');
-						div_memory_fill.className = "fill";
-
-						div_cpu.appendChild(div_cpu_clearfix);
-						div_cpu_clearfix.appendChild(div_cpu_running);
-						div_cpu_running.appendChild(div_cpu_slice);
-						div_cpu_slice.appendChild(div_cpu_bar);
-						div_cpu_bar.appendChild(div_cpu_fill);
-						div_cpu.innerHTML += '<font class="node_status_text"><b>CPU Usage</b>';
-
-						div_memory.appendChild(div_memory_clearfix);
-						div_memory_clearfix.appendChild(div_memory_running_class);
-						div_memory_running_class.appendChild(div_memory_slice);
-						div_memory_slice.appendChild(div_memory_bar);
-						div_memory_bar.appendChild(div_memory_fill);
-						div_memory.innerHTML += '<font class="node_status_text"><b>Memory Usage</b>';
-
-						var node_card = document.createElement("div")
-						node_card.className = "node_card";
-
-
 						div.innerHTML += '<div class="container_card"><div class="container_card_logo">' + distLogo(dist) + check_data.data[i].hostname + '</div><div class="container_card_list"><ul id ="ul_' + i + '">';
 
 						var container_layout_ul = document.getElementById('ul_' + i);
 
 						for (var j in container_layout) {
 							if (container_layout[j]) {
-								node_card.appendChild(div_cpu);
-								node_card.appendChild(div_memory);
-								//div.appendChild(node_card);
-								container_layout_ul.innerHTML += '<br><br><li><a href="/containers-manage.html" onclick="link_function(\'' + container_layout[j] + '\')">' + container_layout[j] + ' - ' + container_uptime[j] + '</a>';
-								container_layout_ul.append(node_card);
+								var name = check_data.data[j].container_stats[j].split(' ');
+								if (container_layout[j] == name[0]) {
+									var node_card = document.createElement("div")
+									node_card.className = "node_card";
+
+
+									var div_cpu = document.createElement('div');
+									div_cpu.className = "node_status_div";
+
+									var div_cpu_clearfix = document.createElement('div');
+									div_cpu_clearfix.className = 'clearfix';
+
+									var div_cpu_running = document.createElement('div');
+
+									div_cpu_running.className = 'c100 p' + name[1].replace('%', '') + ' small';
+									div_cpu_running.innerHTML = '<span id="' + i + '">' + name[1].replace('%', '') + '%</span>';
+
+									var div_cpu_slice = document.createElement('div');
+									div_cpu_slice.className = "slice";
+
+									var div_cpu_bar = document.createElement('div');
+									div_cpu_bar.className = "bar";
+
+									var div_cpu_fill = document.createElement('div');
+									div_cpu_fill.className = "fill";
+
+									var div_memory = document.createElement('div_memory');
+									div_memory.className = "node_status_div";
+
+									var div_memory_clearfix = document.createElement('div');
+									div_memory_clearfix.className = 'clearfix';
+
+									var div_memory_running_class = document.createElement('div');
+
+
+									div_memory_running_class.className = 'c100 p' + name[2].replace('%', '') + ' small';
+									div_memory_running_class.innerHTML = '<span id="' + i + '">' + name[2].replace('%', '') + '%</span>';
+
+									var div_memory_slice = document.createElement('div');
+									div_memory_slice.className = "slice";
+
+									var div_memory_bar = document.createElement('div');
+									div_memory_bar.className = "bar";
+
+									var div_memory_fill = document.createElement('div');
+									div_memory_fill.className = "fill";
+
+									div_cpu.appendChild(div_cpu_clearfix);
+									div_cpu_clearfix.appendChild(div_cpu_running);
+									div_cpu_running.appendChild(div_cpu_slice);
+									div_cpu_slice.appendChild(div_cpu_bar);
+									div_cpu_bar.appendChild(div_cpu_fill);
+									div_cpu.innerHTML += '<font class="node_status_text"><b>CPU Usage</b>';
+
+									div_memory.appendChild(div_memory_clearfix);
+									div_memory_clearfix.appendChild(div_memory_running_class);
+									div_memory_running_class.appendChild(div_memory_slice);
+									div_memory_slice.appendChild(div_memory_bar);
+									div_memory_bar.appendChild(div_memory_fill);
+									div_memory.innerHTML += '<font class="node_status_text"><b>Memory Usage</b>';
+
+									node_card.appendChild(div_cpu);
+									node_card.appendChild(div_memory);
+
+									container_layout_ul.innerHTML += '<br><br><li><a href="/containers-manage.html" onclick="link_function(\'' + container_layout[j] + '\')">' + container_layout[j] + ' - ' + container_uptime[j] + '</a>';
+									container_layout_ul.append(node_card);
+								}
 							}
 						}
 
