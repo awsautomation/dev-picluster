@@ -49,7 +49,7 @@
 
 								var div_cpu_running = document.createElement('div');
 
-								div_cpu_running.className = 'c100 p' + get_container_cpu[j] + ' small';
+								div_cpu_running.className = 'c100 p' + get_container_cpu[j] / check_data.data.cpu_cores + ' small';
 								div_cpu_running.innerHTML = '<span id="' + i + '">' + get_container_cpu[j] + '%</span>';
 
 								var div_cpu_slice = document.createElement('div');
