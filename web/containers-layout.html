@@ -50,8 +50,8 @@
 
 								var div_cpu_running = document.createElement('div');
 
-								div_cpu_running.className = 'c100 p' + get_container_cpu[j] / cpu_cores + ' small';
-								div_cpu_running.innerHTML = '<span id="' + i + '">' + get_container_cpu[j] / cpu_cores + '%</span>';
+								div_cpu_running.className = 'c100 p' + Math.round(get_container_cpu[j] / cpu_cores) + ' small';
+								div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(get_container_cpu[j] / cpu_cores) + '%</span>';
 
 								var div_cpu_slice = document.createElement('div');
 								div_cpu_slice.className = "slice";
