@@ -95,7 +95,7 @@ function monitoring() {
     if (err) {
       console.error(err);
     }
-    container_mem_stats = stdout.split('\n');
+    container_mem_stats = stdout.replace('%','').split('\n');
   });
 
   exec('docker ps --format "{{.Status}}"', (err, stdout) => {
