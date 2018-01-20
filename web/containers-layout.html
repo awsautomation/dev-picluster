@@ -33,9 +33,9 @@
 						var container_layout_ul = document.getElementById('ul_' + i);
 
 						for (var j in container_layout) {
-							if (container_layout[j]) {
+							if (container_layout[j] ) {
 								var name = check_data.data[j].container_stats[j].split(',');
-
+alert(name);
 								var node_card = document.createElement("div")
 								node_card.className = "node_card";
 
