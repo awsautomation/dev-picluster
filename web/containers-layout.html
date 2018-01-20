@@ -48,8 +48,8 @@
 
 									var div_cpu_running = document.createElement('div');
 
-									div_cpu_running.className = 'c100 p' + name[0].replace('%', '') + ' small';
-									div_cpu_running.innerHTML = '<span id="' + i + '">' + name[0].replace('%', '') + '%</span>';
+									div_cpu_running.className = 'c100 p' + name[j].replace('%', '') + ' small';
+									div_cpu_running.innerHTML = '<span id="' + i + '">' + name[j].replace('%', '') + '%</span>';
 
 									var div_cpu_slice = document.createElement('div');
 									div_cpu_slice.className = "slice";
@@ -69,8 +69,8 @@
 									var div_memory_running_class = document.createElement('div');
 
 
-									div_memory_running_class.className = 'c100 p' + name[1].replace('%', '') + ' small';
-									div_memory_running_class.innerHTML = '<span id="' + i + '">' + name[1].replace('%', '') + '%</span>';
+									div_memory_running_class.className = 'c100 p' + name[j+1].replace('%', '') + ' small';
+									div_memory_running_class.innerHTML = '<span id="' + i + '">' + name[j+1].replace('%', '') + '%</span>';
 
 									var div_memory_slice = document.createElement('div');
 									div_memory_slice.className = "slice";
