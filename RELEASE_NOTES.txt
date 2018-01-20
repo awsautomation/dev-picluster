@@ -4,8 +4,9 @@
 * When config changes are made, they now populate to every node in the cluster
 * Initial support for themes
 * JerryCluster - Hungry for Containers?
-* ElasticSearch Metrics for each node - Monitor CPU, Memory, and disk usage over time.
+* Elasticsearch Metrics for each node - Monitor CPU, Memory, and disk usage over time.
   - elasticsearch_index in config.json is now deprecated.
+* Included Grafana dashboard (grafana-dashboard.json) to view host metrics from Elasticsearch.
 
 ## Enhancements:
 * Container Layout: Container uptime is now displayed
