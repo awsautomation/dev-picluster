@@ -29,6 +29,7 @@
 						var container_uptime = check_data.data[i].container_uptime;
 						var get_container_cpu =  check_data.data[i].container_cpu_stats;
 						var get_container_mem =  check_data.data[i].container_mem_stats;
+						var cpu_cores =  check_data.data[i].cpu_cores;
 
 						div.innerHTML += '<div class="container_card"><div class="container_card_logo">' + distLogo(dist) + check_data.data[i].hostname + '</div><div class="container_card_list"><ul id ="ul_' + i + '">';
 
@@ -49,8 +50,8 @@
 
 								var div_cpu_running = document.createElement('div');
 
-								div_cpu_running.className = 'c100 p' + get_container_cpu[j] / check_data.data.cpu_cores + ' small';
-								div_cpu_running.innerHTML = '<span id="' + i + '">' + get_container_cpu[j] + '%</span>';
+								div_cpu_running.className = 'c100 p' + get_container_cpu[j] / cpu_cores + ' small';
+								div_cpu_running.innerHTML = '<span id="' + i + '">' + get_container_cpu[j] / cpu_cores + '%</span>';
 
 								var div_cpu_slice = document.createElement('div');
 								div_cpu_slice.className = "slice";
