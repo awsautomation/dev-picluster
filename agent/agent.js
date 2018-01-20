@@ -88,7 +88,6 @@ function monitoring() {
       console.error(err);
     }
     container_stats = stdout.split('\n');
-    console.log(container_stats);
   });
 
   exec('docker ps --format "{{.Status}}"', (err, stdout) => {

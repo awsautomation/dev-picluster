@@ -33,7 +33,7 @@
 						var container_layout_ul = document.getElementById('ul_' + i);
 
 						for (var j in container_layout) {
-							if (container_layout[j] && check_data.data[j].container_stats[j]) {
+							if (container_layout[j]) {
 								var name = check_data.data[j].container_stats[j].split(',');
 
 								var node_card = document.createElement("div")
