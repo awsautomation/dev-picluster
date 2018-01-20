@@ -83,7 +83,7 @@ function monitoring() {
     running_containers = stdout.split('\n');
   });
 
-  exec('docker stats --no-stream  --format "{{.CPUPerc}} {{.MemPerc}}"', (err, stdout) => {
+  exec('docker stats --no-stream  --format "{{.CPUPerc}},{{.MemPerc}}"', (err, stdout) => {
     if (err) {
       console.error(err);
     }
