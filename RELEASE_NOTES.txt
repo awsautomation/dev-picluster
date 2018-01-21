@@ -7,6 +7,7 @@
 * Elasticsearch Metrics for each node - Monitor CPU, Memory, and disk usage over time.
   - elasticsearch_index in config.json is now deprecated.
 * Included Grafana dashboard (grafana-dashboard.json) to view host metrics from Elasticsearch.
+* Container CPU and Memory metrics are now displayed on the container layout page.
 
 ## Enhancements:
 * Container Layout: Container uptime is now displayed
