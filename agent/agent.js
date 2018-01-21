@@ -88,14 +88,14 @@ function monitoring() {
     if (err) {
       console.error(err);
     }
-    container_cpu_stats = stdout.replace('%', '').split('\n');
+    container_cpu_stats = stdout.replace(/%/gi,'').split('\n');
   });
 
   exec('docker stats --no-stream  --format "{{.MemPerc}}"', (err, stdout) => {
     if (err) {
       console.error(err);
     }
-    container_mem_stats = stdout.replace('%', '').split('\n');
+    container_mem_stats = stdout.replace(/%/gi,'').split('\n');
   });
 
   exec('docker ps --format "{{.Status}}"', (err, stdout) => {
