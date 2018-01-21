@@ -31,7 +31,7 @@
 						var get_container_mem =  check_data.data[i].container_mem_stats;
 						var cpu_cores =  check_data.data[i].cpu_cores;
 
-						div.innerHTML += '<div class="container_card"><div class="container_card_logo">' + distLogo(dist) + check_data.data[i].hostname + '</div><div class="container_card_list"><ul id ="ul_' + i + '">';
+						div.innerHTML += '<div class="container_card"><div class="container_card_logo"><b>' + distLogo(dist) + check_data.data[i].hostname + '</b></div><div class="container_card_list"><ul id ="ul_' + i + '">';
 
 						var container_layout_ul = document.getElementById('ul_' + i);
 
