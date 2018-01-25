@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -6,153 +7,154 @@
 	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
-	// Populate container_heartbeat_fieldset selection and node_list_add drop down
-	$(function() {
-		var option = '';
-		var checkbox = '';
-		$.get("/nodes?token=" + parent.token, function(data) {
-			for (var i in data.nodes) {
-				option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-				checkbox += '<input type="checkbox" name="container_heartbeat_fieldset" class="modal_input" value="' + data.nodes[i] + '" /><label id="windowfont" for="container_heartbeat_fieldset">' + data.nodes[i] + '</label><br>';
-			}
-			option += '<option value="' + '*' + '">' + '*' + '</option>';
-			$('#node_list_add').append(option);
-			$('#node_failover_constraint').append(checkbox);
-		});
-	});
-
-	// Populate container_list dropdown
-	$(function() {
-		var option = '';
-		if (parent.manage_container) {
-			option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
-			$('#container_list').append(option);
-			parent.manage_container = '';
-		} else {
+		// Populate container_heartbeat_fieldset selection and node_list_add drop down
+		$(function() {
+			var option = '';
+			var checkbox = '';
 			$.get("/nodes?token=" + parent.token, function(data) {
-				for (var i in data.container_list) {
-					option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+				for (var i in data.nodes) {
+					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+					checkbox += '<input type="checkbox" name="container_heartbeat_fieldset" class="modal_input" value="' + data.nodes[i] + '" /><label id="windowfont" for="container_heartbeat_fieldset">' + data.nodes[i] + '</label><br>';
 				}
 				option += '<option value="' + '*' + '">' + '*' + '</option>';
-				$('#container_list').append(option);
+				$('#node_list_add').append(option);
+				$('#node_failover_constraint').append(checkbox);
 			});
-		}
-	});
-
-	// Populate node_list_modify drop down
-	$(function() {
-		var option = '';
-		$.get("/nodes?token=" + parent.token, function(data) {
-			for (var i in data.nodes) {
-				option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
-			}
-			option += '<option value="' + '*' + '">' + '*' + '</option>';
-			$('#node_list_modify').append(option);
-		});
-	});
-
-	function exec() {
-		var node_list_add = document.getElementById("node_list_add");
-		var node_list_modify = document.getElementById("node_list_modify");
-		var container_list = document.getElementById("container_list");
-		var node_add = node_list_add.options[node_list_add.selectedIndex].value;
-		var node_modify = node_list_modify.options[node_list_modify.selectedIndex].value;
-		var container_add = $("#container_name").val();
-		var container_modify = container_list.options[container_list.selectedIndex].value;
-		var container_add_args = $("#container_args").val();
-		var heartbeat_add_args = $("#heartbeat_args").val();
-		var container_heartbeat_fieldset = document.getElementsByName('container_heartbeat_fieldset');
-		var radio_container_add = $('input[id=radio_container_add]:checked').val();
-		var radio_container_modify = $('input[id=radio_container_modify]:checked').val();
-		var radio_start = $('input[id=radio_start]:checked').val();
-		var radio_stop = $('input[id=radio_stop]:checked').val();
-		var radio_restart = $('input[id=radio_restart]:checked').val();
-		var radio_delete = $('input[id=radio_delete]:checked').val();
-		var radio_create = $('input[id=radio_create]:checked').val();
-		var radio_container_log = $('input[id=radio_container_log]:checked').val();
-		var radio_change_host = $('input[id=radio_change_host]:checked').val();
-		var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
-		var command;
-		var path;
-		var failover_constraints;
-
-		container_heartbeat_fieldset.forEach(function(node, i) {
-			if (container_heartbeat_fieldset[i].checked) {
-				failover_constraints += failover_constraints ? ',' + node.value : node.value;
-			}
 		});
 
-		failover_constraints = !failover_constraints ? 'none' : failover_constraints;
-
-		path = radio_container_add && radio_container_add.indexOf('on') > -1 ? '/addcontainer'
-			: radio_start && radio_start.indexOf('on') > -1 ? '/start'
-			: radio_stop && radio_stop.indexOf('on') > -1 ? '/stop'
-			: radio_restart && radio_restart.indexOf('on') > -1 ? '/restart'
-			: radio_delete && radio_delete.indexOf('on') > -1 ? '/delete'
-			: radio_create && radio_create.indexOf('on') > -1 ? '/create'
-			: radio_container_log && radio_container_log.indexOf('on') > -1 ? '/containerlog'
-			: radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost'
-			: radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig'
-			: ''
-
-		if (path) {
-			if ((radio_change_host) && (container_modify.indexOf('*') > -1) || (radio_remove_container_config) && (container_modify.indexOf('*') > -1)) {
-				alert('\nError: You cannot control all of these containers at once for chosen action.');
-				output_modal.style.display = "none";
-				modal.style.display = "block";
-			} else if (radio_container_add) {
-				$.post(path, {
-					token: parent.token,
-					container: container_add,
-					host: node_add,
-					container_args: container_add_args,
-					heartbeat_args: heartbeat_add_args,
-					failover_constraints: container_add + ',' + failover_constraints
-				}, function(data) {
-					var div = document.getElementById('containers-manage-modal-body');
-					div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
-				});
-			} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host) {
-				$.post(path, {
-					token: parent.token,
-					command: command,
-					container: container_modify,
-					newhost: node_modify
-				}, function(data) {
-					var div = document.getElementById('containers-manage-modal-body');
-					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
-				});
+		// Populate container_list dropdown
+		$(function() {
+			var option = '';
+			if (parent.manage_container) {
+				option += '<option value="' + parent.manage_container + '">' + parent.manage_container + '</option>';
+				$('#container_list').append(option);
+				parent.manage_container = '';
 			} else {
-				alert('Error, you did not select an operation.')
-				output_modal.style.display = "none";
-				modal.style.display = "block";
+				$.get("/nodes?token=" + parent.token, function(data) {
+					for (var i in data.container_list) {
+						option += '<option value="' + data.container_list[i] + '">' + data.container_list[i] + '</option>';
+					}
+					option += '<option value="' + '*' + '">' + '*' + '</option>';
+					$('#container_list').append(option);
+				});
+			}
+		});
+
+		// Populate node_list_modify drop down
+		$(function() {
+			var option = '';
+			$.get("/nodes?token=" + parent.token, function(data) {
+				for (var i in data.nodes) {
+					option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+				}
+				option += '<option value="' + '*' + '">' + '*' + '</option>';
+				$('#node_list_modify').append(option);
+			});
+		});
+
+		function exec() {
+			var node_list_add = document.getElementById("node_list_add");
+			var node_list_modify = document.getElementById("node_list_modify");
+			var container_list = document.getElementById("container_list");
+			var node_add = node_list_add.options[node_list_add.selectedIndex].value;
+			var node_modify = node_list_modify.options[node_list_modify.selectedIndex].value;
+			var container_add = $("#container_name").val();
+			var container_modify = container_list.options[container_list.selectedIndex].value;
+			var container_add_args = $("#container_args").val();
+			var heartbeat_add_args = $("#heartbeat_args").val();
+			var container_heartbeat_fieldset = document.getElementsByName('container_heartbeat_fieldset');
+			var radio_container_add = $('input[id=radio_container_add]:checked').val();
+			var radio_container_modify = $('input[id=radio_container_modify]:checked').val();
+			var radio_start = $('input[id=radio_start]:checked').val();
+			var radio_stop = $('input[id=radio_stop]:checked').val();
+			var radio_restart = $('input[id=radio_restart]:checked').val();
+			var radio_delete = $('input[id=radio_delete]:checked').val();
+			var radio_create = $('input[id=radio_create]:checked').val();
+			var radio_container_log = $('input[id=radio_container_log]:checked').val();
+			var radio_change_host = $('input[id=radio_change_host]:checked').val();
+			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
+			var command;
+			var path;
+			var failover_constraints = 'none';
+
+			container_heartbeat_fieldset.forEach(function(node, i) {
+				if (container_heartbeat_fieldset[i].checked) {
+					failover_constraints += ',' + node.value;
+				}
+			});
+			if (failover_constraints.indexOf('none,') > -1) {
+				failover_constraints = failover_constraints.replace('none,', '');
+			}
+
+			path = radio_container_add && radio_container_add.indexOf('on') > -1 ? '/addcontainer' :
+				radio_start && radio_start.indexOf('on') > -1 ? '/start' :
+				radio_stop && radio_stop.indexOf('on') > -1 ? '/stop' :
+				radio_restart && radio_restart.indexOf('on') > -1 ? '/restart' :
+				radio_delete && radio_delete.indexOf('on') > -1 ? '/delete' :
+				radio_create && radio_create.indexOf('on') > -1 ? '/create' :
+				radio_container_log && radio_container_log.indexOf('on') > -1 ? '/containerlog' :
+				radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost' :
+				radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig' :
+				''
+
+			if (path) {
+				if ((radio_change_host) && (container_modify.indexOf('*') > -1) || (radio_remove_container_config) && (container_modify.indexOf('*') > -1)) {
+					alert('\nError: You cannot control all of these containers at once for chosen action.');
+					output_modal.style.display = "none";
+					modal.style.display = "block";
+				} else if (radio_container_add) {
+					$.post(path, {
+						token: parent.token,
+						container: container_add,
+						host: node_add,
+						container_args: container_add_args,
+						heartbeat_args: heartbeat_add_args,
+						failover_constraints: container_add + ',' + failover_constraints
+					}, function(data) {
+						var div = document.getElementById('containers-manage-modal-body');
+						div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
+					});
+				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host) {
+					$.post(path, {
+						token: parent.token,
+						command: command,
+						container: container_modify,
+						newhost: node_modify
+					}, function(data) {
+						var div = document.getElementById('containers-manage-modal-body');
+						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+					});
+				} else {
+					alert('Error, you did not select an operation.')
+					output_modal.style.display = "none";
+					modal.style.display = "block";
+				}
 			}
 		}
-	}
 
-	$(document).ready(function() {
-		$("input[id$='radio_container_add']").click(function() {
-			$("#container_list_options_fieldset").show();
-			$(this).is(":checked") ? $("#container_list_add").show() : '';
-			$(this).is(":checked") ? $("#container_list_add_options").show() : '';
-			$(this).is(":checked") ? $("#container_list_modify").hide() : '';
-			$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
-		})
+		$(document).ready(function() {
+			$("input[id$='radio_container_add']").click(function() {
+				$("#container_list_options_fieldset").show();
+				$(this).is(":checked") ? $("#container_list_add").show() : '';
+				$(this).is(":checked") ? $("#container_list_add_options").show() : '';
+				$(this).is(":checked") ? $("#container_list_modify").hide() : '';
+				$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
+			})
 
-		$("input[id$='radio_container_modify']").click(function() {
-			$("#container_list_options_fieldset").show();
-			$(this).is(":checked") ? $("#container_list_add").hide() : '';
-			$(this).is(":checked") ? $("#container_list_add_options").hide() : '';
-			$(this).is(":checked") ? $("#container_list_modify").show() : '';
-			$(this).is(":checked") ? $("#container_list_modify_options").show() : '';
-		})
+			$("input[id$='radio_container_modify']").click(function() {
+				$("#container_list_options_fieldset").show();
+				$(this).is(":checked") ? $("#container_list_add").hide() : '';
+				$(this).is(":checked") ? $("#container_list_add_options").hide() : '';
+				$(this).is(":checked") ? $("#container_list_modify").show() : '';
+				$(this).is(":checked") ? $("#container_list_modify_options").show() : '';
+			})
 
-		$("#container_list_options_fieldset").hide();
-		$("#container_list_add").hide();
-		$("#container_list_add_options").hide();
-		$("#container_list_modify").hide();
-		$("#container_list_modify_options").hide();
-	});
+			$("#container_list_options_fieldset").hide();
+			$("#container_list_add").hide();
+			$("#container_list_add_options").hide();
+			$("#container_list_modify").hide();
+			$("#container_list_modify_options").hide();
+		});
 	</script>
 </head>
 
@@ -273,4 +275,5 @@
 
 		modal.style.display = "block";
 	</script>
+
 </html>
