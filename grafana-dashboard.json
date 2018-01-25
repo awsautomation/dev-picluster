@@ -115,7 +115,7 @@
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "max"
+              "type": "avg"
             }
           ],
           "refId": "A",
@@ -166,7 +166,7 @@
       "datasource": "${DS_ELASTICSEARCH}",
       "fill": 1,
       "gridPos": {
-        "h": 7,
+        "h": 11,
         "w": 24,
         "x": 0,
         "y": 7
@@ -226,7 +226,7 @@
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "max"
+              "type": "avg"
             }
           ],
           "refId": "A",
@@ -277,10 +277,10 @@
       "datasource": "${DS_ELASTICSEARCH}",
       "fill": 1,
       "gridPos": {
-        "h": 7,
+        "h": 13,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 18
       },
       "id": 3,
       "legend": {
@@ -337,7 +337,7 @@
               "id": "1",
               "meta": {},
               "settings": {},
-              "type": "max"
+              "type": "avg"
             }
           ],
           "refId": "A",
@@ -391,7 +391,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 31
       },
       "id": 4,
       "legend": {
@@ -530,5 +530,5 @@
   },
   "timezone": "",
   "title": "PiCluster Monitoring",
-  "version": 2
+  "version": 6
 }
