@@ -6,7 +6,7 @@ const tls = require('tls');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const express = require('express');
-const dateTime = require('node-datetime');
+const Moment = require('moment');
 const request = require('request');
 
 const functions = {
@@ -37,7 +37,7 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const server = config.web_connect;
-const rsyslog_host = config.rsyslog_host;
+let rsyslog_host = config.rsyslog_host;
 const server_port = config.server_port;
 const agent_port = config.agent_port;
 let log = '';
@@ -45,7 +45,7 @@ let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
 
-if (config.elasticsearch && config.elasticsearch_index) {
+if (config.elasticsearch) {
   const mapping = {
     settings: {
       index: {
@@ -54,12 +54,12 @@ if (config.elasticsearch && config.elasticsearch_index) {
       }
     },
     mappings: {
-      picluster: {
+      'picluster-logging': {
         properties: {
           date: {
             type: 'date',
             index: 'true',
-            format: 'yyyy-MM-dd HH:mm:ss'
+            format: 'yyyy-MM-dd HH:mm:ssZ'
           },
           data: {
             type: 'keyword',
@@ -70,8 +70,52 @@ if (config.elasticsearch && config.elasticsearch_index) {
     }
   };
 
+  const monitoring_mapping = {
+    settings: {
+      index: {
+        number_of_shards: 3,
+        number_of_replicas: 2
+      }
+    },
+    mappings: {
+      'picluster-monitoring': {
+        properties: {
+          date: {
+            type: 'date',
+            index: 'true',
+            format: 'yyyy-MM-dd HH:mm:ssZ'
+          },
+          cpu: {
+            type: 'double'
+          },
+          node: {
+            type: 'keyword',
+            index: 'true'
+          },
+          memory: {
+            type: 'double',
+            index: 'true'
+          },
+          disk: {
+            type: 'double',
+            index: 'true'
+          },
+          total_running_containers: {
+            type: 'double',
+            index: 'true'
+          }
+        }
+      }
+    }
+  };
+
+  create_es_mappings(mapping, 'picluster-logging');
+  create_es_mappings(monitoring_mapping, 'picluster-monitoring');
+}
+
+function create_es_mappings(mapping, index) {
   const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index,
+    url: config.elasticsearch + '/' + index,
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -294,9 +338,16 @@ app.get('/nodes', (req, res) => {
         if (error) {
           console.error(error);
         } else {
-          const check = JSON.parse(response.body);
-          if (check.cpu_percent > 0) {
-            addData(check);
+          try {
+            const check = JSON.parse(response.body);
+            if (check.cpu_percent > 0) {
+              addData(check);
+              if (config.elasticsearch) {
+                elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage, check.total_running_containers);
+              }
+            }
+          } catch (err) {
+            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!' + err);
           }
         }
       });
@@ -404,7 +455,7 @@ app.get('/delete-image', (req, res) => {
         });
 
         const options = {
-          url: `${scheme}${node}:${agent_port}/`,
+          url: `${scheme}${node}:${agent_port}/run`,
           rejectUnauthorized: ssl_self_signed,
           method: 'POST',
           headers: {
@@ -662,16 +713,42 @@ app.get('/addhost', (req, res) => {
   }
 });
 
+function elasticsearch_monitoring(cpu, node, disk, memory, total_running_containers) {
+  const current_time = new Moment().format('YYYY-MM-DD HH:mm:ssZ');
+
+  const options = {
+    url: config.elasticsearch + '/picluster-monitoring/picluster-monitoring',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      date: current_time,
+      cpu,
+      node,
+      disk,
+      memory,
+      total_running_containers
+    })
+  };
+
+  request(options, error => {
+    if (error) {
+      console.log(error);
+    }
+  });
+}
+
 function elasticsearch(data) {
-  const dt = dateTime.create();
+  const current_time = new Moment().format('YYYY-MM-DD HH:mm:ssZ');
 
   const elasticsearch_data = JSON.stringify({
-    data,
-    date: dt.format('Y-m-d H:M:S')
+    date: current_time,
+    data
   });
 
   const options = {
-    url: config.elasticsearch + '/' + config.elasticsearch_index + '/' + config.elasticsearch_index,
+    url: config.elasticsearch + '/picluster-logging/picluster-logging',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -700,7 +777,7 @@ app.get('/clear-elasticsearch', (req, res) => {
     };
 
     const options = {
-      url: config.elasticsearch + '/' + config.elasticsearch_index,
+      url: config.elasticsearch + '/picluster-logging',
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -809,9 +886,6 @@ app.get('/removecontainerconfig', (req, res) => {
     if (config.container_host_constraints) {
       Object.keys(config.container_host_constraints).forEach((get_node, i) => {
         Object.keys(config.container_host_constraints[i]).forEach(key => {
-          if ((!config.container_host_constraints[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-            return;
-          }
           const analyze = config.container_host_constraints[i][key].split(',');
           if (container.indexOf(analyze[0]) > -1) {
             config.container_host_constraints.splice(i, i + 1);
@@ -1348,35 +1422,38 @@ app.post('/listnodes', (req, res) => {
   }
 });
 
-function copyToAgents(file) {
+function copyToAgents(file, config_file, temp_file) {
   Object.keys(config.layout).forEach((get_node, i) => {
-    Object.keys(config.layout[i]).forEach(key => {
-      const node = config.layout[i].node;
+    const node = config.layout[i].node;
+    const formData = {
+      name: 'file',
+      token,
+      config_file,
+      file: fs.createReadStream(file)
+    };
 
-      if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-        return;
-      }
+    const form_options = {
+      url: `${scheme}${node}:${agent_port}/receive-file`,
+      rejectUnauthorized: ssl_self_signed,
+      formData
+    };
 
-      const formData = {
-        name: 'file',
-        token,
-        file: fs.createReadStream(file)
-      };
-
-      const form_options = {
-        url: `${scheme}${node}:${agent_port}/receive-file`,
-        rejectUnauthorized: ssl_self_signed,
-        formData
-      };
-
-      request.post(form_options, err => {
-        if (!err) {
+    request.post(form_options, err => {
+      if (!err) {
+        if (!config_file) {
           addLog('\nCopied ' + file + ' to ' + node);
           console.log('\nCopied ' + file + ' to ' + node);
         }
-      });
+      }
     });
   });
+  if (temp_file) {
+    fs.unlink(temp_file, error => {
+      if (error) {
+        console.log(error);
+      }
+    });
+  }
 }
 
 app.post('/receive-file', upload.single('file'), (req, res) => {
@@ -1392,7 +1469,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
           if (err) {
             console.log(err);
           } else {
-            copyToAgents(newPath);
+            copyToAgents(newPath, '', req.file.path);
           }
         });
       }
@@ -1634,7 +1711,7 @@ app.get('/log', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    if (config.elasticsearch && config.elasticsearch_index) {
+    if (config.elasticsearch) {
       elasticsearch(log);
     }
     res.send(log);
@@ -1662,31 +1739,25 @@ app.get('/rsyslog', (req, res) => {
   }
 });
 
-app.get('/reloadconfig', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
+function reloadConfig() {
+  if (process.env.PICLUSTER_CONFIG) {
+    config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
   } else {
-    if (process.env.PICLUSTER_CONFIG) {
-      config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-    } else {
-      config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-    }
-    token = config.token;
-    dockerFolder = config.docker;
-
-    if (config.heartbeat_interval && config.automatic_heartbeat) {
-      if (config.automatic_heartbeat.indexOf('enabled') > -1) {
-        console.log('\nEnabing Heartbeat.');
-        automatic_heartbeat();
-      }
-    }
-
-    addLog('\nReloading Config.json\n');
-    res.end('');
+    config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
   }
-});
+
+  token = config.token;
+  dockerFolder = config.docker;
+  rsyslog_host = config.rsyslog_host;
+
+  if (config.heartbeat_interval && config.automatic_heartbeat) {
+    if (config.automatic_heartbeat.indexOf('enabled') > -1) {
+      console.log('\nEnabing Heartbeat.');
+      automatic_heartbeat();
+    }
+  }
+  addLog('\nReloading Config.json\n');
+}
 
 app.get('/getconfig', (req, res) => {
   const check_token = req.query.token;
@@ -1754,13 +1825,17 @@ app.post('/updateconfig', (req, res) => {
     } else {
       payload = JSON.stringify(verify_payload, null, 4);
 
-      fs.writeFile(config_file, payload, err => {
-        if (err) {
-          console.log('\nError while writing config.' + err);
-        } else {
-          res.end('Updated Configuration. Please reload it now for changes to take effect.');
-        }
-      });
+      setTimeout(() => {
+        fs.writeFile(config_file, payload, err => {
+          if (err) {
+            console.log('\nError while writing config.' + err);
+          } else {
+            copyToAgents(config_file, 'config', '');
+            reloadConfig();
+            res.end('Updated Configuration.');
+          }
+        });
+      }, 3000);
     }
   } catch (err) {
     res.end('Error: Invalid JSON. Configuration not saved.');

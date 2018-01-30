@@ -1,0 +1,77 @@
+<html>
+
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		function exec() {
+			var payload = $("#payload").val();
+
+			try {
+				var payload_json = JSON.parse(payload);
+			} catch (err) {}
+
+			$.post("/sendconfig", {
+				token: parent.token,
+				payload: payload
+			}, function(data) {
+				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+				if (output.indexOf('Error') === -1) {
+					parent.token = payload_json.token;
+					parent.syslog = payload_json.syslog;
+				}
+				alert(output);
+			});
+		};
+
+		function getconfig() {
+			$.get("/getconfig?token=" + parent.token, function(data) {
+				$("#payload").val(JSON.stringify(JSON.parse(data), null, 2));
+			});
+		};
+	</script>
+</head>
+
+<body>
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-large">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Configuraton Editor</h2>
+			</div>
+
+			<div class="modal-body">
+				<div id="config_editor" title="PiCluster Configuration Editor">
+					<textarea id="payload" name="payload" value="" enctype="application/json"></textarea>
+					<br><br>
+					<div id="submit_button_div">
+						<button id="submit_button">Submit</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var submit_button = document.getElementById("submit_button");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			exec();
+		}
+
+		modal.style.display = "block";
+
+		getconfig();
+	</script>
+</body>
+
+</html>

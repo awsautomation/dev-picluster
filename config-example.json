@@ -9,34 +9,20 @@
   "ssl_key": "",
   "layout": [{
       "node": "localhost",
-      "minio": "-p 9000:9000"
-    },
-    {
-      "node": "127.0.0.1",
       "nginx": "-p 80:80"
-    }
-  ],
+  }],
   "hb": [{
       "node": "localhost",
-      "minio": "9000"
-    },
-    {
-      "node": "127.0.0.1",
       "nginx": "80"
-    }
-  ],
+  }],
   "container_host_constraints": [{
-      "container": "nginx,localhost,127.0.0.1"
-    },
-    {
-      "container": "minio,localhost,127.0.0.1"
-    }
-  ],
+  }],
   "automatic_heartbeat": "enabled",
   "heartbeat_interval": "10000",
   "syslog": "dmesg",
   "web_username": "admin",
   "web_password": "admin",
   "web_connect": "127.0.0.1",
-  "web_port": "3003"
+  "web_port": "3003",
+  "theme": "default"
 }

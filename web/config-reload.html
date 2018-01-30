@@ -7,9 +7,10 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			$.get("/killvip?token=" + parent.token, function(data) {
-				var div = document.getElementById('killvip-modal-body');
-				div.innerHTML = 'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data;
+			$.get("/reloadconfig?token=" + parent.token, function(data) {
+				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+				var div = document.getElementById('config-reload-modal-body');
+				div.innerHTML = data;
 			});
 		}
 	</script>
@@ -20,11 +21,11 @@
 		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Resetting VIP on all hosts</h2>
+				<h2>Reloading Configuration File</h2>
 			</div>
 
-			<div id="kill-vip-modal-body" class="modal-body">
-				Please wait.
+			<div id="config-reload-modal-body" class="modal-body">
+				<div id="submit_button_div"></div>
 			</div>
 		</div>
 	</div>

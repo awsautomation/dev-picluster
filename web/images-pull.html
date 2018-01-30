@@ -5,243 +5,106 @@
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
-	<style>
-		body {
-			display: block;
-			color: rgba(255, 255, 255, .9);
-			text-decoration: none;
-			padding: 1rem;
-			font-size: 18px;
-			border-top: 2px solid transparent;
-			border-bottom: 2px solid transparent;
-		}
-
-		#containerlist {
-			font-size: 16px;
-		}
-
-		#container {
-			font-size: 16px;
-		}
-
-		#nodelist {
-			font-size: 18px;
-		}
-
-		#modal-body2 {
-			font-size: 18px;
-		}
-
-		button {
-			background-color: #565051;
-			border: none;
-			color: white;
-			padding: 15px 32px;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-		}
-
-		.modal {
-			display: none;
-			position: fixed;
-			z-index: 1;
-			padding-top: 100px;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			overflow: auto;
-			background-color: rgb(0, 0, 0);
-			background-color: rgba(0, 0, 0, 0.4);
-		}
-
-		.modal-content {
-			position: relative;
-			background-color: #fefefe;
-			margin: auto;
-			padding: 0;
-			font-size: 12px;
-			border: 1px solid #888;
-			width: 50%;
-			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-			-webkit-animation-name: animatetop;
-			-webkit-animation-duration: 0.4s;
-			animation-name: animatetop;
-			animation-duration: 0.4s
-		}
-
-		@-webkit-keyframes animatetop {
-			from {
-				top: -300px;
-				opacity: 0
-			}
-			to {
-				top: 0;
-				opacity: 1
-			}
-		}
-
-		@keyframes animatetop {
-			from {
-				top: -300px;
-				opacity: 0
-			}
-			to {
-				top: 0;
-				opacity: 1
-			}
-		}
-
-		.close {
-			color: white;
-			float: right;
-			font-size: 28px;
-			font-weight: bold;
-		}
-
-		.close:hover,
-		.close:focus {
-			color: #000;
-			text-decoration: none;
-			cursor: pointer;
-		}
-
-		.modal-header {
-			padding: 2px 16px;
-			background-color: #565051;
-			color: white;
-		}
-
-		.modal-body {
-			padding: 2px 16px;
-			color: black
-		}
-
-		textarea {
-			font-size: 18px;
-		}
-
-		.modal-content2 {
-			position: relative;
-			background-color: #fefefe;
-			margin: auto;
-			font-size: 12px;
-			padding: 0;
-			border: 1px solid #888;
-			width: 70%;
-			height: : 70%;
-			overflow: auto;
-			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-			-webkit-animation-name: animatetop;
-			-webkit-animation-duration: 0.4s;
-			animation-name: animatetop;
-			animation-duration: 0.4s
-		}
-	</style>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
 			var path = '/exec';
 			var image = document.getElementById('image').value;
-			var registry = document.getElementsByName('containerlist')[0].value;
+			var registry = document.getElementsByName('container_list')[0].value;
+			var localName = document.getElementById('getLocalName').value;
 
-			if (!image || image.length <= 0) {
-				alert('Error, you did not select an image to pull.');
-				return false;
-			}
-
-			// Build the fully qualified image name to pull
-			// e.g index.docker.io/ubuntu
-			if (registry !== 'hub.docker.com') {
-				image = registry + '/' + image;
+			if (!image || !localName) {
+				alert('\nError: You did not select an image to pull or left out a local name.');
 			} else {
-				image = 'index.docker.io/' + image;
-			}
+				// Build the fully qualified image name to pull
+				// e.g index.docker.io/ubuntu
+				image = registry !== 'hub.docker.com' ? registry + '/' + image : 'index.docker.io/' + image;
 
-			if (image.indexOf(':') === -1) {
-				var tag = document.getElementById('imageTags').value;
-				if (tag.toLowerCase() !== 'latest') {
-					image = image + ':' + tag;
+				if (image.indexOf(':') === -1) {
+					var tag = document.getElementById('imageTags').value;
+					image = tag.toLowerCase() !== 'latest' ? image + ':' + tag : image;
 				}
+
+				var command = "docker image pull " + image + ";docker tag " + image + ' ' + localName;
+				//docker tag tokinring/nginx-php-alpine test
+				var nodes = document.getElementsByName('host_list');
+				var div = document.getElementById('images-pull-modal-body');
+				var username = document.getElementsByName('imageauth-user')[0].value || '';
+				var password = document.getElementsByName('imageauth-password')[0].value || '';
+
+				// Login first if the user has provided authentication
+				command = username.length > 0 && password.length > 0 ? ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command : command;
+
+				var check_counter = 0;
+				nodes.forEach(function(node, i) {
+					if (nodes[i].checked) {
+						nodes.forEach(function(node, i) {
+							if (nodes[i].checked) {
+								check_counter++;
+								$.post(path, {
+									token: parent.token,
+									command: command,
+									node: node.value
+								}, function(data) {});
+							}
+						});
+					}
+				});
+
+				div.innerHTML = check_counter == 0 ? 'Error, no hosts were selected.' : 'Sent request to the server. Please check the logs and running containers for updated information.';
+				return true;
 			}
-
-			var command = ["docker", "image", "pull", image].join(' ');
-			var nodes = document.getElementsByName('nodeslist');
-			var div = document.getElementById('modal-body2');
-			var username = document.getElementsByName('imageauth-user')[0].value || '';
-			var password = document.getElementsByName('imageauth-password')[0].value || '';
-
-			// Login first if the user has provided authentication
-			if (username.length > 0 && password.length > 0) {
-				command = ["docker", "login", registry, "--username", username, "--password", password].join(' ') + ' && ' + command;
-			}
-
-			var check_counter = 0;
-			nodes.forEach(function(node, i) {
-				if (nodes[i].checked) {
-					nodes.forEach(function(node, i) {
-						if (nodes[i].checked) {
-							check_counter++;
-							$.post(path, {
-								token: parent.token,
-								command: command,
-								node: node.value
-							}, function(data) {});
-						}
-					});
-				}
-			});
-			if (check_counter == 0) {
-				div.innerHTML = 'Error, no hosts were selected.';
-			} else {
-				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.';
-			}
-
-			return true;
 		}
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Pull Images</h2>
 			</div>
+
 			<div class="modal-body">
 				<div id="container" title="Pull Images">
 					<fieldset>
-						<label for="containerlist">Select Registry</label>
-						<select name="containerlist" id="containerlist" onchange="clearAuth()">
-							</select>
-						<legend>Authentication (optional)</legend>
+						<legend><b>Authentication</b> <i>(Optional)</i></legend>
+						<label for="container_list">Registry</label>
+						<select name="container_list" class="modal_input" id="container_list" onchange="clearAuth()"></select>
 						<br>
 						<label for="imageauth-user">Username</label>
-						<input type="text" name="imageauth-user" id="imageauth-user" />
+						<input type="text" name="imageauth-user" id="imageauth-user" class="modal_input" />
+						<br>
 						<label for="imageauth-password">Password</label>
-						<input type="password" name="imageauth-password" id="imageauth-password" />
+						<input type="password" name="imageauth-password" id="imageauth-password" class="modal_input" />
 					</fieldset>
-					<br>
+
 					<fieldset name="options" id="options">
-						<legend>Images</legend>
+						<legend><b>Images</b></legend>
 						<p id="imageDescription" style="visibility: hidden;margin: 0;padding: 0;"></p>
-						<label for="image">Image: </label>
+						<label for="image">Image</label>
 						<input id="image">
-						<label for="imageTags">Tags: </label>
+						<label for="imageTags">Tags</label>
 						<select id="imageTags" disabled="disabled">
 								<option value="latest" selected="selected">Latest</option>
 							</select>
+						<br><br>
+						<label for="localname-label">Local Name (Simplified name for the image)</label>
+						<br>
+						<input id="getLocalName" name="getLocalName">
 					</fieldset>
-					<fieldset name="nodesList" id="nodesList">
-						<legend>Nodes:</legend>
-						<label for="nodeslist">All</label><input type="checkbox" name="nodeslist" onClick="checkAll(this);" checked="checked"/>
-						&nbsp;&nbsp;&nbsp;&nbsp;
+
+					<fieldset name="host_list" id="host_list">
+						<legend><b>Nodes</b></legend>
+						<input type="checkbox" name="host_list" onClick="checkAll(this);" checked="checked" />
+						<label for="host_list">All</label><br>
 					</fieldset>
-					<p align=center>
-						<button onclick="exec()" id="myBtn"> Submit</button>
-					</p>
+
+					<div id="submit_button_div">
+						<button onclick="exec()" id="submit_button"> Submit</button>
+					</div>
+
 					<script>
 						function clearAuth() {
 							document.getElementById('imageauth-user').value = "";
@@ -250,11 +113,12 @@
 
 						function checkAll(checkbox) {
 							var checked = checkbox.checked;
-							var checkboxes = document.getElementsByName('nodeslist');
+							var checkboxes = document.getElementsByName('host_list');
 							checkboxes.forEach(function(e) {
 								e.checked = checked;
 							});
 						}
+
 						$(function() {
 							var option = '';
 							$.get('/listregistries', {
@@ -264,23 +128,27 @@
 									var opt = document.createElement('option');
 									opt.value = e.name;
 									opt.innerHTML = e.name;
-									$('#containerlist').append(opt);
+									$('#container_list').append(opt);
 								});
 							});
 						});
+
 						$(function() {
 							$.get("/nodes?token=" + parent.token, function(data) {
 								for (var i in data.nodes) {
 									option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 								}
+
 								option += '<option value="' + '*' + '">' + '*' + '</option>';
-								$('#nodelist').append(option);
+								$('#host_list').append(option);
 
 								var option = '';
+
 								for (var i = 0; i < data.nodes.length; i++) {
-									option += '<label for="nodeslist">' + data.nodes[i] + '</label><input type="checkbox" name="nodeslist" checked="checked" value="' + data.nodes[i] + '" />&nbsp;&nbsp;&nbsp;&nbsp;';
+									option += '<input type="checkbox" name="host_list" checked="checked" value="' + data.nodes[i] + '" /><label for="host_list">' + data.nodes[i] + '</label><br>';
 								}
-								$('#nodesList').append(option);
+
+								$('#host_list').append(option);
 
 								var selectImage = function(event, ui) {
 									var image = event.target.value;
@@ -295,7 +163,7 @@
 
 									$.get('/remoteimagetags', {
 										token: parent.token,
-										registry: $('#containerlist').val(),
+										registry: $('#container_list').val(),
 										image: $('#image').val(),
 										username: $('#imageauth-user').val(),
 										password: $('#imageauth-password').val()
@@ -321,22 +189,21 @@
 												}
 											});
 										}
-										if (imageTags.children.length > 1) {
-											imageTags.disabled = false;
-										}
+
+										imageTags.disabled = imageTags.children.length > 1 ? false : true;
 									});
 								};
 								$("#image").autocomplete({
 									source: function(request, response) {
 										$.get('/remoteimages', {
 											token: parent.token,
-											registry: $('#containerlist').val(),
+											registry: $('#container_list').val(),
 											image: $('#image').val(),
 											username: $('#imageauth-user').val(),
 											password: $('#imageauth-password').val()
 										}, function(images) {
 											images = JSON.parse(images);
-											if ($('#containerlist').val() === 'hub.docker.com') {
+											if ($('#container_list').val() === 'hub.docker.com') {
 												return response(images.results.map(function(e) {
 													return {
 														value: e.repo_name,
@@ -379,24 +246,25 @@
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content2">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-			<div id="modal-body2" class="modal-body">
-				<p align=center>
-					Please wait......
+
+			<div id="images-pull-modal-body" class="modal-body">
+				Please wait.
 			</div>
 		</div>
 	</div>
 </body>
+
 <script>
-	var modal = document.getElementById('myModal');
+	var modal = document.getElementById('modal_container');
 	var span = document.getElementsByClassName("close")[0];
 	var output_modal = document.getElementById('output');
 	var output_span = document.getElementsByClassName("close")[1];
-	var btn = document.getElementById("myBtn");
+	var submit_button = document.getElementById("submit_button");
 
 	span.onclick = function() {
 		modal.style.display = "none";
@@ -406,7 +274,7 @@
 		output_modal.style.display = "none";
 	}
 
-	btn.onclick = function() {
+	submit_button.onclick = function() {
 		if (exec()) {
 			modal.style.display = "none";
 			output_modal.style.display = "block";

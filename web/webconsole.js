@@ -10,22 +10,18 @@ const bodyParser = require('body-parser');
 // require('request-debug')(request);
 /* eslint-enable capitalized-comments */
 
-let config;
-if (process.env.PICLUSTER_CONFIG) {
-  config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-} else {
-  config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-}
+let config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
 
-if (config.ssl_self_signed) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-}
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = config.ssl_self_signed ? '0' : '1';
 
 const app = express();
-
 app.use(bodyParser());
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
+app.use('/assets', express.static(path.join(__dirname, 'assets'), {
+  maxage: '48h'
+}));
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules'), {
+  maxage: '48h'
+}));
 
 const upload = multer({
   dest: '../'
@@ -34,17 +30,23 @@ const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
 const web_port = config.web_port;
+let syslog = config.syslog ? config.syslog : '';
+const doc_dir = config.doc_dir;
+let theme = config.theme;
+let logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
 let token = config.token;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
 let server_port = config.server_port;
-let syslog = '';
 let nodedata = '';
 
-if (config.syslog) {
-  syslog = config.syslog;
+ /*
+Removing for now
+if (fs.existsSync(path.normalize(doc_dir))) {
+  app.use('/docs', express.static(path.join(__dirname, doc_dir)));
 }
+ */
 
 function getData() {
   setTimeout(() => {
@@ -69,7 +71,36 @@ function getData() {
 }
 getData();
 
-app.get('/sandbox', (req, res) => {
+function get_file_list_by_extention(dirpath, extention) {
+  const files = fs.readdirSync(dirpath);
+  const output = [];
+
+  for (const i in files) {
+    if (path.extname(files[i]) === extention) {
+      output.push(files[i]);
+    }
+  }
+
+  return output;
+}
+
+ /*
+Removing for now
+
+function serve_doc_pages() {
+  const doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md');
+
+  for (const i in doc_pages) {
+    if (i) {
+      app.get('/doc' + i, (req, res) => {
+        res.sendFile(path.resolve(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
+      });
+    }
+  }
+}
+  */
+
+app.get('/exec.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -78,16 +109,16 @@ app.get('/sandbox', (req, res) => {
   }
 });
 
-app.get('/editconfig', (req, res) => {
+app.get('/config-edit.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    res.sendFile(__dirname + '/editconfig.html');
+    res.sendFile(__dirname + '/config-edit.html');
   }
 });
 
-app.get('/kibana', (req, res) => {
+app.get('/kibana.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token) || (!config.kibana)) {
     res.end('\nError: Invalid Credentials or invalid configuration.');
@@ -99,6 +130,7 @@ app.get('/kibana', (req, res) => {
 app.post('/sendconfig', (req, res) => {
   const check_token = req.body.token;
   const payload = req.body.payload;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -123,11 +155,48 @@ app.post('/sendconfig', (req, res) => {
       if (error) {
         res.end(error);
       } else {
+        updateConfig(payload);
         res.end(body);
       }
     });
   }
 });
+
+function reloadVariables() {
+  try {
+    config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
+    token = config.token;
+    user = config.web_username;
+    password = config.web_password;
+    server = config.web_connect;
+    server_port = config.server_port;
+    syslog = config.syslog;
+    theme = config.theme;
+    logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
+  } catch (err) {
+    console.log('\nError parsing JSON while trying to update config');
+  }
+}
+
+function updateConfig(payload) {
+  let updated_config_file = '';
+
+  if (process.env.PICLUSTER_CONFIG) {
+    updated_config_file = process.env.PICLUSTER_CONFIG;
+  } else {
+    updated_config_file = '../config.json';
+  }
+
+  setTimeout(() => {
+    fs.writeFile(updated_config_file, payload, err => {
+      if (err) {
+        console.log(err);
+      } else {
+        reloadVariables();
+      }
+    });
+  }, 10000);
+}
 
 app.post('/', (req, res) => {
   const get_user = req.body.username;
@@ -178,6 +247,10 @@ app.post('/exec', (req, res) => {
       }
     });
   }
+});
+
+app.get('/listdocs', (req, res) => {
+  res.json(get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md'));
 });
 
 app.get('/listregistries', (req, res) => {
@@ -428,37 +501,6 @@ app.get('/rsyslog', (req, res) => {
         res.end(body);
       } else {
         res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
-app.get('/reloadconfig', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = {
-      url: `${scheme}${server}:${server_port}/reloadconfig?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        if (process.env.PICLUSTER_CONFIG) {
-          config = JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8'));
-        } else {
-          config = JSON.parse(fs.readFileSync('../config.json', 'utf8'));
-        }
-        token = config.token;
-        user = config.web_username;
-        password = config.web_password;
-        server = config.web_connect;
-        server_port = config.server_port;
-        res.end('\nRequest to update configuration succeeded.');
-      } else {
-        res.end('\nError connecting with server.' + error);
       }
     });
   }
@@ -755,7 +797,7 @@ app.post('/addcontainer', (req, res) => {
   }
 });
 
-function sendFile(file) {
+function sendFile(file, temp_file) {
   const formData = {
     name: 'file',
     token,
@@ -772,6 +814,11 @@ function sendFile(file) {
     if (err) {
       console.error('upload failed:', err);
     } else {
+      fs.unlink(temp_file, error => {
+        if (error) {
+          console.log(error);
+        }
+      });
       console.log('Upload successful!');
     }
   });
@@ -783,11 +830,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    // FixMe: Handle the error...
-    fs.readFile(req.file.path, (err, data) => { // eslint-disable-line handle-callback-err
+    fs.readFile(req.file.path, (err, data) => {
       const newPath = '../' + req.file.originalname;
       fs.writeFile(newPath, data, () => {
-        sendFile(newPath, req.file.originalname);
+        sendFile(newPath, req.file.path);
         res.end('');
       });
     });
@@ -1016,113 +1062,92 @@ app.get('/getconfig', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/main.html');
+  res.sendFile(__dirname + '/index.html');
 });
-
-app.get('/blank', (req, res) => {
+app.get('/blank.html', (req, res) => {
   res.sendFile(__dirname + '/blank.html');
 });
-
-app.get('/nodes.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes.html');
+app.get('/nodes-list.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-list.html');
 });
-
-app.get('/container-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/container-layout.html');
+app.get('/containers-layout.html', (req, res) => {
+  res.sendFile(__dirname + '/containers-layout.html');
 });
-
-app.get('/prune.html', (req, res) => {
-  res.sendFile(__dirname + '/prune.html');
+app.get('/images-prune.html', (req, res) => {
+  res.sendFile(__dirname + '/images-prune.html');
 });
-
-app.get('/clear-functions.html', (req, res) => {
-  res.sendFile(__dirname + '/clear-functions.html');
+app.get('/functions-clear.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-clear.html');
 });
-
 app.get('/functions-viewer.html', (req, res) => {
   res.sendFile(__dirname + '/functions-viewer.html');
 });
-
 app.get('/functions-create.html', (req, res) => {
   res.sendFile(__dirname + '/functions-create.html');
 });
-
-app.get('/current-functions.html', (req, res) => {
-  res.sendFile(__dirname + '/current-functions.html');
+app.get('/functions-current.html', (req, res) => {
+  res.sendFile(__dirname + '/functions-current.html');
 });
-
-app.get('/background', (req, res) => {
-  res.sendFile(__dirname + '/background.jpg');
+app.get('/config-reload.html', (req, res) => {
+  res.sendFile(__dirname + '/config-reload.html');
 });
-
-app.get('/reloadconfig.html', (req, res) => {
-  res.sendFile(__dirname + '/reloadconfig.html');
+app.get('/images-pull.html', (req, res) => {
+  res.sendFile(__dirname + '/images-pull.html');
 });
-
-app.get('/pullimages.html', (req, res) => {
-  res.sendFile(__dirname + '/pullimages.html');
+app.get('/images-manage.html', (req, res) => {
+  res.sendFile(__dirname + '/images-manage.html');
 });
-
-app.get('/manage-images.html', (req, res) => {
-  res.sendFile(__dirname + '/manage-images.html');
+app.get('/images-layout.html', (req, res) => {
+  res.sendFile(__dirname + '/images-layout.html');
 });
-
-app.get('/logo.png', (req, res) => {
-  res.sendFile(__dirname + '/logo.png');
-});
-
-app.get('/image-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/image-layout.html');
-});
-
 app.get('/log.html', (req, res) => {
   res.sendFile(__dirname + '/log.html');
 });
-
-app.get('/hb.html', (req, res) => {
-  res.sendFile(__dirname + '/hb.html');
+app.get('/heartbeat.html', (req, res) => {
+  res.sendFile(__dirname + '/heartbeat.html');
 });
-
 app.get('/killvip.html', (req, res) => {
   res.sendFile(__dirname + '/killvip.html');
 });
-
 app.get('/syslog.html', (req, res) => {
   res.sendFile(__dirname + '/syslog.html');
 });
-
-app.get('/manage.html', (req, res) => {
-  res.sendFile(__dirname + '/manage.html');
+app.get('/containers-manage.html', (req, res) => {
+  res.sendFile(__dirname + '/containers-manage.html');
 });
-
 app.get('/terminal.html', (req, res) => {
   res.sendFile(__dirname + '/terminal.html');
 });
-
-app.get('/addcontainer.html', (req, res) => {
-  res.sendFile(__dirname + '/addcontainer.html');
+app.get('/containers-add.html', (req, res) => {
+  res.sendFile(__dirname + '/containers-add.html');
 });
-app.get('/addhost.html', (req, res) => {
-  res.sendFile(__dirname + '/addhost.html');
+app.get('/nodes-add.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-add.html');
 });
-app.get('/rmhost.html', (req, res) => {
-  res.sendFile(__dirname + '/rmhost.html');
+app.get('/nodes-remove.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-remove.html');
+});
+app.get('/nodes-manage.html', (req, res) => {
+  res.sendFile(__dirname + '/nodes-manage.html');
 });
 app.get('/rsyslog.html', (req, res) => {
   res.sendFile(__dirname + '/rsyslog.html');
 });
-app.get('/server.jpeg', (req, res) => {
-  res.sendFile(__dirname + '/server.jpeg');
-});
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(__dirname + '/favicon.ico');
 });
-app.get('/upload.html', (req, res) => {
-  res.sendFile(__dirname + '/upload.html');
+app.get('/docs.html', (req, res) => {
+  res.sendFile(__dirname + '/docs.html');
 });
-app.get('/searching.jpeg', (req, res) => {
-  res.sendFile(__dirname + '/searching.jpeg');
+app.get('/images-upload.html', (req, res) => {
+  res.sendFile(__dirname + '/images-upload.html');
 });
+
+app.get('/logo.png', (req, res) => {
+  res.sendFile(logo_slug);
+});
+
+// Removing for now serve_doc_pages();
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Web Console enabled');

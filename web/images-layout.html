@@ -1,0 +1,70 @@
+<html>
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		function linkFunction(image) {
+			parent.manage_image = image;
+		};
+
+		function exec() {
+			var div = document.getElementById('modal-body');
+			div ? div.innerHTML += '<div class="image_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for images</label></font></div>' : '';
+
+			$.get("/nodes?token=" + parent.token, function(data) {
+				var check_data = data;
+				div.innerHTML = div ? '' : false;
+
+				for (var i in check_data.data) {
+					if (div) {
+						var dist = check_data.data[i].os_type.toLowerCase() || '';
+						var image_list = check_data.data[i].images;
+
+						div.innerHTML += '<div class="image_card"><div class="image_card_logo">' + distLogo(dist) + check_data.data[i].hostname + '</div><div class="image_card_list"><ul id ="ul_' + i + '">';
+
+						var image_list_ul = document.getElementById('ul_' + i);
+
+						for (var j in image_list) {
+							if (image_list[j]) {
+								image_list_ul.innerHTML += '<li><a href="/images-manage.html" onclick="linkFunction(\'' + image_list[j] + '\')">' + image_list[j] + '</a>';
+							}
+						}
+					}
+
+					div.innerHTML = div ? div.innerHTML + '</ul></div><hr>': '';
+
+					addFontLinux();
+				}
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<div id="output" class="modal">
+		<div class="modal-content modal-large">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Images</h2>
+			</div>
+
+			<div id="modal-body" class="modal-body"></div>
+		</div>
+	</div>
+
+	<script>
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[0];
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		output_modal.style.display = "block";
+
+		exec()
+	</script>
+</html>

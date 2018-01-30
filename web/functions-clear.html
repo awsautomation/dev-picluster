@@ -3,13 +3,13 @@
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
-	<script src="/assets/distLogo.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script src="/assets/distLogo.js"></script>
 	<script>
 		function exec() {
-			$.get("/killvip?token=" + parent.token, function(data) {
-				var div = document.getElementById('killvip-modal-body');
-				div.innerHTML = 'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' + data;
+			$.get("/clear-functions?token=" + parent.token, function(data) {
+				var div = document.getElementById('functions-clear-modal-body');
+				div.innerHTML = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 			});
 		}
 	</script>
@@ -17,17 +17,17 @@
 
 <body>
 	<div id="output" class="modal">
-		<div class="modal-content modal-small">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
-				<h2>Resetting VIP on all hosts</h2>
+				<h2>Cleaning stale functions</h2>
 			</div>
-
-			<div id="kill-vip-modal-body" class="modal-body">
+			<div id="functions-clear-modal-body" class="modal-body">
 				Please wait.
 			</div>
 		</div>
 	</div>
+	</p>
 
 	<script>
 		var output_modal = document.getElementById('output');
@@ -36,9 +36,10 @@
 		output_span.onclick = function() {
 			output_modal.style.display = "none";
 		}
-
 		output_modal.style.display = "block";
 
 		exec();
 	</script>
+	</p>
+
 </html>

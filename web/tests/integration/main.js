@@ -1,7 +1,7 @@
 /* eslint-env phantomjs,browser */
 /* eslint-disable func-names */
 /* global casper,$ */
-casper.test.begin('main.html', 7, test => {
+casper.test.begin('index.html', 7, test => {
   const URL = casper.cli.get('url');
   const username = casper.cli.get('username');
   const password = casper.cli.get('password');
@@ -13,7 +13,7 @@ casper.test.begin('main.html', 7, test => {
   casper.viewport(1920, 1080).then(function () {
     const lib = require('../lib/index.js')(this);
 
-    test.assertEquals(this.currentHTTPStatus, 200, 'HTTP Status Code should be 200');
+    test.assertEquals(this.currentHTTPStatus, 200, 'HTTP Status Code should be 200; is ' + this.currentHTTPStatus + ' at ' + URL);
     test.assertEquals(this.getTitle(), 'PiCluster Web Console', 'Title should equal \'PiCluster WebConsole\'');
     const iframe = this.evaluate(() => {
       const iframes = document.getElementsByTagName('iframe');
@@ -22,7 +22,7 @@ casper.test.begin('main.html', 7, test => {
     });
 
     test.assertEquals(1, iframe.length, 'There should be 1 iframe');
-    test.assertEquals(iframe.url, URL + '/blank', 'Its source should equal ' + URL + '/blank');
+    test.assertEquals(iframe.url, URL + '/blank.html', 'Its source should equal ' + URL + '/blank.html');
 
     this.waitForResource('jquery.min.js', function () {
       const jquery = this.evaluate(() => {

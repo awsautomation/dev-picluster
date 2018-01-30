@@ -1,0 +1,148 @@
+<html>
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<link rel="stylesheet" href="/assets/circle.css">
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		function exec() {
+			var div = document.getElementById('nodes-list-modal-body');
+			div ? div.innerHTML = div.innerHTML + '<br><div id="node_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font></div>' : div;
+
+			$.get("/nodes?token=" + parent.token, function(data) {
+				var check_data = data;
+				div ? div.innerHTML = '' : div;
+
+				for (var i in check_data.data) {
+					if (div) {
+						var dist = (check_data.data[i].os_type || '').toLowerCase();
+						var div_logo = document.createElement('div');
+						div_logo.className = 'node_status_div';
+						div_logo.innerHTML = distLogo(dist) + '<p class="div_logo_text">' + check_data.data[i].hostname + '</p><br>';
+
+						var div_disk = document.createElement('div');
+						div_disk.className = 'node_status_div';
+
+						var div_disk_clearfix = document.createElement('div');
+						div_disk_clearfix.className = 'clearfix';
+
+						var div_disk_running = document.createElement('div');
+						div_disk_running.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
+						div_disk_running.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
+
+						var div_disk_slice = document.createElement('div');
+						div_disk_slice.className = "slice";
+
+						var div_disk_bar = document.createElement('div');
+						div_disk_bar.className = "bar";
+
+						var div_disk_fill = document.createElement('div');
+						div_disk_fill.className = "fill";
+
+						var div_cpu = document.createElement('div');
+						div_cpu.className = "node_status_div";
+
+						var div_cpu_clearfix = document.createElement('div');
+						div_cpu_clearfix.className = 'clearfix';
+
+						var div_cpu_running = document.createElement('div');
+						div_cpu_running.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small';
+						div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + '%</span>';
+
+						var div_cpu_slice = document.createElement('div');
+						div_cpu_slice.className = "slice";
+
+						var div_cpu_bar = document.createElement('div');
+						div_cpu_bar.className = "bar";
+
+						var div_cpu_fill = document.createElement('div');
+						div_cpu_fill.className = "fill";
+
+						var div_memory = document.createElement('div_memory');
+						div_memory.className = "node_status_div";
+
+						var div_memory_clearfix = document.createElement('div');
+						div_memory_clearfix.className = 'clearfix';
+
+						var div_memory_running_class = document.createElement('div');
+						div_memory_running_class.className = 'c100 p' + check_data.data[i].memory_percentage + ' small';
+						div_memory_running_class.innerHTML = '<span id="' + i + '">' + check_data.data[i].memory_percentage + '%</span>';
+
+						var div_memory_slice = document.createElement('div');
+						div_memory_slice.className = "slice";
+
+						var div_memory_bar = document.createElement('div');
+						div_memory_bar.className = "bar";
+
+						var div_memory_fill = document.createElement('div');
+						div_memory_fill.className = "fill";
+
+						div_disk.appendChild(div_disk_clearfix);
+						div_disk_clearfix.appendChild(div_disk_running);
+						div_disk_running.appendChild(div_disk_slice);
+						div_disk_slice.appendChild(div_disk_bar);
+						div_disk_bar.appendChild(div_disk_fill);
+						div_disk.innerHTML += '<font class="node_status_text"><b>Disk Usage</b>';
+
+						div_cpu.appendChild(div_cpu_clearfix);
+						div_cpu_clearfix.appendChild(div_cpu_running);
+						div_cpu_running.appendChild(div_cpu_slice);
+						div_cpu_slice.appendChild(div_cpu_bar);
+						div_cpu_bar.appendChild(div_cpu_fill);
+						div_cpu.innerHTML += '<font class="node_status_text"><b>CPU Usage</b>';
+
+						div_memory.appendChild(div_memory_clearfix);
+						div_memory_clearfix.appendChild(div_memory_running_class);
+						div_memory_running_class.appendChild(div_memory_slice);
+						div_memory_slice.appendChild(div_memory_bar);
+						div_memory_bar.appendChild(div_memory_fill);
+						div_memory.innerHTML += '<font class="node_status_text"><b>Memory Usage</b>';
+
+						var node_card = document.createElement("div")
+						node_card.className = "node_card";
+
+						node_card.appendChild(div_logo);
+						node_card.appendChild(div_disk);
+						node_card.appendChild(div_cpu);
+						node_card.appendChild(div_memory);
+
+						var hr = document.createElement('hr');
+
+						div.appendChild(node_card);
+						div.appendChild(hr);
+					}
+				}
+				addFontLinux();
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<div id="output" class="modal">
+		<div class="modal-content modal-large">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster Nodes</h2>
+			</div>
+
+			<div id="nodes-list-modal-body" class="modal-body">
+			</div>
+		</div>
+	</div>
+
+	<script>
+	  var output_modal = document.getElementById('output');
+	  var output_span = document.getElementsByClassName("close")[0];
+
+	  output_span.onclick = function() {
+		  output_modal.style.display = "none";
+	  }
+
+	  output_modal.style.display = "block";
+
+		exec()
+	</script>
+</html>

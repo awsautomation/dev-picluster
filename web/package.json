@@ -2,13 +2,13 @@
   "name": "picluster-webconsole",
   "version": "0.0.1",
   "config": {
-    "unsafe-perm":true
+    "unsafe-perm": true
   },
   "dependencies": {
     "body-parser": "^1.17.2",
     "exec": "",
     "express": "^4.15.3",
-    "font-linux": "git+https://github.com/Lukas-W/font-linux.git",
+    "font-logos": "git+https://github.com/Lukas-W/font-logos.git",
     "jquery": "^3.2.1",
     "jquery.terminal": "^1.5.0",
     "line-reader": "^0.4.0",

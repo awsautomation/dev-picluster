@@ -120,7 +120,7 @@
       timeout: 30000,
       parallelUploads: 2,
       uploadMultiple: false,
-      maxFilesize: 256,
+      maxFilesize: 1024,
       paramName: "file",
       createImageThumbnails: true,
       maxThumbnailFilesize: 10,

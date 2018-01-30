@@ -1,0 +1,334 @@
+<html>
+
+<head>
+	<title>PiCluster Web Console</title>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-ui.css">
+	<script src="/assets/moment.js"></script>
+	<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+	<link rel="manifest" href="/assets/images/manifest.json">
+	<link rel="mask-icon" href="/assets/images/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<script>
+		var manage_container = '';
+		var manage_image = '';
+		var manage_function = '';
+		var manage_function_uuid = '';
+		var token = '';
+		var syslog = '';
+
+		function clear(callback) {
+			var iframe = document.getElementById('iframe_a').contentWindow.document;
+			iframe.write('<html>');
+			iframe.close();
+			callback();
+		}
+
+		/**
+				function build_doc_links() {
+					var output = '';
+
+					$.get("/listdocs", function(doc_list) {
+						for (var i in doc_list) {
+							output += "$('#doc'" + i + ").click(function() { $('iframe_a').attr('src', '/docs.html?doc_id=doc'" + i + ") });";
+						}
+					});
+
+					return output;
+				}
+
+				function build_docs_nav_menu() {
+					var output = '';
+					output += '<ul class="dropdown">';
+
+					$.get("/listdocs", function(doc_list) {
+						for (var i in doc_list) {
+							var doc_id = "doc" + i;
+							$("<li><a href='#' id='" + doc_id + "' onclick='stinky_linker(\"" + doc_id + "\")'>" + doc_list[i] + "</a></li>").appendTo("#nav_docs > ul");
+						}
+					});
+
+					output += '</ul>';
+					$('#nav_docs').append(output);
+				}
+
+				function stinky_linker(doc_id) {
+					$('#iframe_a').attr('src', '/docs.html?doc_id=' + doc_id);
+				}
+		**/
+
+		function initialize_iframe_height() {
+			document.getElementById("div_iframe").style.height = document.getElementById("iframe_a").contentWindow.document.body.scrollHeight + "px";
+		}
+
+		function resize_iframe_height(iframe) {
+			document.getElementById("div_iframe").style.height = "calc(100% - 4vw)";
+		}
+
+
+		$(document).ready(function() {
+			$('#exec').click(function() {
+				$('#iframe_a').attr('src', '/exec.html?token=' + token);
+			});
+			$('#terminal').click(function() {
+				$('#iframe_a').attr('src', '/terminal.html?token=' + token);
+			});
+			$('#images-layout').click(function() {
+				$('#iframe_a').attr('src', '/images-layout.html');
+			});
+			$('#syslog').click(function() {
+				$('#iframe_a').attr('src', '/syslog.html');
+			});
+			$('#kibana').click(function() {
+				$('#iframe_a').attr('src', '/kibana.html?token=' + token);
+			});
+			$('#functions-viewer').click(function() {
+				$('#iframe_a').attr('src', '/functions-viewer.html');
+			});
+			$('#functions-create').click(function() {
+				$('#iframe_a').attr('src', '/functions-create.html');
+			});
+			$('#functions-remove').click(function() {
+				$('#iframe_a').attr('src', '/functions-clear.html');
+			});
+			$('#functions-current').click(function() {
+				$('#iframe_a').attr('src', '/functions-current.html');
+			});
+			$('#rsyslog').click(function() {
+				$('#iframe_a').attr('src', '/rsyslog.html');
+			});
+			$('#nodes-list').click(function() {
+				$('#iframe_a').attr('src', '/nodes-list.html');
+			});
+			$('#containers-layout').click(function() {
+				$('#iframe_a').attr('src', '/containers-layout.html');
+			});
+			$('#containers-add').click(function() {
+				$('#iframe_a').attr('src', '/containers-add.html');
+			});
+			$('#node-add').click(function() {
+				$('#iframe_a').attr('src', '/nodes-add.html');
+			});
+			$('#node-remove').click(function() {
+				$('#iframe_a').attr('src', '/nodes-remove.html');
+			});
+			$('#node-manage').click(function() {
+				$('#iframe_a').attr('src', '/nodes-manage.html');
+			});
+			$('#config-edit').click(function() {
+				$('#iframe_a').attr('src', '/config-edit.html?token=' + token);
+			});
+			$('#log').click(function() {
+				$('#iframe_a').attr('src', '/log.html');
+			});
+			$('#heartbeat').click(function() {
+				$('#iframe_a').attr('src', '/heartbeat.html');
+			});
+			//$('#docs').click(function() {
+			//		$('#iframe_a').attr('src', '/docs.html');
+			//	});
+			$('#images-upload').click(function() {
+				$('#iframe_a').attr('src', '/images-upload.html');
+			});
+			$('#images-pull').click(function() {
+				$('#iframe_a').attr('src', '/images-pull.html');
+			});
+			$('#images-manage').click(function() {
+				$('#iframe_a').attr('src', '/images-manage.html');
+			});
+			$('#killvip').click(function() {
+				$('#iframe_a').attr('src', '/killvip.html');
+			});
+			$('#containers-manage').click(function() {
+				$('#iframe_a').attr('src', '/containers-manage.html');
+			});
+			$('#images-prune').click(function() {
+				$('#iframe_a').attr('src', '/images-prune.html');
+			});
+			$('#terminal').click(function() {
+				$('#iframe_a').attr('src', '/terminal.html');
+			});
+			//$('#doc1').click(function() {
+			//	$('#iframe_a').attr('src', '/docs.html?doc_id=doc1');
+			//});
+
+			//build_doc_links();
+
+		});
+
+		$("html").click(function() {
+			$(".dropdown").hide();
+		});
+
+		$("nav ul li a:not(:only-child)").click(function(e) {
+			$(this).siblings(".dropdown").toggle();
+
+			$(".dropdown").not($(this).siblings()).hide();
+			e.stopPropagation();
+		});
+
+		function hideshow(id) {
+			var element = document.getElementById(id);
+			element.style.display = element.style.display == 'block' ? 'none' : 'block';
+		}
+
+		$(function() {
+			hideshow('menu');
+			hideshow('content');
+			hideshow('menu');
+			hideshow('content');
+		});
+
+		function getToken() {
+			return token;
+		}
+
+		function login() {
+			var username = document.getElementById("user").value;;
+			var password = document.getElementById("password").value;
+			$.post("/", {
+				username: username,
+				password: password
+			}, function(auth) {
+				syslog = auth.syslog ? auth.syslog : syslog;
+				token = auth.token ? (
+					hideshow('login'),
+					hideshow('login'),
+					hideshow('menu'),
+					hideshow('content'),
+					auth.token
+				) : (
+					alert('Access Denied!'),
+					hideshow('login')
+				)
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<div id="login" class="modal-login">
+		<div class="modal-login-content">
+			<div class="modal-login-header">
+				<span class="close">&times;</span>
+				<h2>PiCluster 2.3 Login</h2>
+			</div>
+
+			<div class="modal-login-body">
+				<div>
+					<img src="/logo.png" height="250" width="200">
+					<br><label>Please login to continue<label>
+					<br>
+					<div>
+						<input type="text" style="width: 250px;" id="user" name="username">
+						<br>
+						<input type="password" style="width: 250px;" size="18" id="password" name="password">
+						<br>
+            <br>
+						<button id="submit_button">Connect</button>
+						<br>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="menu">
+		<nav>
+			<ul>
+				<li id="nav_logo"><a href='/blank.html' target="iframe_a" id="logo"><img src="/assets/images/sphere.png" id="nav_logo_image"></a>
+				<li id="nav_system"><a onmouseover="this.click()" href="#!">Nodes</a>
+					<ul class="dropdown">
+						<li><a href="#" id="nodes-list">List</a></li>
+						<li><a href="#" id="node-manage">Manage</a></li>
+					</ul>
+				</li>
+				<li id="nav_containers"><a onmouseover="this.click()" href="#!">Containers</a>
+					<ul class="dropdown">
+						<li><a href="#" id="containers-layout">List</a></li>
+						<li><a href="#" id="containers-manage">Manage</a></li>
+					</ul>
+				</li>
+				<li id="nav_images"><a onmouseover="this.click()" href="#!">Images</a>
+					<ul class="dropdown">
+						<li><a href="#" id="images-layout">List</a></li>
+						<li><a href="#" id="images-manage">Manage</a></li>
+					</ul>
+				</li>
+				<li id="nav_functions"><a onmouseover="this.click()" href="#!">Functions</a>
+					<ul class="dropdown">
+						<li><a href="#" id="functions-create">Create</a></li>
+						<li><a href="#" id="functions-remove">Remove</a></li>
+						<li><a href="#" id="functions-current">Current</a></li>
+						<li><a href="#" id="functions-viewer">Viewer</a></li>
+					</ul>
+				</li>
+				<li id="nav_operations"><a onmouseover="this.click()" href="#!">Operations</a>
+					<ul class="dropdown">
+						<li><a href="#" id="config-edit">Edit Config</a></li>
+						<li><a href="#" id="killvip">Reset Virtual IP</a></li>
+						<li><a href="#" id="exec">Run Command(s)</a></li>
+						<li><a href="#" id="heartbeat">Heartbeat</a></li>
+						<li><a href="#" id="images-prune">Clean Docker</a></li>
+						<li><a href="#" id="terminal">Terminal</a></li>
+						<li><a href="#" id="kibana">Kibana</a></li>
+					</ul>
+				</li>
+				<li id="nav_logs"><a onmouseover="this.click()" href="#!">Logs</a>
+					<ul class="dropdown">
+						<li><a href="#" id="log">PiCluster Logs</a></li>
+						<li><a href="#" id="syslog">Syslog</a></li>
+						<li><a href="#" id="rsyslog">Rsyslog</a></li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+	</div>
+
+	<script>
+		var modal = document.getElementById('login');
+		var span = document.getElementsByClassName("close")[0];
+		var submit_button = document.getElementById("submit_button");
+
+		//build_docs_nav_menu();
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			modal.style.display = "none";
+			login();
+		}
+
+		modal.style.display = "block";
+
+		$("html").click(function() {
+			$(".dropdown").hide();
+		});
+
+		$("nav ul li a:not(:only-child)").click(function(navmenu) {
+			$(this).siblings(".dropdown").toggle();
+
+			$(".dropdown").not($(this).siblings()).hide();
+			navmenu.stopPropagation();
+		});
+	</script>
+
+	<div id="content">
+		<div class="left"></div>
+		<div style="clear: both;"></div>
+	</div>
+
+	<div id="div_iframe">
+		<iframe src="/blank.html" id="iframe_a" name="iframe_a">
+	</div>
+  </body>
+  </html>

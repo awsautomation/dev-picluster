@@ -28,11 +28,14 @@
 - Rsyslog Analytics
 - Built-in web terminal to easily run commands on nodes
 - Integrate the Kibana dashboard into PiCluster
-- Integrates with Elasticsearch to store the PiCluster logs.
+- Integrates with Elasticsearch to store the PiCluster logs and host monitoring metrics .
 - Automatic container failover to different nodes
 - Pull container images from a registry
 - Upload Dockerfile archives to the entire cluster
 - Functions-as-a-Service (FaaS)
+
+## Public Demo Server
+Click [here](https://www.linux-toys.com/archives/1455) for more informaion.
 
 ## Prerequisites
 

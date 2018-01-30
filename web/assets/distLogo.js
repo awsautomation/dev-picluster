@@ -1,95 +1,105 @@
 function distLogo(dist) {
 	var logo = document.createElement('span');
-	logo.style.fontSize = "100px";
+
 	switch (dist) {
 		case 'alpine linux':
 			logo.className = "fl-alpine";
 			logo.style.color = "#0d597f";
-			return logo.outerHTML;
+			break;
 		case 'centos':
 			logo.className = "fl-centos";
-			return logo.outerHTML;
+			break;
 		case 'rhel':
+		  break;
 		case 'rhas':
+		  break;
 		case 'red hat linux':
 			logo.className = "fl-redhat";
 			logo.style.color = "#e93442";
-			return logo.outerHTML;
+			break;
 		case 'elementary os':
 			logo.className = "fl-elementary";
-			return logo.outerHTML;
+			break;
 		case 'gentoo linux':
 			logo.className = "fl-gentoo";
 			logo.style.color = "#514575";
-			return logo.outerHTML;
+			break;
 		case 'mandriva linux':
 			logo.className = "fl-mandriva";
-			return logo.outerHTML;
+			break;
 		case 'raspbian':
 			logo.className = "fl-raspberry-pi";
 			logo.style.color = "#d6264f";
-			return logo.outerHTML;
+			break;
 		case 'slackware':
 			logo.className = "fl-slackware";
-			return logo.outerHTML;
+			break;
 		case 'aosc':
 			logo.className = "fl-aosc";
-			return logo.outerHTML;
+			break;
 		case 'coreos':
 			logo.className = "fl-coreos";
-			return logo.outerHTML;
+			break;
 		case 'fedora':
 			logo.className = "fl-fedora";
 			logo.style.color = "#294172";
-			return logo.outerHTML;
+			break;
 		case 'linux mint':
 			logo.className = "fl-linuxmint";
 			logo.style.color = "#86ce3e";
-			return logo.outerHTML;
+			break;
 		case 'manjaro':
 			logo.className = "fl-manjaro";
 			logo.style.color = "#37bf5d";
-			return logo.outerHTML;
+			break;
 		case 'apple':
+		  break;
 		case 'osx':
+		  break;
 		case 'macos':
+		  break;
 		case 'darwin':
 			logo.className = "fl-apple";
-			return logo.outerHTML;
+			break;
 		case 'nixos':
 			logo.className = "fl-nixos";
-			return logo.outerHTML;
+			break;
 		case 'sabayon':
 			logo.className = "fl-sabayon";
-			return logo.outerHTML;
+			break;
 		case 'debian':
 			logo.className = "fl-debian";
 			logo.style.color = "#d70751";
-			return logo.outerHTML;
+			break;
 		case 'ubuntu':
+		  break;
 		case 'ubuntu linux':
 			logo.className = "fl-ubuntu-inverse";
-			logo.style.color = "#dd4814"
-			return logo.outerHTML;
+			logo.style.color = "#dd4814";
+			break;
 		case 'arch linux':
 			logo.className = "fl-archlinux";
 			logo.style.color = "#1793d1";
-			return logo.outerHTML;
+			break;
 		case 'freebsd':
 			logo.className = "fl-freebsd";
 			logo.style.color = "#eb0028";
-			return logo.outerHTML;
+			break;
 		case 'mageia':
 			logo.className = "fl-mageia";
-			return logo.outerHTML;
+			break;
 		case 'opensuse':
 			logo.className = "fl-opensuse";
 			logo.style.color = "#73ba25";
-			return logo.outerHTML;
+			break;
 		default:
-			logo.className = "fl-tux"
-			return logo.outerHTML;
+			logo.className = "fl-tux";
+			break;
 	}
+
+	logo.className += " node_status_logo fl-72";
+
+	return logo.outerHTML;
 }
 
 function getDists(arr) {
@@ -109,6 +119,6 @@ function getDists(arr) {
 function addFontLinux() {
     var fontLinux = document.createElement("link");
     fontLinux.rel="stylesheet";
-    fontLinux.href="/node_modules/font-linux/assets/font-linux.css";
+    fontLinux.href="/node_modules/font-logos/assets/font-logos.css";
     document.head.appendChild(fontLinux);
 }

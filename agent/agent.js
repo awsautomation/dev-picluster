@@ -13,7 +13,7 @@ const async = require('async');
 const exec = require('child-process-promise').exec;
 const sysinfo = require('systeminformation');
 
-const config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+let config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 const app = express();
 
 if (config.ssl_self_signed) {
@@ -25,13 +25,14 @@ app.use(bodyParser());
 const upload = multer({
   dest: '../'
 });
+
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
-const server = config.web_connect;
-const server_port = config.server_port;
+let server = config.web_connect;
+let server_port = config.server_port;
 const agent_port = config.agent_port;
 const node = os.hostname();
-const token = config.token;
+let token = config.token;
 const noop = () => {};
 let vip = '';
 let vip_slave = '';
@@ -42,7 +43,10 @@ let cpu_percent = 0;
 let os_type = '';
 let disk_percentage = 0;
 let total_running_containers = 0;
+let container_uptime = '';
 let running_containers = '';
+let container_mem_stats = '';
+let container_cpu_stats = '';
 let cpu_cores = 0;
 let memory_buffers = 0;
 let memory_swap = 0;
@@ -78,6 +82,27 @@ function monitoring() {
       console.error(err);
     }
     running_containers = stdout.split('\n');
+  });
+
+  exec('docker stats --no-stream  --format "{{.CPUPerc}}"', (err, stdout) => {
+    if (err) {
+      console.error(err);
+    }
+    container_cpu_stats = stdout.replace(/%/gi, '').split('\n');
+  });
+
+  exec('docker stats --no-stream  --format "{{.MemPerc}}"', (err, stdout) => {
+    if (err) {
+      console.error(err);
+    }
+    container_mem_stats = stdout.replace(/%/gi, '').split('\n');
+  });
+
+  exec('docker ps --format "{{.Status}}"', (err, stdout) => {
+    if (err) {
+      console.error(err);
+    }
+    container_uptime = stdout.split('\n');
   });
 
   exec('docker images --format "table {{.Repository}}"', (err, stdout) => {
@@ -235,11 +260,13 @@ app.get('/node-status', (req, res) => {
       disk_percentage,
       total_running_containers,
       running_containers,
+      container_mem_stats,
+      container_cpu_stats,
+      container_uptime,
       images,
       cpu_cores,
       memory_percentage
     });
-
     res.send(json_output);
   }
 });
@@ -289,16 +316,51 @@ function unzipFile(file) {
     path: config.docker
   }));
 }
+
+function reloadConfig() {
+  config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
+  token = config.token;
+  server = config.web_connect;
+  server_port = config.server_port;
+}
+
 app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
+  const get_config_file = req.body.config_file;
+
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     fs.readFile(req.file.path, (err, data) => {
-      const newPath = '../' + req.file.originalname;
-      fs.writeFile(newPath, data, err => { // eslint-disable-line no-unused-vars
-        unzipFile(newPath);
-      });
+      let newPath = '../' + req.file.originalname;
+      let config_file = '';
+
+      if (get_config_file) {
+        if (process.env.PICLUSTER_CONFIG) {
+          config_file = process.env.PICLUSTER_CONFIG;
+        } else {
+          config_file = '../config.json';
+        }
+        newPath = config_file;
+      }
+      setTimeout(() => {
+        fs.writeFile(newPath, data, err => {
+          if (!err) {
+            if (get_config_file) {
+              reloadConfig();
+            }
+
+            if (req.file.originalname.indexOf('.zip') > -1) {
+              unzipFile(newPath);
+            }
+            fs.unlink(req.file.path, error => {
+              if (error) {
+                console.log(error);
+              }
+            });
+          }
+        });
+      }, 5000);
     });
     res.end('Done');
   }

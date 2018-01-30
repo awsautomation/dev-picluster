@@ -1,11 +1,29 @@
-# Version 2.2
+# Version 2.3
 
 ## New Features:
-* Functions-as-a-Service
+* When config changes are made, they now populate to every node in the cluster
+* Initial support for themes
+* JerryCluster - Hungry for Containers?
+* Elasticsearch Metrics for each node - Monitor CPU, Memory, and disk usage over time.
+  - elasticsearch_index in config.json is now deprecated.
+* Included Grafana dashboard (grafana-dashboard.json) to view host metrics from Elasticsearch.
+* Container CPU and Memory metrics are now displayed on the container layout page.
 
 ## Enhancements:
-* Cleaner Code
+* Container Layout: Container uptime is now displayed
+* CSS Enhancements
+* Deletes the temporary uploaded files
+* No longer have to click on 'Reload Config', config.json is updated automatically when you submit changes.
+* Legacy 'Reload config' removed from the webconsole and server.
+* Can now update variables cluster-wide in config.json via the webconsole such as:
+       username, password, syslog, rsyslog, elasticsearch, VIP, theme, token, server, and server_port.
+* Merge node functions into combined manage section
+* Merge container functions into combined manage section
+* Merge image functions into combined manage section
+* More consistent user interface and cleaned up navigation
+* Cleaner client-side javascript
+* Refactored node, container, and image listing into a more readable form
 
 ## Bug Fixes:
-* Rsyslog - Displays date correctly when clicking on 'Today'
-* Fixed bug with VIP management to delete and create IP's correctly.
+* You can now create containers from pulled images.
+* Major modal CSS bugfixes

@@ -1,166 +1,14 @@
 <html>
-
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
 	<script src="/assets/distLogo.js"></script>
-	<style>
-		label {
-			font-size: 18px;
-		}
-
-		legend {
-			font-size: 18px;
-		}
-
-		#modal-body2 {
-			font-size: 18px;
-		}
-
-		body {
-			display: block;
-			color: rgba(255, 255, 255, .9);
-			text-decoration: none;
-			padding: 1rem;
-			font-size: 18px;
-			border-top: 2px solid transparent;
-			border-bottom: 2px solid transparent;
-		}
-
-		#functionlist {
-			font-size: 18px;
-		}
-
-		#nodelist {
-			font-size: 18px;
-		}
-
-		button {
-			background-color: #565051;
-			border: none;
-			color: white;
-			padding: 5px 5px;
-			text-align: center;
-			text-decoration: none;
-			display: inline-block;
-			font-size: 16px;
-		}
-
-		.modal {
-			display: none;
-			position: fixed;
-			z-index: 1;
-			padding-top: 100px;
-			left: 0;
-			top: 0;
-			width: 100%;
-			height: 100%;
-			overflow: auto;
-			background-color: rgb(0, 0, 0);
-			background-color: rgba(0, 0, 0, 0.4);
-		}
-
-		.modal-content {
-			position: relative;
-			background-color: #fefefe;
-			margin: auto;
-			padding: 0;
-			font-size: 12px;
-			border: 1px solid #888;
-			width: 90%;
-			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-			-webkit-animation-name: animatetop;
-			-webkit-animation-duration: 0.4s;
-			animation-name: animatetop;
-			animation-duration: 0.4s
-		}
-
-		@-webkit-keyframes animatetop {
-			from {
-				top: -300px;
-				opacity: 0
-			}
-			to {
-				top: 0;
-				opacity: 1
-			}
-		}
-
-		@keyframes animatetop {
-			from {
-				top: -300px;
-				opacity: 0
-			}
-			to {
-				top: 0;
-				opacity: 1
-			}
-		}
-
-		.close {
-			color: white;
-			float: right;
-			font-size: 28px;
-			font-weight: bold;
-		}
-
-		.close:hover,
-		.close:focus {
-			color: #000;
-			text-decoration: none;
-			cursor: pointer;
-		}
-
-		.modal-header {
-			padding: 2px 16px;
-			background-color: #565051;
-			color: white;
-		}
-
-		.modal-body {
-			padding: 2px 16px;
-			color: black
-		}
-
-		textarea {
-			font-size: 18px;
-			resize: none;
-		}
-
-		input {
-			font-size: 14px;
-		}
-
-		.modal-content2 {
-			position: relative;
-			background-color: #fefefe;
-			margin: auto;
-			padding: 0;
-			font-size: 12px;
-			border: 1px solid #888;
-			width: 70%;
-			height: 70%;
-			overflow: auto;
-			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-			-webkit-animation-name: animatetop;
-			-webkit-animation-duration: 0.4s;
-			animation-name: animatetop;
-			animation-duration: 0.4s
-		}
-	</style>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			var get_function = '';
-			var function_args = '';
-
-			if (document.getElementById("function-name").value.length > 1) {
-				get_function = document.getElementById("function-name").value;
-			}
-
-			if (document.getElementById("function-args").value.length > 1) {
-				function_args = document.getElementById("function-args").value;
-			}
+			var get_function = document.getElementById("function-name").value.length > 1 ? document.getElementById("function-name").value : '';
+			var function_args = document.getElementById("function-args").value.length > 1 ? document.getElementById("function-args").value : '';
 
 			if (get_function.length > 1) {
 				$.get("/function?token=" + parent.token + '&function=' + get_function + '&container_args=' + function_args, function(create_data) {
@@ -169,72 +17,66 @@
 				});
 			} else {
 				alert('Error, you did enter a function name.')
-				output_modal.style.display = "none";
 				modal.style.display = "block";
+				output_modal.style.display = "none";
 			}
 		}
 	</script>
 </head>
 
 <body>
-	<div id="myModal" class="modal">
-		<div class="modal-content">
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Create a function</h2>
 			</div>
-			<div class="modal-body">
-				<p align=left>
-					<label>This module allows you to easilly create functions for testing purposes.</label>
-					<label>Please ensure that the container files are present on all the nodes.</label>
-					<br>
-					<fieldset name="functions" id="functions">
-						<legend>Enter the function name</legend>
-						<label><i>This should correspond to the container name in the Docker folder.</i></label>
-						<br><br>
-						<label>Name</label>
-						<input type="text" size="50" id="function-name" name="function-name" value=""></font>
-					</fieldset>
-					<fieldset name="options" id="options">
-						<legend>Container arguments (optional)</legend>
-						</select>
-						<label><i>Additional Docker arguments if needed such as ENVAR's or ports.</i></label>
-						<br><br>
-						<label>Arguments</label>
-						<input type="text" size="50" id="function-args" name="function-args" value=""></font>
-						<br><br>
-						<br>
-						<br>
-					</fieldset>
-					<p align=center>
-						<button id="myBtn">Create</button>
-					</p>
-				</p>
 
+			<div class="modal-body">
+				<label>Create functions for testing purposes.</label>
+				<fieldset name="functions" id="functions">
+					<legend><b>Function Name</b></legend>
+					<label><i>This should correspond to the container name in the Docker folder.</i></label>
+					<br><br>
+					<label>Name</label>
+					<input type="text" id="function-name" class="modal_input" name="function-name" value=""></font>
+				</fieldset>
+
+				<fieldset name="options" id="options">
+					<legend><b>Container Arguments</b> <i>(Optional)</i></legend>
+					</select>
+					<label><i>Additional Docker arguments if needed such as ENVAR's or ports.</i></label>
+					<br><br>
+					<label>Arguments</label>
+					<input type="text" id="function-args" class="modal_input" name="function-args" value=""></font>
+				</fieldset>
+
+				<div id="submit_button_div">
+					<button id="submit_button">Create</button>
+				</div>
 			</div>
 		</div>
 	</div>
 
-
 	<div id="output" class="modal">
-		<div class="modal-content2">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>
 			</div>
-			<div id="modal-body2" class="modal-body">
-				<p align=center>
-					Sent request to create function.
+
+			<div id="functions-create-modal-body" class="modal-body">
+				Sent request to create function.
 			</div>
 		</div>
 	</div>
 
 	<script>
-		var modal = document.getElementById('myModal');
+		var modal = document.getElementById('modal_container');
 		var span = document.getElementsByClassName("close")[0];
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[1];
-		var btn = document.getElementById("myBtn");
+		var submit_button = document.getElementById("submit_button");
 
 		span.onclick = function() {
 			modal.style.display = "none";
@@ -244,11 +86,10 @@
 			output_modal.style.display = "none";
 		}
 
-		btn.onclick = function() {
+		submit_button.onclick = function() {
 			exec();
 		}
 
 		modal.style.display = "block";
 	</script>
-
 </html>

@@ -2,4 +2,7 @@ node_modules/
 */npm-debug.log
 */.DS_Store
 config.json
+picluster-pm2.config.json
 ssl/*
+docs
+docs/*

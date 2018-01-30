@@ -2,7 +2,7 @@
   "name": "picluster-server",
   "version": "0.0.1",
   "config": {
-    "unsafe-perm":true
+    "unsafe-perm": true
   },
   "dependencies": {
     "body-parser": "latest",
@@ -10,7 +10,7 @@
     "fs": "",
     "line-reader": "",
     "multer": "^1.3.0",
-    "node-datetime": "^1.0.1",
+    "moment": "",
     "node-gyp": "",
     "request": "",
     "request-debug": "",
