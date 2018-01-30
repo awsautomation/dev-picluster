@@ -41,9 +41,11 @@ let server = config.web_connect;
 let server_port = config.server_port;
 let nodedata = '';
 
+/**
 if (fs.existsSync(path.normalize(doc_dir))) {
   app.use('/docs', express.static(path.join(__dirname, doc_dir)));
 }
+**/
 
 function getData() {
   setTimeout(() => {
@@ -81,6 +83,7 @@ function get_file_list_by_extention(dirpath, extention) {
   return output;
 }
 
+/**
 function serve_doc_pages() {
   const doc_pages = get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md');
 
@@ -92,6 +95,7 @@ function serve_doc_pages() {
     }
   }
 }
+**/
 
 app.get('/exec.html', (req, res) => {
   const check_token = req.query.token;
@@ -1140,7 +1144,7 @@ app.get('/logo.png', (req, res) => {
   res.sendFile(logo_slug);
 });
 
-serve_doc_pages();
+//serve_doc_pages();
 
 if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Web Console enabled');
