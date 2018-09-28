@@ -12,6 +12,7 @@ const getos = require('picluster-getos');
 const async = require('async');
 const exec = require('child-process-promise').exec;
 const sysinfo = require('systeminformation');
+let bootstrap = 1;
 
 let config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 const app = express();
@@ -143,47 +144,7 @@ function monitoring() {
   }, 3000);
 }
 
-monitoring();
 
-if (config.autostart_containers) {
-  console.log('Starting all the containers.....');
-
-  const options = {
-    url: `${scheme}${server}:${server_port}/start?token=${token}&container=*`,
-    rejectUnauthorized: ssl_self_signed
-  };
-
-  request.get(options).on('error', e => {
-    console.error(e);
-  });
-}
-
-if (config.vip_ip && config.vip) {
-  vip = config.vip_ip;
-  Object.keys(config.vip).forEach(i => {
-    const _node = config.vip[i].node;
-    Object.keys(config.vip[i]).forEach(key => {
-      if (!config.vip[i].hasOwnProperty(key)) {
-        return;
-      }
-      const interfaces = require('os').networkInterfaces();
-      Object.keys(interfaces).forEach(devName => {
-        const iface = interfaces[devName];
-        iface.forEach(alias => {
-          if (alias.address !== _node) {
-            return;
-          }
-          vip_slave = config.vip[i].slave;
-          const vip_eth_device = config.vip[i].vip_eth_device;
-          ip_add_command = 'ip addr add ' + config.vip_ip + '/32 dev ' + vip_eth_device;
-          ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
-          vip_ping_time = config.vip[i].vip_ping_time;
-          exec(ip_delete_command).then(send_ping).catch(send_ping);
-        });
-      });
-    });
-  });
-}
 
 function send_ping() {
   setTimeout(() => {
@@ -421,6 +382,7 @@ app.post('/run', (req, res) => {
   });
 });
 
+
 if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Agent API enabled');
   const ssl_options = {
@@ -437,4 +399,88 @@ if (config.ssl && config.ssl_cert && config.ssl_key) {
   agent.listen(agent_port, () => {
     console.log('Listening on port %d', agent_port);
   });
+}
+
+function bootstrapNode() {
+  setTimeout(() => {
+    console.log('Attempting to bootstrap node to server......');
+    const bootstrap_body = JSON.stringify({
+      token,
+      'host': node
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/bootstrap`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': bootstrap_body.length
+      },
+      body: bootstrap_body
+    };
+
+    request(options, (error, response, body) => {
+      if (error) {
+        console.log('Bootstrap failed due to an error or another bootstrap operation already in progress.\n');
+        console.log(error);
+        bootstrapNode();
+      } else {
+        const status = JSON.parse(body);
+        if (status.output > 0) {
+          console.log('Bootstrap successful.');
+          additional_services();
+        } else {
+          console.log('\nAnother bootstrap is in progress. Will try again soon.....')
+          bootstrapNode();
+        }
+      }
+    });
+  }, 3000);
+}
+
+bootstrapNode();
+
+function additional_services() {
+  monitoring();
+
+  if (config.autostart_containers) {
+    console.log('Starting all the containers.....');
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/start?token=${token}&container=*`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request.get(options).on('error', e => {
+      console.error(e);
+    });
+  }
+
+  if (config.vip_ip && config.vip) {
+    vip = config.vip_ip;
+    Object.keys(config.vip).forEach(i => {
+      const _node = config.vip[i].node;
+      Object.keys(config.vip[i]).forEach(key => {
+        if (!config.vip[i].hasOwnProperty(key)) {
+          return;
+        }
+        const interfaces = require('os').networkInterfaces();
+        Object.keys(interfaces).forEach(devName => {
+          const iface = interfaces[devName];
+          iface.forEach(alias => {
+            if (alias.address !== _node) {
+              return;
+            }
+            vip_slave = config.vip[i].slave;
+            const vip_eth_device = config.vip[i].vip_eth_device;
+            ip_add_command = 'ip addr add ' + config.vip_ip + '/32 dev ' + vip_eth_device;
+            ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
+            vip_ping_time = config.vip[i].vip_ping_time;
+            exec(ip_delete_command).then(send_ping).catch(send_ping);
+          });
+        });
+      });
+    });
+  }
 }
