@@ -8,7 +8,11 @@ const multer = require('multer');
 const express = require('express');
 const Moment = require('moment');
 const request = require('request');
+require('request-debug')(request);
 
+const bootstrap = {
+  status: 1
+};
 const functions = {
   name: []
 };
@@ -175,6 +179,77 @@ app.get('/clear-functions', (req, res) => {
       remove_function_data(functions.name[i].uuid);
     });
     res.end('Sent request to remove stale functions.');
+  }
+});
+
+
+app.post('/bootstrap', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+  const output = {
+    status: 0
+  }
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials or missing parameters.');
+  } else {
+    if (bootstrap.status == 1) {
+      let proceed = 1;
+
+      Object.keys(config.layout).forEach((get_node, i) => {
+        Object.keys(config.layout[i]).forEach(key => {
+          const node = config.layout[i].node;
+          if (config.layout[i].node.indexOf(host) > -1) {
+            proceed = 0;
+          }
+        });
+      });
+
+      if (proceed) {
+        config.layout.push({
+          node: host
+        });
+        const new_config = JSON.stringify({
+          payload: JSON.stringify(config),
+          token
+        });
+
+        const options = {
+          url: `${scheme}${server}:${server_port}/updateconfig`,
+          rejectUnauthorized: ssl_self_signed,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end('An error occurred: ' + error);
+          } else {
+            bootstrap.status = 1;
+            console.log('\nAdded node: ' + host + ' to the cluster.');
+            res.end(JSON.stringify({
+              output: 1
+            }));
+          }
+        });
+      } else {
+        bootstrap.status = 1;
+        console.log('\nnode: ' + host + ' is already part of the cluster.');
+        res.end(JSON.stringify({
+          output: 2
+        }));
+      }
+
+    } else {
+        console.log('\nDebug:' + bootstrap.status);
+      console.log('\nAnother bootstrap process is already running. Please try again later.');
+      res.end(JSON.stringify({
+        output: 0
+      }));
+    }
   }
 });
 
