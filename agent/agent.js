@@ -12,7 +12,6 @@ const getos = require('picluster-getos');
 const async = require('async');
 const exec = require('child-process-promise').exec;
 const sysinfo = require('systeminformation');
-let bootstrap = 1;
 
 let config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
 const app = express();
@@ -143,8 +142,6 @@ function monitoring() {
     monitoring();
   }, 3000);
 }
-
-
 
 function send_ping() {
   setTimeout(() => {
@@ -382,7 +379,6 @@ app.post('/run', (req, res) => {
   });
 });
 
-
 if (config.ssl && config.ssl_cert && config.ssl_key) {
   console.log('SSL Agent API enabled');
   const ssl_options = {
@@ -406,7 +402,7 @@ function bootstrapNode() {
     console.log('Attempting to bootstrap node to server......');
     const bootstrap_body = JSON.stringify({
       token,
-      'host': node
+      host: node
     });
 
     const options = {
@@ -431,7 +427,7 @@ function bootstrapNode() {
           console.log('Bootstrap successful.');
           additional_services();
         } else {
-          console.log('\nAnother bootstrap is in progress. Will try again soon.....')
+          console.log('\nAnother bootstrap is in progress. Will try again soon.....');
           bootstrapNode();
         }
       }
