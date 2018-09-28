@@ -9,16 +9,18 @@
     "ssl_self_signed": false,
     "ssl_cert": "",
     "ssl_key": "",
-    "layout": [{
-    }],
-    "hb": [{
-    }],
-    "container_host_constraints": [{}],
+    "layout": [
+    ],
+    "hb": [
+    ],
+    "container_host_constraints": [
+        {}
+    ],
     "automatic_heartbeat": "enabled",
     "heartbeat_interval": "300000",
     "syslog": "dmesg",
     "web_username": "admin",
     "web_password": "admin",
-    "web_connect": "0.0.0.0",
+    "web_connect": "127.0.0.1",
     "web_port": "3003"
 }
