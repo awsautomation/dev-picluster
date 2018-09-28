@@ -7,10 +7,10 @@
   "ssl_self_signed": false,
   "ssl_cert": "",
   "ssl_key": "",
-  "layout": [{
-  }],
-  "hb": [{
-  }],
+  "layout": [
+  ],
+  "hb": [
+  ],
   "container_host_constraints": [{
   }],
   "automatic_heartbeat": "enabled",
