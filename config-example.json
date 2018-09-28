@@ -8,12 +8,8 @@
   "ssl_cert": "",
   "ssl_key": "",
   "layout": [{
-      "node": "localhost",
-      "nginx": "-p 80:80"
   }],
   "hb": [{
-      "node": "localhost",
-      "nginx": "80"
   }],
   "container_host_constraints": [{
   }],
