@@ -182,26 +182,20 @@ app.get('/clear-functions', (req, res) => {
   }
 });
 
-
 app.post('/bootstrap', (req, res) => {
   const check_token = req.body.token;
   const host = req.body.host;
-  const output = {
-    status: 0
-  }
+  let statusCode = 0;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
   } else {
-    if (bootstrap.status == 1) {
+    if (bootstrap.status === 1) {
       let proceed = 1;
 
       Object.keys(config.layout).forEach((get_node, i) => {
-        Object.keys(config.layout[i]).forEach(key => {
-          const node = config.layout[i].node;
-          if (config.layout[i].node.indexOf(host) > -1) {
-            proceed = 0;
-          }
-        });
+        if (config.layout[i].node.indexOf(host) > -1) {
+          proceed = 0;
+        }
       });
 
       if (proceed) {
@@ -230,26 +224,21 @@ app.post('/bootstrap', (req, res) => {
           } else {
             bootstrap.status = 1;
             console.log('\nAdded node: ' + host + ' to the cluster.');
-            res.end(JSON.stringify({
-              output: 1
-            }));
+            statusCode = 1;
           }
         });
       } else {
         bootstrap.status = 1;
         console.log('\nnode: ' + host + ' is already part of the cluster.');
-        res.end(JSON.stringify({
-          output: 2
-        }));
+        statusCode = 2;
       }
-
     } else {
-        console.log('\nDebug:' + bootstrap.status);
       console.log('\nAnother bootstrap process is already running. Please try again later.');
-      res.end(JSON.stringify({
-        output: 0
-      }));
+      statusCode = 0;
     }
+    res.end(JSON.stringify({
+      output: statusCode
+    }));
   }
 });
 
