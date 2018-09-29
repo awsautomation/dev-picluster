@@ -1,0 +1,153 @@
+<html>
+
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<script src="/assets/distLogo.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		function exec() {
+			var radio_add = $('input[id=radio_add]:checked').val();
+			var radio_delete = $('input[id=radio_delete]:checked').val();
+			var radio_kibana = $('input[id=radio_kibana]:checked').val();
+			var elasticsearch_url = $("#es_url").val();
+			var kibana_url = $("#kibana_url").val();
+			var path = '/elasticsearch';
+			if (path) {
+				if (radio_add) {
+					$.post(path, {
+						token: parent.token,
+						elasticsearch_url,
+						'mode': 'add'
+					}, function(data) {
+						var div = document.getElementById('containers-manage-modal-body');
+						div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs for updated information.<br><br>\n' + data;
+					});
+				} else if (radio_kibana) {
+					$.post(path, {
+						token: parent.token,
+						'elasticsearch_url': kibana_url,
+						'mode': 'kibana'
+					}, function(data) {
+						var div = document.getElementById('containers-manage-modal-body');
+						div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs for updated information.<br><br>\n' + data;
+					});
+				} else if (radio_delete) {
+					$.post(path, {
+						token: parent.token,
+						elasticsearch_url,
+						'mode': 'delete'
+					}, function(data) {
+						var div = document.getElementById('containers-manage-modal-body');
+						div.innerHTML = 'Sent request to the server. Please check the logs for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+					});
+				} else {
+					alert('Error, you did not select an operation.')
+					output_modal.style.display = "none";
+					modal.style.display = "block";
+				}
+			}
+		}
+
+		$(document).ready(function() {
+			$("input[id$='radio_add']").click(function() {
+			$("#es_kibana").hide();
+			$(this).is(":checked") ? $("#es_add").show() : '';
+			})
+
+			$("input[id$='radio_kibana']").click(function() {
+				$("#es_add").hide();
+				$(this).is(":checked") ? $("#es_kibana").show() : '';
+			})
+
+			$("input[id$='radio_delete']").click(function() {
+				$(this).is(":checked") ? $("#es_add").hide() : '';
+			})
+
+			$("#es_add").hide();
+			$("#es_kibana").hide();
+		});
+	</script>
+</head>
+
+<body>
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Manage Elasticsearch Configuration</h2>
+			</div>
+
+			<div class="modal-body">
+				<fieldset id="es_fieldset">
+					<legend><b>Elasticsearch Configuration</b></legend>
+					<div id="es_action_selector">
+						<input type="radio" name="container_radio" id="radio_add">
+						<label class="windowfont">Add</label>
+						<hr>
+						<input type="radio" name="container_radio" id="radio_delete">
+						<label class="windowfont">Remove</label>
+						<hr>
+						<input type="radio" name="container_radio" id="radio_kibana">
+						<label class="windowfont">Kibana or Grafana Access</label>
+					</div>
+
+					<div id="es_add">
+						<br>
+						<label class="windowfont">Elasticsearch URL:</label>
+						<input type="text" size="30" id="es_url" class="modal_input" name="es_url" value=""></font>
+						<br>
+					</div>
+					<div id="es_kibana">
+						<br>
+						<label class="windowfont">Web Console URL:</label>
+						<input type="text" size="30" id="kibana_url" class="modal_input" name="kibana_url" value=""></font>
+						<br>
+					</div>
+				</fieldset>
+				<div id="submit_button_div">
+					<button id="submit_button">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="output" class="modal">
+		<div class="modal-content modal-large">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+
+			<div id="containers-manage-modal-body" class="modal-body">
+				Please wait.
+			</div>
+		</div>
+	</div>
+
+	<script>
+		var modal = document.getElementById('modal_container');
+		var span = document.getElementsByClassName("close")[0];
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+
+		modal.style.display = "block";
+	</script>
+
+</html>
