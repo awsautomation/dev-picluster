@@ -89,6 +89,9 @@
 			$('#kibana').click(function() {
 				$('#iframe_a').attr('src', '/kibana.html?token=' + token);
 			});
+			$('#elasticsearch-config').click(function() {
+				$('#iframe_a').attr('src', '/elasticsearch.html?token=' + token);
+			});
 			$('#functions-viewer').click(function() {
 				$('#iframe_a').attr('src', '/functions-viewer.html');
 			});
@@ -279,6 +282,7 @@
 						<li><a href="#" id="images-prune">Clean Docker</a></li>
 						<li><a href="#" id="terminal">Terminal</a></li>
 						<li><a href="#" id="kibana">Kibana</a></li>
+						<li><a href="#" id="elasticsearch-config">Configure Elasticsearch</a></li>
 					</ul>
 				</li>
 				<li id="nav_logs"><a onmouseover="this.click()" href="#!">Logs</a>
