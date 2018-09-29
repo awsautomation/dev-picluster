@@ -249,6 +249,44 @@ app.post('/exec', (req, res) => {
   }
 });
 
+app.post('/elasticsearch', (req, res) => {
+  const check_token = req.body.token;
+  const elasticsearch_url = req.body.elasticsearch_url;
+  const mode = req.body.mode;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const command = JSON.stringify({
+      command: req.body.command,
+      token,
+      elasticsearch_url,
+      mode
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/elasticsearch`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        display_log(data => {
+          res.end(data);
+        });
+      }
+    });
+  }
+});
+
 app.get('/listdocs', (req, res) => {
   res.json(get_file_list_by_extention(path.join(__dirname, doc_dir.toString()), '.md'));
 });
@@ -1129,6 +1167,9 @@ app.get('/nodes-remove.html', (req, res) => {
 });
 app.get('/nodes-manage.html', (req, res) => {
   res.sendFile(__dirname + '/nodes-manage.html');
+});
+app.get('/elasticsearch.html', (req, res) => {
+  res.sendFile(__dirname + '/elasticsearch.html');
 });
 app.get('/rsyslog.html', (req, res) => {
   res.sendFile(__dirname + '/rsyslog.html');
