@@ -126,11 +126,14 @@
 				}
 
 				if (offline_containers.length > 0) {
-					div.innerHTML += '<img src="/assets/images/alert.png" style="width:75px;height:75px;"><br><b>Stopped/Missing Containers:</b>';
+					var header = '<hr><img src="/assets/images/alert.png" style="width:75px;height:75px;"><br><b>Stopped/Missing Containers:</b>';
+					var divbackup = div.innerHTML;
+					var data = '';
 					for (var z = 0; z != offline_containers.length; z++) {
-						div.innerHTML += '<br><br><a href="/containers-manage.html" onclick="link_function(\'' + offline_containers[z] + '\')">' + offline_containers[z] + '</a>';
+						data += '<br><br><a href="/containers-manage.html" onclick="link_function(\'' + offline_containers[z] + '\')">' + offline_containers[z] + '</a>';
 					}
-					div.innerHTML += '<hr>';
+					div.innerHTML = header + data + '<hr>' + div.innerHTML;
+					divbackup;
 				}
 			});
 		}
