@@ -20,38 +20,28 @@
 			$.get("/nodes?token=" + parent.token, function(data) {
 				var check_data = data;
 				(div) ? div.innerHTML = '': div;
+				var offline_containers = [];
+				var running_containers = [];
+				var configured_containers = check_data.container_list;
 
 				for (var i in check_data.data) {
 					if (div) {
 						var dist = check_data.data[i].os_type.toLowerCase() || '';
 						var container_layout = check_data.data[i].running_containers;
+						running_containers.push(container_layout);
+						//alert(running_containers);
 						var container_uptime = check_data.data[i].container_uptime;
 						var get_container_cpu = check_data.data[i].container_cpu_stats;
 						var get_container_mem = check_data.data[i].container_mem_stats;
 						var cpu_cores = check_data.data[i].cpu_cores;
-						var configured_containers = check_data.container_list;
 						var total_containers = check_data.data[i].total_containers;
 
 						div.innerHTML += '<div class="container_card"><div class="container_card_logo"><b>' + distLogo(dist) + check_data.data[i].hostname + '</b></div><div class="container_card_list"><ul id ="ul_' + i + '">';
-
 						var container_layout_ul = document.getElementById('ul_' + i);
 
 						for (var j in container_layout) {
 							if (container_layout[j]) {
 
-								var offline_containers = [];
-								for (var k = 0; k != configured_containers.length; k++) { //Configured Containers
-									var proceed = 1;
-									for (var l = 0; l != container_layout.length; l++) { //Running Containers
-										if (configured_containers[k] === container_layout[l]) {
-											proceed = 0;
-										}
-									}
-									if (proceed === 1) {
-										offline_containers.push(configured_containers[k]);
-										proceed = 1;
-									}
-								}
 								var node_card = document.createElement("div")
 								node_card.className = "node_card";
 
@@ -116,18 +106,31 @@
 								container_layout_ul.append(node_card);
 							}
 						}
-						if (offline_containers) {
-							container_layout_ul.innerHTML += '<br><br><b><br>Stopped/Missing Containers:</b>';
-							for (var z = 0; z != offline_containers.length; z++) {
-								container_layout_ul.innerHTML += '<br><a href="/containers-manage.html" onclick="link_function(\'' + offline_containers[z] + '\')">' + offline_containers[z] + '</a>';
-							}
-						}
 						div.innerHTML += '</ul></div></div><hr>'
-
 					}
 
 					addFontLinux();
+				}
 
+				for (var k = 0; k != configured_containers.length; k++) { //Configured Containers
+					var proceed = 1;
+					for (var l = 0; l != running_containers.length; l++) { //Running Containers
+						if (running_containers[l].indexOf(configured_containers[k]) > -1) {
+							proceed = 0;
+						}
+					}
+
+					if (proceed === 1) {
+						offline_containers.push(configured_containers[k]);
+					}
+				}
+
+				if (offline_containers.length > 0) {
+					div.innerHTML += '<img src="/assets/images/alert.png" style="width:75px;height:75px;"><br><b>Stopped/Missing Containers:</b>';
+					for (var z = 0; z != offline_containers.length; z++) {
+						div.innerHTML += '<br><br><a href="/containers-manage.html" onclick="link_function(\'' + offline_containers[z] + '\')">' + offline_containers[z] + '</a>';
+					}
+					div.innerHTML += '<hr>';
 				}
 			});
 		}
