@@ -13,6 +13,8 @@
 		};
 
 		function exec() {
+
+
 			var div = document.getElementById('container-layout-modal-body');
 
 			div.innerHTML = (div) ? div.innerHTML + '<div class="container_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font></div>' : div;
@@ -161,8 +163,17 @@
 		}
 
 		output_modal.style.display = "block";
-
 		exec();
+	</script>
+	<script>
+		window_reloader();
+
+		function window_reloader() {
+			setTimeout(() => {
+				exec();
+				window_reloader();
+			}, 15000);
+		}
 	</script>
 
 </html>

@@ -145,4 +145,14 @@
 
 		exec()
 	</script>
+	<script>
+		window_reloader();
+
+		function window_reloader() {
+			setTimeout(() => {
+				exec();
+				window_reloader();
+			}, 15000);
+		}
+	</script>
 </html>
