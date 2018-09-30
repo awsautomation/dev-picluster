@@ -9,4 +9,4 @@
 * Node and Container layout now autorefresh after 15 seconds.
 
 ## Bug Fixes:
-* None
+* Updated Kibana dashboards for the 6.3.x release.
