@@ -6,6 +6,7 @@
 
 ## Enhancements:
 * Can add Elasticsearch and Kibana server details under the new 'Configure Elasticsearch' menu item.
+* Node and Container layout now autorefresh after 15 seconds.
 
 ## Bug Fixes:
 * None
