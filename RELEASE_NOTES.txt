@@ -1,10 +1,11 @@
 # Version 2.4
 
 ## New Features:
-* Automatic Node Bootstrapping - Nodes need a minimum config.json with the token and server IP. When the agent is started, it will be added to the cluster. 
+* Automatic Node Bootstrapping - Nodes need a minimum config.json with the token and server IP. When the agent is started, it will be added to the cluster.
+* Container Status in Web Console now displays stopped/deleted containers.
 
 ## Enhancements:
-* None
+* Can add Elasticsearch and Kibana server details under the new 'Configure Elasticsearch' menu item.
 
 ## Bug Fixes:
 * None
