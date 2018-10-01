@@ -8,6 +8,6 @@
 * Can add Elasticsearch and Kibana server details under the new 'Configure Elasticsearch' menu item.
 * Node and Container layout now autorefresh after 15 seconds.
 * Improved Grafana dashboard to see metrics by intervals.
-
+* Operations->Kibana has been renamed to Monitoring
 ## Bug Fixes:
 * Updated Kibana dashboards for the 6.3.x release.

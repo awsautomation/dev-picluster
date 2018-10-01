@@ -118,7 +118,7 @@ app.get('/config-edit.html', (req, res) => {
   }
 });
 
-app.get('/kibana.html', (req, res) => {
+app.get('/monitoring.html', (req, res) => {
   const check_token = req.query.token;
   if ((check_token !== token) || (!check_token) || (!config.kibana)) {
     res.end('\nError: Invalid Credentials or invalid configuration.');
