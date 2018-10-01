@@ -9,5 +9,7 @@
 * Node and Container layout now autorefresh after 15 seconds.
 * Improved Grafana dashboard to see metrics by intervals.
 * Operations->Kibana has been renamed to Monitoring
+* config.kibana replaced with config.monitoring.
+
 ## Bug Fixes:
 * Updated Kibana dashboards for the 6.3.x release.
