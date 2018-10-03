@@ -22,6 +22,7 @@
 - Heartbeat for services
 - Easily build and orchestrate Docker images across nodes
 - Web interface
+- CLI interface
 - Monitor host metrics (Disk, CPU, Memory)
 - HTTP interface
 - Virtual IP Manager
