@@ -13,3 +13,4 @@
 
 ## Bug Fixes:
 * Updated Kibana dashboards for the 6.3.x release.
+* Manage Containers can display a lot of nodes properly.
