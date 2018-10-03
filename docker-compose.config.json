@@ -9,15 +9,13 @@
     "ssl_self_signed": false,
     "ssl_cert": "",
     "ssl_key": "",
-    "layout": [{
-        "node": "127.0.0.1",
-        "nginx": "-p 80:80"
-    }],
-    "hb": [{
-        "node": "127.0.0.1",
-        "nginx": "80"
-    }],
-    "container_host_constraints": [{}],
+    "layout": [
+    ],
+    "hb": [
+    ],
+    "container_host_constraints": [
+        {}
+    ],
     "automatic_heartbeat": "enabled",
     "heartbeat_interval": "300000",
     "syslog": "dmesg",

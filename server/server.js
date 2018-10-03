@@ -9,6 +9,9 @@ const express = require('express');
 const Moment = require('moment');
 const request = require('request');
 
+const bootstrap = {
+  status: 1
+};
 const functions = {
   name: []
 };
@@ -175,6 +178,66 @@ app.get('/clear-functions', (req, res) => {
       remove_function_data(functions.name[i].uuid);
     });
     res.end('Sent request to remove stale functions.');
+  }
+});
+
+app.post('/bootstrap', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+  let statusCode = 0;
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials or missing parameters.');
+  } else {
+    if (bootstrap.status === 1) {
+      let proceed = 1;
+
+      Object.keys(config.layout).forEach((get_node, i) => {
+        if (config.layout[i].node.indexOf(host) > -1) {
+          proceed = 0;
+        }
+      });
+
+      if (proceed) {
+        config.layout.push({
+          node: host
+        });
+        const new_config = JSON.stringify({
+          payload: JSON.stringify(config),
+          token
+        });
+
+        const options = {
+          url: `${scheme}${server}:${server_port}/updateconfig`,
+          rejectUnauthorized: ssl_self_signed,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': new_config.length
+          },
+          body: new_config
+        };
+
+        request(options, error => {
+          if (error) {
+            res.end('An error occurred: ' + error);
+          } else {
+            bootstrap.status = 1;
+            console.log('\nAdded node: ' + host + ' to the cluster.');
+            statusCode = 1;
+          }
+        });
+      } else {
+        bootstrap.status = 1;
+        console.log('\nnode: ' + host + ' is already part of the cluster.');
+        statusCode = 2;
+      }
+    } else {
+      console.log('\nAnother bootstrap process is already running. Please try again later.');
+      statusCode = 0;
+    }
+    res.end(JSON.stringify({
+      output: statusCode
+    }));
   }
 });
 
@@ -1811,6 +1874,67 @@ app.get('/killvip', (req, res) => {
     }
   }
   res.end('');
+});
+
+app.post('/elasticsearch', (req, res) => {
+  const check_token = req.body.token;
+  const elasticsearch = req.body.elasticsearch_url;
+  const mode = req.body.mode;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    if (mode === 'add') {
+      if (config.elasticsearch) {
+        console.log('\nError, Elasticsearch is already configured.');
+      } else {
+        config.elasticsearch = elasticsearch;
+        console.log('\nAdded Elasticsearch configuration for: ' + elasticsearch);
+      }
+    }
+    if (mode === 'kibana') {
+      if (config.kibana) {
+        console.log('\nError, Kibana is already configured.');
+      } else {
+        config.kibana = elasticsearch;
+        console.log('\nAdded Kibana configuration for: ' + elasticsearch);
+      }
+    }
+    if (mode === 'delete') {
+      if (config.kibana) {
+        console.log('\nDeleted Kibana configuration.');
+        delete config.kibana;
+      }
+      if (config.elasticsearch) {
+        delete config.elasticsearch;
+        console.log('\nDeleted Elasticsearch configuration.');
+      }
+    }
+    const new_config = JSON.stringify({
+      payload: JSON.stringify(config),
+      token
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/updateconfig`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end('An error occurred: ' + error);
+      } else {
+        res.end();
+        console.log('\nUpdated Elasticsearch configuration.');
+      }
+    });
+  }
 });
 
 app.post('/updateconfig', (req, res) => {

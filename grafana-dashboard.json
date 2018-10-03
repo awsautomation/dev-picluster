@@ -1,8 +1,8 @@
 {
   "__inputs": [
     {
-      "name": "DS_ELASTICSEARCH",
-      "label": "Elasticsearch",
+      "name": "DS_PICLUSTER",
+      "label": "PiCluster",
       "description": "",
       "type": "datasource",
       "pluginId": "elasticsearch",
@@ -14,19 +14,19 @@
       "type": "datasource",
       "id": "elasticsearch",
       "name": "Elasticsearch",
-      "version": "3.0.0"
+      "version": "5.0.0"
     },
     {
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.0-pre1"
+      "version": "5.3.0-pre1"
     },
     {
       "type": "panel",
       "id": "graph",
       "name": "Graph",
-      "version": ""
+      "version": "5.0.0"
     }
   ],
   "annotations": {
@@ -53,7 +53,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_ELASTICSEARCH}",
+      "datasource": "${DS_PICLUSTER}",
       "fill": 1,
       "gridPos": {
         "h": 7,
@@ -72,7 +72,7 @@
         "values": false
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 4,
       "links": [],
       "nullPointMode": "null",
       "percentage": false,
@@ -102,7 +102,7 @@
               "field": "date",
               "id": "2",
               "settings": {
-                "interval": "auto",
+                "interval": "1m",
                 "min_doc_count": 0,
                 "trimEdges": 0
               },
@@ -156,14 +156,18 @@
           "min": null,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_ELASTICSEARCH}",
+      "datasource": "${DS_PICLUSTER}",
       "fill": 1,
       "gridPos": {
         "h": 11,
@@ -182,7 +186,7 @@
         "values": false
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 4,
       "links": [],
       "nullPointMode": "null",
       "percentage": false,
@@ -212,7 +216,7 @@
               "field": "date",
               "id": "2",
               "settings": {
-                "interval": "auto",
+                "interval": "1m",
                 "min_doc_count": 0,
                 "trimEdges": 0
               },
@@ -267,14 +271,18 @@
           "min": null,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_ELASTICSEARCH}",
+      "datasource": "${DS_PICLUSTER}",
       "fill": 1,
       "gridPos": {
         "h": 13,
@@ -293,7 +301,7 @@
         "values": false
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 4,
       "links": [],
       "nullPointMode": "null",
       "percentage": false,
@@ -323,7 +331,7 @@
               "field": "date",
               "id": "2",
               "settings": {
-                "interval": "auto",
+                "interval": "1m",
                 "min_doc_count": 0,
                 "trimEdges": 0
               },
@@ -378,14 +386,18 @@
           "min": null,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_ELASTICSEARCH}",
+      "datasource": "${DS_PICLUSTER}",
       "fill": 1,
       "gridPos": {
         "h": 7,
@@ -404,7 +416,7 @@
         "values": false
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 4,
       "links": [],
       "nullPointMode": "null",
       "percentage": false,
@@ -434,7 +446,7 @@
               "field": "date",
               "id": "2",
               "settings": {
-                "interval": "auto",
+                "interval": "1m",
                 "min_doc_count": 0,
                 "trimEdges": 0
               },
@@ -489,7 +501,11 @@
           "min": null,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     }
   ],
   "refresh": false,
@@ -530,5 +546,6 @@
   },
   "timezone": "",
   "title": "PiCluster Monitoring",
-  "version": 6
+  "uid": "sdFDxU0ik",
+  "version": 9
 }
