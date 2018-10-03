@@ -24,17 +24,16 @@ if type jq &>/dev/null; then
   nodes(){
     clear
     echo "Active Nodes:"
-    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}"
-    else curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}"
+    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq .nodes
+    else curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq .nodes
     fi
-    logs
   }
 
   stop(){
     clear
     echo "Stopping the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/stop"
-    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/stop"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/stop
+    else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/stop
     fi
 
     logs
@@ -43,21 +42,10 @@ if type jq &>/dev/null; then
   images(){
     clear
     echo "Gathering a list of images....."
-    if [ "${config_ssl}" == "true" ]; then curl -s  "https://${config_web_connect}:${config_server_port}/images?token=${config_token}"
-    else curl -s  "http://${config_web_connect}:${config_server_port}/images?token=${config_token}"
+    if [ "${config_ssl}" == "true" ]; then curl -s  "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" |  jq -r '.data[] | "\(.hostname) \(.images)"'
+    else curl -s  "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" |  jq -r '.data[] | "\(.hostname) \(.images)"'
     fi
-    logs
   }
-
-  reloadconfig(){
-    clear
-    echo "Reloading the configuration...."
-    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/reloadconfig?token=${config_token}"
-    else curl -s "http://${config_web_connect}:${config_server_port}/reloadconfig?token=${config_token}"
-    fi
-    logs
-  }
-
 
   shell(){
     clear
@@ -80,10 +68,9 @@ if type jq &>/dev/null; then
   build() {
     clear
     echo "Building the container(s) in the background. This may take a while. Continue to check the logs for progress."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&image=$1 https://${config_web_connect}:${config_server_port}/build"
-    else curl -s -G -d "token=${config_token}&image=$1 http://${config_web_connect}:${config_server_port}/build"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&image=$1&no_cache=true" https://${config_web_connect}:${config_server_port}/build
+    else curl -s -G -d "token=${config_token}&image=$1&no_cache=true" http://${config_web_connect}:${config_server_port}/build
     fi
-    logs
   }
 
   logs(){
@@ -107,26 +94,24 @@ if type jq &>/dev/null; then
   start(){
     clear
     echo "Starting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/start"
-    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/start"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/start
+    else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/start
     fi
-    logs
   }
 
   restart(){
     clear
     echo "Restarting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/restart"
-    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/restart"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/restart
+  else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/restart
     fi
-    logs
   }
 
   changehost(){
     clear
     echo "Changing the host....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&newhost=$2&container=$1 https://${config_web_connect}:${config_server_port}/changehost"
-    else curl -s -G -d "token=${config_token}&newhost=$2&container=$1 http://${config_web_connect}:${config_server_port}/changehost"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&newhost=$2&container=$1" https://${config_web_connect}:${config_server_port}/changehost
+  else curl -s -G -d "token=${config_token}&newhost=$2&container=$1" http://${config_web_connect}:${config_server_port}/changehost
     fi
     logs
   }
@@ -134,8 +119,8 @@ if type jq &>/dev/null; then
   delete(){
     clear
     echo "Deleting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/delete"
-    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/delete"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/delete
+  else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/delete
     fi
 
     logs
@@ -144,16 +129,15 @@ if type jq &>/dev/null; then
   status() {
     clear
     echo "Checking the status....."
-    if [ "${config_ssl}" == "true" ]; then curl -s "http://${config_web_connect}:${config_server_port}/status?token=${config_token}"
-    else curl -s "http://${config_web_connect}:${config_server_port}/status?token=${config_token}"
+    if [ "${config_ssl}" == "true" ]; then curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq ".data[].running_containers"
+    else curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname) \(.running_containers)"'
     fi
-    logs
   }
 
   if [  -z "$1" ]; then
     echo "Error, no args specified!"
     echo
-    arguments="build nodes reloadconfig images start create status exec start stop clean "
+    arguments="build nodes images start create status exec start stop clean "
     echo "Valid arguments are: $arguments"
     echo
     exit
@@ -165,7 +149,6 @@ if type jq &>/dev/null; then
   if [ "$1" = "nodes" ]; then nodes;exit; fi;
   if [ "$1" = "clean" ]; then clean;exit; fi;
   if [ "$1" = "images" ]; then images;exit; fi;
-  if [ "$1" = "reloadconfig" ]; then reloadconfig;exit; fi;
   if [ "$1" = "log" ]; then echo "Gathering Logs....";logs;exit; fi;
   if [ "$1" = "restart" ]; then restart "$2";exit; fi;
   if [ "$1" = "changehost" ]; then changehost "$2" "$3";exit; fi;
