@@ -22,6 +22,7 @@
 - Heartbeat for services
 - Easily build and orchestrate Docker images across nodes
 - Web interface
+- CLI interface
 - Monitor host metrics (Disk, CPU, Memory)
 - HTTP interface
 - Virtual IP Manager
@@ -33,9 +34,6 @@
 - Pull container images from a registry
 - Upload Dockerfile archives to the entire cluster
 - Functions-as-a-Service (FaaS)
-
-## Public Demo Server
-Click [here](https://www.linux-toys.com/archives/1455) for more informaion.
 
 ## Prerequisites
 
