@@ -4,7 +4,7 @@ clear
 # Test if jq is installed
 if type jq &>/dev/null; then
   # Config file
-  config="config.json"
+  config="config-example.json"
 
   # Set config parameters to assign to variables
   config_token=$(jq .token $config | sed -e 's/\"//g')
@@ -93,10 +93,9 @@ if type jq &>/dev/null; then
   create() {
     clear
     echo "Running the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1 https://${config_web_connect}:${config_server_port}/create"
-    else curl -s -G -d "token=${config_token}&container=$1 http://${config_web_connect}:${config_server_port}/create"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/create
+  else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/create
     fi
-    logs
   }
 
   start(){
@@ -121,7 +120,6 @@ if type jq &>/dev/null; then
     if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&newhost=$2&container=$1" https://${config_web_connect}:${config_server_port}/changehost
     else curl -s -G -d "token=${config_token}&newhost=$2&container=$1" http://${config_web_connect}:${config_server_port}/changehost
     fi
-    logs
   }
 
   delete(){
@@ -130,8 +128,6 @@ if type jq &>/dev/null; then
     if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/delete
     else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/delete
     fi
-
-    logs
   }
 
   status() {
