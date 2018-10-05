@@ -4,7 +4,7 @@ clear
 # Test if jq is installed
 if type jq &>/dev/null; then
   # Config file
-  config="config.json"
+  config="config-example.json"
 
   # Set config parameters to assign to variables
   config_token=$(jq .token $config | sed -e 's/\"//g')
