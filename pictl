@@ -4,7 +4,7 @@ clear
 # Test if jq is installed
 if type jq &>/dev/null; then
   # Config file
-  config="config-example.json"
+  config="config.json"
 
   # Set config parameters to assign to variables
   config_token=$(jq .token $config | sed -e 's/\"//g')
@@ -24,17 +24,16 @@ if type jq &>/dev/null; then
   nodes(){
     clear
     echo "Active Nodes:"
-    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq .nodes
-    else curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq .nodes
+    if [ "${config_ssl}" == "true" ]; then echo;curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" |  jq -r '.data[] | "\(.hostname)"';echo
+  else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" |  jq -r '.data[] | "\(.hostname)"';echo
     fi
   }
 
   metrics(){
     clear
     echo "Nodes Metrics"
-    if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "'
-    fi
-    else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "'
+    if [ "${config_ssl}" == "true" ]; then echo;curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "'
+  else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "';echo
     fi
   }
 
