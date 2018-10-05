@@ -40,8 +40,8 @@ if type jq &>/dev/null; then
   stop(){
     clear
     echo "Stopping the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/stop
-    else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/stop
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/stop"
+  else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/stop"
     fi
 
     logs
@@ -76,8 +76,8 @@ if type jq &>/dev/null; then
   build() {
     clear
     echo "Building the container(s) in the background. This may take a while. Continue to check the logs for progress."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&image=$1&no_cache=true" https://${config_web_connect}:${config_server_port}/build
-    else curl -s -G -d "token=${config_token}&image=$1&no_cache=true" http://${config_web_connect}:${config_server_port}/build
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&image=$1&no_cache=true" "https://${config_web_connect}:${config_server_port}/build"
+  else curl -s -G -d "token=${config_token}&image=$1&no_cache=true" "http://${config_web_connect}:${config_server_port}/build"
     fi
   }
 
@@ -93,40 +93,40 @@ if type jq &>/dev/null; then
   create() {
     clear
     echo "Running the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/create
-  else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/create
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/create"
+  else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/create"
     fi
   }
 
   start(){
     clear
     echo "Starting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/start
-    else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/start
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/start"
+  else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/start"
     fi
   }
 
   restart(){
     clear
     echo "Restarting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/restart
-    else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/restart
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/restart"
+  else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/restart"
     fi
   }
 
   changehost(){
     clear
     echo "Changing the host....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&newhost=$2&container=$1" https://${config_web_connect}:${config_server_port}/changehost
-    else curl -s -G -d "token=${config_token}&newhost=$2&container=$1" http://${config_web_connect}:${config_server_port}/changehost
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&newhost=$2&container=$1" "https://${config_web_connect}:${config_server_port}/changehost"
+  else curl -s -G -d "token=${config_token}&newhost=$2&container=$1" "http://${config_web_connect}:${config_server_port}/changehost"
     fi
   }
 
   delete(){
     clear
     echo "Deleting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" https://${config_web_connect}:${config_server_port}/delete
-    else curl -s -G -d "token=${config_token}&container=$1" http://${config_web_connect}:${config_server_port}/delete
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/delete"
+  else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/delete"
     fi
   }
 
