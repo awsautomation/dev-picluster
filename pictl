@@ -62,7 +62,6 @@ if type jq &>/dev/null; then
       curl -X POST -F "file=@$1" -F "token=${config_token}" "https://${config_web_connect}:${config_server_port}/receive-file"
       echo
     else
-      echo $2
       echo "Uploading container Zip file to Server......."
       curl -X POST -F "file=@$1" -F "token=${config_token}" "http://${config_web_connect}:${config_server_port}/receive-file"
       echo
