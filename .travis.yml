@@ -26,7 +26,6 @@ script:
 - npm install --unsafe-perm
 - npm test
 - IP=`ip addr show | grep -i eth0 | grep -i inet | cut -d ' ' -f 6 | cut -d '/' -f1`
-- echo $IP;ip addr show
 - cp -r ./example/x86_64/ubuntu/* ./docker/
 - sudo docker image build ./docker/nginx -t nginx -f ./docker/nginx/Dockerfile
 - sudo docker image build . -t local/testing:alpine -f web/tests/integration/Dockerfile.alpine
@@ -41,6 +40,8 @@ script:
 - chmod +x ./pictl
 - ./pictl exec "uname -a"
 - "./pictl nodes"
+- "./pictl status"
+- "./pictl metrics"
 - "./pictl reloadconfig"
 - for container in $(sudo docker-compose ps -q) ; do json=$(sudo docker inspect $container); if [ "$(jq '.[0].State.Running' <<< $json)" != "true" ] ; then sudo docker-compose logs "$(jq -r '.[0].Config.Labels."com.docker.compose.service"' <<< $json)"; fi; done
 - sudo docker-compose down
