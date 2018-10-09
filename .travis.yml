@@ -38,7 +38,7 @@ script:
   -e FONTLINUX=fl-alpine local/testing:alpine
 - shellcheck pictl
 - chmod +x ./pictl
-- "./pictl exec "uname -a"
+- ./pictl exec "uname -a"
 - "./pictl nodes"
 - "./pictl status"
 - "./pictl metrics"
