@@ -38,11 +38,12 @@ script:
   -e FONTLINUX=fl-alpine local/testing:alpine
 - shellcheck pictl
 - chmod +x ./pictl
-- ./pictl exec "uname -a"
+- "./pictl exec "uname -a"
 - "./pictl nodes"
 - "./pictl status"
 - "./pictl metrics"
 - "./pictl reloadconfig"
+- "./pictl addimage ./example/x86_64/ubuntu/elasticsearch.zip"
 - for container in $(sudo docker-compose ps -q) ; do json=$(sudo docker inspect $container); if [ "$(jq '.[0].State.Running' <<< $json)" != "true" ] ; then sudo docker-compose logs "$(jq -r '.[0].Config.Labels."com.docker.compose.service"' <<< $json)"; fi; done
 - sudo docker-compose down
 
