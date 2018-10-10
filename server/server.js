@@ -1553,22 +1553,15 @@ app.post('/listcommands', (req, res) => {
   }
 });
 
-app.post('/swarm-create', (req, res) => {
-  const check_token = req.body.token;
-  let host = req.body.host;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    console.log('\nHere');
-    const command = JSON.stringify({
-      command: 'docker swarm leave --force;docker swarm init | grep -i "docker swarm join" | cut -d " "  -f9',
-      token
-    });
-
-    for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
-      console.log('\nDebug 0: ' + node);
+function swarm_nodes(swarm_token, host) {
+  for (let i = 0; i < config.layout.length; i++) {
+    const node = config.layout[i].node;
+    if (!host.indexOf(node) > -1) {
+      const command = JSON.stringify({
+        command: 'docker swarm leave --force;docker swarm join --token ' + swarm_token + ' ' + host,
+        token
+      });
+      console.log('\nDebug: ' + command.command);
       const options = {
         url: `${scheme}${node}:${agent_port}/run`,
         rejectUnauthorized: ssl_self_signed,
@@ -1579,33 +1572,58 @@ app.post('/swarm-create', (req, res) => {
         },
         body: command
       };
-      /**
-            if (selected_node.length === 0) {
-              request(options, (error, response) => {
-                if (error) {
-                  res.end('An error has occurred.');
-                } else {
-                  const results = JSON.parse(response.body);
-                  console.log('\nDebug: ' +results.output );
-                  addLog('\nNode:' + results.node + '\n' + results.output);
-                }
-              });
-            }
-      **/
+
+      request(options, (error, response) => {
+        if (error) {
+          console.log('An error has occurred.');
+        } else {
+          const results = JSON.parse(response.body);
+          addLog('\nNode:' + results.node + '\n' + results.output);
+        }
+      });
+    }
+  }
+}
+
+app.post('/swarm-create', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    for (let i = 0; i < config.layout.length; i++) {
+      const node = config.layout[i].node;
+
       if (host.indexOf(node) > -1) {
-        console.log('\nDebug Host: ' + host + ' ' + node);
+        const command = JSON.stringify({
+          command: 'docker swarm leave --force;docker swarm init | grep token | head -1 | cut -d " " -f9',
+          token
+        });
+
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
         request(options, (error, response) => {
           if (error) {
             res.end('An error has occurred.');
           } else {
             const results = JSON.parse(response.body);
-            console.log('\nDebug: ' + results.output);
+            swarm_nodes(results.output, host);
             addLog('\nNode:' + results.node + '\n' + results.output);
           }
         });
       }
-      res.end('');
     }
+    res.end('');
   }
 });
 

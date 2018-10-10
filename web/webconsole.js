@@ -937,18 +937,22 @@ app.post('/swarm-create', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
+    const payload = JSON.stringify({
+      host,
+      token
+    });
+
     const options = {
       url: `${scheme}${server}:${server_port}/swarm-create`,
       rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Content-Length': host.length
+        'Content-Length': payload.length
       },
-      host: host,
-      token
+      body: payload
     };
-    
+
     request(options, (error, response) => {
       if (!error && response.statusCode === 200) {
         display_log(data => {
