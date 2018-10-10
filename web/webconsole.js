@@ -1135,6 +1135,9 @@ app.get('/images-pull.html', (req, res) => {
 app.get('/images-manage.html', (req, res) => {
   res.sendFile(__dirname + '/images-manage.html');
 });
+app.get('/swarm.html', (req, res) => {
+  res.sendFile(__dirname + '/swarm.html');
+});
 app.get('/images-layout.html', (req, res) => {
   res.sendFile(__dirname + '/images-layout.html');
 });
