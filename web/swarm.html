@@ -12,8 +12,7 @@
 			for (var i in data.nodes) {
 				option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 			}
-			$('#node_list_create').append(option);
-			$('#node_list_remove').append(option);
+			$('#node_list').append(option);
 		});
 
 		function exec() {
@@ -25,7 +24,7 @@
 				: radio_swarm_remove ? '/swarm-remove'
 				: ''
 
-			var node = radio_swarm_create ? $("#node").val()
+			var node = radio_swarm_create ? $("#node_list").val()
 				: radio_swarm_remove ? node_list.options[node_list.selectedIndex].value
 				: ''
 
@@ -41,16 +40,16 @@
 		$(document).ready(function() {
 			$("input[id$='radio_swarm_create']").click(function() {
 				$(this).is(":checked") ? $("#swarm_create").show() : '';
-				$(this).is(":checked") ? $("#swarm_Remove").hide() : '';
+				$(this).is(":checked") ? $("#swarm_remove").hide() : '';
 			})
 
 			$("input[id$='radio_swarm_remove']").click(function() {
 				$(this).is(":checked") ? $("#swarm_create").hide() : '';
-				$(this).is(":checked") ? $("#swarm_Remove").show() : '';
+				$(this).is(":checked") ? $("#swarm_remove").show() : '';
 			})
 
 			$("#swarm_create").hide();
-			$("#swarm_Remove").hide();
+			$("#swarm_remove").hide();
 		});
 	</script>
 </head>
@@ -76,18 +75,15 @@
 						<hr>
 						<input type="radio" name="nodes_radio" id="radio_swarm_remove">
 						<label class="windowfont">Remove</label>
+						<hr>
+						Master Node:
+						<select name="node_list" id="node_list"></select>
 					</div>
 
 					<div id="swarm_create">
-						<hr>
-						<label for="radio_swarm_create">Choose a Master Node</label>
-						<select name="node_list_create" id="node_list_create"></select>
 					</div>
 
-					<div id="swarm_Remove">
-						<hr>
-						<label for="radio_swarm_remove">Choose Master node:</label>
-						<select name="node_list_remove" id="node_list_remove"></select>
+					<div id="swarm_remove">
 					</div>
 				</fieldset>
 
