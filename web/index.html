@@ -125,6 +125,9 @@
 			$('#node-manage').click(function() {
 				$('#iframe_a').attr('src', '/nodes-manage.html');
 			});
+			$('#swarm').click(function() {
+				$('#iframe_a').attr('src', '/swarm.html');
+			});
 			$('#config-edit').click(function() {
 				$('#iframe_a').attr('src', '/config-edit.html?token=' + token);
 			});
@@ -228,16 +231,16 @@
 				<div>
 					<img src="/logo.png" height="250" width="200">
 					<br><label>Please login to continue<label>
-					<br>
-					<div>
-						<input type="text" style="width: 250px;" id="user" name="username">
-						<br>
-						<input type="password" style="width: 250px;" size="18" id="password" name="password">
-						<br>
-            <br>
-						<button id="submit_button">Connect</button>
-						<br>
-					</div>
+							<br>
+							<div>
+								<input type="text" style="width: 250px;" id="user" name="username">
+								<br>
+								<input type="password" style="width: 250px;" size="18" id="password" name="password">
+								<br>
+								<br>
+								<button id="submit_button">Connect</button>
+								<br>
+							</div>
 				</div>
 			</div>
 		</div>
@@ -251,6 +254,7 @@
 					<ul class="dropdown">
 						<li><a href="#" id="nodes-list">List</a></li>
 						<li><a href="#" id="node-manage">Manage</a></li>
+						<li><a href="#" id="swarm">Swarm Setup</a></li>
 					</ul>
 				</li>
 				<li id="nav_containers"><a onmouseover="this.click()" href="#!">Containers</a>
@@ -334,5 +338,6 @@
 	<div id="div_iframe">
 		<iframe src="/blank.html" id="iframe_a" name="iframe_a">
 	</div>
-  </body>
-  </html>
+</body>
+
+</html>
