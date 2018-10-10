@@ -904,6 +904,58 @@ app.post('/removecontainerconfig', (req, res) => {
   }
 });
 
+app.post('/swarm-remove', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else if (host) {
+    const options = {
+      url: `${scheme}${server}:${server_port}/swarm-remove?token=${token}&host=${host}`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
+  } else {
+    res.end('\nError missing host name.');
+  }
+});
+
+app.post('/swarm-create', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else if (host) {
+    const options = {
+      url: `${scheme}${server}:${server_port}/swarm-create?token=${token}&host=${host}`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
+  } else {
+    res.end('\nError missing host name.');
+  }
+});
+
 app.post('/addhost', (req, res) => {
   const check_token = req.body.token;
   const host = req.body.host;
