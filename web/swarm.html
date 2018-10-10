@@ -1,0 +1,138 @@
+<html>
+
+<head>
+	<script src="/assets/jquery.min.js"></script>
+	<link rel="stylesheet" href="/assets/jquery-ui.css">
+	<script src="/assets/jquery-ui.js"></script>
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<script>
+		var option;
+
+		$.get("/nodes?token=" + parent.token, function(data) {
+			for (var i in data.nodes) {
+				option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
+			}
+			$('#node_list_create').append(option);
+			$('#node_list_remove').append(option);
+		});
+
+		function exec() {
+			var node_list = document.getElementById("node_list");
+			var radio_swarm_create = $('input[id=radio_swarm_create]:checked').val();
+			var radio_swarm_remove = $('input[id=radio_swarm_remove]:checked').val();
+
+			var path = radio_swarm_create ? '/swarm-create'
+				: radio_swarm_remove ? '/swarm-remove'
+				: ''
+
+			var node = radio_swarm_create ? $("#node").val()
+				: radio_swarm_remove ? node_list.options[node_list.selectedIndex].value
+				: ''
+
+			$.post(path, {
+				token: parent.token,
+				host: node
+			}, function(data) {
+				var div = document.getElementById('nodes-manage-modal-body');
+				div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br>' + data;
+			});
+		}
+
+		$(document).ready(function() {
+			$("input[id$='radio_swarm_create']").click(function() {
+				$(this).is(":checked") ? $("#swarm_create").show() : '';
+				$(this).is(":checked") ? $("#swarm_Remove").hide() : '';
+			})
+
+			$("input[id$='radio_swarm_remove']").click(function() {
+				$(this).is(":checked") ? $("#swarm_create").hide() : '';
+				$(this).is(":checked") ? $("#swarm_Remove").show() : '';
+			})
+
+			$("#swarm_create").hide();
+			$("#swarm_Remove").hide();
+		});
+	</script>
+</head>
+
+<body>
+	<div id="modal_container" class="modal">
+		<div class="modal-content modal-small">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Configure Docker Swarm Networking</h2>
+			</div>
+
+			<div class="modal-body">
+				<p class="modal-description">
+					Setup Docker Swarm to use Virtual Networks
+				</p>
+
+				<fieldset>
+					<legend><b>Node</b></legend>
+					<div id="node_list_action_selector">
+						<input type="radio" name="nodes_radio" id="radio_swarm_create">
+						<label class="windowfont">Create</label>
+						<hr>
+						<input type="radio" name="nodes_radio" id="radio_swarm_remove">
+						<label class="windowfont">Remove</label>
+					</div>
+
+					<div id="swarm_create">
+						<hr>
+						<label for="radio_swarm_create">Choose a Master Node</label>
+						<select name="node_list_create" id="node_list_create"></select>
+					</div>
+
+					<div id="swarm_Remove">
+						<hr>
+						<label for="radio_swarm_remove">Choose Master node:</label>
+						<select name="node_list_remove" id="node_list_remove"></select>
+					</div>
+				</fieldset>
+
+				<div id="submit_button_div">
+					<button id="submit_button">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="output" class="modal">
+		<div class="modal-content modal-small">
+			<div class="modal-header">
+				<span class="close">&times;</span>
+				<h2>Command Output</h2>
+			</div>
+			<div id="nodes-manage-modal-body" class="modal-body">
+				Please wait.
+			</div>
+		</div>
+	</div>
+	</p>
+
+	<script>
+		var span = document.getElementsByClassName("close")[0];
+		var modal = document.getElementById('modal_container');
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
+
+		span.onclick = function() {
+			modal.style.display = "none";
+		}
+
+		output_span.onclick = function() {
+			output_modal.style.display = "none";
+		}
+
+		submit_button.onclick = function() {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
+
+		modal.style.display = "block";
+	</script>
+
+</html>
