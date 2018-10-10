@@ -1556,7 +1556,9 @@ app.post('/listcommands', (req, res) => {
 function swarm_nodes(swarm_token, host) {
   for (let i = 0; i < config.layout.length; i++) {
     const node = config.layout[i].node;
-    if (host.indexOf(!node) > -1) {
+    if (host.indexOf(node) > -1) {
+      console.log('\n' + node + ' is already set as the master.');
+    } else {
       const command = JSON.stringify({
         command: 'docker swarm leave --force;docker swarm join --token ' + swarm_token + ' ' + host,
         token
