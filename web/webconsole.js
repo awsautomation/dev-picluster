@@ -911,9 +911,20 @@ app.post('/swarm-remove', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
+    const payload = JSON.stringify({
+      host,
+      token
+    });
+
     const options = {
-      url: `${scheme}${server}:${server_port}/swarm-remove?token=${token}&host=${host}`,
-      rejectUnauthorized: ssl_self_signed
+      url: `${scheme}${server}:${server_port}/swarm-remove`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': payload.length
+      },
+      body: payload
     };
 
     request(options, (error, response) => {
