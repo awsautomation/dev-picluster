@@ -19,6 +19,7 @@
 			var node_list = document.getElementById("node_list");
 			var radio_swarm_create = $('input[id=radio_swarm_create]:checked').val();
 			var radio_swarm_remove = $('input[id=radio_swarm_remove]:checked').val();
+			var radio_swarm_network = $('input[id=radio_swarm_network]:checked').val();
 
 			var path = radio_swarm_create ? '/swarm-create'
 				: radio_swarm_remove ? '/swarm-remove'
@@ -41,14 +42,27 @@
 			$("input[id$='radio_swarm_create']").click(function() {
 				$(this).is(":checked") ? $("#swarm_create").show() : '';
 				$(this).is(":checked") ? $("#swarm_remove").hide() : '';
+				$(this).is(":checked") ? $("#node_list").show() : '';
+				$(this).is(":checked") ? $("#text").show() : '';
 			})
 
 			$("input[id$='radio_swarm_remove']").click(function() {
 				$(this).is(":checked") ? $("#swarm_create").hide() : '';
 				$(this).is(":checked") ? $("#swarm_remove").show() : '';
+				$(this).is(":checked") ? $("#node_list").hide() : '';
+				$(this).is(":checked") ? $("#text").hide() : '';
+			})
+
+			$("input[id$='radio_swarm_network']").click(function() {
+				$(this).is(":checked") ? $("#swarm_create").hide() : '';
+				$(this).is(":checked") ? $("#swarm_remove").show() : '';
+				$(this).is(":checked") ? $("#node_list").hide() : '';
+				$(this).is(":checked") ? $("#text").hide() : '';
 			})
 
 			$("#swarm_create").hide();
+		  $("#text").hide();
+		  $("#node_list").hide();
 			$("#swarm_remove").hide();
 		});
 	</script>
@@ -76,8 +90,11 @@
 						<input type="radio" name="nodes_radio" id="radio_swarm_remove">
 						<label class="windowfont">Remove</label>
 						<hr>
-						<p><b>Master Node:</b></p>
-							<select name="node_list" id="node_list"></select>
+						<input type="radio" name="nodes_radio" id="radio_swarm_network">
+						<label class="windowfont">VLAN</label>
+						<hr>
+						<label id='text'><b>Master Node:</b></label></p>
+						<select name="node_list" id="node_list"></select>
 					</div>
 
 					<div id="swarm_create">
