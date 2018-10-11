@@ -1553,15 +1553,47 @@ app.post('/listcommands', (req, res) => {
   }
 });
 
+function swarm_remove() {
+  for (let i = 0; i < config.layout.length; i++) {
+    const node = config.layout[i].node;
+    const command = JSON.stringify({
+      command: 'docker swarm leave --force',
+      token
+    });
+
+    const options = {
+      url: `${scheme}${node}:${agent_port}/run`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, (error, response) => {
+      if (error) {
+        console.log('An error has occurred.');
+      } else {
+        const results = JSON.parse(response.body);
+        addLog('\nNode:' + results.node + '\n' + results.output);
+      }
+    });
+  }
+}
+
 function swarm_nodes(swarm_token, host) {
   for (let i = 0; i < config.layout.length; i++) {
     const node = config.layout[i].node;
-    if (host.indexOf(!node) > -1) {
+    if (host.indexOf(node) > -1) {
+      console.log('\n' + node + ' is already set as the master.');
+    } else {
       const command = JSON.stringify({
-        command: 'docker swarm leave --force;docker swarm join --token ' + swarm_token + ' ' + host,
+        command: 'docker swarm join --token ' + swarm_token + ' ' + host,
         token
       });
-      console.log('\nDebug: ' + command.command);
+
       const options = {
         url: `${scheme}${node}:${agent_port}/run`,
         rejectUnauthorized: ssl_self_signed,
@@ -1597,7 +1629,7 @@ app.post('/swarm-create', (req, res) => {
 
       if (host.indexOf(node) > -1) {
         const command = JSON.stringify({
-          command: 'docker swarm leave --force;docker swarm init | grep token | head -1 | cut -d " " -f9',
+          command: 'docker swarm init',
           token
         });
 
@@ -1617,12 +1649,30 @@ app.post('/swarm-create', (req, res) => {
             res.end('An error has occurred.');
           } else {
             const results = JSON.parse(response.body);
-            swarm_nodes(results.output, host);
-            addLog('\nNode:' + results.node + '\n' + results.output);
+            const get_output = results.output.toString();
+
+            if (get_output.indexOf('SWMTKN') > -1) {
+              const get_swarm_token_line = get_output.split('--token');
+              const get_swarm_token = get_swarm_token_line[1].split(' ');
+              swarm_nodes(get_swarm_token[1], host);
+            } else {
+              res.end('Error creating Swarm.' + results.output);
+            }
           }
         });
       }
     }
+    res.end('');
+  }
+});
+
+app.post('/swarm-remove', (req, res) => {
+  const check_token = req.body.token;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    swarm_remove();
     res.end('');
   }
 });
