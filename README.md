@@ -25,6 +25,7 @@
 - CLI interface
 - Monitor host metrics (Disk, CPU, Memory)
 - HTTP interface
+- Virtual Networking via Swarm
 - Virtual IP Manager
 - Rsyslog Analytics
 - Built-in web terminal to easily run commands on nodes
