@@ -1,16 +1,10 @@
-# Version 2.4
+# Version 2.5
 
 ## New Features:
-* Automatic Node Bootstrapping - Nodes need a minimum config.json with the token and server IP. When the agent is started, it will be added to the cluster.
-* Container Status in Web Console now displays stopped/deleted containers.
+* Virtual Networks - Added menu option to create a Swarm cluster and VLAN
 
 ## Enhancements:
-* Can add Elasticsearch and Kibana server details under the new 'Configure Elasticsearch' menu item.
-* Node and Container layout now autorefresh after 15 seconds.
-* Improved Grafana dashboard to see metrics by intervals.
-* Operations->Kibana has been renamed to Monitoring
-* config.kibana replaced with config.monitoring.
+* PiCTL can now upload container zip files.
 
 ## Bug Fixes:
-* Updated Kibana dashboards for the 6.3.x release.
-* Manage Containers can display a lot of nodes properly.
+* None
