@@ -41,7 +41,7 @@ let server = config.web_connect;
 let server_port = config.server_port;
 let nodedata = '';
 
- /*
+/*
 Removing for now
 if (fs.existsSync(path.normalize(doc_dir))) {
   app.use('/docs', express.static(path.join(__dirname, doc_dir)));
@@ -84,7 +84,7 @@ function get_file_list_by_extention(dirpath, extention) {
   return output;
 }
 
- /*
+/*
 Removing for now
 
 function serve_doc_pages() {
@@ -955,6 +955,45 @@ app.post('/swarm-create', (req, res) => {
 
     const options = {
       url: `${scheme}${server}:${server_port}/swarm-create`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': payload.length
+      },
+      body: payload
+    };
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
+  } else {
+    res.end('\nError missing host name.');
+  }
+});
+
+app.post('/swarm-network-create', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+  const network = req.body.network;
+  
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else if (host) {
+    const payload = JSON.stringify({
+      host,
+      token,
+      network
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/swarm-network-create`,
       rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {

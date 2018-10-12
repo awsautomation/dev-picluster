@@ -1666,6 +1666,49 @@ app.post('/swarm-create', (req, res) => {
   }
 });
 
+app.post('/swarm-network-create', (req, res) => {
+  const check_token = req.body.token;
+  const host = req.body.host;
+  const network = req.body.network;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    for (let i = 0; i < config.layout.length; i++) {
+      const node = config.layout[i].node;
+
+      if (host.indexOf(node) > -1) {
+        const command = JSON.stringify({
+          command: 'docker network create -d overlay --attachable ' + network,
+          token
+        });
+
+        const options = {
+          url: `${scheme}${node}:${agent_port}/run`,
+          rejectUnauthorized: ssl_self_signed,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
+
+        request(options, (error, response) => {
+          if (error) {
+            res.end('An error has occurred.');
+          } else {
+            const results = JSON.parse(response.body);
+            const get_output = results.output.toString();
+            res.end(results.output);
+          }
+        });
+      }
+    }
+    res.end('');
+  }
+});
+
 app.post('/swarm-remove', (req, res) => {
   const check_token = req.body.token;
 
