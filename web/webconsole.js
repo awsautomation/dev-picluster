@@ -982,7 +982,6 @@ app.post('/swarm-network-create', (req, res) => {
   const check_token = req.body.token;
   const host = req.body.host;
   const network = req.body.network;
-  
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {

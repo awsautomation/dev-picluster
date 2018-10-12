@@ -1699,7 +1699,6 @@ app.post('/swarm-network-create', (req, res) => {
             res.end('An error has occurred.');
           } else {
             const results = JSON.parse(response.body);
-            const get_output = results.output.toString();
             res.end(results.output);
           }
         });
