@@ -89,7 +89,7 @@ fieldset {
   display: none;
   z-index: 1;
   padding-top: 5px;
-  height: 99%;
+  height: 98.5%;
   width: 100%;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);3
@@ -118,7 +118,7 @@ fieldset {
 .modal-small {
   width: 44%;
   min-width: 370px;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 .modal-large {
@@ -258,7 +258,7 @@ fieldset {
 }
 
 #modal_container {
-  height: 99%;
+  height: 98.5%;
 }
 
 #query {
