@@ -1657,34 +1657,36 @@ app.post('/swarm-create', (req, res) => {
             const get_output = results.output.toString();
 
             if (get_output.indexOf('SWMTKN') > -1 || config.swarm_token) {
-              const get_swarm_token_line = get_output.split('--token');
-              const get_swarm_token = get_swarm_token_line[1].split(' ');
-              config.swarm_token = get_swarm_token[1];
+              if (!config.swarm_token) {
+                const get_swarm_token_line = get_output.split('--token');
+                const get_swarm_token = get_swarm_token_line[1].split(' ');
+                config.swarm_token = get_swarm_token[1];
 
-              const new_config = JSON.stringify({
-                payload: JSON.stringify(config),
-                token
-              });
+                const new_config = JSON.stringify({
+                  payload: JSON.stringify(config),
+                  token
+                });
 
-              const options = {
-                url: `${scheme}${server}:${server_port}/updateconfig`,
-                rejectUnauthorized: ssl_self_signed,
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Content-Length': new_config.length
-                },
-                body: new_config
-              };
+                const options = {
+                  url: `${scheme}${server}:${server_port}/updateconfig`,
+                  rejectUnauthorized: ssl_self_signed,
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': new_config.length
+                  },
+                  body: new_config
+                };
 
-              request(options, error => {
-                if (error) {
-                  res.end('An error occurred: ' + error);
-                } else {
-                  bootstrap.status = 1;
-                  console.log('\nAdded Swarm Token to config file.');
-                }
-              });
+                request(options, error => {
+                  if (error) {
+                    res.end('An error occurred: ' + error);
+                  } else {
+                    bootstrap.status = 1;
+                    console.log('\nAdded Swarm Token to config file.');
+                  }
+                });
+              }
               swarm_nodes(config.swarm_token, host);
             } else {
               res.end('Error creating Swarm.' + results.output);
