@@ -47,6 +47,7 @@ let log = '';
 let token = config.token;
 let dockerFolder = config.docker;
 const container_faillog = [];
+const picluster_release = '2.5'
 
 if (config.elasticsearch) {
   const mapping = {
@@ -542,6 +543,10 @@ app.get('/delete-image', (req, res) => {
     });
     res.end('');
   }
+});
+
+app.get('/', (req, res) => {
+  res.end('PiCluster Server v' + picluster_release);
 });
 
 app.get('/create', (req, res) => {

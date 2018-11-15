@@ -5,6 +5,7 @@
 
 ## Enhancements:
 * PiCTL can now upload container zip files.
+* PiCluster Server displays version for / GET requests
 
 ## Bug Fixes:
 * None
