@@ -1650,13 +1650,13 @@ app.post('/swarm-create', (req, res) => {
         };
 
         request(options, (error, response) => {
-          if (error) {
-            res.end('An error has occurred.');
-          } else {
-            const results = JSON.parse(response.body);
-            const get_output = results.output.toString();
+            if (error) {
+              res.end('An error has occurred.');
+            } else {
+              const results = JSON.parse(response.body);
+              const get_output = results.output.toString();
 
-            if (get_output.indexOf('SWMTKN') > -1) {
+              if (get_output.indexOf('SWMTKN') > -1 || config.swarm_token) {
               const get_swarm_token_line = get_output.split('--token');
               const get_swarm_token = get_swarm_token_line[1].split(' ');
               config.swarm_token = get_swarm_token[1];
@@ -1691,10 +1691,10 @@ app.post('/swarm-create', (req, res) => {
             }
           }
         });
-      }
     }
-    res.end('');
   }
+  res.end('');
+}
 });
 
 app.post('/swarm-network-create', (req, res) => {
