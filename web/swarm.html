@@ -48,6 +48,8 @@
 				$(this).is(":checked") ? $("#swarm_remove").hide() : '';
 				$(this).is(":checked") ? $("#node_list").show() : '';
 				$(this).is(":checked") ? $("#text").show() : '';
+				$(this).is(":checked") ? $("#network-name").hide() : '';
+				$(this).is(":checked") ? $("#network-name-label").hide() : '';
 			})
 
 			$("input[id$='radio_swarm_remove']").click(function() {
