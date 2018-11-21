@@ -36,6 +36,9 @@
         }
     },
     "devDependencies": {
-        "xo": "^0.18.2"
+        "xo": "^0.23.0"
+    },
+    "dependencies": {
+        "eslint": "^5.6.0"
     }
 }
