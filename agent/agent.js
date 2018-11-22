@@ -10,7 +10,9 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const getos = require('picluster-getos');
 const async = require('async');
-const exec = require('child-process-promise').exec;
+const {
+  exec
+} = require('child-process-promise');
 const sysinfo = require('systeminformation');
 
 let config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
@@ -29,10 +31,16 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 let server = config.web_connect;
-let server_port = config.server_port;
-const agent_port = config.agent_port;
+let {
+  server_port
+} = config;
+const {
+  agent_port
+} = config;
 const node = os.hostname();
-let token = config.token;
+let {
+  token
+} = config;
 const noop = () => {};
 let vip = '';
 let vip_slave = '';
@@ -180,15 +188,15 @@ function send_ping() {
         if (json_object.vip_detected === 'false' && found_vip === false) {
           console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
           const cmd = ip_add_command;
-          exec(cmd).catch(err => {
-            console.log(err);
+          exec(cmd).catch(error2 => {
+            console.log(error2);
           });
         }
         if ((json_object.vip_detected === 'true' && found_vip === true)) {
           console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
           const cmd = ip_delete_command;
-          exec(cmd).catch(err => {
-            console.log(err);
+          exec(cmd).catch(error2 => {
+            console.log(error2);
           });
         }
       }
@@ -239,8 +247,8 @@ app.post('/killvip', (req, res) => {
     const cmd = ip_delete_command;
     exec(cmd).then(() => {
       res.end('\nCompleted.');
-    }).catch(err => {
-      console.log(err);
+    }).catch(error => {
+      console.log(error);
     });
   }
 });
@@ -365,10 +373,10 @@ app.post('/run', (req, res) => {
       // Console.log('output', log);
       output.output.push(`${log.stdout || ''}${log.stderr || ''}`);
       return cb();
-    }).catch(err => {
+    }).catch(error => {
       // Console.log('error', err);
-      output.output.push(`${err.stdout || ''}${err.stderr || ''}`);
-      return cb(err);
+      output.output.push(`${error.stdout || ''}${error.stderr || ''}`);
+      return cb(error);
     });
   }, err => {
     if (err) {
@@ -469,7 +477,9 @@ function additional_services() {
               return;
             }
             vip_slave = config.vip[i].slave;
-            const vip_eth_device = config.vip[i].vip_eth_device;
+            const {
+              vip_eth_device
+            } = config.vip[i];
             ip_add_command = 'ip addr add ' + config.vip_ip + '/32 dev ' + vip_eth_device;
             ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
             vip_ping_time = config.vip[i].vip_ping_time;
