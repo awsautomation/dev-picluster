@@ -29,16 +29,26 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
-const web_port = config.web_port;
+const {
+  web_port
+} = config;
 let syslog = config.syslog ? config.syslog : '';
-const doc_dir = config.doc_dir;
-let theme = config.theme;
+const {
+  doc_dir
+} = config;
+let {
+  theme
+} = config;
 let logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
-let token = config.token;
+let {
+  token
+} = config;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
-let server_port = config.server_port;
+let {
+  server_port
+} = config;
 let nodedata = '';
 
 /*
@@ -59,8 +69,8 @@ function getData() {
       if (!error && response.statusCode === 200) {
         try {
           nodedata = JSON.parse(response.body);
-        } catch (err) {
-          console.error(err);
+        } catch (error2) {
+          console.error(error2);
         }
       } else {
         console.log('\nError connecting with server. ' + error);
@@ -129,7 +139,9 @@ app.get('/monitoring.html', (req, res) => {
 
 app.post('/sendconfig', (req, res) => {
   const check_token = req.body.token;
-  const payload = req.body.payload;
+  const {
+    payload
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -173,7 +185,7 @@ function reloadVariables() {
     syslog = config.syslog;
     theme = config.theme;
     logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
-  } catch (err) {
+  } catch (error) {
     console.log('\nError parsing JSON while trying to update config');
   }
 }
@@ -215,7 +227,9 @@ app.post('/', (req, res) => {
 
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
-  const node = req.body.node;
+  const {
+    node
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -251,8 +265,12 @@ app.post('/exec', (req, res) => {
 
 app.post('/elasticsearch', (req, res) => {
   const check_token = req.body.token;
-  const elasticsearch_url = req.body.elasticsearch_url;
-  const mode = req.body.mode;
+  const {
+    elasticsearch_url
+  } = req.body;
+  const {
+    mode
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -313,11 +331,21 @@ app.get('/listregistries', (req, res) => {
 });
 
 app.get('/remoteimagetags', (req, res) => {
-  const registry = req.query.registry;
-  const image = req.query.image;
-  const page = req.query.page || 1;
-  const username = req.query.username || '';
-  const password = req.query.password || '';
+  const {
+    registry
+  } = req.query;
+  const {
+    image
+  } = req.query;
+  const {
+    page
+  } = req.query || 1;
+  const {
+    username
+  } = req.query || '';
+  const {
+    password
+  } = req.query || '';
   const check_token = req.query.token;
 
   if (!check_token || check_token !== token) {
@@ -358,11 +386,21 @@ app.get('/remoteimagetags', (req, res) => {
 });
 
 app.get('/remoteimages', (req, res) => {
-  const registry = req.query.registry;
-  const image = req.query.image;
-  const page = req.query.page || 1;
-  const username = req.query.username || '';
-  const password = req.query.password || '';
+  const {
+    registry
+  } = req.query;
+  const {
+    image
+  } = req.query;
+  const {
+    page
+  } = req.query || 1;
+  const {
+    username
+  } = req.query || '';
+  const {
+    password
+  } = req.query || '';
   const check_token = req.query.token;
 
   if (!check_token || check_token !== token) {
@@ -569,7 +607,9 @@ app.get('/killvip', (req, res) => {
 
 app.post('/delete-image', (req, res) => {
   const check_token = req.body.token;
-  let image = req.body.image;
+  let {
+    image
+  } = req.body;
 
   if (image.indexOf('Everthing') > -1) {
     image = '';
@@ -600,8 +640,12 @@ app.post('/delete-image', (req, res) => {
 
 app.post('/build', (req, res) => {
   const check_token = req.body.token;
-  let image = req.body.image;
-  const no_cache = req.body.no_cache;
+  let {
+    image
+  } = req.body;
+  const {
+    no_cache
+  } = req.body;
 
   if (image.indexOf('Everthing') > -1) {
     image = '';
@@ -769,7 +813,9 @@ app.post('/stop', (req, res) => {
 
 app.post('/changehost', (req, res) => {
   const check_token = req.body.token;
-  const newhost = req.body.newhost;
+  const {
+    newhost
+  } = req.body;
   let container;
 
   if (req.body.container) {
@@ -801,11 +847,21 @@ app.post('/changehost', (req, res) => {
 
 app.post('/addcontainer', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const container_args = req.body.container_args;
-  const heartbeat_args = req.body.heartbeat_args;
-  let failover_constraints = req.body.failover_constraints;
-  const container = req.body.container;
+  const {
+    host
+  } = req.body;
+  const {
+    container_args
+  } = req.body;
+  const {
+    heartbeat_args
+  } = req.body;
+  let {
+    failover_constraints
+  } = req.body;
+  const {
+    container
+  } = req.body;
 
   if (failover_constraints) {
     if (failover_constraints.indexOf('none') > -1) {
@@ -880,7 +936,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
 app.post('/removecontainerconfig', (req, res) => {
   const check_token = req.body.token;
-  const container = req.body.container;
+  const {
+    container
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -906,7 +964,9 @@ app.post('/removecontainerconfig', (req, res) => {
 
 app.post('/swarm-remove', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -943,7 +1003,9 @@ app.post('/swarm-remove', (req, res) => {
 
 app.post('/swarm-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -980,8 +1042,12 @@ app.post('/swarm-create', (req, res) => {
 
 app.post('/swarm-network-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const network = req.body.network;
+  const {
+    host
+  } = req.body;
+  const {
+    network
+  } = req.body;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
@@ -1018,7 +1084,9 @@ app.post('/swarm-network-create', (req, res) => {
 
 app.post('/addhost', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -1044,7 +1112,9 @@ app.post('/addhost', (req, res) => {
 
 app.post('/rmhost', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
