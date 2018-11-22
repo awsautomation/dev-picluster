@@ -40,11 +40,19 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const server = config.web_connect;
-let rsyslog_host = config.rsyslog_host;
-const server_port = config.server_port;
-const agent_port = config.agent_port;
+let {
+  rsyslog_host
+} = config;
+const {
+  server_port
+} = config;
+const {
+  agent_port
+} = config;
 let log = '';
-let token = config.token;
+let {
+  token
+} = config;
 let dockerFolder = config.docker;
 const container_faillog = [];
 const picluster_release = '2.5';
@@ -184,7 +192,9 @@ app.get('/clear-functions', (req, res) => {
 
 app.post('/bootstrap', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
   let statusCode = 0;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
@@ -244,8 +254,12 @@ app.post('/bootstrap', (req, res) => {
 
 app.post('/function', (req, res) => {
   const check_token = req.body.token;
-  const output = req.body.output;
-  const uuid = req.body.uuid;
+  const {
+    output
+  } = req.body;
+  const {
+    uuid
+  } = req.body;
 
   if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
@@ -270,7 +284,9 @@ app.get('/function', (req, res) => {
   const max_node = total_nodes - 1;
   const node_number = Math.floor(Math.random() * (max_node - min_node + 1)) + min_node;
   const host = config.layout[node_number].node;
-  const container_args = req.query.container_args;
+  const {
+    container_args
+  } = req.query;
 
   const function_data = {
     uuid,
@@ -301,7 +317,9 @@ function remove_function_data(uuid) {
 
 app.get('/getfunction', (req, res) => {
   const check_token = req.query.token;
-  const uuid = req.query.uuid;
+  const {
+    uuid
+  } = req.query;
   let output = '';
 
   if ((check_token !== token) || (!check_token) || (!uuid)) {
@@ -359,7 +377,9 @@ app.get('/nodes', (req, res) => {
     for (let i = 0; i < config.layout.length; i++) {
       for (const key in config.layout[i]) {
         if (config.layout[i].hasOwnProperty(key)) {
-          const node = config.layout[i].node;
+          const {
+            node
+          } = config.layout[i];
           const node_info = config.layout[i][key];
           if (node_info === node) {
             total_node_count++;
@@ -385,7 +405,9 @@ app.get('/nodes', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     config.layout.forEach(get_node => {
-      const node = get_node.node;
+      const {
+        node
+      } = get_node;
 
       if (!node) {
         console.error('Invalid Config for node', get_node);
@@ -410,8 +432,8 @@ app.get('/nodes', (req, res) => {
                 elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage, check.total_running_containers);
               }
             }
-          } catch (err) {
-            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!' + err);
+          } catch (error2) {
+            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!' + error2);
           }
         }
       });
@@ -428,7 +450,9 @@ function addLog(data) {
 
 app.get('/build', (req, res) => {
   const check_token = req.query.token;
-  const no_cache = req.query.no_cache;
+  const {
+    no_cache
+  } = req.query;
   let image = '';
 
   if (req.query.image) {
@@ -444,7 +468,9 @@ app.get('/build', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
         let command;
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
@@ -507,7 +533,9 @@ app.get('/delete-image', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -566,7 +594,9 @@ app.get('/create', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -620,7 +650,9 @@ app.get('/start', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -729,7 +761,9 @@ function migrate(container, original_host, new_host, original_container_data, uu
 
 app.get('/addhost', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  const {
+    host
+  } = req.query;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -868,7 +902,9 @@ app.get('/clear-elasticsearch', (req, res) => {
 
 app.get('/rmhost', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  const {
+    host
+  } = req.query;
   let hb_proceed = 0;
 
   if ((check_token !== token) || (!check_token)) {
@@ -922,7 +958,9 @@ app.get('/rmhost', (req, res) => {
 
 app.get('/removecontainerconfig', (req, res) => {
   const check_token = req.query.token;
-  const container = req.query.container;
+  const {
+    container
+  } = req.query;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -1001,11 +1039,21 @@ app.get('/removecontainerconfig', (req, res) => {
 
 app.get('/addcontainer', (req, res) => {
   const check_token = req.query.token;
-  let host = req.query.host;
-  const container = req.query.container;
-  const container_args = req.query.container_args;
-  const heartbeat_args = req.query.heartbeat_args;
-  const failover_constraints = req.query.failover_constraints;
+  let {
+    host
+  } = req.query;
+  const {
+    container
+  } = req.query;
+  const {
+    container_args
+  } = req.query;
+  const {
+    heartbeat_args
+  } = req.query;
+  const {
+    failover_constraints
+  } = req.query;
 
   if (host.indexOf('*') > -1) {
     const min = 0;
@@ -1217,7 +1265,9 @@ app.get('/stop', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -1295,7 +1345,9 @@ app.get('/delete', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -1349,7 +1401,9 @@ app.get('/restart', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -1404,7 +1458,9 @@ app.get('/containerlog', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
@@ -1443,7 +1499,9 @@ app.get('/containerlog', (req, res) => {
 });
 
 app.post('/listcontainers', (req, res) => {
-  let node = req.body.node;
+  let {
+    node
+  } = req.body;
   const check_token = req.body.token;
   const output = [];
   let container;
@@ -1492,7 +1550,9 @@ app.post('/listnodes', (req, res) => {
 
 function copyToAgents(file, config_file, temp_file) {
   Object.keys(config.layout).forEach((get_node, i) => {
-    const node = config.layout[i].node;
+    const {
+      node
+    } = config.layout[i];
     const formData = {
       name: 'file',
       token,
@@ -1560,7 +1620,9 @@ app.post('/listcommands', (req, res) => {
 
 function swarm_remove() {
   for (let i = 0; i < config.layout.length; i++) {
-    const node = config.layout[i].node;
+    const {
+      node
+    } = config.layout[i];
     const command = JSON.stringify({
       command: 'docker swarm leave --force',
       token
@@ -1590,7 +1652,9 @@ function swarm_remove() {
 
 function swarm_nodes(swarm_token, host) {
   for (let i = 0; i < config.layout.length; i++) {
-    const node = config.layout[i].node;
+    const {
+      node
+    } = config.layout[i];
     if (host.indexOf(node) > -1) {
       console.log('\n' + node + ' is already set as the master.');
     } else {
@@ -1624,13 +1688,17 @@ function swarm_nodes(swarm_token, host) {
 
 app.post('/swarm-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
 
       if (host.indexOf(node) > -1) {
         const command = JSON.stringify({
@@ -1701,14 +1769,20 @@ app.post('/swarm-create', (req, res) => {
 
 app.post('/swarm-network-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const network = req.body.network;
+  const {
+    host
+  } = req.body;
+  const {
+    network
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
 
       if (host.indexOf(node) > -1) {
         const command = JSON.stringify({
@@ -1801,7 +1875,9 @@ app.post('/exec', (req, res) => {
     });
 
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
 
       const options = {
         url: `${scheme}${node}:${agent_port}/run`,
@@ -1852,7 +1928,9 @@ app.get('/prune', (req, res) => {
     });
 
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
 
       const options = {
         url: `${scheme}${node}:${agent_port}/run`,
@@ -2070,7 +2148,9 @@ app.get('/killvip', (req, res) => {
     } else {
       Object.keys(config.vip).forEach((get_node, i) => {
         Object.keys(config.vip[i]).forEach(key => {
-          const node = config.vip[i].node;
+          const {
+            node
+          } = config.vip[i];
 
           if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
@@ -2106,7 +2186,9 @@ app.get('/killvip', (req, res) => {
 app.post('/elasticsearch', (req, res) => {
   const check_token = req.body.token;
   const elasticsearch = req.body.elasticsearch_url;
-  const mode = req.body.mode;
+  const {
+    mode
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -2165,7 +2247,9 @@ app.post('/elasticsearch', (req, res) => {
 });
 
 app.post('/updateconfig', (req, res) => {
-  let payload = req.body.payload;
+  let {
+    payload
+  } = req.body;
   const check_token = req.body.token;
 
   try {
@@ -2188,7 +2272,7 @@ app.post('/updateconfig', (req, res) => {
         });
       }, 3000);
     }
-  } catch (err) {
+  } catch (error) {
     res.end('Error: Invalid JSON. Configuration not saved.');
   }
 });
