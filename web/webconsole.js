@@ -39,7 +39,7 @@ const {
 let {
   theme
 } = config;
-let logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
+let logo_slug = path.join(__dirname, '/assets/images/theme/', theme, '/logo.png');
 let {
   token
 } = config;
@@ -103,7 +103,7 @@ function serve_doc_pages() {
   for (const i in doc_pages) {
     if (i) {
       app.get('/doc' + i, (req, res) => {
-        res.sendFile(path.resolve(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
+        res.sendFile(path.join(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
       });
     }
   }
@@ -115,7 +115,7 @@ app.get('/exec.html', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    res.sendFile(__dirname + '/exec.html');
+    res.sendFile(path.join(__dirname, '/exec.html'));
   }
 });
 
@@ -124,7 +124,7 @@ app.get('/config-edit.html', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    res.sendFile(__dirname + '/config-edit.html');
+    res.sendFile(path.join(__dirname, '/config-edit.html'));
   }
 });
 
@@ -184,7 +184,7 @@ function reloadVariables() {
     server_port = config.server_port;
     syslog = config.syslog;
     theme = config.theme;
-    logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
+    logo_slug = path.join(__dirname, '/assets/images/theme/', theme, '/logo.png');
   } catch (error) {
     console.log('\nError parsing JSON while trying to update config');
   }
@@ -924,8 +924,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    fs.readFile(req.file.path, (err, data) => {
-      const newPath = '../' + req.file.originalname;
+    fs.readFile(req.file.path, data => {
+      const newPath = path.join('../', req.file.originalname);
       fs.writeFile(newPath, data, () => {
         sendFile(newPath, req.file.path);
         res.end('');
@@ -1282,91 +1282,92 @@ app.get('/getconfig', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  console.log(path.join(__dirname, '/index.html'));
+  res.sendFile(path.join(__dirname, '/index.html'));
 });
 app.get('/blank.html', (req, res) => {
-  res.sendFile(__dirname + '/blank.html');
+  res.sendFile(path.join(__dirname, '/blank.html'));
 });
 app.get('/nodes-list.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-list.html');
+  res.sendFile(path.join(__dirname, '/nodes-list.html'));
 });
 app.get('/containers-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/containers-layout.html');
+  res.sendFile(path.join(__dirname, '/containers-layout.html'));
 });
 app.get('/images-prune.html', (req, res) => {
-  res.sendFile(__dirname + '/images-prune.html');
+  res.sendFile(path.join(__dirname, '/images-prune.html'));
 });
 app.get('/functions-clear.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-clear.html');
+  res.sendFile(path.join(__dirname, '/functions-clear.html'));
 });
 app.get('/functions-viewer.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-viewer.html');
+  res.sendFile(path.join(__dirname, '/functions-viewer.html'));
 });
 app.get('/functions-create.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-create.html');
+  res.sendFile(path.join(__dirname, '/functions-create.html'));
 });
 app.get('/functions-current.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-current.html');
+  res.sendFile(path.join(__dirname, '/functions-current.html'));
 });
 app.get('/config-reload.html', (req, res) => {
-  res.sendFile(__dirname + '/config-reload.html');
+  res.sendFile(path.join(__dirname, '/config-reload.html'));
 });
 app.get('/images-pull.html', (req, res) => {
-  res.sendFile(__dirname + '/images-pull.html');
+  res.sendFile(path.join(__dirname, '/images-pull.html'));
 });
 app.get('/images-manage.html', (req, res) => {
-  res.sendFile(__dirname + '/images-manage.html');
+  res.sendFile(path.join(__dirname, '/images-manage.html'));
 });
 app.get('/swarm.html', (req, res) => {
-  res.sendFile(__dirname + '/swarm.html');
+  res.sendFile(path.join(__dirname, '/swarm.html'));
 });
 app.get('/images-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/images-layout.html');
+  res.sendFile(path.join(__dirname, '/images-layout.html'));
 });
 app.get('/log.html', (req, res) => {
-  res.sendFile(__dirname + '/log.html');
+  res.sendFile(path.join(__dirname, '/log.html'));
 });
 app.get('/heartbeat.html', (req, res) => {
-  res.sendFile(__dirname + '/heartbeat.html');
+  res.sendFile(path.join(__dirname, '/heartbeat.html'));
 });
 app.get('/killvip.html', (req, res) => {
-  res.sendFile(__dirname + '/killvip.html');
+  res.sendFile(path.join(__dirname, '/killvip.html'));
 });
 app.get('/syslog.html', (req, res) => {
-  res.sendFile(__dirname + '/syslog.html');
+  res.sendFile(path.join(__dirname, '/syslog.html'));
 });
 app.get('/containers-manage.html', (req, res) => {
-  res.sendFile(__dirname + '/containers-manage.html');
+  res.sendFile(path.join(__dirname, '/containers-manage.html'));
 });
 app.get('/terminal.html', (req, res) => {
-  res.sendFile(__dirname + '/terminal.html');
+  res.sendFile(path.join(__dirname, '/terminal.html'));
 });
 app.get('/containers-add.html', (req, res) => {
-  res.sendFile(__dirname + '/containers-add.html');
+  res.sendFile(path.join(__dirname, '/containers-add.html'));
 });
 app.get('/nodes-add.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-add.html');
+  res.sendFile(path.join(__dirname, '/nodes-add.html'));
 });
 app.get('/nodes-remove.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-remove.html');
+  res.sendFile(path.join(__dirname, '/nodes-remove.html'));
 });
 app.get('/nodes-manage.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-manage.html');
+  res.sendFile(path.join(__dirname, '/nodes-manage.html'));
 });
 app.get('/elasticsearch.html', (req, res) => {
-  res.sendFile(__dirname + '/elasticsearch.html');
+  res.sendFile(path.join(__dirname, '/elasticsearch.html'));
 });
 app.get('/rsyslog.html', (req, res) => {
-  res.sendFile(__dirname + '/rsyslog.html');
+  res.sendFile(path.join(__dirname, '/rsyslog.html'));
 });
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(__dirname + '/favicon.ico');
+  res.sendFile(path.join(__dirname, '/favicon.ico'));
 });
 app.get('/docs.html', (req, res) => {
-  res.sendFile(__dirname + '/docs.html');
+  res.sendFile(path.join(__dirname, '/docs.html'));
 });
 app.get('/images-upload.html', (req, res) => {
-  res.sendFile(__dirname + '/images-upload.html');
+  res.sendFile(path.join(__dirname, '/images-upload.html'));
 });
 
 app.get('/logo.png', (req, res) => {
