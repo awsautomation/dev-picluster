@@ -845,6 +845,37 @@ app.post('/changehost', (req, res) => {
   }
 });
 
+app.post('/change-container-args', (req, res) => {
+  const check_token = req.body.token;
+  const {
+    container_args
+  } = req.body;
+  const {
+    container
+  } = req.body;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else if (container && container_args) {
+    const options = {
+      url: `${scheme}${server}:${server_port}/change-container-args?token=${token}&container=${container}&container_args=${container_args}`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
+  } else {
+    res.end('\nError missing some parameters.');
+  }
+});
+
 app.post('/addcontainer', (req, res) => {
   const check_token = req.body.token;
   const {

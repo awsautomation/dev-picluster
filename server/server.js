@@ -1141,6 +1141,51 @@ app.get('/addcontainer', (req, res) => {
   }
 });
 
+app.get('/change-container-args', (req, res) => {
+  const check_token = req.query.token;
+  const {
+    container
+  } = req.query;
+  const {
+    container_args
+  } = req.query;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    Object.keys(config.layout).forEach((get_node, i) => {
+      Object.keys(config.layout[i]).forEach(key => {
+        if (key.indexOf(container) > -1) {
+          config.layout[i][key] = container_args;
+        }
+      });
+    });
+    const new_config = JSON.stringify({
+      payload: JSON.stringify(config),
+      token
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/updateconfig`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nModified Container Arguments for ' + container);
+      }
+    });
+  }
+});
+
 app.get('/changehost', (req, res) => {
   const check_token = req.query.token;
   let container = '';
