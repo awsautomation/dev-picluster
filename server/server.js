@@ -212,6 +212,11 @@ app.post('/bootstrap', (req, res) => {
         config.layout.push({
           node: host
         });
+
+        config.hb.push({
+          node: host
+        });
+
         const new_config = JSON.stringify({
           payload: JSON.stringify(config),
           token
@@ -780,11 +785,9 @@ app.get('/addhost', (req, res) => {
         node: host
       });
 
-      if (config.hb) {
-        config.hb.push({
-          node: host
-        });
-      }
+      config.hb.push({
+        node: host
+      });
 
       const new_config = JSON.stringify({
         payload: JSON.stringify(config),

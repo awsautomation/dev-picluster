@@ -8,6 +8,7 @@
 ## Enhancements:
 * PiCTL can now upload container zip files.
 * PiCluster Server displays version for / GET requests
+* When adding a new node, a heartbeat config will be added.
 
 ## Bug Fixes:
 * None
