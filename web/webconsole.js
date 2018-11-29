@@ -845,7 +845,7 @@ app.post('/changehost', (req, res) => {
   }
 });
 
-app.post('/change-container-args', (req, res) => {
+app.post('/update-container', (req, res) => {
   const check_token = req.body.token;
   const {
     container_args
@@ -853,12 +853,15 @@ app.post('/change-container-args', (req, res) => {
   const {
     container
   } = req.body;
+  const {
+    heartbeat_args
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
-  } else if (container && container_args) {
+  } else if (container) {
     const options = {
-      url: `${scheme}${server}:${server_port}/change-container-args?token=${token}&container=${container}&container_args=${container_args}`,
+      url: `${scheme}${server}:${server_port}/update-container?token=${token}&container=${container}&container_args=${container_args}&heartbeat_args=${heartbeat_args}`,
       rejectUnauthorized: ssl_self_signed
     };
 

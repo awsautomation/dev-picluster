@@ -1141,7 +1141,7 @@ app.get('/addcontainer', (req, res) => {
   }
 });
 
-app.get('/change-container-args', (req, res) => {
+app.get('/update-container', (req, res) => {
   const check_token = req.query.token;
   const {
     container
@@ -1149,17 +1149,33 @@ app.get('/change-container-args', (req, res) => {
   const {
     container_args
   } = req.query;
+  const {
+    heartbeat_args
+  } = req.query;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        if (key.indexOf(container) > -1) {
-          config.layout[i][key] = container_args;
-        }
+    if (container_args) {
+      Object.keys(config.layout).forEach((get_node, i) => {
+        Object.keys(config.layout[i]).forEach(key => {
+          if (key.indexOf(container) > -1) {
+            config.layout[i][key] = container_args;
+          }
+        });
       });
-    });
+    }
+
+    if (heartbeat_args) {
+      Object.keys(config.hb).forEach((get_node, i) => {
+        Object.keys(config.hb[i]).forEach(key => {
+          if (key.indexOf(container) > -1) {
+            config.hb[i][key] = heartbeat_args;
+          }
+        });
+      });
+    }
+
     const new_config = JSON.stringify({
       payload: JSON.stringify(config),
       token
