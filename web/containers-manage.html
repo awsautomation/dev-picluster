@@ -79,6 +79,10 @@
 			var path;
 			var failover_constraints = 'none';
 
+			if(heartbeat_add_args.length === 0) {
+				heartbeat_add_args = 'delete'
+			}
+			
 			container_heartbeat_fieldset.forEach(function(node, i) {
 				if (container_heartbeat_fieldset[i].checked) {
 					failover_constraints += ',' + node.value;

@@ -1174,8 +1174,13 @@ app.get('/update-container', (req, res) => {
       Object.keys(config.hb).forEach((get_node, i) => {
         Object.keys(config.hb[i]).forEach(key => {
           if (key.indexOf(container) > -1) {
-            config.hb[i][key] = heartbeat_args;
-            proceed = 1;
+            if (heartbeat_args.indexOf('delete') > -1) {
+              delete config.hb[i][key];
+              proceed = 1;
+            } else {
+              config.hb[i][key] = heartbeat_args;
+              proceed = 1;
+            }
           }
         });
       });
