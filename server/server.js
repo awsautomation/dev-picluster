@@ -1153,7 +1153,7 @@ app.get('/update-container', (req, res) => {
     heartbeat_args
   } = req.query;
 
-  if ((check_token !== token) || (!check_token)) {
+  if ((check_token !== token) || (!check_token) || container.indexOf('*') > -1) {
     res.end('\nError: Invalid Credentials');
   } else {
     if (container_args) {
@@ -1167,13 +1167,32 @@ app.get('/update-container', (req, res) => {
     }
 
     if (heartbeat_args) {
+      let proceed = 0;
       Object.keys(config.hb).forEach((get_node, i) => {
         Object.keys(config.hb[i]).forEach(key => {
           if (key.indexOf(container) > -1) {
             config.hb[i][key] = heartbeat_args;
+            proceed = 1;
           }
         });
       });
+
+      if (proceed === 0) {
+        let node = '';
+        Object.keys(config.layout).forEach((get_node, i) => {
+          Object.keys(config.layout[i]).forEach(key => {
+            if (key.indexOf(container) > -1) {
+              node = config.layout[i].node;
+            }
+          });
+        });
+
+        for (let i = 0; i < config.hb.length; i++) {
+          if (config.hb[i].node.indexOf(node) > -1) {
+            config.hb[i][container] = heartbeat_args;
+          }
+        }
+      }
     }
 
     const new_config = JSON.stringify({
