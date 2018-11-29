@@ -3,6 +3,7 @@
 ## New Features:
 * Virtual Networks - Added menu option to create a Swarm cluster and VLAN
 * Manage Containers - Allows you to modify the Container Arguments
+* Manage Containers - Allows you to modify the Heartbeat port
 
 ## Enhancements:
 * PiCTL can now upload container zip files.
