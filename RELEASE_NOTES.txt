@@ -1,4 +1,4 @@
-# Version 2.5
+# Version 2.6
 
 ## New Features:
 * Virtual Networks - Added menu option to create a Swarm cluster and VLAN
