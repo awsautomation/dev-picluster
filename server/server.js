@@ -1182,15 +1182,7 @@ app.get('/update-container', (req, res) => {
 
           if (config.container_host_constraints[i][key].indexOf(parse_container) > -1) {
             if (failover_constraints.indexOf('none') > -1) {
-              Object.keys(config.container_host_constraints).forEach((get_node, j) => {
-                Object.keys(config.container_host_constraints[j]).forEach(key => {
-                  const analyze = config.container_host_constraints[j][key].split(',');
-                  if (container.indexOf(analyze[0]) > -1) {
-                    config.container_host_constraints.splice(j, j + 1);
-                  }
-                });
-              });
-              proceed = 1;
+              proceed = 0;
             } else {
               proceed = 1;
               config.container_host_constraints[i][key] = failover_constraints;
@@ -1201,14 +1193,16 @@ app.get('/update-container', (req, res) => {
 
       if (proceed === 0) {
         if (failover_constraints.indexOf('none') > -1) {
-          Object.keys(config.container_host_constraints).forEach((get_node, j) => {
-            Object.keys(config.container_host_constraints[j]).forEach(key => {
-              const analyze = config.container_host_constraints[j][key].split(',');
-              if (container.indexOf(analyze[0]) > -1) {
-                config.container_host_constraints.splice(j, j + 1);
+          for (let i = 0; i < config.container_host_constraints.length; i++) {
+            for (const key in config.container_host_constraints[i]) {
+              if (container.length > 0) {
+                const analyze = config.container_host_constraints[i][key].split(',');
+                if (container.indexOf(analyze[0]) > -1) {
+                  config.container_host_constraints.splice(i, i + 1);
+                }
               }
-            });
-          });
+            }
+          }
         } else {
           config.container_host_constraints.push({
             container: failover_constraints
