@@ -1155,6 +1155,9 @@ app.get('/update-container', (req, res) => {
   const {
     heartbeat_args
   } = req.query;
+  const {
+    failover_constraints
+  } = req.query;
 
   if ((check_token !== token) || (!check_token) || container.indexOf('*') > -1) {
     res.end('\nError: Invalid Credentials');
@@ -1167,6 +1170,51 @@ app.get('/update-container', (req, res) => {
           }
         });
       });
+    }
+
+    if (failover_constraints) {
+      let proceed = 0;
+
+      Object.keys(config.container_host_constraints).forEach((get_node, i) => {
+        Object.keys(config.container_host_constraints[i]).forEach(key => {
+          const get_container_name = failover_constraints.split(',');
+          const parse_container = get_container_name[0];
+
+          if (config.container_host_constraints[i][key].indexOf(parse_container) > -1) {
+            if (failover_constraints.indexOf('none') > -1) {
+              Object.keys(config.container_host_constraints).forEach((get_node, j) => {
+                Object.keys(config.container_host_constraints[j]).forEach(key => {
+                  const analyze = config.container_host_constraints[j][key].split(',');
+                  if (container.indexOf(analyze[0]) > -1) {
+                    config.container_host_constraints.splice(j, j + 1);
+                  }
+                });
+              });
+              proceed = 1;
+            } else {
+              proceed = 1;
+              config.container_host_constraints[i][key] = failover_constraints;
+            }
+          }
+        });
+      });
+
+      if (proceed === 0) {
+        if (failover_constraints.indexOf('none') > -1) {
+          Object.keys(config.container_host_constraints).forEach((get_node, j) => {
+            Object.keys(config.container_host_constraints[j]).forEach(key => {
+              const analyze = config.container_host_constraints[j][key].split(',');
+              if (container.indexOf(analyze[0]) > -1) {
+                config.container_host_constraints.splice(j, j + 1);
+              }
+            });
+          });
+        } else {
+          config.container_host_constraints.push({
+            container: failover_constraints
+          });
+        }
+      }
     }
 
     if (heartbeat_args) {

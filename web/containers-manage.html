@@ -60,18 +60,18 @@
 			var node_modify = node_list_modify.options[node_list_modify.selectedIndex].value;
 			var container_add = $("#container_name").val();
 			var container_modify = container_list.options[container_list.selectedIndex].value;
-			var container_add_args = $("#container_args").val() ||  $("#modify_container_arguments").val();
-			var heartbeat_add_args = $("#heartbeat_args").val() || $("#modify_heartbeat_port").val();
+			var container_add_args = $("#container_args").val() || $("#modify_container_arguments").val();
+			var heartbeat_add_args = $("#heartbeat_args").val();
 			var container_heartbeat_fieldset = document.getElementsByName('container_heartbeat_fieldset');
 			var radio_container_add = $('input[id=radio_container_add]:checked').val();
 			var radio_container_modify = $('input[id=radio_container_modify]:checked').val();
 			var radio_container_arg_modify = $('input[id=radio_modify_args]:checked').val();
-			var radio_modify_heartbeat = $('input[id=radio_modify_heartbeat]:checked').val();
 			var radio_start = $('input[id=radio_start]:checked').val();
 			var radio_stop = $('input[id=radio_stop]:checked').val();
 			var radio_restart = $('input[id=radio_restart]:checked').val();
 			var radio_delete = $('input[id=radio_delete]:checked').val();
 			var radio_create = $('input[id=radio_create]:checked').val();
+		  var radio_modify_constraints =  $('input[id=radio_modify_constraints]:checked').val();
 			var radio_container_log = $('input[id=radio_container_log]:checked').val();
 			var radio_change_host = $('input[id=radio_change_host]:checked').val();
 			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
@@ -82,7 +82,7 @@
 			if(heartbeat_add_args.length === 0) {
 				heartbeat_add_args = 'delete'
 			}
-			
+
 			container_heartbeat_fieldset.forEach(function(node, i) {
 				if (container_heartbeat_fieldset[i].checked) {
 					failover_constraints += ',' + node.value;
@@ -97,7 +97,7 @@
 				radio_stop && radio_stop.indexOf('on') > -1 ? '/stop' :
 				radio_restart && radio_restart.indexOf('on') > -1 ? '/restart' :
 				radio_container_arg_modify && radio_container_arg_modify.indexOf('on') > -1 ? '/update-container' :
-				radio_modify_heartbeat && radio_modify_heartbeat.indexOf('on') > -1 ? '/update-container' :
+				radio_modify_constraints && radio_modify_constraints.indexOf('on') > -1 ? '/update-container' :
 				radio_delete && radio_delete.indexOf('on') > -1 ? '/delete' :
 				radio_create && radio_create.indexOf('on') > -1 ? '/create' :
 				radio_container_log && radio_container_log.indexOf('on') > -1 ? '/containerlog' :
@@ -122,13 +122,14 @@
 						var div = document.getElementById('containers-manage-modal-body');
 						div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
 					});
-				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host || radio_container_arg_modify || radio_modify_heartbeat) {
+				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host || radio_container_arg_modify || radio_modify_constraints) {
 					$.post(path, {
 						token: parent.token,
 						command: command,
 						container_args: container_add_args,
 						container: container_modify,
 						heartbeat_args: heartbeat_add_args,
+						failover_constraints: container_modify + ',' + failover_constraints,
 						newhost: node_modify
 					}, function(data) {
 						var div = document.getElementById('containers-manage-modal-body');
@@ -151,18 +152,22 @@
 				$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
 			})
 
-			$("input[id$='radio_modify_heartbeat']").click(function() {
-				$.get("/getconfig?token=" + parent.token, function(data) {
-					var check_data = JSON.parse(data);
-					Object.keys(check_data.hb).forEach((get_node, i) => {
-						Object.keys(check_data.hb[i]).forEach(key => {
-				if(key.indexOf(document.getElementById("container_list").value) > -1) {
-									$('#modify_heartbeat_port').val(check_data.hb[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
-								};
-						});
-							});
+	$("input[id$='radio_modify_constraints']").click(function() {
+		$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
+		$(this).is(":checked") ? $("#container_list_add_options").show() : '';
+		$.get("/getconfig?token=" + parent.token, function(data) {
+			var check_data = JSON.parse(data);
+			Object.keys(check_data.hb).forEach((get_node, i) => {
+				Object.keys(check_data.hb[i]).forEach(key => {
+						if(key.indexOf(document.getElementById("container_list").value) > -1) {
+							$('#heartbeat_args').val(check_data.hb[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
+						};
 				});
-						});
+					});
+		});
+
+
+	});
 
 	$("input[id$='radio_modify_args']").click(function() {
 		$.get("/getconfig?token=" + parent.token, function(data) {
@@ -271,9 +276,8 @@
 						<label for="radio_modify_args">Change Container Arguments</label>
 						<input type="text" size="30" id="modify_container_arguments" class="modal_input" name="modify_container_arguments" value=""></font>
 						<br>
-						<input type="radio" name="options_radio" id="radio_modify_heartbeat">
-						<label for="radio_modify_heartbeat">Change/Set Heartbeat Port</label>
-						<input type="text" size="5" id="modify_heartbeat_port" class="modal_input" name="modify_heartbeat_port" value=""></font>
+						<input type="radio" name="options_radio" id="radio_modify_constraints">
+						<label for="radio_modify_constraints">Change/Set Heartbeat/Failover Constraints</label>
 					</div>
 				</fieldset>
 				<div id="submit_button_div">

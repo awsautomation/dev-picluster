@@ -856,12 +856,15 @@ app.post('/update-container', (req, res) => {
   const {
     heartbeat_args
   } = req.body;
+  const {
+    failover_constraints
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (container) {
     const options = {
-      url: `${scheme}${server}:${server_port}/update-container?token=${token}&container=${container}&container_args=${container_args}&heartbeat_args=${heartbeat_args}`,
+      url: `${scheme}${server}:${server_port}/update-container?token=${token}&container=${container}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
       rejectUnauthorized: ssl_self_signed
     };
 

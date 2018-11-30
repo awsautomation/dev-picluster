@@ -4,6 +4,7 @@
 * Virtual Networks - Added menu option to create a Swarm cluster and VLAN
 * Manage Containers - Allows you to modify the Container Arguments
 * Manage Containers - Allows you to modify the Heartbeat port
+* Manage Containers - Allows you to modify the failover constraints
 
 ## Enhancements:
 * PiCTL can now upload container zip files.
