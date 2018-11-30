@@ -1238,7 +1238,7 @@ app.get('/update-container', (req, res) => {
         });
 
         for (let i = 0; i < config.hb.length; i++) {
-          if (config.hb[i].node.indexOf(node) > -1) {
+          if (config.hb[i].node.indexOf(node) > -1 && heartbeat_args.indexOf('delete') === -1) {
             config.hb[i][container] = heartbeat_args;
           }
         }
