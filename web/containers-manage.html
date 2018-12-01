@@ -79,15 +79,17 @@
 			var path;
 			var failover_constraints = 'none';
 
-			if(heartbeat_add_args.length === 0) {
+		if(radio_container_modify){
+			if (radio_container_modify.indexOf('on') > -1  && heartbeat_add_args.length === 0) {
 				heartbeat_add_args = 'delete'
 			}
-
+		}
 			container_heartbeat_fieldset.forEach(function(node, i) {
 				if (container_heartbeat_fieldset[i].checked) {
 					failover_constraints += ',' + node.value;
 				}
 			});
+
 			if (failover_constraints.indexOf('none,') > -1) {
 				failover_constraints = failover_constraints.replace('none,', '');
 			}
@@ -143,6 +145,45 @@
 			}
 		}
 
+function get_container_info(){
+	$.get("/getconfig?token=" + parent.token, function(data) {
+		var check_data = JSON.parse(data);
+		Object.keys(check_data.hb).forEach((get_node, i) => {
+			Object.keys(check_data.hb[i]).forEach(key => {
+					if(key.indexOf(document.getElementById("container_list").value) > -1) {
+						$('#heartbeat_args').val(check_data.hb[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
+					};
+			});
+				});
+
+				Object.keys(check_data.layout).forEach((get_node, i) => {
+					Object.keys(check_data.layout[i]).forEach(key => {
+			if(key.indexOf(document.getElementById("container_list").value) > -1) {
+								$('#modify_container_arguments').val(check_data.layout[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
+							};
+					});
+						});
+
+						var container_heartbeat_fieldset = document.getElementsByName('container_heartbeat_fieldset');
+
+						Object.keys(check_data.container_host_constraints).forEach((get_node, i) => {
+							Object.keys(check_data.container_host_constraints[i]).forEach(key => {
+								const analyze = check_data.container_host_constraints[i][key].split(',');
+								if (document.getElementById("container_list").value.indexOf(analyze[0]) > -1) {
+
+								container_heartbeat_fieldset.forEach(function(node, z) {
+									var current = container_heartbeat_fieldset[z].value;
+
+								if(analyze.indexOf(current) > -1) {
+											container_heartbeat_fieldset[z].click();
+								}
+							});
+								}
+							});
+						});
+	});
+
+};
 		$(document).ready(function() {
 			$("input[id$='radio_container_add']").click(function() {
 				$("#container_list_options_fieldset").show();
@@ -155,32 +196,12 @@
 	$("input[id$='radio_modify_constraints']").click(function() {
 		$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
 		$(this).is(":checked") ? $("#container_list_add_options").show() : '';
-		$.get("/getconfig?token=" + parent.token, function(data) {
-			var check_data = JSON.parse(data);
-			Object.keys(check_data.hb).forEach((get_node, i) => {
-				Object.keys(check_data.hb[i]).forEach(key => {
-						if(key.indexOf(document.getElementById("container_list").value) > -1) {
-							$('#heartbeat_args').val(check_data.hb[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
-						};
-				});
-					});
-		});
-
-
+		get_container_info();
 	});
 
 	$("input[id$='radio_modify_args']").click(function() {
-		$.get("/getconfig?token=" + parent.token, function(data) {
-			var check_data = JSON.parse(data);
-			Object.keys(check_data.layout).forEach((get_node, i) => {
-				Object.keys(check_data.layout[i]).forEach(key => {
-		if(key.indexOf(document.getElementById("container_list").value) > -1) {
-							$('#modify_container_arguments').val(check_data.layout[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
-						};
-				});
-					});
-		});
-				});
+			get_container_info();
+	});
 
 			$("input[id$='radio_container_modify']").click(function() {
 				$("#container_list_options_fieldset").show();
