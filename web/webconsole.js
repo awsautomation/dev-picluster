@@ -961,7 +961,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    fs.readFile(req.file.path, data => {
+    fs.readFile(req.file.path, (err, data) => {
+      if (err) {
+        console.log('\nReadFile Error:' + err);
+      }
       const newPath = path.join('../', req.file.originalname);
       fs.writeFile(newPath, data, () => {
         sendFile(newPath, req.file.path);
