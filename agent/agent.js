@@ -292,40 +292,6 @@ function reloadConfig() {
   server_port = config.server_port;
 }
 
-function receiveFileDiskOps(file, get_config_file) {
-  fs.readFile(file.path, data => {
-    let newPath = '../' + file.originalname;
-    let config_file = '';
-
-    if (get_config_file) {
-      if (process.env.PICLUSTER_CONFIG) {
-        config_file = process.env.PICLUSTER_CONFIG;
-      } else {
-        config_file = '../config.json';
-      }
-      newPath = config_file;
-    }
-    setTimeout(() => {
-      fs.writeFile(newPath, data, err => {
-        if (!err) {
-          if (get_config_file) {
-            reloadConfig();
-          }
-
-          if (file.originalname.indexOf('.zip') > -1) {
-            unzipFile(newPath);
-          }
-          fs.unlink(file.path, error => {
-            if (error) {
-              console.log(error);
-            }
-          });
-        }
-      });
-    }, 5000);
-  });
-}
-
 app.post('/receive-file', upload.single('file'), (req, res) => {
   const check_token = req.body.token;
   const get_config_file = req.body.config_file;
@@ -333,7 +299,41 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    receiveFileDiskOps(req.file.path, get_config_file);
+    fs.readFile(req.file.path, (err, data) => {
+      if (err) {
+        console.log('\nError reading file: ' + err);
+      }
+      let newPath = '../' + req.file.originalname;
+      let config_file = '';
+
+      if (get_config_file) {
+        if (process.env.PICLUSTER_CONFIG) {
+          config_file = process.env.PICLUSTER_CONFIG;
+        } else {
+          config_file = '../config.json';
+        }
+        newPath = config_file;
+      }
+      setTimeout(() => {
+        fs.writeFile(newPath, data, err => {
+          if (!err) {
+            if (get_config_file) {
+              reloadConfig();
+            }
+
+            if (req.file.originalname.indexOf('.zip') > -1) {
+              unzipFile(newPath);
+            }
+
+            fs.unlink(req.file.path, error => {
+              if (error) {
+                console.log(error);
+              }
+            });
+          }
+        });
+      }, 5000);
+    });
     res.end('Done');
   }
 });
