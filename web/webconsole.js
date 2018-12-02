@@ -1322,7 +1322,6 @@ app.get('/getconfig', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  console.log(path.join(__dirname, '/index.html'));
   res.sendFile(path.join(__dirname, '/index.html'));
 });
 app.get('/blank.html', (req, res) => {
