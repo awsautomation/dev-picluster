@@ -11,6 +11,7 @@
 * PiCluster Server displays version for / GET requests
 * When adding a new node, a heartbeat config will be added.
 * Added Node Network Utilization Monitoring for Elasticsearch.
+* kibana-dashboards.json was merged into kibana-graphs.json for easier import.
 
 ## Bug Fixes:
 * None
