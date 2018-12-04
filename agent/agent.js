@@ -67,8 +67,8 @@ let images = '';
 
 function monitoring() {
   sysinfo.networkStats(data => {
-    network_tx = Math.round(data.tx_sec / 1000 / 1000);
-    network_rx = Math.round(data.rx_sec / 1000 / 1000);
+    network_tx = Math.round(data.tx_sec / 1000);
+    network_rx = Math.round(data.rx_sec / 1000);
   });
 
   sysinfo.mem(data => {
