@@ -52,8 +52,8 @@ let os_type = '';
 let disk_percentage = 0;
 let total_running_containers = 0;
 let container_uptime = '';
-let network_rx = '';
-let network_tx = '';
+let network_rx = 0;
+let network_tx = 0;
 let running_containers = '';
 let container_mem_stats = '';
 let container_cpu_stats = '';
@@ -67,8 +67,8 @@ let images = '';
 
 function monitoring() {
   sysinfo.networkStats(data => {
-    network_tx = Math.round(data.tx_sec);
-    network_rx = Math.round(data.rx_sec);
+    network_tx = Math.round(data.tx_sec / 1000 / 1000);
+    network_rx = Math.round(data.rx_sec  / 1000 / 1000);
   });
 
   sysinfo.mem(data => {
