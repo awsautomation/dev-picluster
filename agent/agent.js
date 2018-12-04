@@ -52,6 +52,8 @@ let os_type = '';
 let disk_percentage = 0;
 let total_running_containers = 0;
 let container_uptime = '';
+let network_rx = '';
+let network_tx = '';
 let running_containers = '';
 let container_mem_stats = '';
 let container_cpu_stats = '';
@@ -64,6 +66,11 @@ let memory_percentage = 0;
 let images = '';
 
 function monitoring() {
+  sysinfo.networkStats(data => {
+    network_tx = Math.round(data.tx_sec);
+    network_rx = Math.round(data.rx_sec);
+  });
+
   sysinfo.mem(data => {
     memory_total = data.total;
     memory_buffers = data.buffcache;
@@ -231,6 +238,8 @@ app.get('/node-status', (req, res) => {
       container_mem_stats,
       container_cpu_stats,
       container_uptime,
+      network_rx,
+      network_tx,
       images,
       cpu_cores,
       memory_percentage

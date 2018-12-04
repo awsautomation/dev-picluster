@@ -108,6 +108,14 @@ if (config.elasticsearch) {
             type: 'double',
             index: 'true'
           },
+          network_tx: {
+            type: 'double',
+            index: 'true'
+          },
+          network_rx: {
+            type: 'double',
+            index: 'true'
+          },
           disk: {
             type: 'double',
             index: 'true'
@@ -434,7 +442,7 @@ app.get('/nodes', (req, res) => {
             if (check.cpu_percent > 0) {
               addData(check);
               if (config.elasticsearch) {
-                elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage, check.total_running_containers);
+                elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage, check.total_running_containers, check.network_rx, check.network_tx);
               }
             }
           } catch (error2) {
@@ -818,7 +826,7 @@ app.get('/addhost', (req, res) => {
   }
 });
 
-function elasticsearch_monitoring(cpu, node, disk, memory, total_running_containers) {
+function elasticsearch_monitoring(cpu, node, disk, memory, total_running_containers, network_rx, network_tx) {
   const current_time = new Moment().format('YYYY-MM-DD HH:mm:ssZ');
 
   const options = {
@@ -833,6 +841,8 @@ function elasticsearch_monitoring(cpu, node, disk, memory, total_running_contain
       node,
       disk,
       memory,
+      network_rx,
+      network_tx,
       total_running_containers
     })
   };
