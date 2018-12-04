@@ -55,7 +55,7 @@ let {
 } = config;
 let dockerFolder = config.docker;
 const container_faillog = [];
-const picluster_release = '2.5';
+const picluster_release = '2.6';
 
 if (config.elasticsearch) {
   const mapping = {
