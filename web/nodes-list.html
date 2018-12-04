@@ -26,10 +26,20 @@
 
 						var node_network_tx = check_data.data[i].network_tx;
 						var node_network_rx = check_data.data[i].network_rx;
+						node_network_rx.className = 'node_status_div';
+						node_network_tx.className = 'node_status_div';
+
 						var node_network_tx_label = document.createElement('label');
 						var node_network_rx_label = document.createElement('label');
-						node_network_rx_label.innerHTML = '<img width="100" height="50" src="/assets/images/network.png"><br><b>Out:</b> ' + node_network_rx + ' KB/s';
-						node_network_tx_label.innerHTML = '<b><br>In:</b> ' + node_network_tx + ' KB/s';
+
+						var network_image = document.createElement('IMG');
+						network_image.className = 'node_status_div';
+						network_image.style.height = "20";
+						network_image.style.width = "60";
+						network_image.src = '/assets/images/network.png';
+
+						node_network_rx_label.innerHTML = '<br><b><font class="node_status_text">Out:</b> ' + node_network_rx + ' KB/s&nbsp;&nbsp;';
+						node_network_tx_label.innerHTML = '<b><font class="node_status_text"><b>In:</b> ' + node_network_tx + ' KB/s';
 
 						var div_disk = document.createElement('div');
 						div_disk.className = 'node_status_div';
@@ -118,8 +128,8 @@
 						node_card.appendChild(div_memory);
 
 						var hr = document.createElement('hr');
-
 						div.appendChild(node_card);
+						div.appendChild(network_image);
 						div.appendChild(node_network_rx_label);
 						div.appendChild(node_network_tx_label);
 						div.appendChild(hr);
