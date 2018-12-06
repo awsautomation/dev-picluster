@@ -33,7 +33,7 @@ if type jq &>/dev/null; then
     clear
     echo "Nodes Metrics"
     if [ "${config_ssl}" == "true" ]; then echo;curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "'
-    else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "';echo
+  else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) Network In : \(.network_rx)  Network Out : \(.network_tx)"';echo
     fi
   }
 
