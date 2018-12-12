@@ -1,13 +1,14 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<link rel="stylesheet" href="/assets/circle.css">
 	<script>
 		function getContainerStatus() {
-			setTimeout(function() {
+			setTimeout(function () {
 				if (parent.token) {
-					$.get("/nodes?token=" + parent.token, function(data) {
+					$.get("/nodes?token=" + parent.token, function (data) {
 						var check_data = data;
 						var total = check_data.total_containers;
 						var running = 0;
@@ -17,7 +18,7 @@
 
 						var calc = Math.floor((running / total * 100));
 						var percent = 0;
-						(!calc == 100) ? percent = percent = Math.ceil((calc + 1) / 100) * 10 : percent = calc;
+						(!calc == 100) ? percent = percent = Math.ceil((calc + 1) / 100) * 10: percent = calc;
 
 						document.getElementById("running_containers").textContent = percent + "%";
 						document.getElementById("running-class").className = "c100 p" + percent + " small";
@@ -26,6 +27,7 @@
 				}
 			}, 5000)
 		}
+
 	</script>
 </head>
 
@@ -35,34 +37,36 @@
 		<br>
 		<b>Welcome to PiCluster!</b>
 	</div>
-  <div id="source_issues_circle">
-    <a href='https://github.com/picluster/picluster' id='source' target="_blank">
-      <img src="/assets/images/GitHub-Mark-120px-plus.png">
-      <br>
-      GitHub
-    </a>
-    <a href='https://github.com/picluster/picluster/issues' id='issues' target="_blank">
-      <img src="/assets/images/Debug-Bug-icon.png">
-      <br>
-      Report Issue
-    </a>
-    <a href="containers-layout.html" id="status_circle">
-      <div class="page">
-        <div class="clearfix">
-          <div id="running-class" class="c100 p0 small">
-            <span id='running_containers'>0%</span>
-            <div class="slice">
-              <div class="bar"></div>
-              <div class="fill"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      Running
-    </a>
-  </div>
-  <script>
-    getContainerStatus();
-  </script>
+	<div id="source_issues_circle">
+		<a href='https://github.com/picluster/picluster' id='source' target="_blank">
+			<img src="/assets/images/GitHub-Mark-120px-plus.png">
+			<br>
+			GitHub
+		</a>
+		<a href='https://github.com/picluster/picluster/issues' id='issues' target="_blank">
+			<img src="/assets/images/Debug-Bug-icon.png">
+			<br>
+			Report Issue
+		</a>
+		<a href="containers-layout.html" id="status_circle">
+			<div class="page">
+				<div class="clearfix">
+					<div id="running-class" class="c100 p0 small">
+						<span id='running_containers'>0%</span>
+						<div class="slice">
+							<div class="bar"></div>
+							<div class="fill"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			Running
+		</a>
+	</div>
+	<script>
+		getContainerStatus();
+
+	</script>
 </body>
+
 </html>

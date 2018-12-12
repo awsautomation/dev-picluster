@@ -1,9 +1,10 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
-  <link rel="stylesheet" href="/assets/picluster-iframe.css">
+	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		var option;
 
@@ -107,26 +108,28 @@
 	</div>
 
 	<script>
-	var span = document.getElementsByClassName("close")[0];
-	var modal = document.getElementById('modal_container');
-	var output_modal = document.getElementById('output');
-	var output_span = document.getElementsByClassName("close")[1];
-	var submit_button = document.getElementById("submit_button");
+		var span = document.getElementsByClassName("close")[0];
+		var modal = document.getElementById('modal_container');
+		var output_modal = document.getElementById('output');
+		var output_span = document.getElementsByClassName("close")[1];
+		var submit_button = document.getElementById("submit_button");
 
-	span.onclick = function() {
-		modal.style.display = "none";
-	}
+		span.onclick = function () {
+			modal.style.display = "none";
+		}
 
-	output_span.onclick = function() {
-		output_modal.style.display = "none";
-	}
+		output_span.onclick = function () {
+			output_modal.style.display = "none";
+		}
 
-	submit_button.onclick = function() {
-		modal.style.display = "none";
-		output_modal.style.display = "block";
-		exec();
-	}
+		submit_button.onclick = function () {
+			modal.style.display = "none";
+			output_modal.style.display = "block";
+			exec();
+		}
 
-	modal.style.display = "block";
+		modal.style.display = "block";
+
 	</script>
+
 </html>

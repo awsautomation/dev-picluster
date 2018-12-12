@@ -4,7 +4,7 @@
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
 	<script src="/assets/jquery-ui.js"></script>
-	<script src="/assets/distLogo.js"></script>
+	<script src="/assets/distLogo.js"></script>ß
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<link rel="stylesheet" href="/assets/circle.css">
 	<script>
@@ -17,9 +17,11 @@
 
 			var div = document.getElementById('container-layout-modal-body');
 
-			div.innerHTML = (div) ? div.innerHTML + '<div class="container_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font></div>' : div;
+			div.innerHTML = (div) ? div.innerHTML +
+				'<div class="container_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for containers</label></font></div>' :
+				div;
 
-			$.get("/nodes?token=" + parent.token, function(data) {
+			$.get("/nodes?token=" + parent.token, function (data) {
 				var check_data = data;
 				(div) ? div.innerHTML = '': div;
 				var offline_containers = [];
@@ -38,7 +40,8 @@
 						var cpu_cores = check_data.data[i].cpu_cores;
 						var total_containers = check_data.data[i].total_containers;
 
-						div.innerHTML += '<div class="container_card"><div class="container_card_logo"><b>' + distLogo(dist) + check_data.data[i].hostname + '</b></div><div class="container_card_list"><ul id ="ul_' + i + '">';
+						div.innerHTML += '<div class="container_card"><div class="container_card_logo"><b>' + distLogo(dist) +
+							check_data.data[i].hostname + '</b></div><div class="container_card_list"><ul id ="ul_' + i + '">';
 						var container_layout_ul = document.getElementById('ul_' + i);
 
 						for (var j in container_layout) {
@@ -56,7 +59,8 @@
 								var div_cpu_running = document.createElement('div');
 
 								div_cpu_running.className = 'c100 p' + Math.round(get_container_cpu[j] / cpu_cores) + ' small';
-								div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(get_container_cpu[j] / cpu_cores) + '%</span>';
+								div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(get_container_cpu[j] / cpu_cores) +
+									'%</span>';
 
 								var div_cpu_slice = document.createElement('div');
 								div_cpu_slice.className = "slice";
@@ -104,7 +108,8 @@
 								node_card.appendChild(div_cpu);
 								node_card.appendChild(div_memory);
 
-								container_layout_ul.innerHTML += '<br><br><li><a href="/containers-manage.html" onclick="link_function(\'' + container_layout[j] + '\')">' + container_layout[j] + ' - ' + container_uptime[j] + '</a>';
+								container_layout_ul.innerHTML += '<br><br><li><a href="/containers-manage.html" onclick="link_function(\'' +
+									container_layout[j] + '\')">' + container_layout[j] + ' - ' + container_uptime[j] + '</a>';
 								container_layout_ul.append(node_card);
 							}
 						}
@@ -128,17 +133,20 @@
 				}
 
 				if (offline_containers.length > 0) {
-					var header = '<hr><img src="/assets/images/alert.png" style="width:75px;height:75px;"><br><b>Stopped/Missing Containers:</b>';
+					var header =
+						'<hr><img src="/assets/images/alert.png" style="width:75px;height:75px;"><br><b>Stopped/Missing Containers:</b>';
 					var divbackup = div.innerHTML;
 					var data = '';
 					for (var z = 0; z != offline_containers.length; z++) {
-						data += '<br><br><a href="/containers-manage.html" onclick="link_function(\'' + offline_containers[z] + '\')">' + offline_containers[z] + '</a>';
+						data += '<br><br><a href="/containers-manage.html" onclick="link_function(\'' + offline_containers[z] + '\')">' +
+							offline_containers[z] + '</a>';
 					}
 					div.innerHTML = header + data + '<hr>' + div.innerHTML;
 					divbackup;
 				}
 			});
 		}
+
 	</script>
 </head>
 
@@ -158,12 +166,13 @@
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[0];
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
 		output_modal.style.display = "block";
 		exec();
+
 	</script>
 	<script>
 		window_reloader();
@@ -174,6 +183,7 @@
 				window_reloader();
 			}, 15000);
 		}
+
 	</script>
 
 </html>

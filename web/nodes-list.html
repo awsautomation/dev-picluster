@@ -10,9 +10,11 @@
 	<script>
 		function exec() {
 			var div = document.getElementById('nodes-list-modal-body');
-			div ? div.innerHTML = div.innerHTML + '<br><div id="node_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font></div>' : div;
+			div ? div.innerHTML = div.innerHTML +
+				'<br><div id="node_searching"><img heigth="200" width="200" src="/assets/images/searching.jpg"><br><font size=+3><label>Searching for nodes</label></font></div>' :
+				div;
 
-			$.get("/nodes?token=" + parent.token, function(data) {
+			$.get("/nodes?token=" + parent.token, function (data) {
 				var check_data = data;
 				div ? div.innerHTML = '' : div;
 
@@ -38,7 +40,8 @@
 						network_image.style.width = "60";
 						network_image.src = '/assets/images/network.png';
 
-						node_network_rx_label.innerHTML = '<br><b><font class="node_status_text">Out:</b> ' + node_network_rx + ' KB/s&nbsp;&nbsp;';
+						node_network_rx_label.innerHTML = '<br><b><font class="node_status_text">Out:</b> ' + node_network_rx +
+							' KB/s&nbsp;&nbsp;';
 						node_network_tx_label.innerHTML = '<b><font class="node_status_text">In:</b> ' + node_network_tx + ' KB/s';
 
 						var div_disk = document.createElement('div');
@@ -49,7 +52,8 @@
 
 						var div_disk_running = document.createElement('div');
 						div_disk_running.className = 'c100 p' + Math.round(check_data.data[i].disk_percentage) + ' small';
-						div_disk_running.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) + '%</span>';
+						div_disk_running.innerHTML = '<span id="' + check_data.data[i] + '">' + Math.round(check_data.data[i].disk_percentage) +
+							'%</span>';
 
 						var div_disk_slice = document.createElement('div');
 						div_disk_slice.className = "slice";
@@ -67,8 +71,10 @@
 						div_cpu_clearfix.className = 'clearfix';
 
 						var div_cpu_running = document.createElement('div');
-						div_cpu_running.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + ' small';
-						div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) + '%</span>';
+						div_cpu_running.className = 'c100 p' + Math.round(check_data.data[i].cpu_percent / check_data.data[i].cpu_cores) +
+							' small';
+						div_cpu_running.innerHTML = '<span id="' + i + '">' + Math.round(check_data.data[i].cpu_percent / check_data.data[
+							i].cpu_cores) + '%</span>';
 
 						var div_cpu_slice = document.createElement('div');
 						div_cpu_slice.className = "slice";
@@ -87,7 +93,8 @@
 
 						var div_memory_running_class = document.createElement('div');
 						div_memory_running_class.className = 'c100 p' + check_data.data[i].memory_percentage + ' small';
-						div_memory_running_class.innerHTML = '<span id="' + i + '">' + check_data.data[i].memory_percentage + '%</span>';
+						div_memory_running_class.innerHTML = '<span id="' + i + '">' + check_data.data[i].memory_percentage +
+							'%</span>';
 
 						var div_memory_slice = document.createElement('div');
 						div_memory_slice.className = "slice";
@@ -138,6 +145,7 @@
 				addFontLinux();
 			});
 		}
+
 	</script>
 </head>
 
@@ -158,13 +166,14 @@
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[0];
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
 		output_modal.style.display = "block";
 
 		exec()
+
 	</script>
 	<script>
 		window_reloader();
@@ -175,6 +184,7 @@
 				window_reloader();
 			}, 15000);
 		}
+
 	</script>
 
 </html>

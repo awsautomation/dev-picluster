@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -78,18 +79,20 @@
 		var output_span = document.getElementsByClassName("close")[1];
 		var submit_button = document.getElementById("submit_button");
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			exec();
 		}
 
 		modal.style.display = "block";
+
 	</script>
+
 </html>

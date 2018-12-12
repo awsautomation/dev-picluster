@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -61,10 +62,10 @@
 				</fieldset>
 
 				<script>
-					$(function() {
+					$(function () {
 						var option = '';
 
-						$.get("/nodes?token=" + parent.token, function(data) {
+						$.get("/nodes?token=" + parent.token, function (data) {
 							for (var i in data.nodes) {
 								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 							}
@@ -73,12 +74,12 @@
 							$('#node_list').append(option);
 						});
 					});
-					$(function() {
+					$(function () {
 						var option = '';
 
 						$.post('/listcommands', {
 							token: parent.token
-						}, function(data) {
+						}, function (data) {
 							option += '<option value="' + 'Choose' + '">' + 'Choose' + '</option>';
 							if (data) {
 								data = JSON.parse(data);
@@ -94,6 +95,7 @@
 							$('#command_list').append(option);
 						});
 					});
+
 				</script>
 			</div>
 		</div>
@@ -124,25 +126,27 @@
 		var submit_button = document.getElementById("submit_button");
 		var rerun_button = document.getElementById("rerun_button");
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
 		}
 
-		rerun_button.onclick = function() {
+		rerun_button.onclick = function () {
 			$('#exec_output').val('');
 			exec();
 		}
 
 		modal.style.display = "block";
+
 	</script>
+
 </html>
