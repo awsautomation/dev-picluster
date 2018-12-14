@@ -2119,8 +2119,6 @@ app.post('/prune', (req, res) => {
   const url = [];
   let command_log = '';
 
-  selected_node = '';
-
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
@@ -2134,9 +2132,7 @@ app.post('/prune', (req, res) => {
         node
       } = config.layout[i];
       const make_url = `${scheme}${node}:${agent_port}/run`;
-      if (selected_node.length === 0) {
-        url.push(make_url);
-      }
+      url.push(make_url);
     }
 
     async.eachSeries(url, (url, cb) => {
