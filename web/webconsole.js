@@ -539,7 +539,7 @@ app.post('/exec', (req, res) => {
     });
 
     const options = {
-      url: `${scheme}${server}:${server_port}/exec2`,
+      url: `${scheme}${server}:${server_port}/exec`,
       rejectUnauthorized: ssl_self_signed,
       method: 'POST',
       headers: {
