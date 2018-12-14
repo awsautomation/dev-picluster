@@ -749,18 +749,28 @@ app.get('/prune', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
+    const command = JSON.stringify({
+      token
+    });
     const options = {
-      url: `${scheme}${server}:${server_port}/prune?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
+      url: `${scheme}${server}:${server_port}/prune`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
     };
-
-    request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+    request(options, (error, response) => {
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while cleaning Docker.');
       }
     });
   }

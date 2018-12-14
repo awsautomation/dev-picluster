@@ -2114,8 +2114,12 @@ app.post('/syslog', (req, res) => {
   }
 });
 
-app.get('/prune', (req, res) => {
-  const check_token = req.query.token;
+app.post('/prune', (req, res) => {
+  const check_token = req.body.token;
+  const url = [];
+  let command_log = '';
+
+  selected_node = '';
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -2129,29 +2133,38 @@ app.get('/prune', (req, res) => {
       const {
         node
       } = config.layout[i];
+      const make_url = `${scheme}${node}:${agent_port}/run`;
+      if (selected_node.length === 0) {
+        url.push(make_url);
+      }
 
-      const options = {
-        url: `${scheme}${node}:${agent_port}/run`,
-        rejectUnauthorized: ssl_self_signed,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
+      async.eachSeries(url, (url, cb) => {
+        const options = {
+          url,
+          rejectUnauthorized: ssl_self_signed,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': command.length
+          },
+          body: command
+        };
 
-      request(options, (error, response) => {
-        if (error) {
-          res.end('An error has occurred.');
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('\nNode:' + results.node + '\n' + results.output);
-          console.log('\nNode:' + results.node + '\n' + results.output);
+        request(options, (err, body) => {
+          try {
+            const data = JSON.parse(body.body);
+            command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+            cb(err);
+          } catch (error) {
+            console.log(error);
+          }
+        });
+      }, err => {
+        if (err) {
+          console.log('\nError: ' + err);
         }
+        res.end(command_log);
       });
-
-      res.end('');
     }
   }
 });
