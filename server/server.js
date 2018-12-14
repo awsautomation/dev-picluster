@@ -8,6 +8,7 @@ const multer = require('multer');
 const express = require('express');
 const Moment = require('moment');
 const request = require('request');
+const async = require('async');
 
 const bootstrap = {
   status: 1
@@ -1991,6 +1992,58 @@ app.post('/swarm-remove', (req, res) => {
   } else {
     swarm_remove();
     res.end('');
+  }
+});
+
+app.post('/syslog', (req, res) => {
+  const check_token = req.body.token;
+  let complete_syslog = '';
+  const url = [];
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    for (let i = 0; i < config.layout.length; i++) {
+      const {
+        node
+      } = config.layout[i];
+
+      const make_url = `${scheme}${node}:${agent_port}/run`;
+      url.push(make_url);
+    }
+
+    const command = JSON.stringify({
+      command: config.syslog,
+      token
+    });
+
+    async.eachSeries(url, (url, cb) => {
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          complete_syslog += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(complete_syslog);
+    });
   }
 });
 

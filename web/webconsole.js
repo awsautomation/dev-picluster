@@ -561,6 +561,41 @@ app.post('/create', (req, res) => {
   }
 });
 
+app.get('/syslog', (req, res) => {
+  const check_token = req.query.token;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const command = JSON.stringify({
+      token
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/syslog`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, (error, response) => {
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error as occurred while retrieving the Syslog.');
+      }
+    });
+  }
+});
+
 app.get('/rsyslog', (req, res) => {
   const check_token = req.query.token;
 
