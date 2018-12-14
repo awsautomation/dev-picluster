@@ -2117,7 +2117,7 @@ app.post('/syslog', (req, res) => {
 app.post('/prune', (req, res) => {
   const check_token = req.body.token;
   const url = [];
-  let complete_syslog = '';
+  let command_log = '';
 
   selected_node = '';
 
