@@ -80,9 +80,8 @@ if type jq &>/dev/null; then
     clear
     echo "Cleaning stale Docker images and containers...."
     if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/prune?token=${config_token}"
-    else curl -s "http://${config_web_connect}:${config_server_port}/prune?token=${config_token}"
+    else curl -H "Content-Type: application/json" -X POST -d '{"token":"'"${config_token}"'"}' "http://${config_web_connect}:${config_server_port}/prune"
     fi
-    logs
   }
 
   build() {
