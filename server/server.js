@@ -2117,7 +2117,7 @@ app.post('/syslog', (req, res) => {
 app.post('/prune', (req, res) => {
   const check_token = req.body.token;
   const url = [];
-  let command_log = '';
+  let complete_syslog = '';
 
   selected_node = '';
 
@@ -2137,35 +2137,35 @@ app.post('/prune', (req, res) => {
       if (selected_node.length === 0) {
         url.push(make_url);
       }
-
-      async.eachSeries(url, (url, cb) => {
-        const options = {
-          url,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        request(options, (err, body) => {
-          try {
-            const data = JSON.parse(body.body);
-            command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
-            cb(err);
-          } catch (error) {
-            console.log(error);
-          }
-        });
-      }, err => {
-        if (err) {
-          console.log('\nError: ' + err);
-        }
-        res.end(command_log);
-      });
     }
+
+    async.eachSeries(url, (url, cb) => {
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(command_log);
+    });
   }
 });
 
