@@ -1998,7 +1998,7 @@ app.post('/swarm-remove', (req, res) => {
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   let selected_node = '';
-  let complete_syslog = '';
+  let command_log = '';
   const url = [];
 
   if (req.body.node) {
@@ -2047,7 +2047,7 @@ app.post('/exec', (req, res) => {
       request(options, (err, body) => {
         try {
           const data = JSON.parse(body.body);
-          complete_syslog += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
           cb(err);
         } catch (error) {
           console.log(error);
@@ -2057,7 +2057,7 @@ app.post('/exec', (req, res) => {
       if (err) {
         console.log('\nError: ' + err);
       }
-      res.end(complete_syslog);
+      res.end(command_log);
     });
   }
 });
