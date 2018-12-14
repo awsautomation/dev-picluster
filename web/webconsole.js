@@ -225,44 +225,6 @@ app.post('/', (req, res) => {
   }
 });
 
-app.post('/exec', (req, res) => {
-  const check_token = req.body.token;
-  const {
-    node
-  } = req.body;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const command = JSON.stringify({
-      command: req.body.command,
-      token,
-      node
-    });
-
-    const options = {
-      url: `${scheme}${server}:${server_port}/exec`,
-      rejectUnauthorized: ssl_self_signed,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': command.length
-      },
-      body: command
-    };
-
-    request(options, error => {
-      if (error) {
-        res.end(error);
-      } else {
-        display_log(data => {
-          res.end(data);
-        });
-      }
-    });
-  }
-});
-
 app.post('/elasticsearch', (req, res) => {
   const check_token = req.body.token;
   const {
@@ -561,6 +523,46 @@ app.post('/create', (req, res) => {
   }
 });
 
+app.post('/exec', (req, res) => {
+  const check_token = req.body.token;
+  const {
+    node
+  } = req.body;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const command = JSON.stringify({
+      command: req.body.command,
+      token,
+      node
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/exec2`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
+    };
+
+    request(options, (error, response) => {
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error3) {
+        res.end('\nAn error has occurred while retrieving the command.');
+      }
+    });
+  }
+});
+
 app.get('/syslog', (req, res) => {
   const check_token = req.query.token;
 
@@ -590,7 +592,7 @@ app.get('/syslog', (req, res) => {
           res.end(response.body);
         }
       } catch (error2) {
-        res.end('\nAn error as occurred while retrieving the Syslog.');
+        res.end('\nAn error has occurred while retrieving the Syslog.');
       }
     });
   }
