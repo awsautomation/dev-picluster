@@ -556,7 +556,7 @@ app.post('/exec', (req, res) => {
         } else {
           res.end(response.body);
         }
-      } catch (error3) {
+      } catch (error2) {
         res.end('\nAn error has occurred while retrieving the command.');
       }
     });

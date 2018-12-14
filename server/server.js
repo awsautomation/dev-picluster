@@ -2062,7 +2062,6 @@ app.post('/exec', (req, res) => {
   }
 });
 
-
 app.post('/syslog', (req, res) => {
   const check_token = req.body.token;
   let complete_syslog = '';
