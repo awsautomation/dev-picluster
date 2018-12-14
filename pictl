@@ -74,7 +74,6 @@ if type jq &>/dev/null; then
     if [ "${config_ssl}" == "true" ]; then curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"${config_token}"'"}' "https://${config_web_connect}:${config_server_port}/exec"
     else curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"${config_token}"'"}' "http://${config_web_connect}:${config_server_port}/exec"
     fi
-    logs
   }
 
   clean(){
