@@ -464,34 +464,6 @@ function clear_log(callback) {
   });
 }
 
-app.post('/create', (req, res) => {
-  const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.token) {
-    container = req.body.container;
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = {
-      url: `${scheme}${server}:${server_port}/create?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(() => {
-          res.end('\nSent request to create the containers.');
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   const {
@@ -1155,7 +1127,7 @@ app.post('/manage', (req, res) => {
           res.end(response.body);
         }
       } catch (error2) {
-        res.end('\nAn error has occurred while trying to start the container(s).');
+        res.end('\nAn error has occurred while trying to manage the container(s).');
       }
     });
   }

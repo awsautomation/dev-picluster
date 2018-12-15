@@ -591,62 +591,6 @@ app.get('/', (req, res) => {
   res.end('PiCluster Server v' + picluster_release);
 });
 
-app.get('/create', (req, res) => {
-  const check_token = req.query.token;
-  let container = '';
-
-  if (req.query.container) {
-    container = req.query.container;
-  }
-
-  if (container.indexOf('*') > -1) {
-    container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const {
-          node
-        } = config.layout[i];
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        const command = JSON.stringify({
-          command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              console.log(error);
-            } else {
-              addLog(response.body);
-            }
-          });
-        }
-      });
-    });
-  }
-  res.end('');
-});
-
 app.get('/manage', (req, res) => {
   const check_token = req.query.token;
   const {
@@ -657,6 +601,7 @@ app.get('/manage', (req, res) => {
   let command_log = '';
   const url = [];
   const what = [];
+  const args = [];
 
   if (operation === 'start') {
     docker_command = 'docker container start';
@@ -672,6 +617,9 @@ app.get('/manage', (req, res) => {
   }
   if (operation === 'logs') {
     docker_command = 'docker container logs';
+  }
+  if (operation === 'create') {
+    docker_command = 'docker container run -d --name ';
   }
 
   if (req.query.container) {
@@ -698,6 +646,7 @@ app.get('/manage', (req, res) => {
         if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
           what.push(key);
           url.push(make_url);
+          args.push(config.layout[i][key]);
         }
       });
     });
@@ -705,10 +654,18 @@ app.get('/manage', (req, res) => {
     let i = 0;
 
     async.eachSeries(url, (url, cb) => {
-      const command = JSON.stringify({
-        command: docker_command + ' ' + what[i],
-        token
-      });
+      let command; 
+      if (operation === 'create') {
+        command = JSON.stringify({
+          command: docker_command + what[i] + ' ' + args[i] + ' ' + what[i],
+          token
+        });
+      } else {
+        command = JSON.stringify({
+          command: docker_command + ' ' + what[i],
+          token
+        });
+      }
 
       const options = {
         url,
