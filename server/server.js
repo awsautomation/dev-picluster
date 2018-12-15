@@ -658,7 +658,7 @@ app.get('/start', (req, res) => {
     container = req.query.container;
   }
 
-  if (container.indexOf('*') > -1) {
+  if (container.indexOf('*') > -1 || container.indexOf('') > -1) {
     container = '*';
   }
 
