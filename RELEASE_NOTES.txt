@@ -12,9 +12,7 @@
 * When adding a new node, a heartbeat config will be added.
 * Added Node Network Utilization Monitoring for Elasticsearch.
 * kibana-dashboards.json was merged into kibana-graphs.json for easier import.
-* Syslog - Redone do gather logs synchronously. 
-* Running Commands - Now done synchronously.
-* Clean Docker - Now done synchronously.
+* Syslog, Exec, Clean Docker, KillVIP - Redone to work synchronously. 
 * Building a containe shows you the entire output and is done synchronously.
 
 ## Bug Fixes:

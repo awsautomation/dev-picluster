@@ -9,9 +9,9 @@
 	<script>
 		function exec() {
 			$.get("/killvip?token=" + parent.token, function (data) {
-				var div = document.getElementById('killvip-modal-body');
+				var div = document.getElementById('kill-vip-modal-body');
 				div.innerHTML =
-					'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.' +
+					'Sent request to delete the VIP from each host. The IP should be restored when the next VIP check is run.<br><br>' +
 					data;
 			});
 		}

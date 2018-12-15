@@ -2079,6 +2079,8 @@ app.get('/getconfig', (req, res) => {
 
 app.get('/killvip', (req, res) => {
   const check_token = req.query.token;
+  const url = [];
+  let command_log = '';
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -2095,28 +2097,42 @@ app.get('/killvip', (req, res) => {
           if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
             return;
           }
-
-          const token_body = JSON.stringify({
-            token
-          });
-
-          const options = {
-            url: `${scheme}${node}:${agent_port}/killvip`,
-            rejectUnauthorized: ssl_self_signed,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': token_body.length
-            },
-            body: token_body
-          };
-
-          request(options, error => {
-            if (error) {
-              res.end('An error has occurred.');
-            }
-          });
+          
+          const make_url = `${scheme}${node}:${agent_port}/killvip`;
+          url.push(make_url);
         });
+      });
+
+      async.eachSeries(url, (url, cb) => {
+        const token_body = JSON.stringify({
+          token
+        });
+
+        const options = {
+          url,
+          rejectUnauthorized: ssl_self_signed,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': token_body.length
+          },
+          body: token_body
+        };
+
+        request(options, (err, body) => {
+          try {
+            const data = JSON.parse(body.body);
+            command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+            cb(err);
+          } catch (error) {
+            console.log(error);
+          }
+        });
+      }, err => {
+        if (err) {
+          console.log('\nError: ' + err);
+        }
+        res.end(command_log);
       });
     }
   }

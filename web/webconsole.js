@@ -572,45 +572,14 @@ app.get('/killvip', (req, res) => {
     };
 
     request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
-app.post('/delete-image', (req, res) => {
-  const check_token = req.body.token;
-  let {
-    image
-  } = req.body;
-
-  if (image.indexOf('Everthing') > -1) {
-    image = '';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = image.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/delete-image?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while trying to kill the VIP).');
       }
     });
   }
