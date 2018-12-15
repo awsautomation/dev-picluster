@@ -560,31 +560,6 @@ app.get('/rsyslog', (req, res) => {
   }
 });
 
-app.get('/killvip', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = {
-      url: `${scheme}${server}:${server_port}/killvip?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      try {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(response.body);
-        }
-      } catch (error2) {
-        res.end('\nAn error has occurred while trying to kill the VIP).');
-      }
-    });
-  }
-});
-
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
 
@@ -1229,9 +1204,6 @@ app.get('/log.html', (req, res) => {
 });
 app.get('/heartbeat.html', (req, res) => {
   res.sendFile(path.join(__dirname, '/heartbeat.html'));
-});
-app.get('/killvip.html', (req, res) => {
-  res.sendFile(path.join(__dirname, '/killvip.html'));
 });
 app.get('/syslog.html', (req, res) => {
   res.sendFile(path.join(__dirname, '/syslog.html'));

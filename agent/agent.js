@@ -248,22 +248,6 @@ app.get('/node-status', (req, res) => {
   }
 });
 
-app.post('/killvip', (req, res) => {
-  const check_token = req.body.token;
-  if (check_token !== token) {
-    return res.status(401).end('\nError: Invalid Credentials');
-  }
-
-  if (config.vip_ip) {
-    const cmd = ip_delete_command;
-    exec(cmd).then(() => {
-      res.end('\nCompleted.');
-    }).catch(error => {
-      console.log(error);
-    });
-  }
-});
-
 app.post('/pong', (req, res) => {
   const check_token = req.body.token;
   if (check_token !== token) {

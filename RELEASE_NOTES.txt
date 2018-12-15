@@ -15,5 +15,8 @@
 * Syslog, Exec, Clean Docker, KillVIP - Redone to work synchronously. 
 * Building a containe shows you the entire output and is done synchronously.
 
+## Removed or Deprecated:
+* KillVIP has been removed from PiCluster.
+
 ## Bug Fixes:
 * None
