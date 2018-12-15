@@ -1286,12 +1286,14 @@ app.post('/restart', (req, res) => {
     };
 
     request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while trying to restart the container(s).');
       }
     });
   }
