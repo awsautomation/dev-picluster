@@ -654,7 +654,7 @@ app.get('/manage', (req, res) => {
     let i = 0;
 
     async.eachSeries(url, (url, cb) => {
-      let command; 
+      let command;
       if (operation === 'create') {
         command = JSON.stringify({
           command: docker_command + what[i] + ' ' + args[i] + ' ' + what[i],
