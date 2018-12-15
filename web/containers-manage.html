@@ -78,7 +78,8 @@
 			var command;
 			var path;
 			var failover_constraints = 'none';
-
+			var operation;
+			
 		if(radio_container_modify){
 			if (radio_container_modify.indexOf('on') > -1  && heartbeat_add_args.length === 0) {
 				heartbeat_add_args = 'delete'
@@ -94,15 +95,31 @@
 				failover_constraints = failover_constraints.replace('none,', '');
 			}
 
+			if(radio_start) {
+				operation = 'start';
+			}
+			if(radio_stop) {
+				operation = 'stop';
+			}
+			if(radio_restart) {
+				operation = 'restart';
+			}
+			if(radio_delete) {
+				operation = 'rm';
+			}
+			if(radio_container_log) {
+				operation = 'logs';
+			}
+
 			path = radio_container_add && radio_container_add.indexOf('on') > -1 ? '/addcontainer' :
-				radio_start && radio_start.indexOf('on') > -1 ? '/start' :
-				radio_stop && radio_stop.indexOf('on') > -1 ? '/stop' :
-				radio_restart && radio_restart.indexOf('on') > -1 ? '/restart' :
+				radio_start && radio_start.indexOf('on') > -1 ? '/manage' :
+				radio_stop && radio_stop.indexOf('on') > -1 ? '/manage' :
+				radio_restart && radio_restart.indexOf('on') > -1 ? '/manage' :
 				radio_container_arg_modify && radio_container_arg_modify.indexOf('on') > -1 ? '/update-container' :
 				radio_modify_constraints && radio_modify_constraints.indexOf('on') > -1 ? '/update-container' :
-				radio_delete && radio_delete.indexOf('on') > -1 ? '/delete' :
+				radio_delete && radio_delete.indexOf('on') > -1 ? '/manage' :
 				radio_create && radio_create.indexOf('on') > -1 ? '/create' :
-				radio_container_log && radio_container_log.indexOf('on') > -1 ? '/containerlog' :
+				radio_container_log && radio_container_log.indexOf('on') > -1 ? '/manage' :
 				radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost' :
 				radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig' :
 				''
@@ -127,6 +144,7 @@
 				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host || radio_container_arg_modify || radio_modify_constraints) {
 					$.post(path, {
 						token: parent.token,
+						operation,
 						command: command,
 						container_args: container_add_args,
 						container: container_modify,

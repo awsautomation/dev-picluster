@@ -6,9 +6,6 @@ const multer = require('multer');
 const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
-/* eslint-disable capitalized-comments */
-// require('request-debug')(request);
-/* eslint-enable capitalized-comments */
 
 let config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
 
@@ -467,34 +464,6 @@ function clear_log(callback) {
   });
 }
 
-app.post('/containerlog', (req, res) => {
-  const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.token) {
-    container = req.body.container;
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = {
-      url: `${scheme}${server}:${server_port}/containerlog?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end('\n' + data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.post('/create', (req, res) => {
   const check_token = req.body.token;
   let container = '';
@@ -709,40 +678,6 @@ app.post('/build', (req, res) => {
   }
 });
 
-app.post('/delete', (req, res) => {
-  const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.container) {
-    container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-      container = '';
-    }
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/delete?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
 
@@ -801,7 +736,6 @@ app.get('/function', (req, res) => {
   const check_token = req.query.token;
   const get_function = req.query.function;
   let get_args = req.query.container_args;
-
   if (req.query.container_args) {
     get_args = req.query.container_args;
   }
@@ -819,42 +753,6 @@ app.get('/function', (req, res) => {
         res.end('');
       } else {
         console.log('\n' + error);
-      }
-    });
-  }
-});
-
-app.post('/stop', (req, res) => {
-  const check_token = req.body.token;
-  let container;
-
-  if (req.body.container) {
-    container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-      container = '';
-    }
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/stop?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      try {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(response.body);
-        }
-      } catch (error2) {
-        res.end('\nAn error has occurred while trying to stop the container(s).');
       }
     });
   }
@@ -1227,8 +1125,11 @@ app.post('/rmhost', (req, res) => {
   }
 });
 
-app.post('/start', (req, res) => {
+app.post('/manage', (req, res) => {
   const check_token = req.body.token;
+  const {
+    operation
+  } = req.body;
   let container;
 
   if (req.body.container) {
@@ -1241,11 +1142,8 @@ app.post('/start', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/start?token=${token}`,
+    const options = {
+      url: `${scheme}${server}:${server_port}/manage?token=${token}&container=${container}&operation=${operation}`,
       rejectUnauthorized: ssl_self_signed
     };
 
@@ -1258,42 +1156,6 @@ app.post('/start', (req, res) => {
         }
       } catch (error2) {
         res.end('\nAn error has occurred while trying to start the container(s).');
-      }
-    });
-  }
-});
-
-app.post('/restart', (req, res) => {
-  const check_token = req.body.token;
-  let container;
-
-  if (req.body.container) {
-    container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-      container = '';
-    }
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/restart?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      try {
-        if (error) {
-          res.end(error);
-        } else {
-          res.end(response.body);
-        }
-      } catch (error2) {
-        res.end('\nAn error has occurred while trying to restart the container(s).');
       }
     });
   }

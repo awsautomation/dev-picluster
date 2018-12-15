@@ -647,12 +647,32 @@ app.get('/create', (req, res) => {
   res.end('');
 });
 
-app.get('/start', (req, res) => {
+app.get('/manage', (req, res) => {
   const check_token = req.query.token;
+  const {
+    operation
+  } = req.query;
+  let docker_command = '';
   let container = '';
   let command_log = '';
   const url = [];
   const what = [];
+
+  if (operation === 'start') {
+    docker_command = 'docker container start';
+  }
+  if (operation === 'stop') {
+    docker_command = 'docker container stop';
+  }
+  if (operation === 'rm') {
+    docker_command = 'docker container rm -f';
+  }
+  if (operation === 'restart') {
+    docker_command = 'docker container restart';
+  }
+  if (operation === 'logs') {
+    docker_command = 'docker container logs';
+  }
 
   if (req.query.container) {
     container = req.query.container;
@@ -683,9 +703,10 @@ app.get('/start', (req, res) => {
     });
 
     let i = 0;
+
     async.eachSeries(url, (url, cb) => {
       const command = JSON.stringify({
-        command: 'docker container start ' + what[i],
+        command: docker_command + ' ' + what[i],
         token
       });
 
@@ -699,6 +720,7 @@ app.get('/start', (req, res) => {
         },
         body: command
       };
+
       request(options, (err, body) => {
         try {
           const data = JSON.parse(body.body);
@@ -1403,76 +1425,6 @@ app.get('/changehost', (req, res) => {
   }
 });
 
-app.get('/stop', (req, res) => {
-  const check_token = req.query.token;
-  let container = '';
-  let command_log = '';
-  const url = [];
-  const what = [];
-
-  if (req.query.container) {
-    container = req.query.container;
-  }
-  if (container.indexOf('*') > -1 || container.length === 0) {
-    container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const {
-          node
-        } = config.layout[i];
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        const make_url = `${scheme}${node}:${agent_port}/run`;
-        if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
-          what.push(key);
-          url.push(make_url);
-        }
-      });
-    });
-
-    let i = 0;
-    async.eachSeries(url, (url, cb) => {
-      const command = JSON.stringify({
-        command: 'docker container stop ' + what[i],
-        token
-      });
-
-      const options = {
-        url,
-        rejectUnauthorized: ssl_self_signed,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-      request(options, (err, body) => {
-        try {
-          const data = JSON.parse(body.body);
-          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
-          cb(err);
-        } catch (error) {
-          console.log(error);
-        }
-      });
-      i++;
-    }, err => {
-      if (err) {
-        console.log('\nError: ' + err);
-      }
-      res.end(command_log);
-    });
-  }
-});
-
 function delete_function(name, node) {
   const command = JSON.stringify({
     command: 'docker container rm -f ' + name,
@@ -1495,189 +1447,6 @@ function delete_function(name, node) {
     }
   });
 }
-
-app.get('/delete', (req, res) => {
-  const check_token = req.query.token;
-  let container = '';
-
-  if (req.query.container) {
-    container = req.query.container;
-  }
-
-  if (container.indexOf('*') > -1) {
-    container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const {
-          node
-        } = config.layout[i];
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        const command = JSON.stringify({
-          command: 'docker container rm -f ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nDeleting: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-  }
-  res.end('');
-});
-
-app.get('/restart', (req, res) => {
-  const check_token = req.query.token;
-  let container = '';
-  let command_log = '';
-  const url = [];
-  const what = [];
-
-  if (req.query.container) {
-    container = req.query.container;
-  }
-  if (container.indexOf('*') > -1 || container.length === 0) {
-    container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const {
-          node
-        } = config.layout[i];
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        const make_url = `${scheme}${node}:${agent_port}/run`;
-        if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
-          what.push(key);
-          url.push(make_url);
-        }
-      });
-    });
-
-    let i = 0;
-    async.eachSeries(url, (url, cb) => {
-      const command = JSON.stringify({
-        command: 'docker container restart ' + what[i],
-        token
-      });
-
-      const options = {
-        url,
-        rejectUnauthorized: ssl_self_signed,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': command.length
-        },
-        body: command
-      };
-      request(options, (err, body) => {
-        try {
-          const data = JSON.parse(body.body);
-          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
-          cb(err);
-        } catch (error) {
-          console.log(error);
-        }
-      });
-      i++;
-    }, err => {
-      if (err) {
-        console.log('\nError: ' + err);
-      }
-      res.end(command_log);
-    });
-  }
-});
-
-app.get('/containerlog', (req, res) => {
-  const check_token = req.query.token;
-  let selected_container = '';
-
-  if (req.query.container) {
-    selected_container = req.query.container;
-  }
-
-  if (selected_container.indexOf('*') > -1) {
-    selected_container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const {
-          node
-        } = config.layout[i];
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        const command = JSON.stringify({
-          command: 'docker container logs ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nLogs for Container: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-  }
-  res.end('');
-});
 
 app.post('/listcontainers', (req, res) => {
   let {
