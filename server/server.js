@@ -462,84 +462,30 @@ function addLog(data) {
   log += data;
 }
 
-app.get('/build', (req, res) => {
+app.get('/', (req, res) => {
+  res.end('PiCluster Server v' + picluster_release);
+});
+
+app.get('/manage-image', (req, res) => {
   const check_token = req.query.token;
+  const {
+    operation
+  } = req.query;
+  let docker_command = '';
+  let container = '';
+  let command_log = '';
+  const url = [];
+  const what = [];
   const {
     no_cache
   } = req.query;
-  let image = '';
 
-  if (req.query.image) {
-    image = req.query.image;
+  if (req.query.container) {
+    container = req.query.container;
   }
 
-  if (image.indexOf('*') > -1) {
-    image = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const {
-          node
-        } = config.layout[i];
-        let command;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        if (no_cache.indexOf('true') > -1) {
-          command = JSON.stringify({
-            command: 'docker image build --no-cache ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
-            token
-          });
-        } else {
-          command = JSON.stringify({
-            command: 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
-            token
-          });
-        }
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-    res.end('');
-  }
-});
-
-app.get('/delete-image', (req, res) => {
-  const check_token = req.query.token;
-  let image = '';
-
-  if (req.query.image) {
-    image = req.query.image;
-  }
-
-  if (image.indexOf('*') > -1) {
-    image = '*';
+  if (container.indexOf('*') > -1 || container.length === 0) {
+    container = '*';
   }
 
   if ((check_token !== token) || (!check_token)) {
@@ -554,41 +500,62 @@ app.get('/delete-image', (req, res) => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
-        const command = JSON.stringify({
-          command: 'docker image rm ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
+        const make_url = `${scheme}${node}:${agent_port}/run`;
+        if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
+          what.push(key);
+          url.push(make_url);
         }
       });
     });
-    res.end('');
-  }
-});
 
-app.get('/', (req, res) => {
-  res.end('PiCluster Server v' + picluster_release);
+    let i = 0;
+
+    async.eachSeries(url, (url, cb) => {
+      if (operation === 'rm') {
+        docker_command = 'docker image rm ' + what[i];
+      }
+
+      if (operation === 'build' && no_cache === '1') {
+        docker_command = 'docker image build --no-cache ' + dockerFolder + '/' + what[i] + ' -t ' + what[i] + ' -f ' + dockerFolder + '/' + what[i] + '/Dockerfile';
+      }
+
+      if (operation === 'build' && no_cache === '0') {
+        docker_command = 'docker image build ' + dockerFolder + '/' + what[i] + ' -t ' + what[i] + ' -f ' + dockerFolder + '/' + what[i] + '/Dockerfile';
+      }
+
+      const command = JSON.stringify({
+        command: docker_command,
+        token
+      });
+
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+      i++;
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(command_log);
+    });
+  }
 });
 
 app.get('/manage', (req, res) => {

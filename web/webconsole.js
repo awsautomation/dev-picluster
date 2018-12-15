@@ -616,40 +616,6 @@ app.post('/delete-image', (req, res) => {
   }
 });
 
-app.post('/build', (req, res) => {
-  const check_token = req.body.token;
-  let {
-    image
-  } = req.body;
-  const {
-    no_cache
-  } = req.body;
-
-  if (image.indexOf('Everthing') > -1) {
-    image = '';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = image.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      }
-    });
-  }
-});
-
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
 
@@ -1116,6 +1082,45 @@ app.post('/manage', (req, res) => {
   } else {
     const options = {
       url: `${scheme}${server}:${server_port}/manage?token=${token}&container=${container}&operation=${operation}`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response) => {
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while trying to manage the container(s).');
+      }
+    });
+  }
+});
+
+app.post('/manage-image', (req, res) => {
+  const check_token = req.body.token;
+  const {
+    operation
+  } = req.body;
+  let container;
+  const {
+    no_cache
+  } = req.body;
+
+  if (req.body.container) {
+    container = req.body.container;
+    if (container.indexOf('Everything') > -1) {
+      container = '';
+    }
+  }
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    const options = {
+      url: `${scheme}${server}:${server_port}/manage-image?token=${token}&container=${container}&operation=${operation}&no_cache=${no_cache}`,
       rejectUnauthorized: ssl_self_signed
     };
 

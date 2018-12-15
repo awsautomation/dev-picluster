@@ -167,7 +167,7 @@ $(function() {
 		function exec() {
 			var image_list = document.getElementById("image_list");
 			var cache = document.getElementById("cache");
-			var no_cache = cache.checked ? 'true' : 'false';
+			var no_cache = 0;
 			var image_build = image_list.options[image_list.selectedIndex].value;
 			var image_pull = document.getElementById('image_pull').value;
 			var registry = document.getElementsByName('container_list')[0].value;
@@ -178,26 +178,36 @@ $(function() {
 			var radio_image_pull = $('input[id=radio_image_pull]:checked').val();
 			var radio_image_upload = $('input[id=radio_start]:checked').val();
 			var path = '';
+			var operation = '';
+			var div = document.getElementById('images-manage-modal-body');
+			
+			if(cache.checked){
+				no_cache = 1;
+			}
 
 			if (radio_image_build && image_build) {
-				$.post('/build', {
+				div.innerHTML = 'Sent request to the server. Any errors will be reported in this window.<br><br>';
+				operation = 'build'
+				$.post('/manage-image', {
 					token: parent.token,
-					image: image_build,
-					no_cache: no_cache
+					operation,
+					container: image_build,
+					no_cache
 				}, function(data) {
-					var div = document.getElementById('images-manage-modal-body');
-					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
-				});
+					div.innerHTML = div.innerHTML + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+						});
 			}
 
 			if (image_build && radio_image_delete) {
-				$.post('/delete-image', {
+				div.innerHTML = 'Sent request to the server. Any errors will be reported in this window.<br><br>';
+				operation = 'rm'
+				$.post('/manage-image', {
 					token: parent.token,
-					image: image_build
+					operation,
+					container: image_build
 				}, function(data) {
-					var div = document.getElementById('images-manage-modal-body');
-					div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>';
-				});
+					div.innerHTML = div.innerHTML + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+						});
 			}
 
 			if (radio_image_pull) {
@@ -390,7 +400,7 @@ $(function() {
 	</div>
 
 	<div id="output" class="modal">
-		<div class="modal-content modal-small">
+		<div class="modal-content modal-large">
 			<div class="modal-header">
 				<span class="close">&times;</span>
 				<h2>Command Output</h2>

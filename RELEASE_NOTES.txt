@@ -15,6 +15,7 @@
 * Syslog - Redone do gather logs synchronously. 
 * Running Commands - Now done synchronously.
 * Clean Docker - Now done synchronously.
+* Building a containe shows you the entire output and is done synchronously.
 
 ## Bug Fixes:
 * None
