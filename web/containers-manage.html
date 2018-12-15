@@ -142,7 +142,7 @@
 						failover_constraints: container_add + ',' + failover_constraints
 					}, function(data) {
 						var div = document.getElementById('containers-manage-modal-body');
-						div.innerHTML = '\nSent request to server.\n' + data;
+						div.innerHTML = '<br>Sent request to server.<br><br>' + data;
 					});
 				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host || radio_container_arg_modify || radio_modify_constraints) {
 					$.post(path, {
@@ -156,7 +156,7 @@
 						newhost: node_modify
 					}, function(data) {
 						var div = document.getElementById('containers-manage-modal-body');
-						div.innerHTML =  '\nSent request to server.\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+						div.innerHTML =  '<br>Sent request to server.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 					});
 				} else {
 					alert('Error, you did not select an operation.')
