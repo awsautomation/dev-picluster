@@ -650,6 +650,9 @@ app.get('/create', (req, res) => {
 app.get('/start', (req, res) => {
   const check_token = req.query.token;
   let container = '';
+  let command_log = '';
+  const url = [];
+  const what = [];
 
   if (req.query.container) {
     container = req.query.container;
@@ -671,36 +674,47 @@ app.get('/start', (req, res) => {
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
-        const command = JSON.stringify({
-          command: 'docker container start ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nStarting: ' + key + '\n' + results.output);
-            }
-          });
+        const make_url = `${scheme}${node}:${agent_port}/run`;
+        if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
+          what.push(key);
+          url.push(make_url);
         }
       });
     });
-    res.end('');
+
+    let i = 0;
+    async.eachSeries(url, (url, cb) => {
+      const command = JSON.stringify({
+        command: 'docker container start ' + what[i],
+        token
+      });
+
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+      i++;
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(command_log);
+    });
   }
 });
 
