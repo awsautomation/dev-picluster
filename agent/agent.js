@@ -423,22 +423,32 @@ function bootstrapNode() {
       body: bootstrap_body
     };
 
-    request(options, (error, response, body) => {
-      if (error) {
-        console.log('Bootstrap failed due to an error or another bootstrap operation already in progress.\n');
-        console.log(error);
-        bootstrapNode();
-      } else {
-        const status = JSON.parse(body);
-        if (status.output > 0) {
-          console.log('Bootstrap successful.');
-          additional_services();
-        } else {
-          console.log('\nAnother bootstrap is in progress. Will try again soon.....');
+    try {
+      request(options, (error, response, body) => {
+        if (error) {
+          console.log('Bootstrap failed due to an error or another bootstrap operation already in progress.\n');
+          console.log(error);
           bootstrapNode();
+        } else {
+          try {
+            const status = JSON.parse(body);
+            if (status.output > 0) {
+              console.log('Bootstrap successful.');
+              additional_services();
+            } else {
+              console.log('\nAnother bootstrap is in progress. Will try again soon.....');
+              bootstrapNode();
+            }
+          } catch (error2) {
+            console.log('\n' + error2 + '\n' + JSON.stringify(body));
+            bootstrapNode();
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.log('\nAn error has occurred with bootstrapping. Trying again.......');
+      bootstrapNode();
+    }
   }, 3000);
 }
 
