@@ -33,18 +33,16 @@ if type jq &>/dev/null; then
     clear
     echo "Nodes Metrics"
     if [ "${config_ssl}" == "true" ]; then echo;curl -s "https://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "'
-    else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) "';echo
+  else echo;curl -s "http://${config_web_connect}:${config_server_port}/nodes?token=${config_token}" | jq -r '.data[] | "\(.hostname)   CPU: \(.cpu_percent)  Memory: \(.memory_percentage)  Disk: \(.disk_percentage)  Running: \(.total_running_containers) Network In : \(.network_rx)  Network Out : \(.network_tx)"';echo
     fi
   }
 
   stop(){
     clear
     echo "Stopping the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/stop"
-    else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/stop"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1&operation=stop" "https://${config_web_connect}:${config_server_port}/manage"
+    else curl -s -G -d "token=${config_token}&container=$1&operation=stop" "http://${config_web_connect}:${config_server_port}/manage"
     fi
-
-    logs
   }
 
   images(){
@@ -74,23 +72,21 @@ if type jq &>/dev/null; then
     if [ "${config_ssl}" == "true" ]; then curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"${config_token}"'"}' "https://${config_web_connect}:${config_server_port}/exec"
     else curl -H "Content-Type: application/json" -X POST -d '{"command":"'"$1"'","token":"'"${config_token}"'"}' "http://${config_web_connect}:${config_server_port}/exec"
     fi
-    logs
   }
 
   clean(){
     clear
     echo "Cleaning stale Docker images and containers...."
     if [ "${config_ssl}" == "true" ]; then curl -s "https://${config_web_connect}:${config_server_port}/prune?token=${config_token}"
-    else curl -s "http://${config_web_connect}:${config_server_port}/prune?token=${config_token}"
+    else curl -H "Content-Type: application/json" -X POST -d '{"token":"'"${config_token}"'"}' "http://${config_web_connect}:${config_server_port}/prune"
     fi
-    logs
   }
 
   build() {
     clear
-    echo "Building the container(s) in the background. This may take a while. Continue to check the logs for progress."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&image=$1&no_cache=true" "https://${config_web_connect}:${config_server_port}/build"
-    else curl -s -G -d "token=${config_token}&image=$1&no_cache=true" "http://${config_web_connect}:${config_server_port}/build"
+    echo "Building the container(s). This may take a while......"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1&no_cache=1&operation=build" "https://${config_web_connect}:${config_server_port}/manage-image"
+    else curl -s -G -d "token=${config_token}&container=$1&no_cache=1&operation=build" "http://${config_web_connect}:${config_server_port}/manage-image"
     fi
   }
 
@@ -114,16 +110,16 @@ if type jq &>/dev/null; then
   start(){
     clear
     echo "Starting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/start"
-    else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/start"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1&operation=start" "https://${config_web_connect}:${config_server_port}/manage"
+    else curl -s -G -d "token=${config_token}&container=$1&operation=start" "http://${config_web_connect}:${config_server_port}/manage"
     fi
   }
 
   restart(){
     clear
     echo "Restarting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/restart"
-    else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/restart"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1&operation=restart" "https://${config_web_connect}:${config_server_port}/manage"
+    else curl -s -G -d "token=${config_token}&container=$1&operation=restart" "http://${config_web_connect}:${config_server_port}/manage"
     fi
   }
 
@@ -138,8 +134,8 @@ if type jq &>/dev/null; then
   delete(){
     clear
     echo "Deleting the container(s)....."
-    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1" "https://${config_web_connect}:${config_server_port}/delete"
-    else curl -s -G -d "token=${config_token}&container=$1" "http://${config_web_connect}:${config_server_port}/delete"
+    if [ "${config_ssl}" == "true" ]; then curl -s -G -d "token=${config_token}&container=$1&operation=rm" "https://${config_web_connect}:${config_server_port}/manage"
+    else curl -s -G -d "token=${config_token}&container=$1&operation=rm" "http://${config_web_connect}:${config_server_port}/manage"
     fi
   }
 

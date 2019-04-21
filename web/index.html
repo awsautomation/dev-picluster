@@ -22,7 +22,6 @@
 		var manage_function = '';
 		var manage_function_uuid = '';
 		var token = '';
-		var syslog = '';
 
 		function clear(callback) {
 			var iframe = document.getElementById('iframe_a').contentWindow.document;
@@ -149,9 +148,6 @@
 			$('#images-manage').click(function() {
 				$('#iframe_a').attr('src', '/images-manage.html');
 			});
-			$('#killvip').click(function() {
-				$('#iframe_a').attr('src', '/killvip.html');
-			});
 			$('#containers-manage').click(function() {
 				$('#iframe_a').attr('src', '/containers-manage.html');
 			});
@@ -196,6 +192,10 @@
 			return token;
 		}
 
+		function getVersion(){
+			return version;
+		}
+
 		function login() {
 			var username = document.getElementById("user").value;;
 			var password = document.getElementById("password").value;
@@ -203,7 +203,6 @@
 				username: username,
 				password: password
 			}, function(auth) {
-				syslog = auth.syslog ? auth.syslog : syslog;
 				token = auth.token ? (
 					hideshow('login'),
 					hideshow('login'),
@@ -224,7 +223,7 @@
 		<div class="modal-login-content">
 			<div class="modal-login-header">
 				<span class="close">&times;</span>
-				<h2>PiCluster 2.5 Login</h2>
+				<h2>PiCluster 2.6 Login</h2>
 			</div>
 
 			<div class="modal-login-body">
@@ -280,7 +279,6 @@
 				<li id="nav_operations"><a onmouseover="this.click()" href="#!">Operations</a>
 					<ul class="dropdown">
 						<li><a href="#" id="config-edit">Edit Config</a></li>
-						<li><a href="#" id="killvip">Reset Virtual IP</a></li>
 						<li><a href="#" id="exec">Run Command(s)</a></li>
 						<li><a href="#" id="heartbeat">Heartbeat</a></li>
 						<li><a href="#" id="images-prune">Clean Docker</a></li>
@@ -307,27 +305,28 @@
 
 		//build_docs_nav_menu();
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			modal.style.display = "none";
 			login();
 		}
 
 		modal.style.display = "block";
 
-		$("html").click(function() {
+		$("html").click(function () {
 			$(".dropdown").hide();
 		});
 
-		$("nav ul li a:not(:only-child)").click(function(navmenu) {
+		$("nav ul li a:not(:only-child)").click(function (navmenu) {
 			$(this).siblings(".dropdown").toggle();
 
 			$(".dropdown").not($(this).siblings()).hide();
 			navmenu.stopPropagation();
 		});
+
 	</script>
 
 	<div id="content">

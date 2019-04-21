@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -12,7 +13,7 @@
 		var node;
 
 		function exec(command, callback) {
-			callback = !callback ? function() {} : callback;
+			callback = !callback ? function () {} : callback;
 
 			$.post('/exec', {
 				token: parent.token,
@@ -24,23 +25,27 @@
 		function init() {
 			var node_list = document.getElementById("node_list");
 			node = node_list.options[node_list.selectedIndex].value;
-			var term = $('#terminal').terminal(function(command) {
+			var term = $('#terminal').terminal(function (command) {
 				var _this = this;
 				command !== '' ? (
-					exec(command, function(output) { _this.echo(output); })
+					exec(command, function (output) {
+						_this.echo(output);
+					})
 				) : (
 					this.echo('')
 				);
 			}, {
-				greetings: '> Connecting to terminal on node ' + node + '. There will be a short delay when returning each command output.\n',
+				greetings: '> Connecting to terminal on node ' + node +
+					'. There will be a short delay when returning each command output.\n',
 				prompt: 'λ ',
 				wrap: true
 			});
 
-			exec('uptime', function(output) {
+			exec('uptime', function (output) {
 				term.echo(output);
 			});
 		}
+
 	</script>
 </head>
 
@@ -63,15 +68,16 @@
 				</div>
 
 				<script>
-					$(function() {
+					$(function () {
 						var option = '';
-						$.get("/nodes?token=" + parent.token, function(data) {
+						$.get("/nodes?token=" + parent.token, function (data) {
 							for (var i in data.nodes) {
 								option += '<option value="' + data.nodes[i] + '">' + data.nodes[i] + '</option>';
 							}
 							$('#node_list').append(option);
 						});
 					});
+
 				</script>
 			</div>
 		</div>
@@ -99,20 +105,22 @@
 		var output_span = document.getElementsByClassName("close")[1];
 		var submit_button = document.getElementById("submit_button");
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			init();
 		}
 
 		modal.style.display = "block";
+
 	</script>
+
 </html>

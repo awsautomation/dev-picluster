@@ -6,9 +6,6 @@ const multer = require('multer');
 const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
-/* eslint-disable capitalized-comments */
-// require('request-debug')(request);
-/* eslint-enable capitalized-comments */
 
 let config = JSON.parse(fs.readFileSync((process.env.PICLUSTER_CONFIG ? process.env.PICLUSTER_CONFIG : '../config.json'), 'utf8'));
 
@@ -29,16 +26,26 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const request_timeout = 5000;
-const web_port = config.web_port;
+const {
+  web_port
+} = config;
 let syslog = config.syslog ? config.syslog : '';
-const doc_dir = config.doc_dir;
-let theme = config.theme;
-let logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
-let token = config.token;
+const {
+  doc_dir
+} = config;
+let {
+  theme
+} = config;
+let logo_slug = path.join(__dirname, '/assets/images/theme/', theme, '/logo.png');
+let {
+  token
+} = config;
 let user = config.web_username;
 let password = config.web_password;
 let server = config.web_connect;
-let server_port = config.server_port;
+let {
+  server_port
+} = config;
 let nodedata = '';
 
 /*
@@ -59,8 +66,8 @@ function getData() {
       if (!error && response.statusCode === 200) {
         try {
           nodedata = JSON.parse(response.body);
-        } catch (err) {
-          console.error(err);
+        } catch (error2) {
+          console.error(error2);
         }
       } else {
         console.log('\nError connecting with server. ' + error);
@@ -93,7 +100,7 @@ function serve_doc_pages() {
   for (const i in doc_pages) {
     if (i) {
       app.get('/doc' + i, (req, res) => {
-        res.sendFile(path.resolve(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
+        res.sendFile(path.join(__dirname + '/' + doc_dir + '/' + doc_pages[i]));
       });
     }
   }
@@ -105,7 +112,7 @@ app.get('/exec.html', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    res.sendFile(__dirname + '/exec.html');
+    res.sendFile(path.join(__dirname, '/exec.html'));
   }
 });
 
@@ -114,7 +121,7 @@ app.get('/config-edit.html', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    res.sendFile(__dirname + '/config-edit.html');
+    res.sendFile(path.join(__dirname, '/config-edit.html'));
   }
 });
 
@@ -129,7 +136,9 @@ app.get('/monitoring.html', (req, res) => {
 
 app.post('/sendconfig', (req, res) => {
   const check_token = req.body.token;
-  const payload = req.body.payload;
+  const {
+    payload
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -172,8 +181,8 @@ function reloadVariables() {
     server_port = config.server_port;
     syslog = config.syslog;
     theme = config.theme;
-    logo_slug = __dirname + '/assets/images/theme/' + theme + '/logo.png';
-  } catch (err) {
+    logo_slug = path.join(__dirname, '/assets/images/theme/', theme, '/logo.png');
+  } catch (error) {
     console.log('\nError parsing JSON while trying to update config');
   }
 }
@@ -213,46 +222,14 @@ app.post('/', (req, res) => {
   }
 });
 
-app.post('/exec', (req, res) => {
-  const check_token = req.body.token;
-  const node = req.body.node;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const command = JSON.stringify({
-      command: req.body.command,
-      token,
-      node
-    });
-
-    const options = {
-      url: `${scheme}${server}:${server_port}/exec`,
-      rejectUnauthorized: ssl_self_signed,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': command.length
-      },
-      body: command
-    };
-
-    request(options, error => {
-      if (error) {
-        res.end(error);
-      } else {
-        display_log(data => {
-          res.end(data);
-        });
-      }
-    });
-  }
-});
-
 app.post('/elasticsearch', (req, res) => {
   const check_token = req.body.token;
-  const elasticsearch_url = req.body.elasticsearch_url;
-  const mode = req.body.mode;
+  const {
+    elasticsearch_url
+  } = req.body;
+  const {
+    mode
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -313,11 +290,21 @@ app.get('/listregistries', (req, res) => {
 });
 
 app.get('/remoteimagetags', (req, res) => {
-  const registry = req.query.registry;
-  const image = req.query.image;
-  const page = req.query.page || 1;
-  const username = req.query.username || '';
-  const password = req.query.password || '';
+  const {
+    registry
+  } = req.query;
+  const {
+    image
+  } = req.query;
+  const {
+    page
+  } = req.query || 1;
+  const {
+    username
+  } = req.query || '';
+  const {
+    password
+  } = req.query || '';
   const check_token = req.query.token;
 
   if (!check_token || check_token !== token) {
@@ -358,11 +345,21 @@ app.get('/remoteimagetags', (req, res) => {
 });
 
 app.get('/remoteimages', (req, res) => {
-  const registry = req.query.registry;
-  const image = req.query.image;
-  const page = req.query.page || 1;
-  const username = req.query.username || '';
-  const password = req.query.password || '';
+  const {
+    registry
+  } = req.query;
+  const {
+    image
+  } = req.query;
+  const {
+    page
+  } = req.query || 1;
+  const {
+    username
+  } = req.query || '';
+  const {
+    password
+  } = req.query || '';
   const check_token = req.query.token;
 
   if (!check_token || check_token !== token) {
@@ -467,57 +464,76 @@ function clear_log(callback) {
   });
 }
 
-app.post('/containerlog', (req, res) => {
+app.post('/exec', (req, res) => {
   const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.token) {
-    container = req.body.container;
-  }
+  const {
+    node
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
+    const command = JSON.stringify({
+      command: req.body.command,
+      token,
+      node
+    });
+
     const options = {
-      url: `${scheme}${server}:${server_port}/containerlog?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
+      url: `${scheme}${server}:${server_port}/exec`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
     };
 
     request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end('\n' + data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while retrieving the command.');
       }
     });
   }
 });
 
-app.post('/create', (req, res) => {
-  const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.token) {
-    container = req.body.container;
-  }
+app.get('/syslog', (req, res) => {
+  const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
+    const command = JSON.stringify({
+      token
+    });
+
     const options = {
-      url: `${scheme}${server}:${server_port}/create?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
+      url: `${scheme}${server}:${server_port}/syslog`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
     };
 
     request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(() => {
-          res.end('\nSent request to create the containers.');
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while retrieving the Syslog.');
       }
     });
   }
@@ -544,142 +560,34 @@ app.get('/rsyslog', (req, res) => {
   }
 });
 
-app.get('/killvip', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = {
-      url: `${scheme}${server}:${server_port}/killvip?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
-app.post('/delete-image', (req, res) => {
-  const check_token = req.body.token;
-  let image = req.body.image;
-
-  if (image.indexOf('Everthing') > -1) {
-    image = '';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = image.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/delete-image?token=${token}&image=${image}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/delete-image?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
-app.post('/build', (req, res) => {
-  const check_token = req.body.token;
-  let image = req.body.image;
-  const no_cache = req.body.no_cache;
-
-  if (image.indexOf('Everthing') > -1) {
-    image = '';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = image.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/build?token=${token}&image=${image}&no_cache=${no_cache}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/build?token=${token}&no_cache=${no_cache}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      }
-    });
-  }
-});
-
-app.post('/delete', (req, res) => {
-  const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.container) {
-    container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-      container = '';
-    }
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/delete?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/delete?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.get('/prune', (req, res) => {
   const check_token = req.query.token;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
+    const command = JSON.stringify({
+      token
+    });
     const options = {
-      url: `${scheme}${server}:${server_port}/prune?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
+      url: `${scheme}${server}:${server_port}/prune`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': command.length
+      },
+      body: command
     };
-
-    request(options, (error, response, body) => { // eslint-disable-line no-unused-vars
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+    request(options, (error, response) => {
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while cleaning Docker.');
       }
     });
   }
@@ -710,7 +618,6 @@ app.get('/function', (req, res) => {
   const check_token = req.query.token;
   const get_function = req.query.function;
   let get_args = req.query.container_args;
-
   if (req.query.container_args) {
     get_args = req.query.container_args;
   }
@@ -733,43 +640,11 @@ app.get('/function', (req, res) => {
   }
 });
 
-app.post('/stop', (req, res) => {
-  const check_token = req.body.token;
-  let container = '';
-
-  if (req.body.container) {
-    container = req.body.container;
-    if (container.indexOf('Everything') > -1) {
-      container = '';
-    }
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/stop?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/stop?token=${token}`,
-      rejectUnauthorized: ssl_self_signed
-    };
-
-    request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
-      }
-    });
-  }
-});
-
 app.post('/changehost', (req, res) => {
   const check_token = req.body.token;
-  const newhost = req.body.newhost;
+  const {
+    newhost
+  } = req.body;
   let container;
 
   if (req.body.container) {
@@ -799,13 +674,60 @@ app.post('/changehost', (req, res) => {
   }
 });
 
+app.post('/update-container', (req, res) => {
+  const check_token = req.body.token;
+  const {
+    container_args
+  } = req.body;
+  const {
+    container
+  } = req.body;
+  const {
+    heartbeat_args
+  } = req.body;
+  const {
+    failover_constraints
+  } = req.body;
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else if (container) {
+    const options = {
+      url: `${scheme}${server}:${server_port}/update-container?token=${token}&container=${container}&container_args=${container_args}&heartbeat_args=${heartbeat_args}&failover_constraints=${failover_constraints}`,
+      rejectUnauthorized: ssl_self_signed
+    };
+
+    request(options, (error, response) => {
+      if (!error && response.statusCode === 200) {
+        display_log(data => {
+          res.end(data);
+        });
+      } else {
+        res.end('\nError connecting with server.');
+      }
+    });
+  } else {
+    res.end('\nError missing some parameters.');
+  }
+});
+
 app.post('/addcontainer', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const container_args = req.body.container_args;
-  const heartbeat_args = req.body.heartbeat_args;
-  let failover_constraints = req.body.failover_constraints;
-  const container = req.body.container;
+  const {
+    host
+  } = req.body;
+  const {
+    container_args
+  } = req.body;
+  const {
+    heartbeat_args
+  } = req.body;
+  let {
+    failover_constraints
+  } = req.body;
+  const {
+    container
+  } = req.body;
 
   if (failover_constraints) {
     if (failover_constraints.indexOf('none') > -1) {
@@ -869,7 +791,10 @@ app.post('/upload', upload.single('file'), (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     fs.readFile(req.file.path, (err, data) => {
-      const newPath = '../' + req.file.originalname;
+      if (err) {
+        console.log('\nReadFile Error:' + err);
+      }
+      const newPath = path.join('../', req.file.originalname);
       fs.writeFile(newPath, data, () => {
         sendFile(newPath, req.file.path);
         res.end('');
@@ -880,7 +805,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
 app.post('/removecontainerconfig', (req, res) => {
   const check_token = req.body.token;
-  const container = req.body.container;
+  const {
+    container
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -906,7 +833,9 @@ app.post('/removecontainerconfig', (req, res) => {
 
 app.post('/swarm-remove', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -943,7 +872,9 @@ app.post('/swarm-remove', (req, res) => {
 
 app.post('/swarm-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -980,8 +911,12 @@ app.post('/swarm-create', (req, res) => {
 
 app.post('/swarm-network-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const network = req.body.network;
+  const {
+    host
+  } = req.body;
+  const {
+    network
+  } = req.body;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else if (host) {
@@ -1018,7 +953,9 @@ app.post('/swarm-network-create', (req, res) => {
 
 app.post('/addhost', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -1044,7 +981,9 @@ app.post('/addhost', (req, res) => {
 
 app.post('/rmhost', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -1068,8 +1007,11 @@ app.post('/rmhost', (req, res) => {
   }
 });
 
-app.post('/start', (req, res) => {
+app.post('/manage', (req, res) => {
   const check_token = req.body.token;
+  const {
+    operation
+  } = req.body;
   let container;
 
   if (req.body.container) {
@@ -1082,29 +1024,34 @@ app.post('/start', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/start?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/start?token=${token}`,
+    const options = {
+      url: `${scheme}${server}:${server_port}/manage?token=${token}&container=${container}&operation=${operation}`,
       rejectUnauthorized: ssl_self_signed
     };
 
     request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while trying to manage the container(s).');
       }
     });
   }
 });
 
-app.post('/restart', (req, res) => {
+app.post('/manage-image', (req, res) => {
   const check_token = req.body.token;
+  const {
+    operation
+  } = req.body;
   let container;
+  const {
+    no_cache
+  } = req.body;
 
   if (req.body.container) {
     container = req.body.container;
@@ -1116,21 +1063,20 @@ app.post('/restart', (req, res) => {
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
-    const options = container.length > 1 ? {
-      url: `${scheme}${server}:${server_port}/restart?token=${token}&container=${container}`,
-      rejectUnauthorized: ssl_self_signed
-    } : {
-      url: `${scheme}${server}:${server_port}/restart?token=${token}`,
+    const options = {
+      url: `${scheme}${server}:${server_port}/manage-image?token=${token}&container=${container}&operation=${operation}&no_cache=${no_cache}`,
       rejectUnauthorized: ssl_self_signed
     };
 
     request(options, (error, response) => {
-      if (!error && response.statusCode === 200) {
-        display_log(data => {
-          res.end(data);
-        });
-      } else {
-        res.end('\nError connecting with server.');
+      try {
+        if (error) {
+          res.end(error);
+        } else {
+          res.end(response.body);
+        }
+      } catch (error2) {
+        res.end('\nAn error has occurred while trying to manage the container(s).');
       }
     });
   }
@@ -1212,91 +1158,88 @@ app.get('/getconfig', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname, '/index.html'));
 });
 app.get('/blank.html', (req, res) => {
-  res.sendFile(__dirname + '/blank.html');
+  res.sendFile(path.join(__dirname, '/blank.html'));
 });
 app.get('/nodes-list.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-list.html');
+  res.sendFile(path.join(__dirname, '/nodes-list.html'));
 });
 app.get('/containers-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/containers-layout.html');
+  res.sendFile(path.join(__dirname, '/containers-layout.html'));
 });
 app.get('/images-prune.html', (req, res) => {
-  res.sendFile(__dirname + '/images-prune.html');
+  res.sendFile(path.join(__dirname, '/images-prune.html'));
 });
 app.get('/functions-clear.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-clear.html');
+  res.sendFile(path.join(__dirname, '/functions-clear.html'));
 });
 app.get('/functions-viewer.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-viewer.html');
+  res.sendFile(path.join(__dirname, '/functions-viewer.html'));
 });
 app.get('/functions-create.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-create.html');
+  res.sendFile(path.join(__dirname, '/functions-create.html'));
 });
 app.get('/functions-current.html', (req, res) => {
-  res.sendFile(__dirname + '/functions-current.html');
+  res.sendFile(path.join(__dirname, '/functions-current.html'));
 });
 app.get('/config-reload.html', (req, res) => {
-  res.sendFile(__dirname + '/config-reload.html');
+  res.sendFile(path.join(__dirname, '/config-reload.html'));
 });
 app.get('/images-pull.html', (req, res) => {
-  res.sendFile(__dirname + '/images-pull.html');
+  res.sendFile(path.join(__dirname, '/images-pull.html'));
 });
 app.get('/images-manage.html', (req, res) => {
-  res.sendFile(__dirname + '/images-manage.html');
+  res.sendFile(path.join(__dirname, '/images-manage.html'));
 });
 app.get('/swarm.html', (req, res) => {
-  res.sendFile(__dirname + '/swarm.html');
+  res.sendFile(path.join(__dirname, '/swarm.html'));
 });
 app.get('/images-layout.html', (req, res) => {
-  res.sendFile(__dirname + '/images-layout.html');
+  res.sendFile(path.join(__dirname, '/images-layout.html'));
 });
 app.get('/log.html', (req, res) => {
-  res.sendFile(__dirname + '/log.html');
+  res.sendFile(path.join(__dirname, '/log.html'));
 });
 app.get('/heartbeat.html', (req, res) => {
-  res.sendFile(__dirname + '/heartbeat.html');
-});
-app.get('/killvip.html', (req, res) => {
-  res.sendFile(__dirname + '/killvip.html');
+  res.sendFile(path.join(__dirname, '/heartbeat.html'));
 });
 app.get('/syslog.html', (req, res) => {
-  res.sendFile(__dirname + '/syslog.html');
+  res.sendFile(path.join(__dirname, '/syslog.html'));
 });
 app.get('/containers-manage.html', (req, res) => {
-  res.sendFile(__dirname + '/containers-manage.html');
+  res.sendFile(path.join(__dirname, '/containers-manage.html'));
 });
 app.get('/terminal.html', (req, res) => {
-  res.sendFile(__dirname + '/terminal.html');
+  res.sendFile(path.join(__dirname, '/terminal.html'));
 });
 app.get('/containers-add.html', (req, res) => {
-  res.sendFile(__dirname + '/containers-add.html');
+  res.sendFile(path.join(__dirname, '/containers-add.html'));
 });
 app.get('/nodes-add.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-add.html');
+  res.sendFile(path.join(__dirname, '/nodes-add.html'));
 });
 app.get('/nodes-remove.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-remove.html');
+  res.sendFile(path.join(__dirname, '/nodes-remove.html'));
 });
 app.get('/nodes-manage.html', (req, res) => {
-  res.sendFile(__dirname + '/nodes-manage.html');
+  res.sendFile(path.join(__dirname, '/nodes-manage.html'));
 });
 app.get('/elasticsearch.html', (req, res) => {
-  res.sendFile(__dirname + '/elasticsearch.html');
+  res.sendFile(path.join(__dirname, '/elasticsearch.html'));
 });
 app.get('/rsyslog.html', (req, res) => {
-  res.sendFile(__dirname + '/rsyslog.html');
+  res.sendFile(path.join(__dirname, '/rsyslog.html'));
 });
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(__dirname + '/favicon.ico');
+  res.sendFile(path.join(__dirname, '/favicon.ico'));
 });
 app.get('/docs.html', (req, res) => {
-  res.sendFile(__dirname + '/docs.html');
+  res.sendFile(path.join(__dirname, '/docs.html'));
 });
 app.get('/images-upload.html', (req, res) => {
-  res.sendFile(__dirname + '/images-upload.html');
+  res.sendFile(path.join(__dirname, '/images-upload.html'));
 });
 
 app.get('/logo.png', (req, res) => {

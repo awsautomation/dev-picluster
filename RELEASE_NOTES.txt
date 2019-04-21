@@ -1,11 +1,20 @@
-# Version 2.5
+# Version 2.6
 
 ## New Features:
 * Virtual Networks - Added menu option to create a Swarm cluster and VLAN
+* Manage Containers - Allows you to modify the Container Arguments, Heartbeat port, and failover constraints
 
 ## Enhancements:
 * PiCTL can now upload container zip files.
 * PiCluster Server displays version for / GET requests
+* When adding a new node, a heartbeat config will be added.
+* Added Node Network Utilization Monitoring for Elasticsearch.
+* kibana-dashboards.json was merged into kibana-graphs.json for easier import.
+* Syslog, Exec, Clean Docker, KillVIP - Redone to work synchronously. 
+* Building a container shows you the entire output and is done synchronously.
+
+## Removed or Deprecated:
+* KillVIP has been removed from PiCluster.
 
 ## Bug Fixes:
 * None

@@ -17,7 +17,7 @@
 			$.post("/sendconfig", {
 				token: parent.token,
 				payload: payload
-			}, function(data) {
+			}, function (data) {
 				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 				if (output.indexOf('Error') === -1) {
 					parent.token = payload_json.token;
@@ -28,10 +28,11 @@
 		};
 
 		function getconfig() {
-			$.get("/getconfig?token=" + parent.token, function(data) {
+			$.get("/getconfig?token=" + parent.token, function (data) {
 				$("#payload").val(JSON.stringify(JSON.parse(data), null, 2));
 			});
 		};
+
 	</script>
 </head>
 
@@ -60,17 +61,18 @@
 		var span = document.getElementsByClassName("close")[0];
 		var submit_button = document.getElementById("submit_button");
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			exec();
 		}
 
 		modal.style.display = "block";
 
 		getconfig();
+
 	</script>
 </body>
 

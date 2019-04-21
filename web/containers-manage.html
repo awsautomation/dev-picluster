@@ -60,39 +60,69 @@
 			var node_modify = node_list_modify.options[node_list_modify.selectedIndex].value;
 			var container_add = $("#container_name").val();
 			var container_modify = container_list.options[container_list.selectedIndex].value;
-			var container_add_args = $("#container_args").val();
+			var container_add_args = $("#container_args").val() || $("#modify_container_arguments").val();
 			var heartbeat_add_args = $("#heartbeat_args").val();
 			var container_heartbeat_fieldset = document.getElementsByName('container_heartbeat_fieldset');
 			var radio_container_add = $('input[id=radio_container_add]:checked').val();
 			var radio_container_modify = $('input[id=radio_container_modify]:checked').val();
+			var radio_container_arg_modify = $('input[id=radio_modify_args]:checked').val();
 			var radio_start = $('input[id=radio_start]:checked').val();
 			var radio_stop = $('input[id=radio_stop]:checked').val();
 			var radio_restart = $('input[id=radio_restart]:checked').val();
 			var radio_delete = $('input[id=radio_delete]:checked').val();
 			var radio_create = $('input[id=radio_create]:checked').val();
+		  var radio_modify_constraints =  $('input[id=radio_modify_constraints]:checked').val();
 			var radio_container_log = $('input[id=radio_container_log]:checked').val();
 			var radio_change_host = $('input[id=radio_change_host]:checked').val();
 			var radio_remove_container_config = $('input[id=radio_remove_container_config]:checked').val();
 			var command;
 			var path;
 			var failover_constraints = 'none';
-
+			var operation;
+			
+		if(radio_container_modify){
+			if (radio_container_modify.indexOf('on') > -1  && heartbeat_add_args.length === 0) {
+				heartbeat_add_args = 'delete'
+			}
+		}
 			container_heartbeat_fieldset.forEach(function(node, i) {
 				if (container_heartbeat_fieldset[i].checked) {
 					failover_constraints += ',' + node.value;
 				}
 			});
+
 			if (failover_constraints.indexOf('none,') > -1) {
 				failover_constraints = failover_constraints.replace('none,', '');
 			}
 
+			if(radio_start) {
+				operation = 'start';
+			}
+			if(radio_stop) {
+				operation = 'stop';
+			}
+			if(radio_restart) {
+				operation = 'restart';
+			}
+			if(radio_delete) {
+				operation = 'rm';
+			}
+			if(radio_container_log) {
+				operation = 'logs';
+			}
+			if(radio_create) {
+				operation = 'create';
+			}
+
 			path = radio_container_add && radio_container_add.indexOf('on') > -1 ? '/addcontainer' :
-				radio_start && radio_start.indexOf('on') > -1 ? '/start' :
-				radio_stop && radio_stop.indexOf('on') > -1 ? '/stop' :
-				radio_restart && radio_restart.indexOf('on') > -1 ? '/restart' :
-				radio_delete && radio_delete.indexOf('on') > -1 ? '/delete' :
-				radio_create && radio_create.indexOf('on') > -1 ? '/create' :
-				radio_container_log && radio_container_log.indexOf('on') > -1 ? '/containerlog' :
+				radio_start && radio_start.indexOf('on') > -1 ? '/manage' :
+				radio_stop && radio_stop.indexOf('on') > -1 ? '/manage' :
+				radio_restart && radio_restart.indexOf('on') > -1 ? '/manage' :
+				radio_container_arg_modify && radio_container_arg_modify.indexOf('on') > -1 ? '/update-container' :
+				radio_modify_constraints && radio_modify_constraints.indexOf('on') > -1 ? '/update-container' :
+				radio_delete && radio_delete.indexOf('on') > -1 ? '/manage' :
+				radio_create && radio_create.indexOf('on') > -1 ? '/manage' :
+				radio_container_log && radio_container_log.indexOf('on') > -1 ? '/manage' :
 				radio_change_host && radio_change_host.indexOf('on') > -1 ? '/changehost' :
 				radio_remove_container_config && radio_remove_container_config.indexOf('on') > -1 ? '/removecontainerconfig' :
 				''
@@ -112,17 +142,21 @@
 						failover_constraints: container_add + ',' + failover_constraints
 					}, function(data) {
 						var div = document.getElementById('containers-manage-modal-body');
-						div.innerHTML = '<label id="windowfont"> Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data;
+						div.innerHTML = '<br>Sent request to server.<br><br>' + data;
 					});
-				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host) {
+				} else if (radio_start || radio_stop || radio_restart || radio_delete || radio_create || radio_container_log || radio_remove_container_config || radio_change_host || radio_container_arg_modify || radio_modify_constraints) {
 					$.post(path, {
 						token: parent.token,
+						operation,
 						command: command,
+						container_args: container_add_args,
 						container: container_modify,
+						heartbeat_args: heartbeat_add_args,
+						failover_constraints: container_modify + ',' + failover_constraints,
 						newhost: node_modify
 					}, function(data) {
 						var div = document.getElementById('containers-manage-modal-body');
-						div.innerHTML = 'Sent request to the server. Please check the logs and running containers for updated information.<br><br>\n' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
+						div.innerHTML =  '<br>Sent request to server.<br><br>' + data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 					});
 				} else {
 					alert('Error, you did not select an operation.')
@@ -132,6 +166,45 @@
 			}
 		}
 
+function get_container_info(){
+	$.get("/getconfig?token=" + parent.token, function(data) {
+		var check_data = JSON.parse(data);
+		Object.keys(check_data.hb).forEach((get_node, i) => {
+			Object.keys(check_data.hb[i]).forEach(key => {
+					if(key.indexOf(document.getElementById("container_list").value) > -1) {
+						$('#heartbeat_args').val(check_data.hb[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
+					};
+			});
+				});
+
+				Object.keys(check_data.layout).forEach((get_node, i) => {
+					Object.keys(check_data.layout[i]).forEach(key => {
+			if(key.indexOf(document.getElementById("container_list").value) > -1) {
+								$('#modify_container_arguments').val(check_data.layout[i][document.getElementById("container_list").options[document.getElementById("container_list").selectedIndex].value]);
+							};
+					});
+						});
+
+						var container_heartbeat_fieldset = document.getElementsByName('container_heartbeat_fieldset');
+
+						Object.keys(check_data.container_host_constraints).forEach((get_node, i) => {
+							Object.keys(check_data.container_host_constraints[i]).forEach(key => {
+								const analyze = check_data.container_host_constraints[i][key].split(',');
+								if (document.getElementById("container_list").value.indexOf(analyze[0]) > -1) {
+
+								container_heartbeat_fieldset.forEach(function(node, z) {
+									var current = container_heartbeat_fieldset[z].value;
+
+								if(analyze.indexOf(current) > -1) {
+											container_heartbeat_fieldset[z].click();
+								}
+							});
+								}
+							});
+						});
+	});
+
+};
 		$(document).ready(function() {
 			$("input[id$='radio_container_add']").click(function() {
 				$("#container_list_options_fieldset").show();
@@ -140,6 +213,16 @@
 				$(this).is(":checked") ? $("#container_list_modify").hide() : '';
 				$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
 			})
+
+	$("input[id$='radio_modify_constraints']").click(function() {
+		$(this).is(":checked") ? $("#container_list_modify_options").hide() : '';
+		$(this).is(":checked") ? $("#container_list_add_options").show() : '';
+		get_container_info();
+	});
+
+	$("input[id$='radio_modify_args']").click(function() {
+			get_container_info();
+	});
 
 			$("input[id$='radio_container_modify']").click(function() {
 				$("#container_list_options_fieldset").show();
@@ -193,7 +276,7 @@
 						<select name="container_list" id="container_list"></select>
 					</div>
 				</fieldset>
-				<fieldset name="options"  id="container_list_options_fieldset">
+				<fieldset name="options" id="container_list_options_fieldset">
 					<legend><b>Options</b></legend>
 
 					<div id="container_list_add_options">
@@ -230,6 +313,14 @@
 						<input type="radio" name="options_radio" id="radio_change_host">
 						<label for="radio_change_host">Change Node to</label>
 						<select name="node_list_modify" id="node_list_modify"></select>
+						<br>
+						<input type="radio" name="options_radio" id="radio_modify_constraints">
+						<label for="radio_modify_constraints">Change/Set Heartbeat/Failover Constraints</label>
+						<br>
+						<input type="radio" name="options_radio" id="radio_modify_args">
+						<label for="radio_modify_args">Change Container Arguments</label>
+						<input type="text" style="height:20px" size="50" id="modify_container_arguments" class="modal_input" name="modify_container_arguments"
+						 value=""></font>
 					</div>
 				</fieldset>
 				<div id="submit_button_div">
@@ -259,21 +350,22 @@
 		var output_span = document.getElementsByClassName("close")[1];
 		var submit_button = document.getElementById("submit_button");
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
 		}
 
 		modal.style.display = "block";
+
 	</script>
 
 </html>

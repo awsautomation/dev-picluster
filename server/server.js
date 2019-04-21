@@ -8,6 +8,7 @@ const multer = require('multer');
 const express = require('express');
 const Moment = require('moment');
 const request = require('request');
+const async = require('async');
 
 const bootstrap = {
   status: 1
@@ -40,14 +41,22 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 const server = config.web_connect;
-let rsyslog_host = config.rsyslog_host;
-const server_port = config.server_port;
-const agent_port = config.agent_port;
+let {
+  rsyslog_host
+} = config;
+const {
+  server_port
+} = config;
+const {
+  agent_port
+} = config;
 let log = '';
-let token = config.token;
+let {
+  token
+} = config;
 let dockerFolder = config.docker;
 const container_faillog = [];
-const picluster_release = '2.5';
+const picluster_release = '2.6';
 
 if (config.elasticsearch) {
   const mapping = {
@@ -97,6 +106,14 @@ if (config.elasticsearch) {
             index: 'true'
           },
           memory: {
+            type: 'double',
+            index: 'true'
+          },
+          network_tx: {
+            type: 'double',
+            index: 'true'
+          },
+          network_rx: {
             type: 'double',
             index: 'true'
           },
@@ -184,7 +201,9 @@ app.get('/clear-functions', (req, res) => {
 
 app.post('/bootstrap', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
   let statusCode = 0;
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
@@ -202,6 +221,11 @@ app.post('/bootstrap', (req, res) => {
         config.layout.push({
           node: host
         });
+
+        config.hb.push({
+          node: host
+        });
+
         const new_config = JSON.stringify({
           payload: JSON.stringify(config),
           token
@@ -244,8 +268,12 @@ app.post('/bootstrap', (req, res) => {
 
 app.post('/function', (req, res) => {
   const check_token = req.body.token;
-  const output = req.body.output;
-  const uuid = req.body.uuid;
+  const {
+    output
+  } = req.body;
+  const {
+    uuid
+  } = req.body;
 
   if ((check_token !== token) || (!check_token) || (!uuid)) {
     res.end('\nError: Invalid Credentials or missing parameters.');
@@ -270,7 +298,9 @@ app.get('/function', (req, res) => {
   const max_node = total_nodes - 1;
   const node_number = Math.floor(Math.random() * (max_node - min_node + 1)) + min_node;
   const host = config.layout[node_number].node;
-  const container_args = req.query.container_args;
+  const {
+    container_args
+  } = req.query;
 
   const function_data = {
     uuid,
@@ -301,7 +331,9 @@ function remove_function_data(uuid) {
 
 app.get('/getfunction', (req, res) => {
   const check_token = req.query.token;
-  const uuid = req.query.uuid;
+  const {
+    uuid
+  } = req.query;
   let output = '';
 
   if ((check_token !== token) || (!check_token) || (!uuid)) {
@@ -359,7 +391,9 @@ app.get('/nodes', (req, res) => {
     for (let i = 0; i < config.layout.length; i++) {
       for (const key in config.layout[i]) {
         if (config.layout[i].hasOwnProperty(key)) {
-          const node = config.layout[i].node;
+          const {
+            node
+          } = config.layout[i];
           const node_info = config.layout[i][key];
           if (node_info === node) {
             total_node_count++;
@@ -385,7 +419,9 @@ app.get('/nodes', (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     config.layout.forEach(get_node => {
-      const node = get_node.node;
+      const {
+        node
+      } = get_node;
 
       if (!node) {
         console.error('Invalid Config for node', get_node);
@@ -407,11 +443,11 @@ app.get('/nodes', (req, res) => {
             if (check.cpu_percent > 0) {
               addData(check);
               if (config.elasticsearch) {
-                elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage, check.total_running_containers);
+                elasticsearch_monitoring(check.cpu_percent / check.cpu_cores, check.hostname, check.disk_percentage, check.memory_percentage, check.total_running_containers, check.network_rx, check.network_tx);
               }
             }
-          } catch (err) {
-            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!' + err);
+          } catch (error2) {
+            console.log('\nError gathering monitoring metrics: Invalid JSON or Credentials!' + error2);
           }
         }
       });
@@ -426,138 +462,29 @@ function addLog(data) {
   log += data;
 }
 
-app.get('/build', (req, res) => {
-  const check_token = req.query.token;
-  const no_cache = req.query.no_cache;
-  let image = '';
-
-  if (req.query.image) {
-    image = req.query.image;
-  }
-
-  if (image.indexOf('*') > -1) {
-    image = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-        let command;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        if (no_cache.indexOf('true') > -1) {
-          command = JSON.stringify({
-            command: 'docker image build --no-cache ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
-            token
-          });
-        } else {
-          command = JSON.stringify({
-            command: 'docker image build ' + dockerFolder + '/' + key + ' -t ' + key + ' -f ' + dockerFolder + '/' + key + '/Dockerfile',
-            token
-          });
-        }
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-    res.end('');
-  }
-});
-
-app.get('/delete-image', (req, res) => {
-  const check_token = req.query.token;
-  let image = '';
-
-  if (req.query.image) {
-    image = req.query.image;
-  }
-
-  if (image.indexOf('*') > -1) {
-    image = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        const command = JSON.stringify({
-          command: 'docker image rm ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((image.indexOf('*') > -1) || key.indexOf(image) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-    res.end('');
-  }
-});
-
 app.get('/', (req, res) => {
   res.end('PiCluster Server v' + picluster_release);
 });
 
-app.get('/create', (req, res) => {
+app.get('/manage-image', (req, res) => {
   const check_token = req.query.token;
+  const {
+    operation
+  } = req.query;
+  let docker_command = '';
   let container = '';
+  let command_log = '';
+  const url = [];
+  const what = [];
+  const {
+    no_cache
+  } = req.query;
 
   if (req.query.container) {
     container = req.query.container;
   }
 
-  if (container.indexOf('*') > -1) {
+  if (container.indexOf('*') > -1 || container.length === 0) {
     container = '*';
   }
 
@@ -566,52 +493,107 @@ app.get('/create', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
-        const command = JSON.stringify({
-          command: 'docker container run -d --name ' + key + ' ' + config.layout[i][key] + ' ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((key.indexOf(container) > -1) || (container.indexOf('*')) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              console.log(error);
-            } else {
-              addLog(response.body);
-            }
-          });
+        const make_url = `${scheme}${node}:${agent_port}/run`;
+        if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
+          what.push(key);
+          url.push(make_url);
         }
       });
     });
+
+    let i = 0;
+
+    async.eachSeries(url, (url, cb) => {
+      if (operation === 'rm') {
+        docker_command = 'docker image rm ' + what[i];
+      }
+
+      if (operation === 'build' && no_cache === '1') {
+        docker_command = 'docker image build --no-cache ' + dockerFolder + '/' + what[i] + ' -t ' + what[i] + ' -f ' + dockerFolder + '/' + what[i] + '/Dockerfile';
+      }
+
+      if (operation === 'build' && no_cache === '0') {
+        docker_command = 'docker image build ' + dockerFolder + '/' + what[i] + ' -t ' + what[i] + ' -f ' + dockerFolder + '/' + what[i] + '/Dockerfile';
+      }
+
+      const command = JSON.stringify({
+        command: docker_command,
+        token
+      });
+
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+      i++;
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(command_log);
+    });
   }
-  res.end('');
 });
 
-app.get('/start', (req, res) => {
+app.get('/manage', (req, res) => {
   const check_token = req.query.token;
+  const {
+    operation
+  } = req.query;
+  let docker_command = '';
+  let command_log = '';
   let container = '';
+  const url = [];
+  const what = [];
+  const args = [];
+
+  if (operation === 'start') {
+    docker_command = 'docker container start';
+  }
+  if (operation === 'stop') {
+    docker_command = 'docker container stop';
+  }
+  if (operation === 'rm') {
+    docker_command = 'docker container rm -f';
+  }
+  if (operation === 'restart') {
+    docker_command = 'docker container restart';
+  }
+  if (operation === 'logs') {
+    docker_command = 'docker container logs';
+  }
+  if (operation === 'create') {
+    docker_command = 'docker container run -d --name ';
+  }
 
   if (req.query.container) {
     container = req.query.container;
   }
 
-  if (container.indexOf('*') > -1) {
+  if (container.indexOf('*') > -1 || container.length === 0) {
     container = '*';
   }
 
@@ -620,41 +602,65 @@ app.get('/start', (req, res) => {
   } else {
     Object.keys(config.layout).forEach((get_node, i) => {
       Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
+        const {
+          node
+        } = config.layout[i];
 
         if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
           return;
         }
-
-        const command = JSON.stringify({
-          command: 'docker container start ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nStarting: ' + key + '\n' + results.output);
-            }
-          });
+        const make_url = `${scheme}${node}:${agent_port}/run`;
+        if (container.indexOf('*') > -1 || container.indexOf(key) > -1) {
+          what.push(key);
+          url.push(make_url);
+          args.push(config.layout[i][key]);
         }
       });
     });
-    res.end('');
+
+    let i = 0;
+
+    async.eachSeries(url, (url, cb) => {
+      let command;
+      if (operation === 'create') {
+        command = JSON.stringify({
+          command: docker_command + what[i] + ' ' + args[i] + ' ' + what[i],
+          token
+        });
+      } else {
+        command = JSON.stringify({
+          command: docker_command + ' ' + what[i],
+          token
+        });
+      }
+
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+      i++;
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(command_log);
+    });
   }
 });
 
@@ -729,7 +735,9 @@ function migrate(container, original_host, new_host, original_container_data, uu
 
 app.get('/addhost', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  const {
+    host
+  } = req.query;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -746,11 +754,9 @@ app.get('/addhost', (req, res) => {
         node: host
       });
 
-      if (config.hb) {
-        config.hb.push({
-          node: host
-        });
-      }
+      config.hb.push({
+        node: host
+      });
 
       const new_config = JSON.stringify({
         payload: JSON.stringify(config),
@@ -781,7 +787,7 @@ app.get('/addhost', (req, res) => {
   }
 });
 
-function elasticsearch_monitoring(cpu, node, disk, memory, total_running_containers) {
+function elasticsearch_monitoring(cpu, node, disk, memory, total_running_containers, network_rx, network_tx) {
   const current_time = new Moment().format('YYYY-MM-DD HH:mm:ssZ');
 
   const options = {
@@ -796,6 +802,8 @@ function elasticsearch_monitoring(cpu, node, disk, memory, total_running_contain
       node,
       disk,
       memory,
+      network_rx,
+      network_tx,
       total_running_containers
     })
   };
@@ -868,7 +876,9 @@ app.get('/clear-elasticsearch', (req, res) => {
 
 app.get('/rmhost', (req, res) => {
   const check_token = req.query.token;
-  const host = req.query.host;
+  const {
+    host
+  } = req.query;
   let hb_proceed = 0;
 
   if ((check_token !== token) || (!check_token)) {
@@ -922,7 +932,9 @@ app.get('/rmhost', (req, res) => {
 
 app.get('/removecontainerconfig', (req, res) => {
   const check_token = req.query.token;
-  const container = req.query.container;
+  const {
+    container
+  } = req.query;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -1001,11 +1013,21 @@ app.get('/removecontainerconfig', (req, res) => {
 
 app.get('/addcontainer', (req, res) => {
   const check_token = req.query.token;
-  let host = req.query.host;
-  const container = req.query.container;
-  const container_args = req.query.container_args;
-  const heartbeat_args = req.query.heartbeat_args;
-  const failover_constraints = req.query.failover_constraints;
+  let {
+    host
+  } = req.query;
+  const {
+    container
+  } = req.query;
+  const {
+    container_args
+  } = req.query;
+  const {
+    heartbeat_args
+  } = req.query;
+  const {
+    failover_constraints
+  } = req.query;
 
   if (host.indexOf('*') > -1) {
     const min = 0;
@@ -1090,6 +1112,133 @@ app.get('/addcontainer', (req, res) => {
         }
       });
     }
+  }
+});
+
+app.get('/update-container', (req, res) => {
+  const check_token = req.query.token;
+  const {
+    container
+  } = req.query;
+  const {
+    container_args
+  } = req.query;
+  const {
+    heartbeat_args
+  } = req.query;
+  const {
+    failover_constraints
+  } = req.query;
+
+  if ((check_token !== token) || (!check_token) || container.indexOf('*') > -1) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    if (container_args) {
+      Object.keys(config.layout).forEach((get_node, i) => {
+        Object.keys(config.layout[i]).forEach(key => {
+          if (key.indexOf(container) > -1) {
+            config.layout[i][key] = container_args;
+          }
+        });
+      });
+    }
+
+    if (failover_constraints) {
+      let proceed = 0;
+
+      Object.keys(config.container_host_constraints).forEach((get_node, i) => {
+        Object.keys(config.container_host_constraints[i]).forEach(key => {
+          const get_container_name = failover_constraints.split(',');
+          const parse_container = get_container_name[0];
+
+          if (config.container_host_constraints[i][key].indexOf(parse_container) > -1) {
+            if (failover_constraints.indexOf('none') > -1) {
+              proceed = 0;
+            } else {
+              proceed = 1;
+              config.container_host_constraints[i][key] = failover_constraints;
+            }
+          }
+        });
+      });
+
+      if (proceed === 0) {
+        if (failover_constraints.indexOf('none') > -1) {
+          for (let i = 0; i < config.container_host_constraints.length; i++) {
+            for (const key in config.container_host_constraints[i]) {
+              if (container.length > 0) {
+                const analyze = config.container_host_constraints[i][key].split(',');
+                if (container.indexOf(analyze[0]) > -1) {
+                  config.container_host_constraints.splice(i, i + 1);
+                }
+              }
+            }
+          }
+        } else {
+          config.container_host_constraints.push({
+            container: failover_constraints
+          });
+        }
+      }
+    }
+
+    if (heartbeat_args) {
+      let proceed = 0;
+      Object.keys(config.hb).forEach((get_node, i) => {
+        Object.keys(config.hb[i]).forEach(key => {
+          if (key.indexOf(container) > -1) {
+            if (heartbeat_args.indexOf('delete') > -1) {
+              delete config.hb[i][key];
+              proceed = 1;
+            } else {
+              config.hb[i][key] = heartbeat_args;
+              proceed = 1;
+            }
+          }
+        });
+      });
+
+      if (proceed === 0) {
+        let node = '';
+        Object.keys(config.layout).forEach((get_node, i) => {
+          Object.keys(config.layout[i]).forEach(key => {
+            if (key.indexOf(container) > -1) {
+              node = config.layout[i].node;
+            }
+          });
+        });
+
+        for (let i = 0; i < config.hb.length; i++) {
+          if (config.hb[i].node.indexOf(node) > -1 && heartbeat_args.indexOf('delete') === -1) {
+            config.hb[i][container] = heartbeat_args;
+          }
+        }
+      }
+    }
+
+    const new_config = JSON.stringify({
+      payload: JSON.stringify(config),
+      token
+    });
+
+    const options = {
+      url: `${scheme}${server}:${server_port}/updateconfig`,
+      rejectUnauthorized: ssl_self_signed,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': new_config.length
+      },
+      body: new_config
+    };
+
+    request(options, error => {
+      if (error) {
+        res.end(error);
+      } else {
+        res.end('\nModified Container Arguments for ' + container);
+      }
+    });
   }
 });
 
@@ -1200,61 +1349,6 @@ app.get('/changehost', (req, res) => {
   }
 });
 
-app.get('/stop', (req, res) => {
-  const check_token = req.query.token;
-  let container = '';
-
-  if (req.query.container) {
-    container = req.query.container;
-  }
-
-  if (container.indexOf('*') > -1) {
-    container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        const command = JSON.stringify({
-          command: 'docker container stop ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nStopping: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-    res.end('');
-  }
-});
-
 function delete_function(name, node) {
   const command = JSON.stringify({
     command: 'docker container rm -f ' + name,
@@ -1278,172 +1372,10 @@ function delete_function(name, node) {
   });
 }
 
-app.get('/delete', (req, res) => {
-  const check_token = req.query.token;
-  let container = '';
-
-  if (req.query.container) {
-    container = req.query.container;
-  }
-
-  if (container.indexOf('*') > -1) {
-    container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-        const command = JSON.stringify({
-          command: 'docker container rm -f ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((container.indexOf('*') > -1) || key.indexOf(container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nDeleting: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-  }
-  res.end('');
-});
-
-app.get('/restart', (req, res) => {
-  const check_token = req.query.token;
-  let selected_container = '';
-
-  if (req.query.container) {
-    selected_container = req.query.container;
-  }
-
-  if (selected_container.indexOf('*') > -1) {
-    selected_container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        const command = JSON.stringify({
-          command: 'docker container restart ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nRestarting: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-    res.end('');
-  }
-});
-
-app.get('/containerlog', (req, res) => {
-  const check_token = req.query.token;
-  let selected_container = '';
-
-  if (req.query.container) {
-    selected_container = req.query.container;
-  }
-
-  if (selected_container.indexOf('*') > -1) {
-    selected_container = '*';
-  }
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    Object.keys(config.layout).forEach((get_node, i) => {
-      Object.keys(config.layout[i]).forEach(key => {
-        const node = config.layout[i].node;
-
-        if ((!config.layout[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-          return;
-        }
-
-        const command = JSON.stringify({
-          command: 'docker container logs ' + key,
-          token
-        });
-
-        const options = {
-          url: `${scheme}${node}:${agent_port}/run`,
-          rejectUnauthorized: ssl_self_signed,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': command.length
-          },
-          body: command
-        };
-
-        if ((selected_container.indexOf('*') > -1) || key.indexOf(selected_container) > -1) {
-          request(options, (error, response) => {
-            if (error) {
-              res.end('An error has occurred.');
-            } else {
-              const results = JSON.parse(response.body);
-              addLog('\nLogs for Container: ' + key + '\n' + results.output);
-            }
-          });
-        }
-      });
-    });
-  }
-  res.end('');
-});
-
 app.post('/listcontainers', (req, res) => {
-  let node = req.body.node;
+  let {
+    node
+  } = req.body;
   const check_token = req.body.token;
   const output = [];
   let container;
@@ -1492,7 +1424,9 @@ app.post('/listnodes', (req, res) => {
 
 function copyToAgents(file, config_file, temp_file) {
   Object.keys(config.layout).forEach((get_node, i) => {
-    const node = config.layout[i].node;
+    const {
+      node
+    } = config.layout[i];
     const formData = {
       name: 'file',
       token,
@@ -1560,7 +1494,9 @@ app.post('/listcommands', (req, res) => {
 
 function swarm_remove() {
   for (let i = 0; i < config.layout.length; i++) {
-    const node = config.layout[i].node;
+    const {
+      node
+    } = config.layout[i];
     const command = JSON.stringify({
       command: 'docker swarm leave --force',
       token
@@ -1590,7 +1526,9 @@ function swarm_remove() {
 
 function swarm_nodes(swarm_token, host) {
   for (let i = 0; i < config.layout.length; i++) {
-    const node = config.layout[i].node;
+    const {
+      node
+    } = config.layout[i];
     if (host.indexOf(node) > -1) {
       console.log('\n' + node + ' is already set as the master.');
     } else {
@@ -1624,13 +1562,17 @@ function swarm_nodes(swarm_token, host) {
 
 app.post('/swarm-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
+  const {
+    host
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
 
       if (host.indexOf(node) > -1) {
         const command = JSON.stringify({
@@ -1701,14 +1643,20 @@ app.post('/swarm-create', (req, res) => {
 
 app.post('/swarm-network-create', (req, res) => {
   const check_token = req.body.token;
-  const host = req.body.host;
-  const network = req.body.network;
+  const {
+    host
+  } = req.body;
+  const {
+    network
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
   } else {
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
 
       if (host.indexOf(node) > -1) {
         const command = JSON.stringify({
@@ -1783,6 +1731,8 @@ app.post('/swarm-remove', (req, res) => {
 app.post('/exec', (req, res) => {
   const check_token = req.body.token;
   let selected_node = '';
+  let command_log = '';
+  const url = [];
 
   if (req.body.node) {
     selected_node = req.body.node;
@@ -1801,10 +1751,23 @@ app.post('/exec', (req, res) => {
     });
 
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
+      const make_url = `${scheme}${node}:${agent_port}/run`;
 
+      if (selected_node.length > -1 && selected_node.indexOf(node) > -1) {
+        url.push(make_url);
+      }
+
+      if (selected_node.length === 0) {
+        url.push(make_url);
+      }
+    }
+
+    async.eachSeries(url, (url, cb) => {
       const options = {
-        url: `${scheme}${node}:${agent_port}/run`,
+        url,
         rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
@@ -1814,34 +1777,80 @@ app.post('/exec', (req, res) => {
         body: command
       };
 
-      if (selected_node.length === 0) {
-        request(options, (error, response) => {
-          if (error) {
-            res.end('An error has occurred.');
-          } else {
-            const results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
       }
-
-      if (selected_node.indexOf(node) > -1) {
-        request(options, (error, response) => {
-          if (error) {
-            res.end('An error has occurred.');
-          } else {
-            const results = JSON.parse(response.body);
-            addLog('\nNode:' + results.node + '\n' + results.output);
-          }
-        });
-      }
-      res.end('');
-    }
+      res.end(command_log);
+    });
   }
 });
 
-app.get('/prune', (req, res) => {
-  const check_token = req.query.token;
+app.post('/syslog', (req, res) => {
+  const check_token = req.body.token;
+  let complete_syslog = '';
+  const url = [];
+
+  if ((check_token !== token) || (!check_token)) {
+    res.end('\nError: Invalid Credentials');
+  } else {
+    for (let i = 0; i < config.layout.length; i++) {
+      const {
+        node
+      } = config.layout[i];
+
+      const make_url = `${scheme}${node}:${agent_port}/run`;
+      url.push(make_url);
+    }
+
+    const command = JSON.stringify({
+      command: config.syslog,
+      token
+    });
+
+    async.eachSeries(url, (url, cb) => {
+      const options = {
+        url,
+        rejectUnauthorized: ssl_self_signed,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': command.length
+        },
+        body: command
+      };
+
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          complete_syslog += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(complete_syslog);
+    });
+  }
+});
+
+app.post('/prune', (req, res) => {
+  const check_token = req.body.token;
+  const url = [];
+  let command_log = '';
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -1852,10 +1861,16 @@ app.get('/prune', (req, res) => {
     });
 
     for (let i = 0; i < config.layout.length; i++) {
-      const node = config.layout[i].node;
+      const {
+        node
+      } = config.layout[i];
+      const make_url = `${scheme}${node}:${agent_port}/run`;
+      url.push(make_url);
+    }
 
+    async.eachSeries(url, (url, cb) => {
       const options = {
-        url: `${scheme}${node}:${agent_port}/run`,
+        url,
         rejectUnauthorized: ssl_self_signed,
         method: 'POST',
         headers: {
@@ -1865,18 +1880,21 @@ app.get('/prune', (req, res) => {
         body: command
       };
 
-      request(options, (error, response) => {
-        if (error) {
-          res.end('An error has occurred.');
-        } else {
-          const results = JSON.parse(response.body);
-          addLog('\nNode:' + results.node + '\n' + results.output);
-          console.log('\nNode:' + results.node + '\n' + results.output);
+      request(options, (err, body) => {
+        try {
+          const data = JSON.parse(body.body);
+          command_log += 'Node: ' + data.node + '\n\n' + data.output + '\n\n';
+          cb(err);
+        } catch (error) {
+          console.log(error);
         }
       });
-
-      res.end('');
-    }
+    }, err => {
+      if (err) {
+        console.log('\nError: ' + err);
+      }
+      res.end(command_log);
+    });
   }
 });
 
@@ -2059,54 +2077,12 @@ app.get('/getconfig', (req, res) => {
   }
 });
 
-app.get('/killvip', (req, res) => {
-  const check_token = req.query.token;
-
-  if ((check_token !== token) || (!check_token)) {
-    res.end('\nError: Invalid Credentials');
-  } else {
-    if (!config.vip) { // eslint-disable-line no-negated-condition,no-lonely-if
-      res.end('\nError: VIP not configured.');
-    } else {
-      Object.keys(config.vip).forEach((get_node, i) => {
-        Object.keys(config.vip[i]).forEach(key => {
-          const node = config.vip[i].node;
-
-          if ((!config.vip[i].hasOwnProperty(key) || key.indexOf('node') > -1)) {
-            return;
-          }
-
-          const token_body = JSON.stringify({
-            token
-          });
-
-          const options = {
-            url: `${scheme}${node}:${agent_port}/killvip`,
-            rejectUnauthorized: ssl_self_signed,
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Content-Length': token_body.length
-            },
-            body: token_body
-          };
-
-          request(options, error => {
-            if (error) {
-              res.end('An error has occurred.');
-            }
-          });
-        });
-      });
-    }
-  }
-  res.end('');
-});
-
 app.post('/elasticsearch', (req, res) => {
   const check_token = req.body.token;
   const elasticsearch = req.body.elasticsearch_url;
-  const mode = req.body.mode;
+  const {
+    mode
+  } = req.body;
 
   if ((check_token !== token) || (!check_token)) {
     res.end('\nError: Invalid Credentials');
@@ -2165,7 +2141,9 @@ app.post('/elasticsearch', (req, res) => {
 });
 
 app.post('/updateconfig', (req, res) => {
-  let payload = req.body.payload;
+  let {
+    payload
+  } = req.body;
   const check_token = req.body.token;
 
   try {
@@ -2188,7 +2166,7 @@ app.post('/updateconfig', (req, res) => {
         });
       }, 3000);
     }
-  } catch (err) {
+  } catch (error) {
     res.end('Error: Invalid JSON. Configuration not saved.');
   }
 });

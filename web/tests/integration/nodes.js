@@ -11,7 +11,7 @@ casper.test.begin('nodes-list.html', 2, test => {
   casper.start(URL);
 
   casper.viewport(1920, 1080).then(function Viewport() {
-    const lib = require('../lib/index.js')(this);
+    const lib = require('../lib')(this);
     lib.doLogin(username, password);
 
     this.evaluate(() => {

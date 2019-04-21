@@ -13,7 +13,7 @@ module.exports = function (_this) {
       try {
         slimer; // eslint-disable-line no-unused-expressions
         return 'slimerjs';
-      } catch (err) {
+      } catch (error) {
         return 'phantomjs';
       }
     }

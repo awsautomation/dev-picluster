@@ -10,7 +10,9 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const getos = require('picluster-getos');
 const async = require('async');
-const exec = require('child-process-promise').exec;
+const {
+  exec
+} = require('child-process-promise');
 const sysinfo = require('systeminformation');
 
 let config = process.env.PICLUSTER_CONFIG ? JSON.parse(fs.readFileSync(process.env.PICLUSTER_CONFIG, 'utf8')) : JSON.parse(fs.readFileSync('../config.json', 'utf8'));
@@ -29,10 +31,16 @@ const upload = multer({
 const scheme = config.ssl ? 'https://' : 'http://';
 const ssl_self_signed = config.ssl_self_signed === false;
 let server = config.web_connect;
-let server_port = config.server_port;
-const agent_port = config.agent_port;
+let {
+  server_port
+} = config;
+const {
+  agent_port
+} = config;
 const node = os.hostname();
-let token = config.token;
+let {
+  token
+} = config;
 const noop = () => {};
 let vip = '';
 let vip_slave = '';
@@ -44,6 +52,8 @@ let os_type = '';
 let disk_percentage = 0;
 let total_running_containers = 0;
 let container_uptime = '';
+let network_rx = 0;
+let network_tx = 0;
 let running_containers = '';
 let container_mem_stats = '';
 let container_cpu_stats = '';
@@ -56,6 +66,11 @@ let memory_percentage = 0;
 let images = '';
 
 function monitoring() {
+  sysinfo.networkStats(data => {
+    network_tx = Math.round(data.tx_sec / 1000);
+    network_rx = Math.round(data.rx_sec / 1000);
+  });
+
   sysinfo.mem(data => {
     memory_total = data.total;
     memory_buffers = data.buffcache;
@@ -127,7 +142,9 @@ function monitoring() {
     });
 
     diskspace.check('/', (err, result) => {
-      disk_percentage = Math.round(result.used / result.total * 100);
+      if (!err) {
+        disk_percentage = Math.round(result.used / result.total * 100);
+      }
     });
 
     require('cpu-stats')(1000, (error, result) => {
@@ -180,15 +197,15 @@ function send_ping() {
         if (json_object.vip_detected === 'false' && found_vip === false) {
           console.log('\nVIP not detected on either machine. Bringing up the VIP on this host.');
           const cmd = ip_add_command;
-          exec(cmd).catch(err => {
-            console.log(err);
+          exec(cmd).catch(error2 => {
+            console.log(error2);
           });
         }
         if ((json_object.vip_detected === 'true' && found_vip === true)) {
           console.log('\nVIP detected on boths hosts! Stopping the VIP on this host.');
           const cmd = ip_delete_command;
-          exec(cmd).catch(err => {
-            console.log(err);
+          exec(cmd).catch(error2 => {
+            console.log(error2);
           });
         }
       }
@@ -221,27 +238,13 @@ app.get('/node-status', (req, res) => {
       container_mem_stats,
       container_cpu_stats,
       container_uptime,
+      network_rx,
+      network_tx,
       images,
       cpu_cores,
       memory_percentage
     });
     res.send(json_output);
-  }
-});
-
-app.post('/killvip', (req, res) => {
-  const check_token = req.body.token;
-  if (check_token !== token) {
-    return res.status(401).end('\nError: Invalid Credentials');
-  }
-
-  if (config.vip_ip) {
-    const cmd = ip_delete_command;
-    exec(cmd).then(() => {
-      res.end('\nCompleted.');
-    }).catch(err => {
-      console.log(err);
-    });
   }
 });
 
@@ -290,6 +293,9 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
     res.end('\nError: Invalid Credentials');
   } else {
     fs.readFile(req.file.path, (err, data) => {
+      if (err) {
+        console.log('\nError reading file: ' + err);
+      }
       let newPath = '../' + req.file.originalname;
       let config_file = '';
 
@@ -311,6 +317,7 @@ app.post('/receive-file', upload.single('file'), (req, res) => {
             if (req.file.originalname.indexOf('.zip') > -1) {
               unzipFile(newPath);
             }
+
             fs.unlink(req.file.path, error => {
               if (error) {
                 console.log(error);
@@ -365,10 +372,10 @@ app.post('/run', (req, res) => {
       // Console.log('output', log);
       output.output.push(`${log.stdout || ''}${log.stderr || ''}`);
       return cb();
-    }).catch(err => {
+    }).catch(error => {
       // Console.log('error', err);
-      output.output.push(`${err.stdout || ''}${err.stderr || ''}`);
-      return cb(err);
+      output.output.push(`${error.stdout || ''}${error.stderr || ''}`);
+      return cb(error);
     });
   }, err => {
     if (err) {
@@ -416,22 +423,32 @@ function bootstrapNode() {
       body: bootstrap_body
     };
 
-    request(options, (error, response, body) => {
-      if (error) {
-        console.log('Bootstrap failed due to an error or another bootstrap operation already in progress.\n');
-        console.log(error);
-        bootstrapNode();
-      } else {
-        const status = JSON.parse(body);
-        if (status.output > 0) {
-          console.log('Bootstrap successful.');
-          additional_services();
-        } else {
-          console.log('\nAnother bootstrap is in progress. Will try again soon.....');
+    try {
+      request(options, (error, response, body) => {
+        if (error) {
+          console.log('Bootstrap failed due to an error or another bootstrap operation already in progress.\n');
+          console.log(error);
           bootstrapNode();
+        } else {
+          try {
+            const status = JSON.parse(body);
+            if (status.output > 0) {
+              console.log('Bootstrap successful.');
+              additional_services();
+            } else {
+              console.log('\nAnother bootstrap is in progress. Will try again soon.....');
+              bootstrapNode();
+            }
+          } catch (error2) {
+            console.log('\n' + error2 + '\n' + JSON.stringify(body));
+            bootstrapNode();
+          }
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.log('\nAn error has occurred with bootstrapping. Trying again.......');
+      bootstrapNode();
+    }
   }, 3000);
 }
 
@@ -469,7 +486,9 @@ function additional_services() {
               return;
             }
             vip_slave = config.vip[i].slave;
-            const vip_eth_device = config.vip[i].vip_eth_device;
+            const {
+              vip_eth_device
+            } = config.vip[i];
             ip_add_command = 'ip addr add ' + config.vip_ip + '/32 dev ' + vip_eth_device;
             ip_delete_command = 'ip addr del ' + config.vip_ip + '/32 dev ' + vip_eth_device;
             vip_ping_time = config.vip[i].vip_ping_time;

@@ -1,4 +1,5 @@
 <html>
+
 <head>
 	<script src="/assets/jquery.min.js"></script>
 	<link rel="stylesheet" href="/assets/jquery-ui.css">
@@ -7,11 +8,12 @@
 	<link rel="stylesheet" href="/assets/picluster-iframe.css">
 	<script>
 		function exec() {
-			$.get("/log?token=" + parent.token, function(data) {
+			$.get("/log?token=" + parent.token, function (data) {
 				var output = data.replace(/(?:\r\n|\r|\n)/g, '<br />');
 				$("#command_output").val(data);
 			});
 		}
+
 	</script>
 </head>
 
@@ -35,12 +37,14 @@
 		var output_modal = document.getElementById('output');
 		var output_span = document.getElementsByClassName("close")[0];
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
 		output_modal.style.display = "block";
 
 		exec();
+
 	</script>
+
 </html>

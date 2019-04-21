@@ -145,21 +145,22 @@
 		var output_span = document.getElementsByClassName("close")[1];
 		var submit_button = document.getElementById("submit_button");
 
-		span.onclick = function() {
+		span.onclick = function () {
 			modal.style.display = "none";
 		}
 
-		output_span.onclick = function() {
+		output_span.onclick = function () {
 			output_modal.style.display = "none";
 		}
 
-		submit_button.onclick = function() {
+		submit_button.onclick = function () {
 			modal.style.display = "none";
 			output_modal.style.display = "block";
 			exec();
 		}
 
 		modal.style.display = "block";
+
 	</script>
 
 </html>
