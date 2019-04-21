@@ -11,7 +11,7 @@
 * Added Node Network Utilization Monitoring for Elasticsearch.
 * kibana-dashboards.json was merged into kibana-graphs.json for easier import.
 * Syslog, Exec, Clean Docker, KillVIP - Redone to work synchronously. 
-* Building a containe shows you the entire output and is done synchronously.
+* Building a container shows you the entire output and is done synchronously.
 
 ## Removed or Deprecated:
 * KillVIP has been removed from PiCluster.
